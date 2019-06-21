@@ -1,0 +1,46 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:SatisfactorySavegameTool"
+    xmlns:panels="clr-namespace:SatisfactorySavegameTool.Panels"
+	>
+
+    <Style TargetType="{x:Type panels:TreePanel}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type panels:TreePanel}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+	<Style TargetType="{x:Type panels:DetailsPanel}">
+		<!--<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type panels:DetailsPanel}">
+					<Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+					</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>-->
+	</Style>
+
+	<!--
+	Requires:
+		static StrControl() 
+		{
+			DefaultStyleKeyProperty.OverrideMetadata(typeof(StrControl), new FrameworkPropertyMetadata(typeof(StrControl)));
+		}
+	<Style TargetType="{x:Type panels:StrControl}" BasedOn="{StaticResource {x:Type TextBox}}">
+		<Setter Property="Background" Value="AliceBlue" />
+	</Style>
+	-->
+
+
+</ResourceDictionary>

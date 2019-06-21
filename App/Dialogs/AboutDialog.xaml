@@ -1,0 +1,28 @@
+﻿<Window x:Class="SatisfactorySavegameTool.Dialogs.AboutDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SatisfactorySavegameTool.Dialogs"
+		xmlns:lang="clr-namespace:CoreLib.Language.XAML;assembly=CoreLib"
+        mc:Ignorable="d"
+        Title="{lang:Translate Key=AboutDialog.Title}" Width="750" Height="500"
+		WindowStartupLocation="CenterOwner" ResizeMode="NoResize" ShowInTaskbar="False">
+	<Grid Margin="5,5">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*" />
+			<RowDefinition Height="10" />
+			<RowDefinition Height="26"/>
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+
+		<WebBrowser x:Name="Display" Grid.Row="0" 
+					ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden" />
+
+		<Button x:Name="CloseBtn" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Top"
+			Width="75" Height="21" Content="{lang:Translate Key=Close}" Click="Close_Click" />
+
+	</Grid>
+</Window>

@@ -1,0 +1,99 @@
+﻿<Window x:Class="SatisfactorySavegameTool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SatisfactorySavegameTool"
+		xmlns:panels="clr-namespace:SatisfactorySavegameTool.Panels"
+		xmlns:lang="clr-namespace:CoreLib.Language.XAML;assembly=CoreLib"
+        mc:Ignorable="d"
+        Title="{lang:Translate Key=MainWindow.Title}" Height="500" Width="800" Icon="Resources/Logo-128x128.png">
+
+	<DockPanel>
+
+		<Menu DockPanel.Dock="Top" HorizontalAlignment="Left" Background="White" BorderBrush="Black" >
+			<MenuItem Header="{lang:Translate Key=MainWindow.Menu.File}">
+				<MenuItem Header="{lang:Translate Key=MainWindow.Menu.File.Open}" 
+						  ToolTip="{lang:Translate Key=MainWindow.Menu.File.Open.TT}" 
+						  InputGestureText="{lang:Translate Key=MainWindow.Menu.File.Open.IG}" 
+						  Click="File_Open_Click" />
+				<MenuItem Header="{lang:Translate Key=MainWindow.Menu.File.Save}" 
+						  ToolTip="{lang:Translate Key=MainWindow.Menu.File.Save.TT}" 
+						  InputGestureText="{lang:Translate Key=MainWindow.Menu.File.Save.IG}" 
+						  x:Name="File_Save" Click="File_Save_Click" IsEnabled="False" />
+				<MenuItem Header="{lang:Translate Key=MainWindow.Menu.File.SaveAs}" 
+						  ToolTip="{lang:Translate Key=MainWindow.Menu.File.SaveAs.TT}" 
+						  x:Name="File_SaveAs" Click="File_SaveAs_Click" IsEnabled="False" />
+				<MenuItem Header="{lang:Translate Key=MainWindow.Menu.File.Close}" 
+						  ToolTip="{lang:Translate Key=MainWindow.Menu.File.Close.TT}" 
+						  InputGestureText="{lang:Translate Key=MainWindow.Menu.File.Close.IG}"
+						  x:Name="File_Close" Click="File_Close_Click" IsEnabled="False" />
+				<Separator/>
+				<MenuItem Header="{lang:Translate Key=MainWindow.Menu.File.Export}" 
+						  ToolTip="{lang:Translate Key=MainWindow.Menu.File.Export.TT}"
+						  x:Name="File_Export" Click="File_Export_Click" IsEnabled="False" />
+				<MenuItem Header="{lang:Translate Key=MainWindow.Menu.File.Import}" 
+						  ToolTip="{lang:Translate Key=MainWindow.Menu.File.Import.TT}" 
+						  x:Name="File_Import" Click="File_Import_Click" IsEnabled="False" />
+				<Separator/>
+				<MenuItem Header="{lang:Translate Key=MainWindow.Menu.File.MRU}" 
+						  x:Name="File_MRU" IsEnabled="False">
+					<MenuItem x:Name="Clear" 
+							  Header="{lang:Translate Key=MainWindow.Menu.File.MRU.ClearAll}" 
+							  ToolTip="{lang:Translate Key=MainWindow.Menu.File.MRU.ClearAll.TT}" 
+							  Tag="-1" IsEnabled="False" />
+					<Separator/>
+				</MenuItem>
+				<Separator/>
+				<MenuItem Header="{lang:Translate Key=MainWindow.Menu.File.Exit}" 
+						  ToolTip="{lang:Translate Key=MainWindow.Menu.File.Exit.TT}" 
+						  Click="File_Exit_Click" />
+			</MenuItem>
+			<MenuItem Header="{lang:Translate Key=MainWindow.Menu.Edit}">
+				<MenuItem Header="{lang:Translate Key=MainWindow.Menu.Edit.Options}" 
+						  ToolTip="{lang:Translate Key=MainWindow.Menu.Edit.Options.TT}" 
+						  Click="Edit_Options_Click" />
+			</MenuItem>
+			<MenuItem Header="{lang:Translate Key=MainWindow.Menu.Help}">
+				<MenuItem Header="{lang:Translate Key=MainWindow.Menu.Help.Changelog}" 
+						  ToolTip="{lang:Translate Key=MainWindow.Menu.Help.Changelog.TT}" 
+						  Click="Help_Changelog_Click" />
+				<MenuItem Header="{lang:Translate Key=MainWindow.Menu.Help.About}" 
+						  ToolTip="{lang:Translate Key=MainWindow.Menu.Help.About.TT}" 
+						  Click="Help_About_Click" />
+			</MenuItem>
+		</Menu>
+
+		<StatusBar DockPanel.Dock="Bottom" Background="Beige">
+			<StatusBarItem>
+				<TextBlock x:Name="StatBarText" Text="{lang:Translate Key=MainWindow.Menu.Statusbar.Ready}" />
+			</StatusBarItem>
+		</StatusBar>
+
+		<Grid x:Name="MainGrid" DockPanel.Dock="Left">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="4*" />
+				<ColumnDefinition Width="auto" />
+				<ColumnDefinition Width="6*" />
+			</Grid.ColumnDefinitions>
+
+			<panels:TreePanel x:Name="TreeView" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+							  BorderThickness="1" BorderBrush="DarkGray"
+							  VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
+							  SelectedItemChanged="TreeView_SelectedItemChanged" />
+
+			<GridSplitter Grid.Column="1" Width="3" Background="Gray" HorizontalAlignment="Center" VerticalAlignment="Stretch" 
+						  ShowsPreview="False" />
+
+			<Border Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="auto" Height="auto"
+				BorderThickness="1" BorderBrush="DarkGray">
+				<ScrollViewer HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="auto" Height="auto"
+							  ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" >
+					<panels:DetailsPanel x:Name="Details" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="auto" Height="auto" />
+				</ScrollViewer>
+			</Border>
+
+		</Grid>
+
+	</DockPanel>
+</Window>
