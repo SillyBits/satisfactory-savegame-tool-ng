@@ -16,8 +16,14 @@ namespace SatisfactorySavegameTool.Dialogs
 		{
 			InitializeComponent();
 
+			Icon = Application.Current.MainWindow.Icon;
+
+			if (parent == null)
+				parent = Application.Current.MainWindow;
 			Owner = parent;
-			Title = title;
+
+			if (!string.IsNullOrEmpty(title))
+				Title = title;
 
 			string filename = Path.Combine(App.RESOURCEPATH, App.LANGUAGE, "Changelog.res");
 			string content = File.ReadAllText(filename);

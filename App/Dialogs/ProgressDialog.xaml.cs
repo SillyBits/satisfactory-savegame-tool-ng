@@ -22,8 +22,15 @@ namespace SatisfactorySavegameTool.Dialogs
 		{
 			InitializeComponent();
 
+			Icon = Application.Current.MainWindow.Icon;
+
+			if (parent == null)
+				parent = Application.Current.MainWindow;
 			Owner = parent;
-			Title = title;
+
+			if (!string.IsNullOrEmpty(title))
+				Title = title;
+
 			Interval = interval;
 
 			// Bind our events
