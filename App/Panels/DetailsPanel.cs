@@ -386,11 +386,6 @@ namespace SatisfactorySavegameTool.Panels
 
 	internal class StrControl : TextBox, IValueContainer<string>
 	{
-		//static StrControl() 
-		//{
-		//	DefaultStyleKeyProperty.OverrideMetadata(typeof(StrControl), new FrameworkPropertyMetadata(typeof(StrControl)));
-		//}
-
 		internal StrControl(string val)
 			: base()
 		{

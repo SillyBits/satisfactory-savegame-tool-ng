@@ -33,7 +33,7 @@ namespace SatisfactorySavegameTool
 		{
 			string path;
 #if DEBUG
-			path = @"E:\GitHub\satisfactory-save-repairer-ng\App";
+			path = @"E:\GitHub\satisfactory-savegame-tool-ng\App";
 #else
 			/*TODO:
 			path = Process.GetCurrentProcess().StartInfo.WorkingDirectory;
@@ -43,7 +43,7 @@ namespace SatisfactorySavegameTool
 			}
 			if (path == "" || !Directory.Exists(path))
 			{
-				path = @"E:\GitHub\satisfactory-save-repairer-ng";
+				path = @"E:\GitHub\satisfactory-savegame-tool-ng";
 			}*/
 #endif
 

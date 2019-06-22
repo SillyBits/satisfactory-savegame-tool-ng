@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SatisfactorySavegameTool.Dialogs"
 		xmlns:lang="clr-namespace:CoreLib.Language.XAML;assembly=CoreLib"
         mc:Ignorable="d"
-        Title="ProgressDialog" Height="135" Width="500" 
+        Title="" Height="135" Width="500" 
 		WindowStartupLocation="CenterOwner" ResizeMode="NoResize" ShowInTaskbar="False">
     <Grid Margin="5,5">
 		<Grid.RowDefinitions>

@@ -27,14 +27,11 @@ namespace SatisfactorySavegameTool.Dialogs
 			Owner = parent;
 			Title = title;
 
-			//TODO: Based on image dimensions, eithre resize dialog or scale image
+			// Based on image dimensions, scale it down
 			double w = image.Width;
 			double h = image.Height;
 			if (w > 1024 && h > 1024)
-			{
-				// Scale down a bit
 				image = new TransformedBitmap(image, new ScaleTransform(0.5, 0.5));
-			}
 
 			Image.Source = image;
 		}

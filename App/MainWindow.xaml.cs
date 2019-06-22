@@ -25,7 +25,9 @@ namespace SatisfactorySavegameTool
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+
+#region Window core
+		public MainWindow()
 			: base()
         {
             InitializeComponent();
@@ -93,6 +95,7 @@ namespace SatisfactorySavegameTool
 
 			base.OnClosing(e);
 		}
+#endregion
 
 #region Menu "stuff"
 		protected void _UpdateMenuStates()
@@ -328,7 +331,6 @@ namespace SatisfactorySavegameTool
 			_UpdateMRU();
 		}
 #endregion
-
 
 	}
 
