@@ -14,10 +14,10 @@ namespace SatisfactorySavegameTool.Dialogs
 		public ChangelogDialog(Window parent, string title)
 			: base()
 		{
+			InitializeComponent();
+
 			Owner = parent;
 			Title = title;
-
-			InitializeComponent();
 
 			string filename = Path.Combine(App.RESOURCEPATH, App.LANGUAGE, "Changelog.res");
 			string content = File.ReadAllText(filename);

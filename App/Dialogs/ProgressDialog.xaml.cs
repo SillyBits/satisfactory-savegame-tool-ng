@@ -20,11 +20,11 @@ namespace SatisfactorySavegameTool.Dialogs
 		public ProgressDialog(Window parent, string title, int interval = 10000)
 			: base()
 		{
+			InitializeComponent();
+
 			Owner = parent;
 			Title = title;
 			Interval = interval;
-
-			InitializeComponent();
 
 			// Bind our events
 			_publisher = new Publisher(SynchronizationContext.Current);

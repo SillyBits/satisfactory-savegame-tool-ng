@@ -22,10 +22,10 @@ namespace SatisfactorySavegameTool.Dialogs
 		public ImageDialog(Window parent, string title, BitmapSource image)
 			: base()
 		{
+			InitializeComponent();
+
 			Owner = parent;
 			Title = title;
-
-			InitializeComponent();
 
 			//TODO: Based on image dimensions, eithre resize dialog or scale image
 			double w = image.Width;
