@@ -229,20 +229,39 @@ namespace SatisfactorySavegameTool.Panels
 			});
 		}
 
+		protected override void OnContextMenuOpening(ContextMenuEventArgs e)
+		{
+			TreeViewItem tvi = e.Source as TreeViewItem;
+			if (tvi == null)
+			{
+				e.Handled = true;
+				return;
+			}
+			if (!tvi.IsSelected)
+				tvi.IsSelected = true;
+
+			Property prop = tvi.Tag as Property;
+			if (prop == null)
+			{
+				e.Handled = true;
+				return;
+			}
+
+			base.OnContextMenuOpening(e);
+		}
 
 		private void Contextmenu_Inspect_Click(object sender, RoutedEventArgs e)
 		{
-			//throw new NotImplementedException();
 			TreeViewItem tvi = SelectedItem as TreeViewItem;
-			if (tvi != null)
-			{
-				Property prop = tvi.Tag as Property;
-				if (prop != null)
-				{
-					var dlg = new PropertyDumpDialog(Application.Current.MainWindow, "", prop);
-					dlg.ShowDialog();
-				}
-			}
+			if (tvi == null)
+				return;
+
+			Property prop = tvi.Tag as Property;
+			if (prop == null)
+				return;
+
+			var dlg = new PropertyDumpDialog(Application.Current.MainWindow, "", prop);
+			dlg.ShowDialog();
 		}
 
 	}
