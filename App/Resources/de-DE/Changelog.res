@@ -1,5 +1,6 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
+<meta charset="UTF-8">
 <head>
 <style type='text/css'>
 html { overflow:hidden;/*as long the changelog is this short*/ }
