@@ -52,9 +52,13 @@
 
 	<ChangelogDialog.Title>Changelog ...</ChangelogDialog.Title>
 
+	<TreePanel.Context.Inspect>Inspect ...</TreePanel.Context.Inspect>
+	
 	<ImageDialog.Title>Image</ImageDialog.Title>
 
 	<ImageControl.Label>Bitmap of size {0}x{1} and color depth {2}</ImageControl.Label>
 	<ImageControl.Button>Show ...</ImageControl.Button>
 
+	<PropertyDumpDialog.Title>Details</PropertyDumpDialog.Title>
+	
 </translation>

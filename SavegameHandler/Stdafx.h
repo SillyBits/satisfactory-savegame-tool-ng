@@ -26,4 +26,5 @@ using namespace PubSub;
 #include "Types.h"
 #include "Reader.h"
 #include "Properties.h"
+#include "PropertyDumper.h"
 //#include "SavegameHandler.h"

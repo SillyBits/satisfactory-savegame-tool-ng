@@ -33,6 +33,9 @@
     <ClInclude Include="Properties.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="PropertyDumper.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SavegameHandler.cpp">

@@ -79,6 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Properties.h" />
+    <ClInclude Include="PropertyDumper.h" />
     <ClInclude Include="Reader.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SavegameHandler.h" />

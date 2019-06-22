@@ -52,9 +52,13 @@
 
 	<ChangelogDialog.Title>Änderungsprotokoll ...</ChangelogDialog.Title>
 
+	<TreePanel.Context.Inspect>Details ...</TreePanel.Context.Inspect>
+	
 	<ImageDialog.Title>Bild</ImageDialog.Title>
 	
 	<ImageControl.Label>Bild der Größe {0}x{1}, Farbtiefe {2}</ImageControl.Label>
 	<ImageControl.Button>Anzeigen ...</ImageControl.Button>
 	
+	<PropertyDumpDialog.Title>Details</PropertyDumpDialog.Title>
+
 </translation>

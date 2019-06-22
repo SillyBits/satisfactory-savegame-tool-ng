@@ -8,6 +8,8 @@ using System.Windows.Threading;
 using CoreLib;
 using Savegame.Properties;
 
+using SatisfactorySavegameTool.Dialogs;
+
 namespace SatisfactorySavegameTool.Panels
 {
 	/*
@@ -19,6 +21,17 @@ namespace SatisfactorySavegameTool.Panels
 
 	public class TreePanel : TreeView
 	{
+		public TreePanel()
+			: base()
+		{
+			ContextMenu = new ContextMenu();
+
+			MenuItem item = new MenuItem() {
+				Header = Translate._("TreePanel.Context.Inspect"),
+			};
+			item.Click += Contextmenu_Inspect_Click;
+			ContextMenu.Items.Add(item);
+		}
 
 		public void CreateTree(Savegame.Savegame savegame, ICallback callback)
 		{
@@ -214,6 +227,21 @@ namespace SatisfactorySavegameTool.Panels
 			});
 		}
 
+
+		private void Contextmenu_Inspect_Click(object sender, RoutedEventArgs e)
+		{
+			//throw new NotImplementedException();
+			TreeViewItem tvi = SelectedItem as TreeViewItem;
+			if (tvi != null)
+			{
+				Property prop = tvi.Tag as Property;
+				if (prop != null)
+				{
+					var dlg = new PropertyDumpDialog(Application.Current.MainWindow, "", prop);
+					dlg.ShowDialog();
+				}
+			}
+		}
 
 	}
 }
