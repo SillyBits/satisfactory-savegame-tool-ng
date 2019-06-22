@@ -65,11 +65,13 @@ namespace SatisfactorySavegameTool.Panels
 
 		private void CreateSimpleTree(Savegame.Savegame savegame, TreeViewItem root)
 		{
-			TreeViewItem objects = AddItem(root, string.Format("Objects ({0} elements)", savegame.Objects.Count), null);
+			String label = string.Format(Translate._("TreePanel.Tree.Objects"), savegame.Objects.Count);
+			TreeViewItem objects = AddItem(root, label, null);
 			foreach (Property prop in savegame.Objects)
 				AddItem(objects, prop.ToString(), prop);
 
-			TreeViewItem collected = AddItem(root, string.Format("Collected ({0} elements)", savegame.Collected.Count), null);
+			label = string.Format(Translate._("TreePanel.Tree.Collected"), savegame.Collected.Count);
+			TreeViewItem collected = AddItem(root, label, null);
 			foreach (Property prop in savegame.Collected)
 				AddItem(collected, prop.ToString(), prop);
 

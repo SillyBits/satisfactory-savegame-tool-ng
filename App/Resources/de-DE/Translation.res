@@ -44,7 +44,7 @@
 	<MainWindow.LoadGamefile.Title>Spielstand auswählen</MainWindow.LoadGamefile.Title>
 	<MainWindow.LoadGamefile.Filter>Spielstände (*.sav)|*.sav|Alle Dateien (*.*)|*.*</MainWindow.LoadGamefile.Filter>
 	<MainWindow.LoadGamefile.Progress.Title>Lade Spielstand ...</MainWindow.LoadGamefile.Progress.Title>
-	<MainWindow.LoadGamefile.Progress.CounterFormat>{0:#,#} / {1:#,#} bytes</MainWindow.LoadGamefile.Progress.CounterFormat>
+	<MainWindow.LoadGamefile.Progress.CounterFormat>{0:#,#} / {1:#,#} Bytes</MainWindow.LoadGamefile.Progress.CounterFormat>
 	<MainWindow.LoadGamefile.Progress.Title.2>Erzeuge Baumstruktur ...</MainWindow.LoadGamefile.Progress.Title.2>
 	<MainWindow.LoadGamefile.Progress.CounterFormat.2>{0:#,#} / {1:#,#} Elemente</MainWindow.LoadGamefile.Progress.CounterFormat.2>
 
@@ -54,9 +54,14 @@
 
 	<TreePanel.Context.Inspect>Details ...</TreePanel.Context.Inspect>
 	
+	<TreePanel.Tree.Objects>Objekte ({0} Elemente)</TreePanel.Tree.Objects>
+	<TreePanel.Tree.Collected>Sammlung ({0} Elemente)</TreePanel.Tree.Collected>
+
+	<DetailsPanel.Empty>&lt;leer&gt;</DetailsPanel.Empty>
+
 	<ImageDialog.Title>Bild</ImageDialog.Title>
 	
-	<ImageControl.Label>Bild der Größe {0}x{1}, Farbtiefe {2}</ImageControl.Label>
+	<ImageControl.Label>Bild der Größe {0}x{1} mit {2} Farbkanälen</ImageControl.Label>
 	<ImageControl.Button>Anzeigen ...</ImageControl.Button>
 	
 	<PropertyDumpDialog.Title>Details</PropertyDumpDialog.Title>

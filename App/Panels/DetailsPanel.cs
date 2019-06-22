@@ -18,6 +18,8 @@ namespace SatisfactorySavegameTool.Panels
 
 	public class DetailsPanel : StackPanel
 	{
+		internal static readonly string EMPTY = Translate._("DetailsPanel.Empty");
+
 		public DetailsPanel()
 			: base()
 		{ }
@@ -437,7 +439,7 @@ namespace SatisfactorySavegameTool.Panels
 				System.Windows.Media.Color c = 
 					System.Windows.Media.Color.FromArgb(value.A, value.R, value.G, value.B);
 				Background = new SolidColorBrush(c);
-				Content = string.Format("{0} / {1} / {2} / {3}", value.R, value.G, value.B, value.A);
+				Content = string.Format("R:{0} / G:{1} / B:{2} / A:{3}", value.R, value.G, value.B, value.A);
 			}
 		}
 
@@ -462,7 +464,7 @@ namespace SatisfactorySavegameTool.Panels
 				System.Windows.Media.Color c = 
 					System.Windows.Media.Color.FromScRgb(value.A, value.R, value.G, value.B);
 				Background = new SolidColorBrush(c);
-				Content = string.Format("{0:F7} / {1:F7} / {2:F7} / {3:F7}", value.R, value.G, value.B, value.A);
+				Content = string.Format("R:{0:F7} / G:{1:F7} / B:{2:F7} / A:{3:F7}", value.R, value.G, value.B, value.A);
 			}
 		}
 
@@ -653,7 +655,7 @@ namespace SatisfactorySavegameTool.Panels
 	internal class ObjectControl : SimpleValueControl<string>
 	{
 		internal ObjectControl(string label, ObjectProperty val)
-			: base(label, val.Name != null ? val.Name.ToString() : "None")
+			: base(label, val.Name != null ? val.Name.ToString() : DetailsPanel.EMPTY)
 		{ }
 	}
 
@@ -692,7 +694,7 @@ namespace SatisfactorySavegameTool.Panels
 				return new IntControl((int) val);
 			else if (val is float)
 				return new FloatControl((float) val);
-			return new StrControl(val != null ? val.ToString() : "<empty>");
+			return new StrControl(val != null ? val.ToString() : DetailsPanel.EMPTY);
 		}
 
 		internal static ValueControl CreateSimple(string label, object val, bool read_only = false)

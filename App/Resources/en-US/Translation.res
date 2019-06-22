@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<translation langid="en-DE" version="0.1">
+<translation langid="en-US" version="0.1">
 
 	<Ok>Ok</Ok>
 	<Cancel>Cancel</Cancel>
@@ -47,16 +47,21 @@
 	<MainWindow.LoadGamefile.Progress.CounterFormat>{0:#,#} / {1:#,#} bytes</MainWindow.LoadGamefile.Progress.CounterFormat>
 	<MainWindow.LoadGamefile.Progress.Title.2>Building tree ...</MainWindow.LoadGamefile.Progress.Title.2>
 	<MainWindow.LoadGamefile.Progress.CounterFormat.2>{0:#,#} / {1:#,#} elements</MainWindow.LoadGamefile.Progress.CounterFormat.2>
-
+	
 	<AboutDialog.Title>About ...</AboutDialog.Title>
 
 	<ChangelogDialog.Title>Changelog ...</ChangelogDialog.Title>
 
 	<TreePanel.Context.Inspect>Inspect ...</TreePanel.Context.Inspect>
 	
+	<TreePanel.Tree.Objects>Objects ({0} elements)</TreePanel.Tree.Objects>
+	<TreePanel.Tree.Collected>Collected ({0} elements)</TreePanel.Tree.Collected>
+
+	<DetailsPanel.Empty>&lt;empty&gt;</DetailsPanel.Empty>
+	
 	<ImageDialog.Title>Image</ImageDialog.Title>
 
-	<ImageControl.Label>Bitmap of size {0}x{1} and color depth {2}</ImageControl.Label>
+	<ImageControl.Label>Bitmap of size {0}x{1} with {2} color channels</ImageControl.Label>
 	<ImageControl.Button>Show ...</ImageControl.Button>
 
 	<PropertyDumpDialog.Title>Details</PropertyDumpDialog.Title>
