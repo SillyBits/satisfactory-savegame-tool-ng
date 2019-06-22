@@ -126,8 +126,23 @@ namespace Savegame
 
 					if (cad->AttributeType == Publish::typeid)
 					{
-						Log::Debug("- " + mi);
-						published->Add(mi->Name, mi);
+						if (!published->ContainsKey(mi->Name))
+						{
+							Log::Debug("- " + mi);
+							published->Add(mi->Name, mi);
+						}
+						else
+						{
+							// Member with this name added already 
+							// (mostly on .Value with its type changing)
+							// So we do replace the inherited one,
+							// or skip this if its the inherited
+							if (published[mi->Name]->DeclaringType != t)
+							{
+								// Inherited was stored earlier -> replace
+								published[mi->Name] = mi;
+							}
+						}
 					}
 				}
 
@@ -412,7 +427,7 @@ namespace Savegame
 
 	CLS_(ByteProperty, ValueProperty)
 		PUB(Unknown,str^)
-		PUB(Value,Object^)
+		//PUB(Value,Object^)
 		READ
 			Unknown = reader->ReadString();
 			CheckNullByte(reader);
