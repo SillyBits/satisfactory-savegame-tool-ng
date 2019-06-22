@@ -30,8 +30,17 @@ namespace SatisfactorySavegameTool.Panels
 			_ClearAll();
 
 			Log.Info("Adding property {0}", prop);
-			Expando exp = _Add(null, null, prop);
-			exp.IsExpanded = true;
+			Expando exp;
+			if (prop == null)
+			{
+				exp = _Add(null, Translate._("DetailsPanel.Empty"), prop);
+				exp.IsEnabled = false;
+			}
+			else
+			{
+				exp = _Add(null, null, prop);
+				exp.IsExpanded = true;
+			}
 			Children.Add(exp);
 		}
 
@@ -207,7 +216,7 @@ namespace SatisfactorySavegameTool.Panels
 						foreach (object obj in e)
 						{
 							if (obj is Property)
-								_Add(sub_exp, "*" + obj.ToString(), (Property)obj);
+								_Add(sub_exp, name/*"*" + obj.ToString()*/, (Property)obj);
 							//else?
 						}
 				}

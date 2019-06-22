@@ -202,9 +202,14 @@ namespace SatisfactorySavegameTool
 #endregion
 
 #region Control events
-		private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		public void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
-			TreeViewItem tvi = TreeView.SelectedItem as TreeViewItem;
+			TreeView tv = sender as TreeView;
+			if (tv == null)
+				return;
+			TreeViewItem tvi = tv.SelectedItem as TreeViewItem;
+			if (tvi == null)
+				return;
 			Property prop = tvi.Tag as Property;
 			Details.ShowProperty(prop);
 		}
@@ -239,7 +244,8 @@ namespace SatisfactorySavegameTool
 				Log.Info("Creating tree ...");
 				progress.CounterFormat = Translate._("MainWindow.LoadGamefile.Progress.CounterFormat.2");
 				progress.Interval = 1000;
-				TreeView.CreateTree(CurrFile, progress.Events);
+				//TreeView.CreateTree(CurrFile, progress.Events);
+				TreeView.CreateTrees(CurrFile, progress.Events);
 				Log.Info("... finished creating tree");
 
 				DateTime end_time = DateTime.Now;

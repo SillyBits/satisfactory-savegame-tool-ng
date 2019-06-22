@@ -18,12 +18,50 @@ namespace SatisfactorySavegameTool.Panels
 	 * - Add better tree style handling
 	 * 
 	 */
-
-	public class TreePanel : TreeView
+	
+	public class TreePanel : TabControl
 	{
 		public TreePanel()
 			: base()
 		{
+			_tabSimple = new TabItem() { Header = "Simple", };
+			_treeSimple = new SimpleTree();
+			_tabSimple.Content = _treeSimple;
+			AddChild(_tabSimple);
+
+			_tabClasses = new TabItem() { Header = "Classes", };
+			_treeClasses = new ClassesTree();
+			_tabClasses.Content = _treeClasses;
+			AddChild(_tabClasses);
+		}
+
+		public void CreateTrees(Savegame.Savegame savegame, ICallback callback)
+		{
+			_treeSimple.CreateTree(savegame, callback);
+			_treeClasses.CreateTree(savegame, callback);
+
+			Dispatcher.Invoke(() => SelectedItem = _tabClasses);
+		}
+
+		internal TabItem _tabSimple;
+		internal BasicTree _treeSimple;
+
+		internal TabItem _tabClasses;
+		internal BasicTree _treeClasses;
+
+	}
+
+
+	public abstract class BasicTree : TreeView
+	{
+		public BasicTree()
+			: base()
+		{
+			SetValue(VirtualizingPanel.IsVirtualizingProperty, true);
+			SetValue(VirtualizingPanel.VirtualizationModeProperty, VirtualizationMode.Recycling);
+
+			SelectedItemChanged += (Application.Current.MainWindow as SatisfactorySavegameTool.MainWindow).TreeView_SelectedItemChanged;
+
 			ContextMenu = new ContextMenu();
 
 			MenuItem item = new MenuItem() {
@@ -33,12 +71,14 @@ namespace SatisfactorySavegameTool.Panels
 			ContextMenu.Items.Add(item);
 		}
 
+
 		public void CreateTree(Savegame.Savegame savegame, ICallback callback)
 		{
 			_callback = callback;
 
 			//int extra = 3; // SimpleTree
-			int extra = 150; // ClassesTree
+			//int extra = 150; // ClassesTree
+			int extra = NoOfExtraElements;
 
 			Dispatcher.Invoke(() => {
 				Items.Clear();
@@ -47,13 +87,12 @@ namespace SatisfactorySavegameTool.Panels
 
 			_count = 0;
 
-			TreeViewItem root = AddItem(null, System.IO.Path.GetFileName(savegame.Filename), null);
+			TreeViewItem root = _AddItem(null, System.IO.Path.GetFileName(savegame.Filename), null);
 			Dispatcher.Invoke(() => {
 				root.Tag = savegame.Header;
 			});
 
-			//CreateSimpleTree(savegame, root);
-			CreateClassesTree(savegame, root);
+			_CreateTree(savegame, root);
 
 			Dispatcher.Invoke(() => {
 				root.IsExpanded = true;
@@ -63,157 +102,14 @@ namespace SatisfactorySavegameTool.Panels
 		}
 
 
-		private void CreateSimpleTree(Savegame.Savegame savegame, TreeViewItem root)
-		{
-			String label = string.Format(Translate._("TreePanel.Tree.Objects"), savegame.Objects.Count);
-			TreeViewItem objects = AddItem(root, label, null);
-			foreach (Property prop in savegame.Objects)
-				AddItem(objects, prop.ToString(), prop);
-
-			label = string.Format(Translate._("TreePanel.Tree.Collected"), savegame.Collected.Count);
-			TreeViewItem collected = AddItem(root, label, null);
-			foreach (Property prop in savegame.Collected)
-				AddItem(collected, prop.ToString(), prop);
-
-			//if self.__savegame.Missing:
-			//	label = "Missing"
-			//	self.__add(self.root, label, self.__savegame.Missing)
-		}
-
-		private void CreateClassesTree(Savegame.Savegame savegame, TreeViewItem root)
-		{
-			_classes = new Dictionary<string,TreeViewItem>();
-
-			foreach (Property prop in savegame.Objects)
-				AddClassRecurs(root, "/", prop);
-
-			//foreach (Property prop in savegame.Collected)
-			//	AddClassRecurs(root, "/", (Savegame.Properties.Object) prop);
-
-			//if self.__savegame.Missing:
-			//	label = "Missing"
-			//	self.__add(self.root, label, self.__savegame.Missing)
-		}
-
-		private TreeViewItem AddClassRecurs(TreeViewItem parent, string path, Savegame.Properties.Property prop)
-		{
-			string classname, fullname, label;
-			TreeViewItem class_item;
-
-			string ClassName, PathName;
-			if (prop.TypeName == "Object")
-			{
-				Savegame.Properties.Object obj = (Savegame.Properties.Object) prop;
-				ClassName = obj.ClassName.ToString();
-				PathName = obj.PathName.ToString();
-			}
-			else if (prop.TypeName == "Actor")
-			{
-				Actor actor = (Actor) prop;
-				ClassName = actor.ClassName.ToString();
-				PathName = actor.PathName.ToString();
-			}
-			else
-				throw new Exception(string.Format("Can't handle {0}", prop));
-
-			string remain = ClassName.Substring(path.Length);
-			if (remain.Contains('/'))
-			{
-				classname = remain.Split('/')[0];
-				fullname = path + classname + "/";
-				//if not fullname in self.__classes:
-				//	class_item = self.__add(parent_item, classname)
-				//	self.__classes[fullname] = class_item
-				//else:
-				//	class_item = self.__classes[fullname]
-				class_item = AddOrGetClass(parent, fullname, classname);
-				return AddClassRecurs(class_item, fullname, prop);
-			}
-			if (remain.Contains('.'))
-			{
-				string[] classnames = remain.Split('.');
-				if (classnames.Length == 2)
-				{
-					/*
-					if (classnames[0] + "_C" == classnames[1])
-					{
-						// Ignore [1]
-						//return self.__add(parent_item, classnames[0], prop)
-						fullname = path + classnames[0] + ".";
-						classname = classnames[0];
-						class_item = AddOrGetClass(parent, fullname, classnames[0]);
-					}
-					else
-					{
-						// Add both?
-						fullname = path + classnames[0] + ".";
-						class_item = AddOrGetClass(parent, fullname, classnames[0]);
-					
-						fullname += classnames[1];
-						class_item = AddOrGetClass(class_item, fullname, classnames[1]);
-					}
-					*/
-					fullname = path + classnames[0] + ".";
-					class_item = AddOrGetClass(parent, fullname, classnames[0]);
-
-					// Ignore [1] or add both?
-					if (classnames[0] + "_C" != classnames[1])
-					{
-						fullname += classnames[1];
-						class_item = AddOrGetClass(class_item, fullname, classnames[1]);
-					}
-
-					label = PathName;
-					label = label.Substring(label.IndexOf('.') + 1);
-					return AddItem(class_item, label, prop);
-				}
-				Log.Warning("AddClassRecurd: What to do with '{0}'?", ClassName);
-			/*
-				fullname = parent_class + classname + "."
-				if not fullname in self.__classes:
-					class_item = self.__add(parent_item, classname)
-					self.__classes[fullname] = class_item
-				else:
-					class_item = self.__classes[fullname]
-				return self.__add_class_recurs(class_item, fullname, prop)
-			*/
-			}
-
-			/*
-			if prop.ClassName.startswith("/Script/") and remain:
-				fullname = prop.ClassName
-				if not fullname in self.__classes:
-					class_item = self.__add(parent_item, remain)
-					self.__classes[fullname] = class_item
-				else:
-					class_item = self.__classes[fullname]
-				parent_item = class_item
-			*/
-	
-			// At the end of our path, now add property
-			//return self.__add(parent_item, remain, prop)
-			//label = prop.PathName.split(".")[1:]
-			label = PathName;
-			label = label.Substring(label.IndexOf('.') + 1);
-			return AddItem(parent, label, prop);
-		}
-
-		private TreeViewItem AddOrGetClass(TreeViewItem parent, string fullname, string classname)
-		{
-			if (_classes.ContainsKey(fullname))
-				return _classes[fullname];
-			TreeViewItem class_item = AddItem(parent, classname);
-			_classes.Add(fullname, class_item);
-			return class_item;
-		}
-
-		private Dictionary<string,TreeViewItem> _classes;
+		internal abstract int NoOfExtraElements { get; }
+		internal abstract void _CreateTree(Savegame.Savegame savegame, TreeViewItem root);
 
 
-		private ICallback _callback;
-		private int _count;
+		internal ICallback _callback;
+		internal int _count;
 
-		private TreeViewItem AddItem(TreeViewItem parent, string label, Property prop = null)
+		internal TreeViewItem _AddItem(TreeViewItem parent, string label, Property prop = null)
 		{
 			_count ++;
 			return Dispatcher.Invoke(() => {
@@ -228,6 +124,7 @@ namespace SatisfactorySavegameTool.Panels
 				return item;
 			});
 		}
+
 
 		protected override void OnContextMenuOpening(ContextMenuEventArgs e)
 		{
@@ -265,4 +162,174 @@ namespace SatisfactorySavegameTool.Panels
 		}
 
 	}
+
+
+	public class SimpleTree : BasicTree
+	{
+		public SimpleTree()
+			: base()
+		{ }
+
+		internal override int NoOfExtraElements { get { return 3; } }
+
+		internal override void _CreateTree(Savegame.Savegame savegame, TreeViewItem root)
+		{
+			String label = string.Format(Translate._("TreePanel.Tree.Objects"), savegame.Objects.Count);
+			TreeViewItem objects = _AddItem(root, label, null);
+			foreach (Property prop in savegame.Objects)
+				_AddItem(objects, prop.ToString(), prop);
+
+			label = string.Format(Translate._("TreePanel.Tree.Collected"), savegame.Collected.Count);
+			TreeViewItem collected = _AddItem(root, label, null);
+			foreach (Property prop in savegame.Collected)
+				_AddItem(collected, prop.ToString(), prop);
+
+			//if self.__savegame.Missing:
+			//	label = "Missing"
+			//	self.__add(self.root, label, self.__savegame.Missing)
+		}
+
+	}
+
+
+	public class ClassesTree : BasicTree
+	{
+		public ClassesTree()
+			: base()
+		{ }
+
+		internal override int NoOfExtraElements { get { return 150; } }
+
+		internal override void _CreateTree(Savegame.Savegame savegame, TreeViewItem root)
+		{
+			_classes = new Dictionary<string,TreeViewItem>();
+
+			foreach (Property prop in savegame.Objects)
+				_AddClassRecurs(root, "/", prop);
+
+			//foreach (Property prop in savegame.Collected)
+			//	AddClassRecurs(root, "/", (Savegame.Properties.Object) prop);
+
+			//if self.__savegame.Missing:
+			//	label = "Missing"
+			//	self.__add(self.root, label, self.__savegame.Missing)
+		}
+
+		internal TreeViewItem _AddClassRecurs(TreeViewItem parent, string path, Savegame.Properties.Property prop)
+		{
+			string classname, fullname, label;
+			TreeViewItem class_item;
+
+			string ClassName, PathName;
+			if (prop.TypeName == "Object")
+			{
+				Savegame.Properties.Object obj = (Savegame.Properties.Object) prop;
+				ClassName = obj.ClassName.ToString();
+				PathName = obj.PathName.ToString();
+			}
+			else if (prop.TypeName == "Actor")
+			{
+				Actor actor = (Actor) prop;
+				ClassName = actor.ClassName.ToString();
+				PathName = actor.PathName.ToString();
+			}
+			else
+				throw new Exception(string.Format("Can't handle {0}", prop));
+
+			string remain = ClassName.Substring(path.Length);
+			if (remain.Contains('/'))
+			{
+				classname = remain.Split('/')[0];
+				fullname = path + classname + "/";
+				//if not fullname in self.__classes:
+				//	class_item = self.__add(parent_item, classname)
+				//	self.__classes[fullname] = class_item
+				//else:
+				//	class_item = self.__classes[fullname]
+				class_item = _AddOrGetClass(parent, fullname, classname);
+				return _AddClassRecurs(class_item, fullname, prop);
+			}
+			if (remain.Contains('.'))
+			{
+				string[] classnames = remain.Split('.');
+				if (classnames.Length == 2)
+				{
+					/*
+					if (classnames[0] + "_C" == classnames[1])
+					{
+						// Ignore [1]
+						//return self.__add(parent_item, classnames[0], prop)
+						fullname = path + classnames[0] + ".";
+						classname = classnames[0];
+						class_item = AddOrGetClass(parent, fullname, classnames[0]);
+					}
+					else
+					{
+						// Add both?
+						fullname = path + classnames[0] + ".";
+						class_item = AddOrGetClass(parent, fullname, classnames[0]);
+					
+						fullname += classnames[1];
+						class_item = AddOrGetClass(class_item, fullname, classnames[1]);
+					}
+					*/
+					fullname = path + classnames[0] + ".";
+					class_item = _AddOrGetClass(parent, fullname, classnames[0]);
+
+					// Ignore [1] or add both?
+					if (classnames[0] + "_C" != classnames[1])
+					{
+						fullname += classnames[1];
+						class_item = _AddOrGetClass(class_item, fullname, classnames[1]);
+					}
+					//TODO: Add BP_... and FG...
+
+					label = PathName;
+					label = label.Substring(label.IndexOf('.') + 1);
+					return _AddItem(class_item, label, prop);
+				}
+				Log.Warning("AddClassRecurd: What to do with '{0}'?", ClassName);
+			/*
+				fullname = parent_class + classname + "."
+				if not fullname in self.__classes:
+					class_item = self.__add(parent_item, classname)
+					self.__classes[fullname] = class_item
+				else:
+					class_item = self.__classes[fullname]
+				return self.__add_class_recurs(class_item, fullname, prop)
+			*/
+			}
+
+			/*
+			if prop.ClassName.startswith("/Script/") and remain:
+				fullname = prop.ClassName
+				if not fullname in self.__classes:
+					class_item = self.__add(parent_item, remain)
+					self.__classes[fullname] = class_item
+				else:
+					class_item = self.__classes[fullname]
+				parent_item = class_item
+			*/
+	
+			// At the end of our path, now add property
+			//return self.__add(parent_item, remain, prop)
+			//label = prop.PathName.split(".")[1:]
+			label = PathName;
+			label = label.Substring(label.IndexOf('.') + 1);
+			return _AddItem(parent, label, prop);
+		}
+
+		internal TreeViewItem _AddOrGetClass(TreeViewItem parent, string fullname, string classname)
+		{
+			if (_classes.ContainsKey(fullname))
+				return _classes[fullname];
+			TreeViewItem class_item = _AddItem(parent, classname);
+			_classes.Add(fullname, class_item);
+			return class_item;
+		}
+
+		internal Dictionary<string,TreeViewItem> _classes;
+
+	}
+
 }
