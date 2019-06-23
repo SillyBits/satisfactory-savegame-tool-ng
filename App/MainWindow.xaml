@@ -78,8 +78,7 @@
 			</Grid.ColumnDefinitions>
 
 			<panels:TreePanel x:Name="TreeView" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
-							  BorderThickness="1" BorderBrush="DarkGray" TabStripPlacement="Bottom"
-							  /><!-- SelectedItemChanged="TreeView_SelectedItemChanged" -->
+							  BorderThickness="1" BorderBrush="DarkGray" TabStripPlacement="Bottom" />
 
 			<GridSplitter Grid.Column="1" Width="3" Background="Gray" HorizontalAlignment="Center" VerticalAlignment="Stretch" 
 						  ShowsPreview="False" />

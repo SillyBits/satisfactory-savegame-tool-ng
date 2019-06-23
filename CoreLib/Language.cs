@@ -74,7 +74,12 @@ namespace CoreLib
 				Log.Warning("Missing translation for id '{0}'", id);
 				return "[" + id + "]";
 			}
-			return _translations[id];
+			string t = _translations[id];
+			if (t.Contains("\\t"))
+				t = t.Replace("\\t", "\t");
+			if (t.Contains("\\n"))
+				t = t.Replace("\\n", "\n");
+			return t;
 		}
 
 

@@ -45,6 +45,7 @@ namespace SatisfactorySavegameTool
 			{
 				path = @"E:\GitHub\satisfactory-savegame-tool-ng";
 			}*/
+			path = @"E:\GitHub\satisfactory-savegame-tool-ng\App";
 #endif
 
 			APPPATH = path;
@@ -57,7 +58,12 @@ namespace SatisfactorySavegameTool
 			// Setup initial language, if any specified
 			if (Config.Root.HasSection("core") && Config.Root.core.HasItem("language"))
 			{
+				Log.Info("Language: {0}", Thread.CurrentThread.CurrentUICulture.Name);
+#if DEBUG
+				string langid = "en-US";
+#else
 				string langid = Config.Root.core.language;
+#endif
 				if (string.IsNullOrEmpty(langid))
 					langid = Thread.CurrentThread.CurrentUICulture.Name;
 				_languages.SelectLanguage(langid);

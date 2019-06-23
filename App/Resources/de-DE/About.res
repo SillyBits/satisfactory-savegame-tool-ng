@@ -16,11 +16,11 @@ td { vertical-align:center; }
 </tr></table>
 <br/>
 <br/>
-Dieses Programm erlaubt das überarbeiten von Satisfactory Spielständen und zeigt u.a. 
-Informationen über defekte Objekte an welche dann per Klick entfernt werden können.<br/>
+Dieses Programm erlaubt das Überarbeiten von Satisfactory Spielständen und zeigt u.a. 
+Informationen über defekte Objekte an, welche dann per Klick entfernt werden können.<br/>
 <br/>
 Es wurde komplett in C#/C++ implementiert und ist um Welten schneller als der
-alte <b>Satisfactory Spielstand Überprüfer</b> der rein in Python entwickelt wurde.<br/>
+alte <b>Satisfactory Spielstand Überprüfer</b>, der rein in Python entwickelt wurde.<br/>
 Sein Quellcode kann unter 
 <a href='https://github.com/SillyBits/satisfactory-savegame-tool-ng/' target='_blank'>
 https://github.com/SillyBits/satisfactory-savegame-tool-ng/</a>
@@ -29,7 +29,7 @@ Auf <a href='https://www.satisfactory-forum.de' target='_blank'>https://www.sati
 besteht die Möglichkeit eine ausführbare Anwendung herunterzuladen.<br/>
 <br/>
 <br/>
-Dank an <i>bitowl</i>, <i>S4XXX</i> und <i>Goz3rr</i> für ihre Vorarbeit bzgl. der 
+Danke an <i>bitowl</i>, <i>S4XXX</i> und <i>Goz3rr</i> für ihre Vorarbeit bzgl. der 
 Struktur von Satisfactory Spielständen.<br/>
 <br/>
 <br/>
