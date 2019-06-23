@@ -162,7 +162,7 @@ namespace Savegame
 		Property^ Parent;
 
 		/*[Publish]*/ String^ TypeName;//TODO: Use a property instead to reduce memory usage
-		/*[Publish]*/ List<String^> Errors; //TODO:
+		/*[Publish]*/ List<String^>^ Errors = nullptr; //TODO:
 
 
 		Property(Property^ parent)
@@ -279,8 +279,16 @@ namespace Savegame
 
 		// Used to store error info discovered by validator
 		//TODO: Move those somewhere else?
-		property bool HasErrors { bool get() { return (Errors.Count > 0); }}
-		void AddError(String^ err) { Errors.Add(err); }
+		property bool HasErrors 
+		{ 
+			bool get() { return (Errors != nullptr && Errors->Count > 0); }
+		}
+		void AddError(String^ err) 
+		{ 
+			if (Errors == nullptr)
+				Errors = gcnew List<String^>();
+			Errors->Add(err); 
+		}
 
 
 		String^ ToString() override { return "[" + TypeName + "]"; }
