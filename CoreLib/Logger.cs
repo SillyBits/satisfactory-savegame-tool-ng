@@ -129,6 +129,18 @@ namespace CoreLib
 			Log(string.Format(msg, args), Level.Error);
 		}
 
+		public void Error(string msg, Exception exc)
+		{
+			if (Level.Error > _min_level)
+				return;
+			string s = msg + ":\n"
+				+ exc.Message.ToString() + "\n"
+				+ exc.Source.ToString() + "\n"
+				+ exc.StackTrace.ToString() + "\n"
+				;
+			Log(msg, Level.Error);
+		}
+
 
 		protected Level _min_level;
 		protected TextWriter _file;
@@ -208,6 +220,11 @@ public static class Log
 	public static void Error(string msg, params object[] args)
 	{
 		L.Error(msg, args);
+	}
+
+	public static void Error(string msg, Exception exc)
+	{
+		L.Error(msg, exc);
 	}
 
 
