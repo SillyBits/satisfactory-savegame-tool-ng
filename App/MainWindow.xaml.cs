@@ -13,6 +13,7 @@ using CoreLib.PubSub;
 using Savegame;
 using Savegame.Properties;
 
+using SatisfactorySavegameTool.Actions;
 using SatisfactorySavegameTool.Dialogs;
 
 #pragma warning disable CS1998 // async method called from synchronous context
@@ -185,6 +186,12 @@ namespace SatisfactorySavegameTool
 
 		private void Edit_Options_Click(object sender, RoutedEventArgs e)
 		{
+		}
+
+
+		private void Actions_Validate_Click(object sender, RoutedEventArgs e)
+		{
+			ValidateSavegame.Run(CurrFile);
 		}
 
 

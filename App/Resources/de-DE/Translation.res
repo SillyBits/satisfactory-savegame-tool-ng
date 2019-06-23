@@ -34,6 +34,9 @@
 	<MainWindow.Menu.Edit>Be_arbeiten</MainWindow.Menu.Edit>
 	<MainWindow.Menu.Edit.Options>_Optionen ...</MainWindow.Menu.Edit.Options>
 	<MainWindow.Menu.Edit.Options.TT>Zeigt den Optionsdialog an</MainWindow.Menu.Edit.Options.TT>
+	<MainWindow.Menu.Actions>A_ktionen</MainWindow.Menu.Actions>
+	<MainWindow.Menu.Actions.Validate>_Validieren ...</MainWindow.Menu.Actions.Validate>
+	<MainWindow.Menu.Actions.Validate.TT>Validiert geladenen Spielstand</MainWindow.Menu.Actions.Validate.TT>
 	<MainWindow.Menu.Help>_Hilfe</MainWindow.Menu.Help>
 	<MainWindow.Menu.Help.Changelog>Änderungen ...</MainWindow.Menu.Help.Changelog>
 	<MainWindow.Menu.Help.Changelog.TT>Zeigt das aktuelle Änderungsprotokoll an</MainWindow.Menu.Help.Changelog.TT>
@@ -70,4 +73,14 @@
 	
 	<PropertyDumpDialog.Title>Details</PropertyDumpDialog.Title>
 
+	<Action.Prepare>Vorbereitung ...</Action.Prepare>
+	<Action.Done>Abgeschlossen</Action.Done>
+
+	<Action.Validate.Title>Validierung</Action.Validate.Title>
+	<Action.Validate.Progress.Title>Validiere ...</Action.Validate.Progress.Title>
+	<Action.Validate.Progress.Validate>Validiere Elemente ...</Action.Validate.Progress.Validate>
+	<Action.Validate.Progress.CounterFormat>{0:#,#} / {1:#,#} Elemente</Action.Validate.Progress.CounterFormat>
+	<Action.Validate.NoErrors>Keine Fehler gefunden.</Action.Validate.NoErrors>
+	<Action.Validate.HasErrors>Es wurden {0} fehlerhafte Elemente gefunden!\n\nMöchtest Du den Bericht jetzt einsehen?</Action.Validate.HasErrors>
+	
 </translation>

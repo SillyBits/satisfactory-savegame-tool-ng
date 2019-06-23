@@ -34,6 +34,9 @@
 	<MainWindow.Menu.Edit>E_dit</MainWindow.Menu.Edit>
 	<MainWindow.Menu.Edit.Options>_Options ...</MainWindow.Menu.Edit.Options>
 	<MainWindow.Menu.Edit.Options.TT>Opens up options dialog</MainWindow.Menu.Edit.Options.TT>
+	<MainWindow.Menu.Actions>A_ctions</MainWindow.Menu.Actions>
+	<MainWindow.Menu.Actions.Validate>_Validate ...</MainWindow.Menu.Actions.Validate>
+	<MainWindow.Menu.Actions.Validate.TT>Validate loaded savegames</MainWindow.Menu.Actions.Validate.TT>
 	<MainWindow.Menu.Help>_Help</MainWindow.Menu.Help>
 	<MainWindow.Menu.Help.Changelog>Changelog ...</MainWindow.Menu.Help.Changelog>
 	<MainWindow.Menu.Help.Changelog.TT>Shows current changelog</MainWindow.Menu.Help.Changelog.TT>
@@ -69,5 +72,15 @@
 	<ImageControl.Button>Show ...</ImageControl.Button>
 
 	<PropertyDumpDialog.Title>Details</PropertyDumpDialog.Title>
+
+	<Action.Prepare>Preparing ...</Action.Prepare>
+	<Action.Done>Done</Action.Done>
+	
+	<Action.Validate.Title>Validation</Action.Validate.Title>
+	<Action.Validate.Progress.Title>Validating ...</Action.Validate.Progress.Title>
+	<Action.Validate.Progress.Validate>Validating elements ...</Action.Validate.Progress.Validate>
+	<Action.Validate.Progress.CounterFormat>{0:#,#} / {1:#,#} elements</Action.Validate.Progress.CounterFormat>
+	<Action.Validate.NoErrors>No errors found.</Action.Validate.NoErrors>
+	<Action.Validate.HasErrors>Found a {0} elements with errors!\n\nWould you like to see the report?</Action.Validate.HasErrors>
 	
 </translation>

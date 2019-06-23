@@ -54,6 +54,11 @@
 						  ToolTip="{lang:Translate Key=MainWindow.Menu.Edit.Options.TT}" 
 						  Click="Edit_Options_Click" />
 			</MenuItem>
+			<MenuItem Header="{lang:Translate Key=MainWindow.Menu.Actions}">
+				<MenuItem Header="{lang:Translate Key=MainWindow.Menu.Actions.Validate}" 
+						  ToolTip="{lang:Translate Key=MainWindow.Menu.Actions.Validate.TT}" 
+						  Click="Actions_Validate_Click" />
+			</MenuItem>
 			<MenuItem Header="{lang:Translate Key=MainWindow.Menu.Help}">
 				<MenuItem Header="{lang:Translate Key=MainWindow.Menu.Help.Changelog}" 
 						  ToolTip="{lang:Translate Key=MainWindow.Menu.Help.Changelog.TT}" 
