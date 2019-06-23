@@ -61,7 +61,7 @@ namespace Savegame {
 		void _cbStop(IReader^ reader, String^ status, String^ info)
 		{
 			if (_callback) 
-				_callback->Stop(status, info);//reader->Pos == reader->Size);
+				_callback->Stop(status, info);
 		}
 
 
@@ -149,17 +149,11 @@ namespace Savegame {
 
 				for (int i = 0; i < Objects->Count;++i)
 				{
-					//Properties::Object^ obj = (Properties::Object^) Objects[i];
-					////if (obj->Type == 0)
-					//if (obj->TypeName == "Object")
-					//	obj->ReadEntity(reader);
-					//else
-					//	((Properties::Actor^)obj)->ReadEntity(reader);
 					Properties::Property^ prop = Objects[i];
-					if (prop->TypeName == "Object")
-						((Properties::Object^)prop)->ReadEntity(reader);
-					else if (prop->TypeName == "Actor")
-						((Properties::Actor^)prop)->ReadEntity(reader);
+					if (IsInstance<Properties::Actor>(prop))
+						safe_cast<Properties::Actor^>(prop)->ReadEntity(reader);
+					else if (IsInstance<Properties::Object>(prop))
+						safe_cast<Properties::Object^>(prop)->ReadEntity(reader);
 					else
 						throw gcnew Exception(
 							String::Format("Can't handle object {0}", prop));
@@ -240,7 +234,7 @@ namespace Savegame {
 		{
 			_callback = callback;
 
-
+			//...
 		}
 
 	};
