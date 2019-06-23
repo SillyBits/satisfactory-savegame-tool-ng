@@ -707,6 +707,9 @@ namespace Savegame
 	CLS_(SchematicCost, PropertyList)
 	CLS_END
 
+	CLS_(TimerHandle,PropertyList)
+	CLS_END
+
 	CLS_(ObjectProperty,ValueProperty)
 		PUB_s(LevelName)
 		PUB_s(PathName)
