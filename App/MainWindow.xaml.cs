@@ -197,14 +197,16 @@ namespace SatisfactorySavegameTool
 
 		private void Help_Changelog_Click(object sender, RoutedEventArgs e)
 		{
-			var dlg = new ChangelogDialog(this, Translate._("ChangelogDialog.Title"));
-			dlg.ShowDialog();
+			string filename = Path.Combine(App.RESOURCEPATH, App.LANGUAGE, "Changelog.res");
+			string content = File.ReadAllText(filename);
+			ShowHtmlResDialog.Show(Translate._("Dialog.Changelog.Title"), content);
 		}
 
 		private void Help_About_Click(object sender, RoutedEventArgs e)
 		{
-			var dlg = new AboutDialog(this, Translate._("AboutDialog.Title"));
-			dlg.ShowDialog();
+			string filename = Path.Combine(App.RESOURCEPATH, App.LANGUAGE, "About.res");
+			string content = File.ReadAllText(filename);
+			ShowHtmlResDialog.Show(Translate._("Dialog.About.Title"), content);
 		}
 #endregion
 

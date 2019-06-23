@@ -73,13 +73,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="Dialogs\ChangelogDialog.xaml">
+    <Page Include="Dialogs\ShowHtmlResDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Dialogs\AboutDialog.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="Dialogs\ShowRawTextDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Dialogs\PropertyDumpDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -105,11 +105,11 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Dialogs\ChangelogDialog.xaml.cs">
-      <DependentUpon>ChangelogDialog.xaml</DependentUpon>
+    <Compile Include="Dialogs\ShowHtmlResDialog.xaml.cs">
+      <DependentUpon>ShowHtmlResDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\AboutDialog.xaml.cs">
-      <DependentUpon>AboutDialog.xaml</DependentUpon>
+    <Compile Include="Dialogs\ShowRawTextDialog.xaml.cs">
+      <DependentUpon>ShowRawTextDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\PropertyDumpDialog.xaml.cs">
       <DependentUpon>PropertyDumpDialog.xaml</DependentUpon>

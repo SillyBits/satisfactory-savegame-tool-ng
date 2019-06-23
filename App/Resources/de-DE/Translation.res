@@ -51,9 +51,9 @@
 	<MainWindow.LoadGamefile.Progress.Title.2>Erzeuge Baumstruktur ...</MainWindow.LoadGamefile.Progress.Title.2>
 	<MainWindow.LoadGamefile.Progress.CounterFormat.2>{0:#,#} / {1:#,#} Elemente</MainWindow.LoadGamefile.Progress.CounterFormat.2>
 
-	<AboutDialog.Title>Über ...</AboutDialog.Title>
-
-	<ChangelogDialog.Title>Änderungsprotokoll ...</ChangelogDialog.Title>
+	<Dialog.About.Title>Über ...</Dialog.About.Title>
+	<Dialog.Changelog.Title>Änderungsprotokoll ...</Dialog.Changelog.Title>
+	<Dialog.PropertyDump.Title>Elementdetails ...</Dialog.PropertyDump.Title>
 
 	<TreePanel.Context.Inspect>Details ...</TreePanel.Context.Inspect>
 
@@ -71,8 +71,6 @@
 	<ImageControl.Label>Bild der Größe {0}x{1} mit {2} Farbkanälen</ImageControl.Label>
 	<ImageControl.Button>Anzeigen ...</ImageControl.Button>
 	
-	<PropertyDumpDialog.Title>Details</PropertyDumpDialog.Title>
-
 	<Action.Prepare>Vorbereitung ...</Action.Prepare>
 	<Action.Done>Abgeschlossen</Action.Done>
 

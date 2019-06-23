@@ -184,8 +184,11 @@ namespace SatisfactorySavegameTool.Panels
 			if (prop == null)
 				return;
 
-			var dlg = new PropertyDumpDialog(Application.Current.MainWindow, "", prop);
-			dlg.ShowDialog();
+			StringBuilder sb = new StringBuilder();
+			Dumper.WriteFunc writer = (s) => { sb.Append(s); };
+			Dumper.Dump(prop, writer);
+
+			ShowRawTextDialog.Show(Translate._("Dialog.PropertyDump.Title"), sb.ToString());
 		}
 
 	}

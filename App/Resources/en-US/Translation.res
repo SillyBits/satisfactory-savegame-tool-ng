@@ -51,9 +51,9 @@
 	<MainWindow.LoadGamefile.Progress.Title.2>Building tree ...</MainWindow.LoadGamefile.Progress.Title.2>
 	<MainWindow.LoadGamefile.Progress.CounterFormat.2>{0:#,#} / {1:#,#} elements</MainWindow.LoadGamefile.Progress.CounterFormat.2>
 	
-	<AboutDialog.Title>About ...</AboutDialog.Title>
-
-	<ChangelogDialog.Title>Changelog ...</ChangelogDialog.Title>
+	<Dialog.About.Title>About ...</Dialog.About.Title>
+	<Dialog.Changelog.Title>Changelog ...</Dialog.Changelog.Title>
+	<Dialog.PropertyDump.Title>Property details ...</Dialog.PropertyDump.Title>
 
 	<TreePanel.Context.Inspect>Inspect ...</TreePanel.Context.Inspect>
 	
@@ -70,8 +70,6 @@
 
 	<ImageControl.Label>Bitmap of size {0}x{1} with {2} color channels</ImageControl.Label>
 	<ImageControl.Button>Show ...</ImageControl.Button>
-
-	<PropertyDumpDialog.Title>Details</PropertyDumpDialog.Title>
 
 	<Action.Prepare>Preparing ...</Action.Prepare>
 	<Action.Done>Done</Action.Done>
