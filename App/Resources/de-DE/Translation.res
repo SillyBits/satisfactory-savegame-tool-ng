@@ -53,6 +53,10 @@
 	<ChangelogDialog.Title>Änderungsprotokoll ...</ChangelogDialog.Title>
 
 	<TreePanel.Context.Inspect>Details ...</TreePanel.Context.Inspect>
+
+	<TreePanel.Tab.Simple>Einfach</TreePanel.Tab.Simple>
+	<TreePanel.Tab.Classes>Klassen</TreePanel.Tab.Classes>
+	<TreePanel.Tab.Paths>Pfade</TreePanel.Tab.Paths>
 	
 	<TreePanel.Tree.Objects>Objekte ({0} Elemente)</TreePanel.Tree.Objects>
 	<TreePanel.Tree.Collected>Sammlung ({0} Elemente)</TreePanel.Tree.Collected>

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 using CoreLib;
@@ -24,15 +26,37 @@ namespace SatisfactorySavegameTool.Panels
 		public TreePanel()
 			: base()
 		{
-			_tabSimple = new TabItem() { Header = "Simple", };
+			Func<string,string,BasicTree,TabItem> createTab = (title,icon,tree) => {
+				TabItem tab = new TabItem();
+				StackPanel sp = new StackPanel() {
+					Orientation = Orientation.Horizontal,
+				};
+				sp.Children.Add(new Image() {
+					Source = new BitmapImage(new Uri(Path.Combine(App.RESOURCEPATH, icon))),
+					Width = 20,
+					Height = 20,
+				});
+				sp.Children.Add(new Label() {
+					Content = Translate._(title),
+				});
+				tab.Header = sp;
+				tab.Content = tree;
+				return tab;
+			};
+
+			//TODO: Suitable icon for 'simple'
 			_treeSimple = new SimpleTree();
+			_tabSimple = new TabItem() { Header = Translate._("TreePanel.Tab.Simple"), };
 			_tabSimple.Content = _treeSimple;
 			AddChild(_tabSimple);
 
-			_tabClasses = new TabItem() { Header = "Classes", };
 			_treeClasses = new ClassesTree();
-			_tabClasses.Content = _treeClasses;
+			_tabClasses = createTab("TreePanel.Tab.Classes", "Icon.TreePanel.Classes.png", _treeClasses);
 			AddChild(_tabClasses);
+
+			_treePaths = null;//new PathTree();
+			_tabPaths = createTab("TreePanel.Tab.Paths", "Icon.TreePanel.Paths.png", _treePaths);
+			AddChild(_tabPaths);
 		}
 
 		public void CreateTrees(Savegame.Savegame savegame, ICallback callback)
@@ -48,6 +72,9 @@ namespace SatisfactorySavegameTool.Panels
 
 		internal TabItem _tabClasses;
 		internal BasicTree _treeClasses;
+
+		internal TabItem _tabPaths;
+		internal BasicTree _treePaths;
 
 	}
 

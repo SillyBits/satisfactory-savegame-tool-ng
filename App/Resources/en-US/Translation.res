@@ -54,6 +54,10 @@
 
 	<TreePanel.Context.Inspect>Inspect ...</TreePanel.Context.Inspect>
 	
+	<TreePanel.Tab.Simple>Simple</TreePanel.Tab.Simple>
+	<TreePanel.Tab.Classes>Classes</TreePanel.Tab.Classes>
+	<TreePanel.Tab.Paths>Paths</TreePanel.Tab.Paths>
+	
 	<TreePanel.Tree.Objects>Objects ({0} elements)</TreePanel.Tree.Objects>
 	<TreePanel.Tree.Collected>Collected ({0} elements)</TreePanel.Tree.Collected>
 

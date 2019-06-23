@@ -31,6 +31,7 @@ You can also get ready-made executables in the download section at
 <br/>
 Credits to <i>bitowl</i>, <i>S4XXX</i> and <i>Goz3rr</i> for their work on deciphering 
 the structure of satisfactory savegames.<br/>
+Also thanks to <i>Panossa</i> for doing the graphics.
 <br/>
 <br/>
 Cheers, and always remember:<br/>
