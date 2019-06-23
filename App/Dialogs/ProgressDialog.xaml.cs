@@ -77,7 +77,7 @@ namespace SatisfactorySavegameTool.Dialogs
 
 		private void OnStart(Publisher sender, Callback.StartData data)
 		{
-			Dispatcher.InvokeAsync(() => {
+			Dispatcher.Invoke/*Async*/(() => {
 				_last_val = 0;
 				_max_val = data.MaxVal;
 				Progress.Value = 0;
@@ -100,7 +100,7 @@ namespace SatisfactorySavegameTool.Dialogs
 
 		private void OnStop(Publisher sender, Callback.StopData data)
 		{
-			Dispatcher.InvokeAsync(() => {
+			Dispatcher.Invoke/*Async*/(() => {
 				Update((int)Progress.Maximum, data.Status, data.Info);
 				Hide();
 			});
@@ -108,7 +108,7 @@ namespace SatisfactorySavegameTool.Dialogs
 
 		private void OnDestroy(Publisher sender, Callback.DestroyData data)
 		{
-			Dispatcher.InvokeAsync(() => {
+			Dispatcher.Invoke/*Async*/(() => {
 				Hide();
 				Close();
 			});
