@@ -216,7 +216,12 @@ namespace SatisfactorySavegameTool.Panels
 						foreach (object obj in e)
 						{
 							if (obj is Property)
-								_Add(sub_exp, name/*"*" + obj.ToString()*/, (Property)obj);
+							{
+								label = obj.ToString();
+								if (label.Length > 30)
+									label = label.Substring(0,10)+"..."+label.Substring(label.Length-10);
+								_Add(sub_exp, label, (Property)obj);
+							}
 							//else?
 						}
 				}
@@ -518,6 +523,8 @@ namespace SatisfactorySavegameTool.Panels
 		internal SimpleValueControl(string label, object val)
 			: base(val)
 		{
+			if (val is ValueProperty)
+				label = (val as ValueProperty).Name.ToString();
 			Label = label;
 			Ctrl = ControlFactory.Create(val);
 		}
