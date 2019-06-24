@@ -193,6 +193,15 @@ namespace SatisfactorySavegameTool.Actions
 				 */
 				if (sub is Property)
 					outcome &= _Validate(sub as Property);
+				else
+				{
+					if (!_ValidateObject(sub))
+					{
+						outcome = false;
+						_AddError(prop, string.Format("Invalid child '{0}', value {1}", 
+							name, sub));
+					}
+				}
 			}
 
 			if (!outcome)
@@ -258,11 +267,16 @@ namespace SatisfactorySavegameTool.Actions
 			return _validators[prop.TypeName](prop);
 		}
 
-		internal static bool _ValidateObject(Property prop)
+		internal static bool _ValidateObject(object obj)
 		{
-			if (!_validators.ContainsKey(prop.TypeName))
-				return true;
-			return false;
+			//if (!_validators.ContainsKey(prop.TypeName))
+			//	return true;
+
+			if (obj is float)
+				return _IsValid((float) obj);
+
+			// No handler for validation found
+			return true;
 		}
 
 		internal static float LOWER_SCALE = +1.0e-10f;
@@ -407,7 +421,7 @@ namespace SatisfactorySavegameTool.Actions
 		internal static bool _v_BoolProperty(Property obj)
 		{
 			BoolProperty bool_prop = obj as BoolProperty;
-			if (!_IsValid(bool_prop.Value, 0, 1))
+			if (!_IsValid((byte)bool_prop.Value, 0, 1))
 			{
 				_AddError(obj, string.Format("0 <= {0} <= 1", bool_prop.Value));
 				return false;
