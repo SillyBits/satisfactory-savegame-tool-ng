@@ -1,8 +1,12 @@
 __unused
 __releases
 __internal
+
 logs
+*.log
+
 reports
+
 dist
 
 
