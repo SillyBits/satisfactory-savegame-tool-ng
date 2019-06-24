@@ -12,7 +12,7 @@ using CoreLib;
 
 using Savegame;
 using Savegame.Properties;
-
+using P = Savegame.Properties;
 namespace SatisfactorySavegameTool.Panels
 {
 
@@ -400,9 +400,9 @@ namespace SatisfactorySavegameTool.Panels
 		}
 	}
 
-	internal class StrControl : TextBox, IValueContainer<string>
+	internal class StrControl : TextBox, IValueContainer<str>
 	{
-		internal StrControl(string val)
+		internal StrControl(str val)
 			: base()
 		{
 			//Width = new GridLength(100, GridUnitType.Auto).Value;
@@ -412,10 +412,10 @@ namespace SatisfactorySavegameTool.Panels
 			Value = val;
 		}
 
-		public string Value
+		public str Value
 		{
-			get { return Text; }
-			set	{ Text = value; }
+			get { return (Text != DetailsPanel.EMPTY) ? new str(Text) : null; }
+			set	{ Text = (value != null) ? value.ToString() : DetailsPanel.EMPTY; }
 		}
 	}
 
@@ -493,38 +493,32 @@ namespace SatisfactorySavegameTool.Panels
 
 	internal abstract class ValueControl
 	{
-		internal ValueControl(object val)
-		{
-			_value = val;
-		}
-
 		internal string Label;
 		internal UIElement Ctrl;
-
-		internal object _value;
 	}
 
 	internal abstract class ValueControl<_ValueType> : ValueControl
 	{
-		internal ValueControl(object val) 
-			: base(val)
-		{ }
+		internal ValueControl(_ValueType val) 
+			: base()
+		{
+			_value = val;
+		}
 
 		internal virtual _ValueType Value
 		{
 			get { return (Ctrl as IValueContainer<_ValueType>).Value; }
-			set { (Ctrl as IValueContainer<_ValueType>).Value = (_ValueType) _value; }
+			set { (Ctrl as IValueContainer<_ValueType>).Value = _value; }
 		}
+		internal _ValueType _value;
 	}
 
 
 	internal class SimpleValueControl<_ValueType> : ValueControl<_ValueType>
 	{
-		internal SimpleValueControl(string label, object val)
+		internal SimpleValueControl(string label, _ValueType val)
 			: base(val)
 		{
-			if (val is ValueProperty)
-				label = (val as ValueProperty).Name.ToString();
 			Label = label;
 			Ctrl = ControlFactory.Create(val);
 		}
@@ -532,7 +526,7 @@ namespace SatisfactorySavegameTool.Panels
 
 	internal class ReadonlySimpleValueControl<_ValueType> : SimpleValueControl<_ValueType>
 	{
-		internal ReadonlySimpleValueControl(string label, object val)
+		internal ReadonlySimpleValueControl(string label, _ValueType val)
 			: base(label, val)
 		{
 			Ctrl.IsEnabled = false;
@@ -676,26 +670,26 @@ namespace SatisfactorySavegameTool.Panels
 	}
 
 
-	internal class EnumControl : SimpleValueControl<string>
+	internal class EnumControl : SimpleValueControl<str>
 	{
 		internal EnumControl(string label, EnumProperty val)
-			: base(label, val.Value.ToString())
+			: base(val.EnumName.ToString(), (str)val.Value)
 		{ }
 	}
 
 
-	internal class NameControl : SimpleValueControl<string>
+	internal class NameControl : SimpleValueControl<str>
 	{
 		internal NameControl(string label, NameProperty val)
-			: base(label, val.Value.ToString())
+			: base(val.Name.ToString()/*label*/, (str)val.Value)
 		{ }
 	}
 
 
-	internal class TextControl : SimpleValueControl<string>
+	internal class TextControl : SimpleValueControl<str>
 	{
 		internal TextControl(string label, TextProperty val)
-			: base(label, val.Value.ToString())
+			: base(val.Name.ToString()/*label*/, (str)val.Value)
 		{ }
 	}
 
@@ -704,72 +698,61 @@ namespace SatisfactorySavegameTool.Panels
 	{
 		internal static UIElement Create(object val)
 		{
-			if (val is bool)
-				return new BoolControl((int) val);
-			else if (val is int)
-				return new IntControl((int) val);
-			else if (val is float)
-				return new FloatControl((float) val);
-			return new StrControl(val != null ? val.ToString() : DetailsPanel.EMPTY);
+			// The 'bool' was just to get the right thing here, but it must be at least a byte,
+			// and fields like 'int32:WasPlacedInLevel' use this control too.
+			if (val is bool)	return new BoolControl ((bool)  val ? 1 : 0);
+			if (val is int)		return new IntControl  ((int)   val);
+			if (val is float)	return new FloatControl((float) val);
+			return				       new StrControl  ((str)   val);
 		}
 
 		internal static ValueControl CreateSimple(string label, object val, bool read_only = false)
 		{
 			if (!read_only)
 			{
-				if (val is bool)
-					return new SimpleValueControl<bool>(label, val);
-				else if (val is int)
-					return new SimpleValueControl<int>(label, val);
-				else if (val is float)
-					return new SimpleValueControl<float>(label, val);
-				return new SimpleValueControl<string>(label, val);
+				if (val is bool)	return new SimpleValueControl<bool> (label, (bool)  val);
+				if (val is int)		return new SimpleValueControl<int>  (label, (int)   val);
+				if (val is float)	return new SimpleValueControl<float>(label, (float) val);
+				return                     new SimpleValueControl<str>  (label, (str)   val);
 			}
 			else
 			{
-				if (val is bool)
-					return new ReadonlySimpleValueControl<bool>(label, val);
-				else if (val is int)
-					return new ReadonlySimpleValueControl<int>(label, val);
-				else if (val is float)
-					return new ReadonlySimpleValueControl<float>(label, val);
-				return new ReadonlySimpleValueControl<string>(label, val);
+				if (val is bool)	return new ReadonlySimpleValueControl<bool> (label, (bool)  val);
+				if (val is int)		return new ReadonlySimpleValueControl<int>  (label, (int)   val);
+				if (val is float)	return new ReadonlySimpleValueControl<float>(label, (float) val);
+				return                     new ReadonlySimpleValueControl<str>  (label, (str)   val);
 			}
+		}
+
+		internal static ValueControl CreateValueProperty<_PropType>(string label, Property prop, object value = null)
+			where _PropType : ValueProperty
+		{
+			_PropType value_prop = prop as _PropType;
+			if (value == null)
+				value = value_prop.Value;
+			return CreateSimple(value_prop.Name.ToString(), value);
 		}
 
 		internal static ValueControl Create(string label, Property prop)
 		{
-			if (prop is BoolProperty)
-				return CreateSimple(label, (prop as BoolProperty).Value);
-			if (prop is ByteProperty)
-				return CreateSimple(label, (prop as ByteProperty).Value);
-			if (prop is IntProperty)
-				return CreateSimple(label, (prop as IntProperty).Value);
-			if (prop is FloatProperty)
-				return CreateSimple(label, (prop as FloatProperty).Value);
-			if (prop is StrProperty)
-				return CreateSimple(label, (prop as StrProperty).Value);
-			if (prop is Savegame.Properties.Vector)
-				return new VectorControl(label, prop as Savegame.Properties.Vector);
-			if (prop is Rotator)
-				return new VectorControl(label, prop as Savegame.Properties.Vector);
-			if (prop is Scale)
-				return new VectorControl(label, prop as Savegame.Properties.Vector);
-			if (prop is Savegame.Properties.Color)
-				return new ColorControl(label, prop as Savegame.Properties.Color);
-			if (prop is LinearColor)
-				return new LinearColorControl(label, prop as LinearColor);
-			if (prop is Quat)
-				return new QuatControl(label, prop as Quat);
-			if (prop is ObjectProperty)
-				return new ObjectControl(label, prop as ObjectProperty);
-			if (prop is EnumProperty)
-				return new EnumControl(label, prop as EnumProperty);
-			if (prop is NameProperty)
-				return new NameControl(label, prop as NameProperty);
-			if (prop is TextProperty)
-				return new TextControl(label, prop as TextProperty);
-			return null;
+			// BoolControl is getting an explicit 'bool' here to let 'Create(object val)' pick the right control
+			if (prop is BoolProperty)	return CreateValueProperty<BoolProperty> (label, prop, ((byte)(prop as BoolProperty).Value) == 1);
+			if (prop is ByteProperty)	return CreateValueProperty<ByteProperty> (label, prop);
+			if (prop is IntProperty)	return CreateValueProperty<IntProperty>  (label, prop);
+			if (prop is FloatProperty)	return CreateValueProperty<FloatProperty>(label, prop);
+			if (prop is StrProperty)	return CreateValueProperty<StrProperty>  (label, prop);
+
+			if (prop is P.Vector)		return new VectorControl     (label, prop as P.Vector);
+			if (prop is Rotator)		return new VectorControl     (label, prop as P.Vector);
+			if (prop is Scale)			return new VectorControl     (label, prop as P.Vector);
+			if (prop is P.Color)		return new ColorControl      (label, prop as P.Color);
+			if (prop is LinearColor)	return new LinearColorControl(label, prop as LinearColor);
+			if (prop is Quat)			return new QuatControl       (label, prop as Quat);
+		//	if (prop is ObjectProperty)	return new ObjectControl     (label, prop as ObjectProperty);
+			if (prop is EnumProperty)	return new EnumControl       (label, prop as EnumProperty);
+			if (prop is NameProperty)	return new NameControl       (label, prop as NameProperty);
+			if (prop is TextProperty)	return new TextControl       (label, prop as TextProperty);
+			return                             null;
 		}
 
 	}

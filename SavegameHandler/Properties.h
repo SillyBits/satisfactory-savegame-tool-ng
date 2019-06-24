@@ -455,7 +455,6 @@ namespace Savegame
 	//
 
 	CLS_(BoolProperty, ValueProperty)
-		PUB_b(Value)
 		READ
 			Value = reader->ReadByte();
 			CheckNullByte(reader);
@@ -465,7 +464,6 @@ namespace Savegame
 
 	CLS_(ByteProperty, ValueProperty)
 		PUB(Unknown,str^)
-		//PUB(Value,Object^)
 		READ
 			Unknown = reader->ReadString();
 			CheckNullByte(reader);
@@ -477,7 +475,6 @@ namespace Savegame
 	CLS_END
 	
 	CLS_(IntProperty, ValueProperty)
-		PUB_i(Value);
 		READ
 			CheckNullByte(reader);
 			Value = reader->ReadInt();
@@ -486,7 +483,6 @@ namespace Savegame
 	CLS_END
 
 	CLS_(FloatProperty, ValueProperty)
-		PUB_f(Value)
 		READ
 			CheckNullByte(reader);
 			Value = reader->ReadFloat();
@@ -495,7 +491,6 @@ namespace Savegame
 	CLS_END
 	
 	CLS_(StrProperty, ValueProperty)
-		PUB_s(Value)
 		READ
 			CheckNullByte(reader);
 			Value = reader->ReadString();
@@ -551,7 +546,6 @@ namespace Savegame
 
 	CLS_(StructProperty,ValueProperty)
 		PUB_ab(Unknown)
-		//PUB_o(Value)
 		bool IsArray;
 		READ
 			IsArray = false;
@@ -795,7 +789,6 @@ namespace Savegame
 
 	CLS_(ArrayProperty,ValueProperty)
 		PUB_s(InnerType)
-		//PUB_o(Value)
 		READ
 			InnerType = reader->ReadString();
 			if (InnerType == "StructProperty")
@@ -845,7 +838,6 @@ namespace Savegame
 
 	CLS_(EnumProperty,ValueProperty)
 		PUB_s(EnumName)
-		PUB_s(Value)
 		READ
 			EnumName = reader->ReadString();
 			CheckNullByte(reader);
@@ -890,7 +882,6 @@ namespace Savegame
 
 	CLS_(TextProperty,ValueProperty)
 		PUB_ab(Unknown)
-		PUB_s(Value)
 		READ
 			CheckNullByte(reader);
 			Unknown = ReadBytes(reader, 13);
