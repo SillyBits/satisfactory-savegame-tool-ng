@@ -107,6 +107,11 @@ public:
 		return (wcscmp(_unicode, s) == 0);
 	}
 
+	static bool IsNull(str^ s)
+	{
+		return (s == (str^)nullptr) || (!s->_ascii && !s->_unicode);
+	}
+
 
 protected:
 	char *_ascii;
