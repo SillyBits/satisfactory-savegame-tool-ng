@@ -1,6 +1,7 @@
 #pragma once
 
 using namespace System;
+using namespace System::Text;
 
 using namespace CoreLib;
 
@@ -246,19 +247,22 @@ namespace Savegame
 				if (IsInstance<str>(val))//str
 				{
 					//vals = "[ '" + "', '".join(obj) + "' ]"
-					vals = "[ ";
+					StringBuilder^ sb = gcnew StringBuilder();
+					sb->Append("[ ");
 					e->Reset();
 					while (e->MoveNext())
-						vals += "'" + e->Current->ToString() + "', ";
-					vals += " ]";
+						sb->Append("'" + e->Current->ToString() + "', ");
+					sb->Append(" ]");
+					vals = sb->ToString();
 				}
-				else if (IsType<int>(val))
+				else if (IsType<int>(val) || IsType<byte>(val))
 				{
 					// Extra check for those empty .Unknown[N]
+					bool isByte = IsType<byte>(val);
 					int sum = 0;
 					e->Reset();
 					while (e->MoveNext())
-						sum += (int) (e->Current);
+						sum += isByte ? (byte) (e->Current) : (int) (e->Current);
 					if (sum == 0)
 					{
 						t = String::Format("list({0:#,#0})", coll->Count);
@@ -267,11 +271,13 @@ namespace Savegame
 					else
 					{
 						//vals = "[ " + ", ".join([ "{:,d}".format(val) for val in obj ]) + " ]"
-						vals = "[ ";
+						StringBuilder^ sb = gcnew StringBuilder(coll->Count*10);
+						sb->Append("[ ");
 						e->Reset();
 						while (e->MoveNext())
-							vals += String::Format("{0:#,#d}, ", (int)(e->Current));
-						vals += " ]";
+							sb->AppendFormat("{0:#,#0}, ", (isByte ? (byte) (e->Current) : (int)(e->Current)));
+						sb->Append(" ]");
+						vals = sb->ToString();
 					}
 				}
 				if (t == nullptr)
@@ -279,11 +285,13 @@ namespace Savegame
 				if (vals == nullptr)
 				{
 					//vals = "[ " + ", ".join([ str(val) for val in obj ]) + " ]"
-					vals = "[ ";
+					StringBuilder^ sb = gcnew StringBuilder();
+					sb->Append("[ ");
 					e->Reset();
 					while (e->MoveNext())
-						vals += "'" + e->Current->ToString() + "', ";
-					vals += " ]";
+						sb->Append("'" + e->Current->ToString() + "', ");
+					sb->Append(" ]");
+					vals = sb->ToString();
 				}
 				return t + ":" + vals;
 			}
@@ -292,7 +300,7 @@ namespace Savegame
 			String^ s;
 			if (IsInstance<str>(obj))//str
 				s = "'" + obj + "'";
-			else if (IsType<int>(obj))//int
+			else if (IsType<int>(obj) || IsType<long>(obj))//int
 				s = String::Format("{0:#,#0}", obj);
 			else
 				s = obj->ToString();
