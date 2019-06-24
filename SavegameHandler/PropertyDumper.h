@@ -161,9 +161,9 @@ namespace Savegame
 					Object^ val = e->Value;
 
 					//if val != None and isinstance(val, (Property.Accessor,list,dict)):
-					if (IsInstance<Property>(e->Current)
-						|| IsInstance<Collections::ICollection>(e->Current)
-						|| IsInstance<Collections::IDictionary>(e->Current))
+					if (IsInstance<Property>(val)
+						|| IsInstance<Collections::ICollection>(val)
+						|| IsInstance<Collections::IDictionary>(val))
 					{
 						_AddLine(String::Format("Key '{0}':", key));
 						_Push(1, '\t');
