@@ -67,6 +67,13 @@ namespace SatisfactorySavegameTool.Panels
 			Dispatcher.Invoke(() => SelectedItem = _tabClasses);
 		}
 
+		public void ClearTrees()
+		{
+			_treeSimple.ClearTree();
+			_treeClasses.ClearTree();
+		}
+
+
 		internal TabItem _tabSimple;
 		internal BasicTree _treeSimple;
 
@@ -126,6 +133,11 @@ namespace SatisfactorySavegameTool.Panels
 				root.IsSelected = true;
 				_callback.Stop("", "");
 			});
+		}
+
+		public void ClearTree()
+		{
+			Items.Clear();
 		}
 
 

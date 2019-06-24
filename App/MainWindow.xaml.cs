@@ -74,7 +74,7 @@ namespace SatisfactorySavegameTool
 			_SetupMRU();
 
 			// Finally, update menu states
-			_UpdateMenuStates();
+			_UpdateUIState();
         }
 
 		protected override void OnClosing(CancelEventArgs e)
@@ -99,7 +99,7 @@ namespace SatisfactorySavegameTool
 #endregion
 
 #region Menu "stuff"
-		protected void _UpdateMenuStates()
+		protected void _UpdateUIState()
 		{
 			bool has_save = (CurrFile != null);
 			bool modified = false; //TODO: has_save && CurrFile.IsModified;
@@ -107,6 +107,12 @@ namespace SatisfactorySavegameTool
 			File_Save.IsEnabled = File_SaveAs.IsEnabled = modified;
 			File_Close.IsEnabled = has_save;
 			File_Export.IsEnabled = File_Import.IsEnabled = false;//TODO:
+
+			if (!has_save)
+			{
+				Details.ShowProperty(null);
+				TreeView.ClearTrees();
+			}
 		}
 
 		protected override void OnKeyUp(KeyEventArgs e)
@@ -135,7 +141,6 @@ namespace SatisfactorySavegameTool
 
 		private void File_Open_Click(object sender, RoutedEventArgs e)
 		{
-			_CloseGamefile();
 
 			OpenFileDialog dlg = new OpenFileDialog();
 			dlg.Title = Translate._("MainWindow.LoadGamefile.Title");//"Select savegame to load";
@@ -159,8 +164,9 @@ namespace SatisfactorySavegameTool
 
 		private void File_Close_Click(object sender, RoutedEventArgs e)
 		{
-			CurrFile = null;
-			_UpdateMenuStates();
+			_CloseGamefile();
+
+			_UpdateUIState();
 		}
 
 		private void File_Export_Click(object sender, RoutedEventArgs e)
@@ -261,7 +267,7 @@ namespace SatisfactorySavegameTool
 				TimeSpan ofs = end_time - start_time;
 				Log.Info("Loading took {0}", ofs);
 
-				Dispatcher.Invoke(() => { _UpdateMenuStates(); });
+				Dispatcher.Invoke(() => { _UpdateUIState(); });
 			});
 		}
 
