@@ -81,10 +81,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Dialogs\PropertyDumpDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Dialogs\ImageDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -110,9 +106,6 @@
     </Compile>
     <Compile Include="Dialogs\ShowRawTextDialog.xaml.cs">
       <DependentUpon>ShowRawTextDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\PropertyDumpDialog.xaml.cs">
-      <DependentUpon>PropertyDumpDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\ImageDialog.xaml.cs">
       <DependentUpon>ImageDialog.xaml</DependentUpon>
