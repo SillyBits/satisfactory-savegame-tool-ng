@@ -80,5 +80,6 @@
 	<Action.Validate.Progress.CounterFormat>{0:#,#0} / {1:#,#0} elements</Action.Validate.Progress.CounterFormat>
 	<Action.Validate.NoErrors>No errors found.</Action.Validate.NoErrors>
 	<Action.Validate.HasErrors>Found a {0:#,#0} elements with errors!\n\nWould you like to see the report?</Action.Validate.HasErrors>
+	<Action.Validate.Report>Generating report ...</Action.Validate.Report>
 	
 </translation>
