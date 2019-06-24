@@ -63,6 +63,7 @@ namespace SatisfactorySavegameTool.Panels
 		{
 			_treeSimple.CreateTree(savegame, callback);
 			_treeClasses.CreateTree(savegame, callback);
+			//_treePaths.CreateTree(savegame, callback);
 
 			Dispatcher.Invoke(() => SelectedItem = _tabClasses);
 		}
@@ -71,6 +72,7 @@ namespace SatisfactorySavegameTool.Panels
 		{
 			_treeSimple.ClearTree();
 			_treeClasses.ClearTree();
+			//_treePaths.ClearTree();
 		}
 
 

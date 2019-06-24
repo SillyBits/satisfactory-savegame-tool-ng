@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using CoreLib;
@@ -187,7 +188,7 @@ namespace TestBed
 		static Logger _l;
 		static void StartLogger()
 		{
-			string path = @"E:\GitHub\satisfactory-save-repairer-ng";
+			string path = @"E:\GitHub\satisfactory-savegame-tool-ng";
 			/*TODO:
 			path = Process.GetCurrentProcess().StartInfo.WorkingDirectory;
 			if (path == "" || !Directory.Exists(path))
@@ -196,9 +197,9 @@ namespace TestBed
 			}
 			if (path == "" || !Directory.Exists(path))
 			{
-				path = @"E:\GitHub\satisfactory-save-repairer-ng";
+				path = @"E:\GitHub\satisfactory-savegame-tool-ng";
 			}*/
-			path = Path.Combine(path, "logs");
+			path = Path.Combine(path, "TestBed");
 
 			_l = new Logger(path, "TestBed", Logger.Level.Debug);
 		}
@@ -395,8 +396,30 @@ namespace TestBed
 			Trace.Write("Done testing config file");
 		}
 
-#endregion
+		#endregion
 
+		#region Regex
+		static void TestRegex()
+		{
+			Regex _regex = new Regex(@"\[\[IMG\:(?<file>.*)\]\]", 
+			/*RegexOptions.Compiled|*/RegexOptions.CultureInvariant|RegexOptions.ExplicitCapture);
+
+			string content = File.ReadAllText(@"E:\GitHub\satisfactory-savegame-tool-ng\App\Resources\de-DE\About-new.res");
+
+			int offset = 0;
+			Match match = _regex.Match(content, offset);
+			while (match.Success)
+			{
+				int pos = match.Index;
+				string to_replace = match.Value;
+				string filename = match.Groups["file"].Value;
+				Trace.Write(match + " -> " + filename + " @ pos " + pos.ToString());
+
+				break;
+			}
+
+		}
+		#endregion
 
 
 		static void TestBed(string[] args)
@@ -405,7 +428,8 @@ namespace TestBed
 			//TestLogger();
 			//TestSavegame();
 			//TestSavegameLoader();
-			TestConfigFile();
+			//TestConfigFile();
+			TestRegex();
 		}
 
 

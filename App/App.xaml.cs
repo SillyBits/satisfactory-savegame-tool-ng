@@ -23,6 +23,7 @@ namespace SatisfactorySavegameTool
 		public static string RESOURCEPATH    = null;
 		public static string TRANSLATIONFILE = "Translation.res";
 		public static string LANGUAGE        = null;
+		//public static string ...
 
 
 		protected Logger _logger = null;

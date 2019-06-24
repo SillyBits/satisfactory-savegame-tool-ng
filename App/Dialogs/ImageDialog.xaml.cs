@@ -12,6 +12,13 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+/*
+ * TODO:
+ * 
+ * - Add export button
+ * 
+ */
+
 namespace SatisfactorySavegameTool.Dialogs
 {
 	/// <summary>
