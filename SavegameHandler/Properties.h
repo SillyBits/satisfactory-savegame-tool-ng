@@ -173,64 +173,15 @@ namespace Savegame
 
 
 		typedef Publish::Published::KeyCollection Keys;
-		Keys^ GetKeys()
+		virtual Keys^ GetKeys()
 		{
-			Publish::Published^ published;
-			if (!_keys.ContainsKey(TypeName))
-			{
-				published = Publish::Retrieve(this);
-				_keys.Add(TypeName, published);
-			}
-			else
-			{
-				published = _keys[TypeName];
-			}
-
-			return published->Keys;
+			return _GetKeys(nullptr);
 		}
 
 		typedef Dictionary<String^, Object^> Childs;
-		Childs^ GetChilds()
+		virtual Childs^ GetChilds()
 		{
-			Publish::Published^ published;
-			if (!_keys.ContainsKey(TypeName))
-			{
-				published = Publish::Retrieve(this);
-				_keys.Add(TypeName, published);
-			}
-			else
-			{
-				published = _keys[TypeName];
-			}
-
-			Childs^ childs = gcnew Childs();
-
-			Publish::Published::Enumerator iter = published->GetEnumerator();
-			while (iter.MoveNext())
-			{
-				KeyValuePair<String^, MemberInfo^> pair = iter.Current;
-
-				Object^ value;
-				switch (pair.Value->MemberType)
-				{
-				case MemberTypes::Field:
-					value = ((FieldInfo^)pair.Value)->GetValue(this);
-					break;
-				case MemberTypes::Property:
-					value = ((PropertyInfo^)pair.Value)->GetValue(this);
-					break;
-				case MemberTypes::Method:
-					value = ((MethodInfo^)pair.Value)->Invoke(this, nullptr);
-					break;
-				default:
-					throw gcnew ArgumentOutOfRangeException(String::Format("{0}: Invalid type '{1}' for member {2}", 
-						this->GetType(), pair.Value->MemberType, pair.Key));
-				}
-
-				childs->Add(pair.Key, value);
-			}
-
-			return childs;
+			return _GetChilds(nullptr);
 		}
 
 
@@ -305,6 +256,85 @@ namespace Savegame
 
 	protected:
 		static Dictionary<String^, Publish::Published^> _keys;
+
+		Keys^ _GetKeys(List<String^>^ excludeList)
+		{
+			Publish::Published^ published;
+			if (!_keys.ContainsKey(TypeName))
+			{
+				published = Publish::Retrieve(this);
+				_keys.Add(TypeName, published);
+			}
+			else
+			{
+				published = _keys[TypeName];
+			}
+
+			// Normal case is to have no exclusions
+			if (excludeList == nullptr)
+				return published->Keys;
+
+			// Build a different list
+			Publish::Published^ new_published = gcnew Publish::Published();
+
+			Publish::Published::Enumerator^ e = published->GetEnumerator();
+			while (e->MoveNext())
+			{
+				KeyValuePair<String^, MemberInfo^>^ kv = e->Current;
+				if (!excludeList->Contains(kv->Key))
+					new_published->Add(kv->Key, kv->Value);
+			}
+
+			return new_published->Keys;
+		}
+
+		virtual Childs^ _GetChilds(List<String^>^ excludeList)
+		{
+			Publish::Published^ published;
+			if (!_keys.ContainsKey(TypeName))
+			{
+				published = Publish::Retrieve(this);
+				_keys.Add(TypeName, published);
+			}
+			else
+			{
+				published = _keys[TypeName];
+			}
+
+			Childs^ childs = gcnew Childs();
+
+			Publish::Published::Enumerator^ e = published->GetEnumerator();
+			while (e->MoveNext())
+			{
+				KeyValuePair<String^, MemberInfo^>^ kv = e->Current;
+
+				if (excludeList != nullptr && excludeList->Contains(kv->Key))
+					continue;
+				// Normal case is to have no exclusions
+
+				Object^ value;
+				switch (kv->Value->MemberType)
+				{
+				case MemberTypes::Field:
+					value = ((FieldInfo^)kv->Value)->GetValue(this);
+					break;
+				case MemberTypes::Property:
+					value = ((PropertyInfo^)kv->Value)->GetValue(this);
+					break;
+				case MemberTypes::Method:
+					value = ((MethodInfo^)kv->Value)->Invoke(this, nullptr);
+					break;
+				default:
+					throw gcnew ArgumentOutOfRangeException(
+						String::Format("{0}: Invalid type '{1}' for member {2}", 
+							this->GetType(), kv->Value->MemberType, kv->Key));
+				}
+
+				childs->Add(kv->Key, value);
+			}
+
+			return childs;
+		}
 
 	};
 
@@ -719,6 +749,9 @@ namespace Savegame
 	CLS_END
 
 	CLS_(ObjectProperty,ValueProperty)
+		// Note that ObjectProperty is somewhat special with having
+		// two different faces: w/ .Name + .Value and w/o those.
+		// (depending on its 'context' when loaded)
 		PUB_s(LevelName)
 		PUB_s(PathName)
 		READ
@@ -733,6 +766,31 @@ namespace Savegame
 			return this;
 		}
 		STR_(PathName)
+		Keys^ GetKeys() override
+		{
+			return Property::_GetKeys(_GetExcludes());
+		}
+		Childs^ GetChilds() override
+		{
+			return Property::_GetChilds(_GetExcludes());
+		}
+	protected:
+		List<String^>^ _GetExcludes()
+		{
+			if (str::IsNull(Name) || Name->ToString()->Equals(str::Statics::EMPTY))
+			{
+				// No name, so no value
+				if (_excludes == nullptr)
+				{
+					_excludes = gcnew List<String^>();
+					_excludes->Add("Name");
+					_excludes->Add("Value");
+				}
+				return _excludes;
+			}
+			return nullptr;
+		}
+		static List<String^>^ _excludes = nullptr;
 	CLS_END
 
 	CLS_(ArrayProperty,ValueProperty)
