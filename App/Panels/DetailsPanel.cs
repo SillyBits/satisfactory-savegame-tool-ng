@@ -13,6 +13,11 @@ using CoreLib;
 using Savegame;
 using Savegame.Properties;
 using P = Savegame.Properties;
+
+/*
+ * TODO:
+ * 
+ */
 namespace SatisfactorySavegameTool.Panels
 {
 
@@ -33,7 +38,7 @@ namespace SatisfactorySavegameTool.Panels
 			Expando exp;
 			if (prop == null)
 			{
-				exp = _Add(null, Translate._("DetailsPanel.Empty"), prop);
+				exp = _Add(null, EMPTY, prop);
 				exp.IsEnabled = false;
 			}
 			else
@@ -100,6 +105,40 @@ namespace SatisfactorySavegameTool.Panels
 								return parent;
 							}
 						}
+					}
+				}
+
+				if (prop is ObjectProperty)
+				{
+					ObjectProperty obj_p = prop as ObjectProperty;
+
+					// Have seen 4 different combinations so far:
+					// - (1) Only PathName valid, LevelName + Name + Value = empty (sub in an ArrayProperty)
+					// - (2) PathName + LevelName, but Name + Value are empty (also with ArrayProperty)
+					// - (2) PathName + Name valid, but LevelName + Value empty (sub in a StructProperty)
+					// - (3) PathName, LevelName + Name, but empty Value (sub in an EntityObj)
+					//
+					//=> PathName  LevelName  Name  Value
+					//      x          -       -      -
+					//      x          x       -      -
+					//      x          -       x      -
+					//      x          x       x      -
+
+					if (str.IsNull(obj_p.LevelName) || obj_p.LevelName.ToString() == "Persistent_Level")
+					{
+						if (str.IsNull(obj_p.Name))
+						{
+							// Only PathName (... are we in an ArrayProperty?)
+							UIElement single = ControlFactory.Create(obj_p.PathName);
+							parent.AddRow(single);
+						}
+						else
+						{
+							// PathName + Name, so Name is our label
+							ctrl = ControlFactory.CreateSimple(obj_p.Name.ToString(), obj_p.PathName);
+							parent.AddRow(ctrl);
+						}
+						return parent;
 					}
 				}
 
@@ -218,8 +257,6 @@ namespace SatisfactorySavegameTool.Panels
 							if (obj is Property)
 							{
 								label = obj.ToString();
-								if (label.Length > 30)
-									label = label.Substring(0,10)+"..."+label.Substring(label.Length-10);
 								_Add(sub_exp, label, (Property)obj);
 							}
 							//else?
@@ -334,10 +371,9 @@ namespace SatisfactorySavegameTool.Panels
 		internal BoolControl(int val)
 			: base()
 		{
-			//Width = new GridLength(100).Value;
 			HorizontalAlignment = HorizontalAlignment.Left;
 			VerticalAlignment = VerticalAlignment.Center;
-			Margin = new Thickness(0, 2, 0, 2);
+			Margin = new Thickness(0, 4, 0, 4);
 			Value = val;
 		}
 
@@ -350,12 +386,12 @@ namespace SatisfactorySavegameTool.Panels
 
 	internal class FloatControl : TextBox, IValueContainer<float>
 	{
-		internal readonly string _format = "{0:F7}"; //Translate._("");
+		internal readonly string _format = "{0:F7}"; //TODO: Translate._("");
 
 		internal FloatControl(float val)
 			: base()
 		{
-			Width = new GridLength(100).Value;
+			Width = new GridLength((Math.Abs(val) > 1e7f) ? 200 : 100).Value;
 			HorizontalAlignment = HorizontalAlignment.Left;
 			TextAlignment = TextAlignment.Right;
 			Value = val;
@@ -367,10 +403,36 @@ namespace SatisfactorySavegameTool.Panels
 			{
 				float f;
 				if (!float.TryParse(Text, out f))
-					throw new FormatException("Input for float value is invalid");
+					throw new FormatException("Input for float value is invalid"); //TODO: Translate._("");
 				return f;
 			}
 			set { Text = string.Format(_format, value); }
+		}
+	}
+
+	internal class ByteControl : TextBox, IValueContainer<byte> // Might change to wx.SpinCtrl later
+	{
+		internal readonly string _format = "{0}"; //TODO: Translate._("");
+
+		internal ByteControl(byte val)
+			: base()
+		{
+			Width = new GridLength(50).Value;
+			HorizontalAlignment = HorizontalAlignment.Left;
+			TextAlignment = TextAlignment.Right;
+			Value = val;
+		}
+
+		public byte Value
+		{
+			get
+			{
+				byte b;
+				if (!byte.TryParse(Text, out b))
+					throw new FormatException("Input for byte value is invalid"); //TODO: Translate._("");
+				return b;
+			}
+			set	{ Text = string.Format(_format, value); }
 		}
 	}
 
@@ -381,7 +443,7 @@ namespace SatisfactorySavegameTool.Panels
 		internal IntControl(int val)
 			: base()
 		{
-			Width = new GridLength(val > 1e10 ? 150 : 100).Value;
+			Width = new GridLength((Math.Abs(val) > 1e10) ? 200 : 100).Value;
 			HorizontalAlignment = HorizontalAlignment.Left;
 			TextAlignment = TextAlignment.Right;
 			Value = val;
@@ -393,8 +455,34 @@ namespace SatisfactorySavegameTool.Panels
 			{
 				int i;
 				if (!int.TryParse(Text, out i))
-					throw new FormatException("Input for integer value is invalid");
+					throw new FormatException("Input for integer value is invalid"); //TODO: Translate._("");
 				return i;
+			}
+			set	{ Text = string.Format(_format, value); }
+		}
+	}
+
+	internal class LongControl : TextBox, IValueContainer<long> // Might change to wx.SpinCtrl later
+	{
+		internal readonly string _format = "{0:#,#0}"; //TODO: Translate._("");
+
+		internal LongControl(long val)
+			: base()
+		{
+			Width = new GridLength(200).Value;
+			HorizontalAlignment = HorizontalAlignment.Left;
+			TextAlignment = TextAlignment.Right;
+			Value = val;
+		}
+
+		public long Value
+		{
+			get
+			{
+				long l;
+				if (!long.TryParse(Text, out l))
+					throw new FormatException("Input for long integer value is invalid"); //TODO: Translate._("");
+				return l;
 			}
 			set	{ Text = string.Format(_format, value); }
 		}
@@ -405,8 +493,6 @@ namespace SatisfactorySavegameTool.Panels
 		internal StrControl(str val)
 			: base()
 		{
-			//Width = new GridLength(100, GridUnitType.Auto).Value;
-			//Height = new GridLength(0, GridUnitType.Auto).Value;
 			HorizontalAlignment = HorizontalAlignment.Stretch;
 			VerticalAlignment = VerticalAlignment.Stretch;
 			Value = val;
@@ -439,7 +525,8 @@ namespace SatisfactorySavegameTool.Panels
 	{
 		internal ColorDisplay(Savegame.Properties.Color color)
 		{
-			Width = new GridLength(200).Value;
+			Content = "";
+			Width = new GridLength(100).Value;
 			BorderBrush = System.Windows.Media.Brushes.DarkGray;
 			BorderThickness = new Thickness(1);
 			Value = color;
@@ -453,7 +540,6 @@ namespace SatisfactorySavegameTool.Panels
 				System.Windows.Media.Color c = 
 					System.Windows.Media.Color.FromArgb(value.A, value.R, value.G, value.B);
 				Background = new SolidColorBrush(c);
-				Content = string.Format("R:{0} / G:{1} / B:{2} / A:{3}", value.R, value.G, value.B, value.A);
 			}
 		}
 
@@ -464,7 +550,8 @@ namespace SatisfactorySavegameTool.Panels
 	{
 		internal LinearColorDisplay(LinearColor color)
 		{
-			Width = new GridLength(200).Value;
+			Content = "";
+			Width = new GridLength(100).Value;
 			BorderBrush = System.Windows.Media.Brushes.DarkGray;
 			BorderThickness = new Thickness(1);
 			Value = color;
@@ -478,7 +565,6 @@ namespace SatisfactorySavegameTool.Panels
 				System.Windows.Media.Color c = 
 					System.Windows.Media.Color.FromScRgb(value.A, value.R, value.G, value.B);
 				Background = new SolidColorBrush(c);
-				Content = string.Format("R:{0:F7} / G:{1:F7} / B:{2:F7} / A:{3:F7}", value.R, value.G, value.B, value.A);
 			}
 		}
 
@@ -541,11 +627,9 @@ namespace SatisfactorySavegameTool.Panels
 		{
 			Label = label;
 			Ctrl = new TextBox() {
-				Text = CoreLib.Helpers.Hexdump(val, indent:0),
+				Text = Helpers.Hexdump(val, indent:0),
 				FontFamily = new FontFamily("Consolas, FixedSys, Terminal"),
 				FontSize = 12,
-				//BorderBrush = Brushes.DarkGray,
-				//BorderThickness = new Thickness(1),//LTRB
 			};
 		}
 
@@ -589,9 +673,7 @@ namespace SatisfactorySavegameTool.Panels
 
 		private void _button_Click(object sender, RoutedEventArgs e)
 		{
-			var dlg = new ImageDialog(Application.Current.MainWindow, Translate._("ImageDialog.Title"), _image);
-			dlg.ShowDialog();
-			dlg.Close();
+			new ImageDialog(null, Translate._("ImageDialog.Title"), _image).ShowDialog();
 		}
 
 		internal Label _label;
@@ -626,9 +708,19 @@ namespace SatisfactorySavegameTool.Panels
 		internal ColorControl(string label, Savegame.Properties.Color val)
 			: base(val)
 		{
-			Label = label;
-			Ctrl = new ColorDisplay(val);
-			//TODO: Add separate fields for RGBA
+			Label = label + " [RGBA]";
+
+			StackPanel panel = new StackPanel() {
+				Orientation = Orientation.Horizontal,
+			};
+
+			panel.Children.Add(new IntControl(val.R));
+			panel.Children.Add(new IntControl(val.G));
+			panel.Children.Add(new IntControl(val.B));
+			panel.Children.Add(new IntControl(val.A));
+			panel.Children.Add(new ColorDisplay(val));
+
+			Ctrl = panel;
 		}
 	}
 
@@ -637,9 +729,19 @@ namespace SatisfactorySavegameTool.Panels
 		internal LinearColorControl(string label, LinearColor val)
 			: base(val)
 		{
-			Label = label;
-			Ctrl = new LinearColorDisplay(val);
-			//TODO: Add separate fields for RGBA
+			Label = label + " [RGBA]";
+
+			StackPanel panel = new StackPanel() {
+				Orientation = Orientation.Horizontal,
+			};
+
+			panel.Children.Add(new FloatControl(val.R));
+			panel.Children.Add(new FloatControl(val.G));
+			panel.Children.Add(new FloatControl(val.B));
+			panel.Children.Add(new FloatControl(val.A));
+			panel.Children.Add(new LinearColorDisplay(val));
+
+			Ctrl = panel;
 		}
 	}
 
@@ -662,12 +764,17 @@ namespace SatisfactorySavegameTool.Panels
 	}
 
 
-	internal class ObjectControl : SimpleValueControl<string>
-	{
-		internal ObjectControl(string label, ObjectProperty val)
-			: base(label, val.Name != null ? val.Name.ToString() : DetailsPanel.EMPTY)
-		{ }
-	}
+	//internal class ObjectControl : SimpleValueControl<str>
+	//{
+	//	// Showing stuff swapped!
+	//	internal ObjectControl(string label, ObjectProperty val)
+	//		//: base(val.Name != null ? val.Name.ToString() : label, (str)val.Value)
+	//		//: base(label, val.Name != null ? val.Name : DetailsPanel.strEMPTY)
+	//		//: base(label, val.Value as str)
+	//		: base(val.?, val.? as str)
+	//	{ }
+	//}
+	//=> Must show one or more values
 
 
 	internal class EnumControl : SimpleValueControl<str>
@@ -701,7 +808,9 @@ namespace SatisfactorySavegameTool.Panels
 			// The 'bool' was just to get the right thing here, but it must be at least a byte,
 			// and fields like 'int32:WasPlacedInLevel' use this control too.
 			if (val is bool)	return new BoolControl ((bool)  val ? 1 : 0);
+			if (val is byte)	return new ByteControl ((byte)  val);
 			if (val is int)		return new IntControl  ((int)   val);
+			if (val is long)	return new LongControl ((long)  val);
 			if (val is float)	return new FloatControl((float) val);
 			return				       new StrControl  ((str)   val);
 		}
@@ -711,14 +820,18 @@ namespace SatisfactorySavegameTool.Panels
 			if (!read_only)
 			{
 				if (val is bool)	return new SimpleValueControl<bool> (label, (bool)  val);
+				if (val is byte)	return new SimpleValueControl<byte> (label, (byte)  val);
 				if (val is int)		return new SimpleValueControl<int>  (label, (int)   val);
+				if (val is long)	return new SimpleValueControl<long> (label, (long)  val);
 				if (val is float)	return new SimpleValueControl<float>(label, (float) val);
 				return                     new SimpleValueControl<str>  (label, (str)   val);
 			}
 			else
 			{
 				if (val is bool)	return new ReadonlySimpleValueControl<bool> (label, (bool)  val);
+				if (val is byte)	return new ReadonlySimpleValueControl<byte> (label, (byte)  val);
 				if (val is int)		return new ReadonlySimpleValueControl<int>  (label, (int)   val);
+				if (val is long)	return new ReadonlySimpleValueControl<long> (label, (long)  val);
 				if (val is float)	return new ReadonlySimpleValueControl<float>(label, (float) val);
 				return                     new ReadonlySimpleValueControl<str>  (label, (str)   val);
 			}
