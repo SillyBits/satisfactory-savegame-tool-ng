@@ -85,6 +85,23 @@ namespace SatisfactorySavegameTool.Panels
 		internal TabItem _tabPaths;
 		internal BasicTree _treePaths;
 
+		protected override void OnSelectionChanged(SelectionChangedEventArgs e)
+		{
+			base.OnSelectionChanged(e);
+
+			if (e.AddedItems.Count != 1)
+				return;
+			TabItem tab = e.AddedItems[0] as TabItem;
+			if (tab == null)
+				return;
+			BasicTree tree = tab.Content as BasicTree;
+			if (tree == null)
+				return;
+			RoutedPropertyChangedEventArgs<object> ev = 
+				new RoutedPropertyChangedEventArgs<object>(null, null, 
+					TreeView.SelectedItemChangedEvent);
+			tree.RaiseEvent(ev);
+		}
 	}
 
 
