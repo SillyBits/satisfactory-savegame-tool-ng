@@ -57,21 +57,22 @@ namespace SatisfactorySavegameTool
 			_config = new ConfigFile(APPPATH, APPNAME);
 			_languages = new LanguageHandler(RESOURCEPATH, null, TRANSLATIONFILE);
 
-			// Setup initial language, if any specified
+			// Select suitable language for translations
+			string langid = null;
 			if (Config.Root.HasSection("core") && Config.Root.core.HasItem("language"))
 			{
 				Log.Info("Language: {0}", Thread.CurrentThread.CurrentUICulture.Name);
-#if DEBUG
-				string langid = "en-US";
-#else
-				string langid = Config.Root.core.language;
-#endif
-				if (string.IsNullOrEmpty(langid))
-					langid = Thread.CurrentThread.CurrentUICulture.Name;
-				_languages.SelectLanguage(langid);
-				Thread.CurrentThread.CurrentUICulture = new CultureInfo(langid);
-				LANGUAGE = langid;
+				#if DEBUG
+				langid = "en-US";
+				#else
+				langid = Config.Root.core.language;
+				#endif
 			}
+			if (string.IsNullOrEmpty(langid))
+				langid = Thread.CurrentThread.CurrentUICulture.Name;
+			_languages.SelectLanguage(langid);
+			Thread.CurrentThread.CurrentUICulture = new CultureInfo(langid);
+			LANGUAGE = langid;
 
 			// Create defaultpath setting if not set up yet
 			if (!Config.Root.HasSection("core") 
