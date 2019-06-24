@@ -71,7 +71,7 @@ namespace Savegame {
 			TotalElements = 0;
 
 			FileReader^ reader = gcnew FileReader(Filename, nullptr);
-			Log::Info("-> {0:#,#} Bytes", reader->Size);
+			Log::Info("-> {0:#,#0} Bytes", reader->Size);
 
 			//if treeview.IsSideloadingAvail:
 			//	treeview.InitSideloading(self)
@@ -116,7 +116,7 @@ namespace Savegame {
 			
 				//self.Objects = []
 				int count = reader->ReadInt();
-				Log::Info("-> {0:#,#} game objects", count);
+				Log::Info("-> {0:#,#0} game objects", count);
 				for (int i=0; i<count; ++i)
 				{
 					int prev_pos = reader->Pos;
@@ -128,7 +128,7 @@ namespace Savegame {
 						new_child = (gcnew Properties::Object(nullptr))->Read(reader);
 					else
 						throw gcnew Exception(
-							String::Format("Savegame at pos {0:#,#}: Unhandled type {1}", 
+							String::Format("Savegame at pos {0:#,#0}: Unhandled type {1}", 
 								prev_pos, type));
 					TotalElements++;
 					Objects->Add(new_child);
@@ -144,7 +144,7 @@ namespace Savegame {
 				int count_next = reader->ReadInt();
 				if (count != count_next)
 					throw gcnew Exception(
-						String::Format("Savegame at pos {0:#,#}: Counts do not match ({1:#,#} != {2:#,#})", 
+						String::Format("Savegame at pos {0:#,#0}: Counts do not match ({1:#,#0} != {2:#,#0})", 
 							prev_pos, count, count_next));
 
 				for (int i = 0; i < Objects->Count;++i)
@@ -165,7 +165,7 @@ namespace Savegame {
 
 				//self.Collected = []
 				count = reader->ReadInt();
-				Log::Info("-> {0:#,#} collected objects", count);
+				Log::Info("-> {0:#,#0} collected objects", count);
 				for (int i = 0; i < count; ++i)
 				{
 					Properties::Property^ new_child = (gcnew Properties::Collected(nullptr))->Read(reader);
@@ -181,7 +181,7 @@ namespace Savegame {
 				if (missing > 0)
 				{
 					Missing = Properties::Property::ReadBytes(reader, missing);
-					Log::Info("-> Found extra data of size {0:#,#} at end of file", missing);
+					Log::Info("-> Found extra data of size {0:#,#0} at end of file", missing);
 					TotalElements++;
 				}
 				_cbUpdate(reader, nullptr, "Done loading");

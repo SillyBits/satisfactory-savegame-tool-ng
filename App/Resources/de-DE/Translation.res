@@ -47,9 +47,9 @@
 	<MainWindow.LoadGamefile.Title>Spielstand auswählen</MainWindow.LoadGamefile.Title>
 	<MainWindow.LoadGamefile.Filter>Spielstände (*.sav)|*.sav|Alle Dateien (*.*)|*.*</MainWindow.LoadGamefile.Filter>
 	<MainWindow.LoadGamefile.Progress.Title>Lade Spielstand ...</MainWindow.LoadGamefile.Progress.Title>
-	<MainWindow.LoadGamefile.Progress.CounterFormat>{0:#,#} / {1:#,#} Bytes</MainWindow.LoadGamefile.Progress.CounterFormat>
+	<MainWindow.LoadGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} Bytes</MainWindow.LoadGamefile.Progress.CounterFormat>
 	<MainWindow.LoadGamefile.Progress.Title.2>Erzeuge Baumstruktur ...</MainWindow.LoadGamefile.Progress.Title.2>
-	<MainWindow.LoadGamefile.Progress.CounterFormat.2>{0:#,#} / {1:#,#} Elemente</MainWindow.LoadGamefile.Progress.CounterFormat.2>
+	<MainWindow.LoadGamefile.Progress.CounterFormat.2>{0:#,#0} / {1:#,#0} Elemente</MainWindow.LoadGamefile.Progress.CounterFormat.2>
 
 	<Dialog.About.Title>Über ...</Dialog.About.Title>
 	<Dialog.Changelog.Title>Änderungsprotokoll ...</Dialog.Changelog.Title>
@@ -61,8 +61,8 @@
 	<TreePanel.Tab.Classes>Klassen</TreePanel.Tab.Classes>
 	<TreePanel.Tab.Paths>Pfade</TreePanel.Tab.Paths>
 	
-	<TreePanel.Tree.Objects>Objekte ({0} Elemente)</TreePanel.Tree.Objects>
-	<TreePanel.Tree.Collected>Sammlung ({0} Elemente)</TreePanel.Tree.Collected>
+	<TreePanel.Tree.Objects>Objekte ({0:#,#0} Elemente)</TreePanel.Tree.Objects>
+	<TreePanel.Tree.Collected>Sammlung ({0:#,#0} Elemente)</TreePanel.Tree.Collected>
 
 	<DetailsPanel.Empty>&lt;leer&gt;</DetailsPanel.Empty>
 
@@ -77,8 +77,8 @@
 	<Action.Validate.Title>Validierung</Action.Validate.Title>
 	<Action.Validate.Progress.Title>Validiere ...</Action.Validate.Progress.Title>
 	<Action.Validate.Progress.Validate>Validiere Elemente ...</Action.Validate.Progress.Validate>
-	<Action.Validate.Progress.CounterFormat>{0:#,#} / {1:#,#} Elemente</Action.Validate.Progress.CounterFormat>
+	<Action.Validate.Progress.CounterFormat>{0:#,#0} / {1:#,#0} Elemente</Action.Validate.Progress.CounterFormat>
 	<Action.Validate.NoErrors>Keine Fehler gefunden.</Action.Validate.NoErrors>
-	<Action.Validate.HasErrors>Es wurden {0} fehlerhafte Elemente gefunden!\n\nMöchtest Du den Bericht jetzt einsehen?</Action.Validate.HasErrors>
+	<Action.Validate.HasErrors>Es wurden {0:#,#0} fehlerhafte Elemente gefunden!\n\nMöchtest Du den Bericht jetzt einsehen?</Action.Validate.HasErrors>
 	
 </translation>

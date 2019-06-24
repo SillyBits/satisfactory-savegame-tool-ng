@@ -100,7 +100,7 @@ namespace Savegame
 			}
 			else
 			{
-				_AddLine(String::Format("/ List with {0:#,#} elements:", l->Count));
+				_AddLine(String::Format("/ List with {0:#,#0} elements:", l->Count));
 				_Push(1, '|');
 	
 				Collections::IEnumerator^ e = l->GetEnumerator();
@@ -149,7 +149,7 @@ namespace Savegame
 			}
 			else
 			{
-				_AddLine(String::Format("/ Dict with {0:#,#} elements:", d->Count));
+				_AddLine(String::Format("/ Dict with {0:#,#0} elements:", d->Count));
 				_Push(1, '|');
 
 				//for key,val in d.items():
@@ -261,7 +261,7 @@ namespace Savegame
 						sum += (int) (e->Current);
 					if (sum == 0)
 					{
-						t = String::Format("list({0:#,#})", coll->Count);
+						t = String::Format("list({0:#,#0})", coll->Count);
 						vals = "[0,]";
 					}
 					else
@@ -293,7 +293,7 @@ namespace Savegame
 			if (IsInstance<str>(obj))//str
 				s = "'" + obj + "'";
 			else if (IsType<int>(obj))//int
-				s = String::Format("{0:#,#}", obj);
+				s = String::Format("{0:#,#0}", obj);
 			else
 				s = obj->ToString();
 			return obj->GetType()->Name + ":" + s;

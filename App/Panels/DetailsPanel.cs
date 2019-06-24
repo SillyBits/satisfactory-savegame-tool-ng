@@ -376,7 +376,7 @@ namespace SatisfactorySavegameTool.Panels
 
 	internal class IntControl : TextBox, IValueContainer<int> // Might change to wx.SpinCtrl later
 	{
-		internal readonly string _format = "{0:#,#}"; //Translate._("");
+		internal readonly string _format = "{0:#,#0}"; //TODO: Translate._("");
 
 		internal IntControl(int val)
 			: base()

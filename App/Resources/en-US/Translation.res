@@ -47,9 +47,9 @@
 	<MainWindow.LoadGamefile.Title>Select savegame to load</MainWindow.LoadGamefile.Title>
 	<MainWindow.LoadGamefile.Filter>Savegames (*.sav)|*.sav|All files (*.*)|*.*</MainWindow.LoadGamefile.Filter>
 	<MainWindow.LoadGamefile.Progress.Title>Loading savegame ...</MainWindow.LoadGamefile.Progress.Title>
-	<MainWindow.LoadGamefile.Progress.CounterFormat>{0:#,#} / {1:#,#} bytes</MainWindow.LoadGamefile.Progress.CounterFormat>
+	<MainWindow.LoadGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} bytes</MainWindow.LoadGamefile.Progress.CounterFormat>
 	<MainWindow.LoadGamefile.Progress.Title.2>Building tree ...</MainWindow.LoadGamefile.Progress.Title.2>
-	<MainWindow.LoadGamefile.Progress.CounterFormat.2>{0:#,#} / {1:#,#} elements</MainWindow.LoadGamefile.Progress.CounterFormat.2>
+	<MainWindow.LoadGamefile.Progress.CounterFormat.2>{0:#,#0} / {1:#,#0} elements</MainWindow.LoadGamefile.Progress.CounterFormat.2>
 	
 	<Dialog.About.Title>About ...</Dialog.About.Title>
 	<Dialog.Changelog.Title>Changelog ...</Dialog.Changelog.Title>
@@ -61,8 +61,8 @@
 	<TreePanel.Tab.Classes>Classes</TreePanel.Tab.Classes>
 	<TreePanel.Tab.Paths>Paths</TreePanel.Tab.Paths>
 	
-	<TreePanel.Tree.Objects>Objects ({0} elements)</TreePanel.Tree.Objects>
-	<TreePanel.Tree.Collected>Collected ({0} elements)</TreePanel.Tree.Collected>
+	<TreePanel.Tree.Objects>Objects ({0:#,#0} elements)</TreePanel.Tree.Objects>
+	<TreePanel.Tree.Collected>Collected ({0:#,#0} elements)</TreePanel.Tree.Collected>
 
 	<DetailsPanel.Empty>&lt;empty&gt;</DetailsPanel.Empty>
 	
@@ -77,8 +77,8 @@
 	<Action.Validate.Title>Validation</Action.Validate.Title>
 	<Action.Validate.Progress.Title>Validating ...</Action.Validate.Progress.Title>
 	<Action.Validate.Progress.Validate>Validating elements ...</Action.Validate.Progress.Validate>
-	<Action.Validate.Progress.CounterFormat>{0:#,#} / {1:#,#} elements</Action.Validate.Progress.CounterFormat>
+	<Action.Validate.Progress.CounterFormat>{0:#,#0} / {1:#,#0} elements</Action.Validate.Progress.CounterFormat>
 	<Action.Validate.NoErrors>No errors found.</Action.Validate.NoErrors>
-	<Action.Validate.HasErrors>Found a {0} elements with errors!\n\nWould you like to see the report?</Action.Validate.HasErrors>
+	<Action.Validate.HasErrors>Found a {0:#,#0} elements with errors!\n\nWould you like to see the report?</Action.Validate.HasErrors>
 	
 </translation>
