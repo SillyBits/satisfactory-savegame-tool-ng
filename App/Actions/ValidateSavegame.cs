@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -68,8 +69,8 @@ namespace SatisfactorySavegameTool.Actions
 				Log.Info("Validation took {0}", ofs);
 			});
 
-			_progress.Events.Destroy();
-			_progress = null;
+			//_progress.Events.Destroy();
+			//_progress = null;
 
 			if (outcome)
 			{
@@ -86,8 +87,27 @@ namespace SatisfactorySavegameTool.Actions
 				if (res == MessageBoxResult.Yes)
 				{
 					//=> TODO
+					_report_sb = new StringBuilder();
+					_report_depth = 0;
+
+					await Task.Run(() => {
+						Log.Info("Creating report ...");
+						DateTime start_time = DateTime.Now;
+
+						_CreateReport();
+
+						DateTime end_time = DateTime.Now;
+						TimeSpan ofs = end_time - start_time;
+						Log.Info("Reporting took {0}", ofs);
+					});
+
+					ShowRawTextDialog.Show("", _report_sb.ToString());
+					_report_sb = null;
 				}
 			}
+
+			_progress.Events.Destroy();
+			_progress = null;
 		}
 
 		internal static void _ClearAllErrorStates()
@@ -191,6 +211,7 @@ namespace SatisfactorySavegameTool.Actions
 					#self.__total += 1
 					outcome &= self.__check(prop)
 				 */
+
 				if (sub is Property)
 					outcome &= _Validate(sub as Property);
 				else
@@ -209,6 +230,86 @@ namespace SatisfactorySavegameTool.Actions
 
 			return outcome;
 		}
+
+
+		internal static void _CreateReport()
+		{
+			int total = 1 + _savegame.TotalElements * 10;
+			//Log.Info("Creating report ...", total);
+			_cbStart(total, Translate._("Action.Validate.Report"), "");
+
+			if (_CreateReportRecurs(_savegame.Header))
+				_AddToReport("");
+
+			foreach (Property prop in _savegame.Objects)
+			{
+				if (_CreateReportRecurs(prop))
+					_AddToReport("");
+			}
+
+			foreach (Property prop in _savegame.Objects)
+			{
+				if (_CreateReportRecurs(prop))
+					_AddToReport("");
+			}
+
+			//_CreateReportRecurs(_savegame.Missing);
+
+			_cbStop("Done", "");
+			//Log.Info("... done reporting");
+		}
+
+		internal static bool _CreateReportRecurs(Property prop)
+		{
+			if (prop == null)
+				return false;
+
+			_cbUpdate(null, prop.ToString());
+
+			if (!prop.HasErrors)
+				return false;
+
+			_AddToReport(prop.ToString());
+			foreach (string err in prop.Errors)
+				_AddToReport(err);
+
+			_report_depth++;
+
+			Dictionary<string, object> childs = prop.GetChilds();
+			foreach (string name in childs.Keys)
+			{
+				object sub = childs[name];
+
+				if (sub is Property)
+				{
+					_CreateReportRecurs(sub as Property);
+				}
+				else if (sub is ICollection)
+				{
+					ICollection coll = sub as ICollection;
+					foreach (object obj in coll)
+					{
+						if (obj is Property)
+							_CreateReportRecurs(obj as Property);
+					}
+				}
+				else if (sub is IDictionary)
+				{
+					IDictionary coll = sub as IDictionary;
+					foreach (object key in coll.Keys)
+					{
+						object obj = coll[key];
+						if (obj is Property)
+							_CreateReportRecurs(obj as Property);
+					}
+				}
+			}
+
+			_report_depth--;
+
+			return true;
+		}
+
 
 		/*
 		def __was_missing_reported_already(self, missing):
@@ -250,7 +351,19 @@ namespace SatisfactorySavegameTool.Actions
 		internal static ICallback _callback;
 		internal static int _count;
 		internal static int _errors;
-		
+		internal static StringBuilder _report_sb;
+		internal static int _report_depth;
+
+
+		// Reporting helper
+		//
+
+		internal static void _AddToReport(string s)
+		{
+			_report_sb.Append('\t', _report_depth);
+			_report_sb.AppendLine(s);
+		}
+
 
 		// Validation helpers
 		//
@@ -274,6 +387,39 @@ namespace SatisfactorySavegameTool.Actions
 
 			if (obj is float)
 				return _IsValid((float) obj);
+
+			if (obj is ICollection)
+			{
+				bool outcome = true;
+
+				ICollection coll = obj as ICollection;
+				foreach (object sub in coll)
+				{
+					if (sub is Property)
+						outcome &= _Validate(sub as Property);
+					else
+						outcome &= _ValidateObject(sub);
+				}
+
+				return outcome;
+			}
+
+			if (obj is IDictionary)
+			{
+				bool outcome = true;
+
+				IDictionary coll = obj as IDictionary;
+				foreach (object key in coll.Keys)
+				{
+					object sub = coll[key];
+					if (sub is Property)
+						outcome &= _Validate(sub as Property);
+					else
+						outcome &= _ValidateObject(sub);
+				}
+
+				return outcome;
+			}
 
 			// No handler for validation found
 			return true;
@@ -390,6 +536,13 @@ namespace SatisfactorySavegameTool.Actions
 			{
 				_AddError(prop, string.Format("{0} | {1} | {2} | {3}", a, b, c, d));
 				return false;
+			}
+			float len = (a*a) + (b*b) + (c*c) + (d*d);
+			if (!_IsValid(len, 0.9999f, 1.0001f))
+			{
+				_AddError(prop, string.Format("{0}² + {1}² + {2}² + {3}² = {4} != 1", a, b, c, d, len));
+				return false;
+
 			}
 			return true;
 		}
