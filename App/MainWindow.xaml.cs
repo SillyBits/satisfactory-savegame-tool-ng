@@ -106,7 +106,12 @@ namespace SatisfactorySavegameTool
 
 			File_Save.IsEnabled = File_SaveAs.IsEnabled = modified;
 			File_Close.IsEnabled = has_save;
+			#if DEBUG
+			File_Export.IsEnabled = has_save;//Only for me :D
+			File_Import.IsEnabled = false;
+			#else
 			File_Export.IsEnabled = File_Import.IsEnabled = false;//TODO:
+			#endif
 
 			if (!has_save)
 			{
@@ -171,6 +176,20 @@ namespace SatisfactorySavegameTool
 
 		private void File_Export_Click(object sender, RoutedEventArgs e)
 		{
+			string export_file;
+			if (Config.Root.core.HasItem("exportpath"))
+			{
+				string path = Config.Root.core.exportpath;
+				if (path == "")
+					path = Path.Combine(App.APPPATH, App.EXPORTS);
+				string filename = Path.GetFileName(CurrFile.Filename) + ".export";
+				export_file = Path.Combine(path, filename);
+			}
+			else
+			{
+				export_file = CurrFile.Filename + ".export";
+			}
+			_ExportGamefile(export_file);
 		}
 
 		private void File_Import_Click(object sender, RoutedEventArgs e)
@@ -280,6 +299,70 @@ namespace SatisfactorySavegameTool
 			//TODO: Add modification check
 
 			CurrFile = null;
+		}
+
+		private async void _ExportGamefile(string export_file)
+		{
+			ProgressDialog progress = new ProgressDialog(this, "Exporting save ..."/*Translate._("MainWindow.LoadGamefile.Progress.Title")*/);
+			progress.CounterFormat = "{0} / {1} elements";//Translate._("MainWindow.LoadGamefile.Progress.CounterFormat.2");
+			progress.Interval = 100;
+
+			int count = 0;
+
+			await Task.Run(() => {
+				Log.Info("Exporting file '{0}'\n"
+					   + "-> to          '{1}'", 
+					   CurrFile.Filename, export_file);
+				((ICallback)progress.Events).Start(CurrFile.TotalElements, "Exporting ...", "");
+
+				DateTime start_time = DateTime.Now;
+
+				StreamWriter sw = File.CreateText(export_file);
+
+				sw.Write("/ Header\n");
+				//Dumper.Indent(1, 9);
+				++count;
+				((ICallback)progress.Events).Update(count, null, CurrFile.Header.ToString());
+				Dumper.Dump(CurrFile.Header, sw.Write);
+				sw.Flush();
+				//Dumper.Unindent(1);
+				sw.Write("\\ Header\n");
+
+				sw.Write("/ Objects\n");
+				//Dumper.Indent(1, 9);
+				foreach (Property prop in CurrFile.Objects)
+				{
+					++count;
+					((ICallback)progress.Events).Update(count, null, prop.ToString());
+					Dumper.Dump(prop, sw.Write);
+					sw.Flush();
+				}
+				//Dumper.Unindent(1);
+				sw.Write("\\ Objects\n");
+
+				sw.Write("/ Collected\n");
+				//Dumper.Indent(1, 9);
+				foreach (Property prop in CurrFile.Collected)
+				{
+					++count;
+					((ICallback)progress.Events).Update(count, null, prop.ToString());
+					Dumper.Dump(prop, sw.Write);
+					sw.Flush();
+				}
+				//Dumper.Unindent(1);
+				sw.Write("\\ Collected\n");
+
+				sw.Close();
+
+				DateTime end_time = DateTime.Now;
+				TimeSpan ofs = end_time - start_time;
+				Log.Info("Finished exporting, took {0}", ofs);
+
+				((ICallback)progress.Events).Stop("Done", "");
+			});
+
+			progress.Events.Destroy();
+			MessageBox.Show("Done");
 		}
 #endregion
 

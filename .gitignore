@@ -7,6 +7,9 @@ logs
 
 reports
 
+exports
+*.export
+
 dist
 
 
