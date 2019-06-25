@@ -144,21 +144,21 @@ namespace SatisfactorySavegameTool.Actions
 				object sub = childs[name];
 				if (sub is Property)
 					_CleanErrorsRecurs(sub as Property);
-				else if (sub is ICollection)
-				{
-					ICollection coll = sub as ICollection;
-					foreach (object obj in coll)
-					{
-						if (obj is Property)
-							_CleanErrorsRecurs(obj as Property);
-					}
-				}
 				else if (sub is IDictionary)
 				{
 					IDictionary coll = sub as IDictionary;
 					foreach (object key in coll.Keys)
 					{
 						object obj = coll[key];
+						if (obj is Property)
+							_CleanErrorsRecurs(obj as Property);
+					}
+				}
+				else if (sub is ICollection)
+				{
+					ICollection coll = sub as ICollection;
+					foreach (object obj in coll)
+					{
 						if (obj is Property)
 							_CleanErrorsRecurs(obj as Property);
 					}
@@ -173,9 +173,7 @@ namespace SatisfactorySavegameTool.Actions
 			Log.Info("Validating a {0} elements ...", total);
 			_cbStart(total, Translate._("Action.Validate.Progress.Validate"), "");
 
-			bool outcome = true;
-
-			outcome &= _Validate(_savegame.Header);
+			bool outcome = _Validate(_savegame.Header);
 
 			foreach (Property prop in _savegame.Objects)
 				outcome &= _Validate(prop);
@@ -303,21 +301,21 @@ namespace SatisfactorySavegameTool.Actions
 				{
 					_CreateReportRecurs(sub as Property);
 				}
-				else if (sub is ICollection)
-				{
-					ICollection coll = sub as ICollection;
-					foreach (object obj in coll)
-					{
-						if (obj is Property)
-							_CreateReportRecurs(obj as Property);
-					}
-				}
 				else if (sub is IDictionary)
 				{
 					IDictionary coll = sub as IDictionary;
 					foreach (object key in coll.Keys)
 					{
 						object obj = coll[key];
+						if (obj is Property)
+							_CreateReportRecurs(obj as Property);
+					}
+				}
+				else if (sub is ICollection)
+				{
+					ICollection coll = sub as ICollection;
+					foreach (object obj in coll)
+					{
 						if (obj is Property)
 							_CreateReportRecurs(obj as Property);
 					}
@@ -407,22 +405,6 @@ namespace SatisfactorySavegameTool.Actions
 			if (obj is float)
 				return _IsValid((float) obj);
 
-			if (obj is ICollection)
-			{
-				bool outcome = true;
-
-				ICollection coll = obj as ICollection;
-				foreach (object sub in coll)
-				{
-					if (sub is Property)
-						outcome &= _Validate(sub as Property);
-					else
-						outcome &= _ValidateObject(sub);
-				}
-
-				return outcome;
-			}
-
 			if (obj is IDictionary)
 			{
 				bool outcome = true;
@@ -440,6 +422,22 @@ namespace SatisfactorySavegameTool.Actions
 				return outcome;
 			}
 
+			if (obj is ICollection)
+			{
+				bool outcome = true;
+
+				ICollection coll = obj as ICollection;
+				foreach (object sub in coll)
+				{
+					if (sub is Property)
+						outcome &= _Validate(sub as Property);
+					else
+						outcome &= _ValidateObject(sub);
+				}
+
+				return outcome;
+			}
+
 			// No handler for validation found
 			return true;
 		}
@@ -447,10 +445,6 @@ namespace SatisfactorySavegameTool.Actions
 		internal static float LOWER_SCALE = +1.0e-10f;
 		internal static float LOWER_BOUND = -1.0e+10f;
 		internal static float UPPER_BOUND = +1.0e+10f;
-
-		internal interface IValidator
-		{
-		}
 
 		internal delegate bool ValidatorFunc(Property prop);
 		internal static Dictionary<string, ValidatorFunc> _validators = new Dictionary<string, ValidatorFunc>
@@ -561,7 +555,6 @@ namespace SatisfactorySavegameTool.Actions
 			{
 				_AddError(prop, string.Format("{0}² + {1}² + {2}² + {3}² = {4} != 1", a, b, c, d, len));
 				return false;
-
 			}
 			return true;
 		}
