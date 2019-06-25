@@ -244,6 +244,26 @@ namespace SatisfactorySavegameTool.Panels
 				{
 					parent.AddRow(name, new BoolControl((int)sub));
 				}
+				else if (sub is System.Collections.IDictionary)
+				{
+					System.Collections.IDictionary e = sub as System.Collections.IDictionary;
+					string label = string.Format("{0} [{1}]", name, e.Count);
+					Expando sub_exp = _Add(parent, label, null);
+					if (e.Count == 0)
+						sub_exp.IsEnabled = false;
+					else
+						foreach (object key in e.Keys)
+						{
+							object obj = e[key];
+
+							if (obj is Property)
+							{
+								label = key.ToString();obj.ToString();
+								_Add(sub_exp, label, (Property)obj);
+							}
+							//else?
+						}
+				}
 				else if (sub is System.Collections.ICollection)
 				{
 					System.Collections.ICollection e = sub as System.Collections.ICollection;
