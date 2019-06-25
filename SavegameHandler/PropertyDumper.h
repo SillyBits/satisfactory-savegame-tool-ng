@@ -30,6 +30,7 @@ namespace Savegame
 			_Add(prop);
 		}
 
+
 	protected:
 
 		// Add given object to output
@@ -116,24 +117,26 @@ namespace Savegame
 				}
 				else
 				{
-					String^ str_vals;
+					StringBuilder^ sb = gcnew StringBuilder();
+					sb->Append("  " + e->Current->GetType()->Name + ":[ ");
 					if (IsInstance<str>(e->Current))
 					{
-						str_vals = "[ ";
+						sb->Append("[ ");
 						e->Reset();
 						while (e->MoveNext())
-							str_vals += "'" + e->Current->ToString() + "', ";
-						str_vals += " ]";
+							sb->Append("'" + e->Current->ToString() + "', ");
+						sb->Append(" ]");
 					}
 					else
 					{
-						str_vals = "[ ";
+						sb->Append("[ ");
 						e->Reset();
 						while (e->MoveNext())
-							str_vals += e->Current->ToString() + ", ";
-						str_vals += " ]";
+							sb->Append(e->Current->ToString() + ", ");
+						sb->Append(" ]");
 					}
-					_AddLine("  " + e->Current->GetType()->Name + ":[ " + str_vals + " ]");
+					sb->Append(" ]");
+					_AddLine(sb->ToString());
 				}
 
 				_Pop(1);
@@ -200,7 +203,7 @@ namespace Savegame
 
 		static String^ _IsSimple(Object^ obj)
 		{
-			// Analyze given objectchain, returning either the simplified text
+			// Analyze given object chain, returning either the simplified text
 			// version or 'None' if this can't be inlined due to its complexity.
 
 			if (obj == nullptr)
@@ -246,7 +249,6 @@ namespace Savegame
 				String^ vals = nullptr;
 				if (IsInstance<str>(val))//str
 				{
-					//vals = "[ '" + "', '".join(obj) + "' ]"
 					StringBuilder^ sb = gcnew StringBuilder();
 					sb->Append("[ ");
 					e->Reset();
@@ -270,7 +272,6 @@ namespace Savegame
 					}
 					else
 					{
-						//vals = "[ " + ", ".join([ "{:,d}".format(val) for val in obj ]) + " ]"
 						StringBuilder^ sb = gcnew StringBuilder(coll->Count*10);
 						sb->Append("[ ");
 						e->Reset();
@@ -280,19 +281,21 @@ namespace Savegame
 						vals = sb->ToString();
 					}
 				}
+
 				if (t == nullptr)
 					t = val->GetType()->Name;
+
 				if (vals == nullptr)
 				{
-					//vals = "[ " + ", ".join([ str(val) for val in obj ]) + " ]"
 					StringBuilder^ sb = gcnew StringBuilder();
 					sb->Append("[ ");
 					e->Reset();
 					while (e->MoveNext())
-						sb->Append("'" + e->Current->ToString() + "', ");
+						sb->Append(e->Current->ToString() + ", ");
 					sb->Append(" ]");
 					vals = sb->ToString();
 				}
+
 				return t + ":" + vals;
 			}
 
@@ -300,7 +303,7 @@ namespace Savegame
 			String^ s;
 			if (IsInstance<str>(obj))//str
 				s = "'" + obj + "'";
-			else if (IsType<int>(obj) || IsType<long>(obj))//int
+			else if (IsType<byte>(obj) || IsType<int>(obj) || IsType<long>(obj))//int
 				s = String::Format("{0:#,#0}", obj);
 			else
 				s = obj->ToString();
@@ -310,7 +313,6 @@ namespace Savegame
 		static void _AddProperty(/*Value*/Property^ prop)
 		{
 			_AddLine("-> " + prop->ToString());
-			//_Push();
 
 			Collections::IDictionaryEnumerator^ e = prop->GetChilds()->GetEnumerator();
 			while(e->MoveNext())
@@ -380,8 +382,6 @@ namespace Savegame
 					}
 				}
 			}
-
-			//_Pop();
 		}
 
 
