@@ -42,27 +42,25 @@ namespace Savegame
 			{
 				_AddLine(simple);
 			}
+			else if (IsInstance<Property>(obj))
+			{
+				//if obj not in self.__reported_properties:
+				//	self.__reported_properties.append(prop)
+				_AddProperty(safe_cast<Property^>(obj));
+			}
+			else if (IsInstance<Collections::IDictionary>(obj))
+			{
+				_AddDict(safe_cast<Collections::IDictionary^>(obj));
+			}
+			else if (IsInstance<Collections::ICollection>(obj))
+			{
+				_AddList(safe_cast<Collections::ICollection^>(obj));
+			}
 			else
 			{
-				if (IsInstance</*Value*/Property>(obj))
-				{
-					//if obj not in self.__reported_properties:
-					//	self.__reported_properties.append(prop)
-					_AddProperty(safe_cast</*Value*/Property^>(obj));
-				}
-				else if (IsInstance<Collections::IDictionary>(obj)) //dict
-				{
-					_AddDict(safe_cast<Collections::IDictionary^>(obj));
-				}
-				else if (IsInstance<Collections::ICollection>(obj)) //list
-				{
-					_AddList(safe_cast<Collections::ICollection^>(obj));
-				}
-				else
-				{
-					// Final resort: Raw display
-					_AddLine("**" + obj->GetType()->Name + ": " + obj->ToString());
-				}
+				// Final resort: Raw display
+				// -> Haven't seen this, but lets keep it until we're sure
+				_AddLine("**" + obj->GetType()->Name + ":" + obj->ToString());
 			}
 		}
 
@@ -99,49 +97,54 @@ namespace Savegame
 			if (simple != nullptr)
 			{
 				_AddLine(simple);
+				return;
+			}
+
+			_AddLine(String::Format("/ List with {0:#,#0} elements:", l->Count));
+			_Push(1, '|');
+
+			// We can safely ignore checking elements for nullptr here, 
+			// loader won't add such
+	
+			Collections::IEnumerator^ e = l->GetEnumerator();
+			e->MoveNext();
+			Object^ obj = e->Current;
+
+			e->Reset();
+
+			if (IsInstance<Property>(obj) || IsInstance<Collections::ICollection>(obj))
+			{
+				while (e->MoveNext())
+					_Add(e->Current);
 			}
 			else
 			{
-				_AddLine(String::Format("/ List with {0:#,#0} elements:", l->Count));
-				_Push(1, '|');
-	
-				Collections::IEnumerator^ e = l->GetEnumerator();
-				e->MoveNext();
-				if (IsInstance<Property>(e->Current)
-					|| IsInstance<Collections::ICollection>(e->Current)
-					|| IsInstance<Collections::IDictionary>(e->Current))
+				StringBuilder^ sb = gcnew StringBuilder();
+				sb->Append("  " + obj->GetType()->Name + ":[ ");
+
+				if (IsInstance<str>(obj) || IsInstance<String>(obj))
 				{
-					e->Reset();
 					while (e->MoveNext())
-						_Add(e->Current);
+						sb->Append("'" + e->Current->ToString() + "', ");
+				}
+				else if (IsType<byte>(obj) || IsType<int>(obj) || IsType<long>(obj))
+				{
+					while (e->MoveNext())
+						sb->AppendFormat("{0:#,#0}, ", e->Current);
 				}
 				else
 				{
-					StringBuilder^ sb = gcnew StringBuilder();
-					sb->Append("  " + e->Current->GetType()->Name + ":[ ");
-					if (IsInstance<str>(e->Current))
-					{
-						sb->Append("[ ");
-						e->Reset();
-						while (e->MoveNext())
-							sb->Append("'" + e->Current->ToString() + "', ");
-						sb->Append(" ]");
-					}
-					else
-					{
-						sb->Append("[ ");
-						e->Reset();
-						while (e->MoveNext())
-							sb->Append(e->Current->ToString() + ", ");
-						sb->Append(" ]");
-					}
-					sb->Append(" ]");
-					_AddLine(sb->ToString());
+					// Raw even for floats and doubles to get exact number w/o rounding
+					while (e->MoveNext())
+						sb->Append(e->Current->ToString() + ", ");
 				}
 
-				_Pop(1);
-				_AddLine("\\ end of list");
+				sb->Append(" ]");
+				_AddLine(sb->ToString());
 			}
+
+			_Pop(1);
+			_AddLine("\\ end of list");
 		}
 
 		static void _AddDict(Collections::IDictionary^ d)
@@ -150,55 +153,53 @@ namespace Savegame
 			if (simple != nullptr)
 			{
 				_AddLine(simple);
+				return;
 			}
-			else
+
+			_AddLine(String::Format("/ Dict with {0:#,#0} elements:", d->Count));
+			_Push(1, '|');
+
+			// We can safely ignore checking elements for nullptr here, 
+			// loader won't add such
+
+			Collections::IDictionaryEnumerator^ e = d->GetEnumerator();
+			while (e->MoveNext())
 			{
-				_AddLine(String::Format("/ Dict with {0:#,#0} elements:", d->Count));
-				_Push(1, '|');
+				Object^ key = e->Key;
+				Object^ val = e->Value;
+				String^ s_val = String::Format("Key '{0}'", key);
 
-				//for key,val in d.items():
-				Collections::IDictionaryEnumerator^ e = d->GetEnumerator();
-				while (e->MoveNext())
+				if (IsInstance<Property>(val) || IsInstance<Collections::ICollection>(val))
 				{
-					Object^ key = e->Key;
-					Object^ val = e->Value;
+					_AddLine(s_val + ":");
+					_Push(1, '\t');
+					_Add(val);
+					_Pop(1);
+				}
+				else
+				{
+					s_val += " = " + val->GetType()->Name + ":";
 
-					//if val != None and isinstance(val, (Property.Accessor,list,dict)):
-					if (IsInstance<Property>(val)
-						|| IsInstance<Collections::ICollection>(val)
-						|| IsInstance<Collections::IDictionary>(val))
+					if (IsInstance<str>(val) || IsInstance<String>(val))
 					{
-						_AddLine(String::Format("Key '{0}':", key));
-						_Push(1, '\t');
-						_Add(val);
-						_Pop(1);
+						s_val += "'" + val->ToString() + "'";
+					}
+					else if (IsType<byte>(val) || IsType<int>(val) || IsType<long>(val))
+					{
+						s_val += String::Format("{0:#,#0}", val);
 					}
 					else
 					{
-						String^ s_val;
-						// Inline simple values, incl. any None
-						if (IsInstance<str>(val))
-						{
-							s_val = "str:'" + val->ToString() + "'";
-						}
-						else
-						{
-							if (val != nullptr)
-							{
-								s_val = val->GetType()->Name + ":" + val->ToString();
-							}
-							else
-							{
-								s_val = "<empty>";
-							}
-						}
-						_AddLine(String::Format("Key {0} = {1}", key, s_val));
+						// Raw even for floats and doubles to get exact number w/o rounding
+						s_val += val->ToString();
 					}
-				}
 
-				_Pop(1);
-				_AddLine("\\ end of dict");
+					_AddLine(s_val);
+				}
 			}
+
+			_Pop(1);
+			_AddLine("\\ end of dict");
 		}
 
 		static String^ _IsSimple(Object^ obj)
@@ -212,16 +213,17 @@ namespace Savegame
 			if (IsInstance</*Value*/Property>(obj))
 				return nullptr;
 
-			if (IsInstance<Collections::IDictionary>(obj))//dict
+			if (IsInstance<Collections::IDictionary>(obj))
 			{
 				Collections::IDictionary^ dict = safe_cast<Collections::IDictionary^>(obj);
 				if (dict->Count == 0) //not len(obj):
 					return "<empty dict>";
-				// Could check for one value only, but nahh
+				// Could check for one value only, but nahh, not worth the effort 
+				// as there are only a few properties with dicts in it.
 				return nullptr;
 			}
 
-			if (IsInstance<Collections::ICollection>(obj))//list
+			if (IsInstance<Collections::ICollection>(obj))
 			{
 				Collections::ICollection^ coll = safe_cast<Collections::ICollection^>(obj);
 				if (coll->Count == 0)
@@ -245,68 +247,66 @@ namespace Savegame
 					return nullptr;
 				}
 
-				String^ t = nullptr;
-				String^ vals = nullptr;
-				if (IsInstance<str>(val))//str
+				StringBuilder^ sb = gcnew StringBuilder();
+
+				if (IsInstance<str>(val) || IsInstance<String>(val))
 				{
-					StringBuilder^ sb = gcnew StringBuilder();
 					sb->Append("[ ");
 					e->Reset();
 					while (e->MoveNext())
 						sb->Append("'" + e->Current->ToString() + "', ");
 					sb->Append(" ]");
-					vals = sb->ToString();
 				}
 				else if (IsType<int>(val) || IsType<byte>(val))
 				{
 					// Extra check for those empty .Unknown[N]
+					// (so no check on long here, .Unknown won't be of this type)
 					bool isByte = IsType<byte>(val);
-					int sum = 0;
+
+					long sum = 0;
 					e->Reset();
 					while (e->MoveNext())
 						sum += isByte ? (byte) (e->Current) : (int) (e->Current);
 					if (sum == 0)
-					{
-						t = String::Format("list({0:#,#0})", coll->Count);
-						vals = "[0,]";
-					}
-					else
-					{
-						StringBuilder^ sb = gcnew StringBuilder(coll->Count*10);
-						sb->Append("[ ");
-						e->Reset();
-						while (e->MoveNext())
-							sb->AppendFormat("{0:#,#0}, ", (isByte ? (byte) (e->Current) : (int)(e->Current)));
-						sb->Append(" ]");
-						vals = sb->ToString();
-					}
+						return String::Format("list<%s>({0:#,#0}):[0,]", val->GetType()->Name, coll->Count);
+
+					sb->EnsureCapacity(coll->Count*(isByte ? 5 : 10));
+					sb->Append("[ ");
+					e->Reset();
+					while (e->MoveNext())
+						sb->AppendFormat("{0:#,#0}, ", (isByte ? (byte) (e->Current) : (int)(e->Current)));
+					sb->Append(" ]");
 				}
 
-				if (t == nullptr)
-					t = val->GetType()->Name;
-
-				if (vals == nullptr)
+				if (sb->Length == 0)
 				{
-					StringBuilder^ sb = gcnew StringBuilder();
+					// Raw even for floats and doubles to get exact number w/o rounding
+					// Long will land here too ... but if I remember correctly, there aren't
+					// any long-lists at all, so who cares :D
 					sb->Append("[ ");
 					e->Reset();
 					while (e->MoveNext())
 						sb->Append(e->Current->ToString() + ", ");
 					sb->Append(" ]");
-					vals = sb->ToString();
 				}
 
-				return t + ":" + vals;
+				return val->GetType()->Name + ":" + sb->ToString();
 			}
 
 			// None of the above so this is "defined" to be simple :D
 			String^ s;
-			if (IsInstance<str>(obj))//str
+			if (IsInstance<str>(obj) || IsInstance<String>(obj))
+			{
 				s = "'" + obj + "'";
-			else if (IsType<byte>(obj) || IsType<int>(obj) || IsType<long>(obj))//int
+			}
+			else if (IsType<byte>(obj) || IsType<int>(obj) || IsType<long>(obj))
+			{
 				s = String::Format("{0:#,#0}", obj);
+			}
 			else
+			{
 				s = obj->ToString();
+			}
 			return obj->GetType()->Name + ":" + s;
 		}
 
@@ -323,64 +323,57 @@ namespace Savegame
 				if (name == "Missing")
 				{
 					// This needs special handling, for now, might add a specialized class later
-					if (val != nullptr)
-					{
-						_AddLine("  .Missing");
-						_Push(1, '\t');
-						String^ dump = Helpers::Hexdump(safe_cast<array<byte>^>(val), 16, true, true, 0);
-						array<String^>^ lines = dump->Split('\n');
-						Collections::IEnumerator^ e = lines->GetEnumerator();
-						while(e->MoveNext())
-							_AddLine((String^)e->Current);
-						_Pop(1);
-					}
-					else
+					if (val == nullptr)
 					{
 						_AddLine("  .Missing = <empty>");
+						continue;
 					}
+
+					_AddLine("  .Missing");
+					_Push(1, '\t');
+					String^ dump = Helpers::Hexdump(safe_cast<array<byte>^>(val), 16, true, true, 0);
+					array<String^>^ lines = dump->Split('\n');
+					Collections::IEnumerator^ e = lines->GetEnumerator();
+					while(e->MoveNext())
+						_AddLine((String^)e->Current);
+					_Pop(1);
+					continue;
+				}
+
+				String^ simple = _IsSimple(val);
+				if (simple != nullptr)
+				{
+					_AddLine("  ." + name + " = " + simple);
+					continue;
+				}
+
+				// Inline as much as possible to keep the report short
+				if (IsInstance</*Value*/Property>(val) || IsInstance<Collections::ICollection>(val))
+				{
+					_AddLine("  ." + name + " =");
+					_Push(1, '\t');
+					_Add(val);
+					_Pop(1);
+					continue;
+				}
+
+				// Hmm, _IsSimple above should have catched this already
+				// -> Lets add '??' as marker to see if this arises or not
+				String^ s_val = "  ??." + name + " = " + val->GetType()->Name + ":";
+				if (IsInstance<str>(val) || IsInstance<String>(val))
+				{
+					s_val += "'" + val->ToString() + "'";
+				}
+				else if (IsType<byte>(val) || IsType<int>(val) || IsType<long>(val))
+				{
+					s_val += String::Format("{0:#,#0}, ", val);
 				}
 				else
 				{
-					String^ simple = _IsSimple(val);
-					if (simple != nullptr)
-					{
-						_AddLine("  ." + name + " = " + simple);
-					}
-					else
-					{
-						// Inline as much as possible to keep the report short
-						if (IsInstance</*Value*/Property>(val)
-							|| IsInstance<Collections::ICollection>(val)
-							|| IsInstance<Collections::IDictionary>(val))
-						{
-							_AddLine("  ." + name + " =");
-							_Push(1, '\t');
-							_Add(val);
-							_Pop(1);
-						}
-						else
-						{
-							// Inline simple values, incl. any None
-							String^ s_val = val->ToString();
-							if (IsInstance<str>(val))
-							{
-								s_val = "str:'" + val + "'";
-							}
-							else
-							{
-								if (val != nullptr)
-								{
-									s_val = val->GetType()->Name + ":" + val->ToString();
-								}
-								else
-								{
-									s_val = "<empty>";
-								}
-							}
-							_AddLine("  **." + name + " = " + s_val);
-						}
-					}
+					// Raw even for floats and doubles to get exact number w/o rounding
+					s_val += val->ToString();
 				}
+				_AddLine(s_val);
 			}
 		}
 
