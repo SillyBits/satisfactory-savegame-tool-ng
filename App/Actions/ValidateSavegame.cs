@@ -144,6 +144,25 @@ namespace SatisfactorySavegameTool.Actions
 				object sub = childs[name];
 				if (sub is Property)
 					_CleanErrorsRecurs(sub as Property);
+				else if (sub is ICollection)
+				{
+					ICollection coll = sub as ICollection;
+					foreach (object obj in coll)
+					{
+						if (obj is Property)
+							_CleanErrorsRecurs(obj as Property);
+					}
+				}
+				else if (sub is IDictionary)
+				{
+					IDictionary coll = sub as IDictionary;
+					foreach (object key in coll.Keys)
+					{
+						object obj = coll[key];
+						if (obj is Property)
+							_CleanErrorsRecurs(obj as Property);
+					}
+				}
 			}
 		}
 		
