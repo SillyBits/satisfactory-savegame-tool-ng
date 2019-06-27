@@ -283,17 +283,17 @@ namespace SatisfactorySavegameTool.Panels
 			TreeViewItem class_item;
 
 			string ClassName, PathName;
-			if (prop.TypeName == "Object")
-			{
-				Savegame.Properties.Object obj = (Savegame.Properties.Object) prop;
-				ClassName = obj.ClassName.ToString();
-				PathName = obj.PathName.ToString();
-			}
-			else if (prop.TypeName == "Actor")
+			if (prop is Actor)//.TypeName == "Actor")
 			{
 				Actor actor = (Actor) prop;
 				ClassName = actor.ClassName.ToString();
 				PathName = actor.PathName.ToString();
+			}
+			else if (prop is Savegame.Properties.Object)//.TypeName == "Object")
+			{
+				Savegame.Properties.Object obj = (Savegame.Properties.Object) prop;
+				ClassName = obj.ClassName.ToString();
+				PathName = obj.PathName.ToString();
 			}
 			else
 				throw new Exception(string.Format("Can't handle {0}", prop));
@@ -317,24 +317,6 @@ namespace SatisfactorySavegameTool.Panels
 				if (classnames.Length == 2)
 				{
 					/*
-					if (classnames[0] + "_C" == classnames[1])
-					{
-						// Ignore [1]
-						//return self.__add(parent_item, classnames[0], prop)
-						fullname = path + classnames[0] + ".";
-						classname = classnames[0];
-						class_item = AddOrGetClass(parent, fullname, classnames[0]);
-					}
-					else
-					{
-						// Add both?
-						fullname = path + classnames[0] + ".";
-						class_item = AddOrGetClass(parent, fullname, classnames[0]);
-					
-						fullname += classnames[1];
-						class_item = AddOrGetClass(class_item, fullname, classnames[1]);
-					}
-					*/
 					fullname = path + classnames[0] + ".";
 					class_item = _AddOrGetClass(parent, fullname, classnames[0]);
 
@@ -348,9 +330,31 @@ namespace SatisfactorySavegameTool.Panels
 
 					label = PathName;
 					label = label.Substring(label.IndexOf('.') + 1);
+					*/
+					label = PathName;
+					label = label.Substring(label.LastIndexOf('.') + 1);
+
+					// Before adding more sub-classes, check for both BP_... and FG... condition
+					if ("BP_" + label != classnames[0] && "FG_" + label != classnames[0])
+					{
+						fullname = path + classnames[0] + ".";
+						class_item = _AddOrGetClass(parent, fullname, classnames[0]);
+
+						// Ignore [1] or add both?
+						if (classnames[0] + "_C" != classnames[1])
+						{
+							fullname += classnames[1];
+							class_item = _AddOrGetClass(class_item, fullname, classnames[1]);
+						}
+					}
+					else
+					{
+						class_item = parent;
+					}
+
 					return _AddItem(class_item, label, prop);
 				}
-				Log.Warning("AddClassRecurd: What to do with '{0}'?", ClassName);
+				Log.Warning("AddClassRecurs: What to do with '{0}'?", ClassName);
 			/*
 				fullname = parent_class + classname + "."
 				if not fullname in self.__classes:
