@@ -175,6 +175,7 @@ namespace SatisfactorySavegameTool.Panels
 		internal void _AddRecurs(Expando parent, Dictionary<string,object> childs)
 		{
 			// Sort children first by both their "type" and name
+			#region Sort children
 			var names = childs.Keys.OrderBy((s) => s);
 			List<string> simple = new List<string>();
 			List<string> simple2 = new List<string>();
@@ -217,32 +218,20 @@ namespace SatisfactorySavegameTool.Panels
 			order.AddRange(props);
 			order.AddRange(sets);
 			order.AddRange(last);
+#endregion
 
-			foreach (string name in order)//childs.Keys)
+			foreach (string name in order)
 			{
 				object sub = childs[name];
 				Log.Info("_AddRecurs: {0}", sub != null ? sub.GetType() : sub);
 
-				//TODO: Those are to be moved into explicit type handlers???
-				// Do some testing on property name here as some do need special handling, e.g.
+				// Some "specific" property names will do need special handling, e.g.
 				// - Length : Must be readonly as this will be calculated based on properties stored.
-				// - Missing: Should show a (readonly) hex dump
-				if (name == "Length")
+				// - Missing: Should show a (readonly?) hex dump
+				ValueControl ctrl = ControlFactory.CreateNamed(name, sub);
+				if (ctrl != null)
 				{
-					parent.AddRow(new ReadonlySimpleValueControl<int>(name, (int)sub));
-				}
-				else if (name == "Missing")
-				{
-					parent.AddRow(new HexdumpControl(name, sub as byte[]));
-				}
-				else if (name == "Unknown")// && (sub is Array || sub is System.Collections.IEnumerable))
-				{
-					// There are several .Unknown properties, dump only list-based ones
-					parent.AddRow(new HexdumpControl(name, sub as byte[]));
-				}
-				else if (name == "WasPlacedInLevel" || name == "NeedTransform")
-				{
-					parent.AddRow(name, new BoolControl((int)sub));
+					parent.AddRow(ctrl);
 				}
 				else if (sub is System.Collections.IDictionary)
 				{
@@ -250,19 +239,26 @@ namespace SatisfactorySavegameTool.Panels
 					string label = string.Format("{0} [{1}]", name, e.Count);
 					Expando sub_exp = _Add(parent, label, null);
 					if (e.Count == 0)
+					{
 						sub_exp.IsEnabled = false;
+					}
 					else
+					{
 						foreach (object key in e.Keys)
 						{
 							object obj = e[key];
 
+							label = key.ToString();
 							if (obj is Property)
 							{
-								label = key.ToString();obj.ToString();
 								_Add(sub_exp, label, (Property)obj);
 							}
-							//else?
+							else
+							{
+								sub_exp.AddRow(ControlFactory.CreateSimple(label, obj));
+							}
 						}
+					}
 				}
 				else if (sub is System.Collections.ICollection)
 				{
@@ -274,12 +270,15 @@ namespace SatisfactorySavegameTool.Panels
 					else
 						foreach (object obj in e)
 						{
+							label = obj.ToString();
 							if (obj is Property)
 							{
-								label = obj.ToString();
 								_Add(sub_exp, label, (Property)obj);
 							}
-							//else?
+							else
+							{
+								sub_exp.AddRow(ControlFactory.CreateSimple(label, obj));
+							}
 						}
 				}
 				else if (sub is Property)
@@ -291,8 +290,8 @@ namespace SatisfactorySavegameTool.Panels
 					parent.AddRow(ControlFactory.CreateSimple(name, sub));
 				}
 			}
-
 		}
+
 	}
 
 	internal class Expando : Expander
@@ -784,19 +783,6 @@ namespace SatisfactorySavegameTool.Panels
 	}
 
 
-	//internal class ObjectControl : SimpleValueControl<str>
-	//{
-	//	// Showing stuff swapped!
-	//	internal ObjectControl(string label, ObjectProperty val)
-	//		//: base(val.Name != null ? val.Name.ToString() : label, (str)val.Value)
-	//		//: base(label, val.Name != null ? val.Name : DetailsPanel.strEMPTY)
-	//		//: base(label, val.Value as str)
-	//		: base(val.?, val.? as str)
-	//	{ }
-	//}
-	//=> Must show one or more values
-
-
 	internal class EnumControl : SimpleValueControl<str>
 	{
 		internal EnumControl(string label, EnumProperty val)
@@ -888,6 +874,24 @@ namespace SatisfactorySavegameTool.Panels
 			return                             null;
 		}
 
+
+		internal static ValueControl CreateNamed(string name, object obj)
+		{
+			return _named.ContainsKey(name) ? _named[name](name, obj) : null;
+		}
+
+		internal delegate ValueControl CreatorFunc(string label, object obj);
+
+
+		internal static Dictionary<string, CreatorFunc> _named = new Dictionary<string, CreatorFunc>
+		{
+			{ "Length",				(l,o) => new ReadonlySimpleValueControl<int>(l, (int)o) },
+			{ "Missing",			(l,o) => new HexdumpControl(l, o as byte[]) },
+			{ "Unknown",			(l,o) => new HexdumpControl(l, o as byte[]) },
+			{ "WasPlacedInLevel",	(l,o) => CreateSimple(l, (int)o == 1) },	// Force boolean display
+			{ "NeedTransform",		(l,o) => CreateSimple(l, (int)o == 1) },	// Force boolean display
+			{ "IsValid",			(l,o) => CreateSimple(l, (byte)o == 1) },   // Force boolean display
+		};
 	}
 
 }
