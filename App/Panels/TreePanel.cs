@@ -55,7 +55,7 @@ namespace SatisfactorySavegameTool.Panels
 			_tabClasses = createTab("TreePanel.Tab.Classes", "Icon.TreePanel.Classes.png", _treeClasses);
 			AddChild(_tabClasses);
 
-			_treePaths = null;//new PathTree();
+			_treePaths = new PathTree();
 			_tabPaths = createTab("TreePanel.Tab.Paths", "Icon.TreePanel.Paths.png", _treePaths);
 			AddChild(_tabPaths);
 		}
@@ -64,7 +64,7 @@ namespace SatisfactorySavegameTool.Panels
 		{
 			_treeSimple.CreateTree(savegame, callback);
 			_treeClasses.CreateTree(savegame, callback);
-			//_treePaths.CreateTree(savegame, callback);
+			_treePaths.CreateTree(savegame, callback);
 
 			Dispatcher.Invoke(() => SelectedItem = _tabClasses);
 		}
@@ -73,7 +73,7 @@ namespace SatisfactorySavegameTool.Panels
 		{
 			_treeSimple.ClearTree();
 			_treeClasses.ClearTree();
-			//_treePaths.ClearTree();
+			_treePaths.ClearTree();
 		}
 
 
@@ -395,6 +395,107 @@ namespace SatisfactorySavegameTool.Panels
 		}
 
 		internal Dictionary<string,TreeViewItem> _classes;
+
+	}
+
+	public class PathTree : BasicTree
+	{
+		public PathTree()
+			: base()
+		{ }
+
+		internal override int NoOfExtraElements { get { return 150; } }
+
+		internal override void _CreateTree(Savegame.Savegame savegame, TreeViewItem root)
+		{
+			_paths = new Dictionary<string,TreeViewItem>();
+
+			foreach (Property prop in savegame.Objects)
+				_AddTreeRecurs(root, "", prop);
+
+			foreach (Property prop in savegame.Collected)
+				_AddTreeRecurs(root, "", (Savegame.Properties.Object) prop);
+		}
+
+		internal TreeViewItem _AddTreeRecurs(TreeViewItem parent, string path, Savegame.Properties.Property prop)
+		{
+			string pathname, fullname, label;
+			TreeViewItem path_item;
+
+			string PathName;
+			if (prop is Actor)
+			{
+				Actor actor = (Actor) prop;
+				PathName = actor.PathName.ToString();
+			}
+			else if (prop is Savegame.Properties.Object)
+			{
+				Savegame.Properties.Object obj = (Savegame.Properties.Object) prop;
+				PathName = obj.PathName.ToString();
+			}
+			else
+				throw new Exception(string.Format("Can't handle {0}", prop));
+
+			string remain = PathName.Substring(path.Length);
+			if (remain.Contains(':'))
+			{
+				pathname = remain.Split(':')[0];
+				fullname = path + pathname + ":";
+				path_item = _AddOrGetPath(parent, fullname, pathname);
+				return _AddTreeRecurs(path_item, fullname, prop);
+			}
+			if (remain.Contains('.'))
+			{
+				string[] pathnames = remain.Split('.');
+				if (pathnames.Length == 2)
+				{
+					label = PathName;
+					label = label.Substring(label.LastIndexOf('.') + 1);
+
+					// Before adding more sub-classes, check for both BP_... and FG... condition
+					if ("BP_" + label != pathnames[0] && "FG_" + label != pathnames[0])
+					{
+						fullname = path + pathnames[0] + ".";
+						path_item = _AddOrGetPath(parent, fullname, pathnames[0]);
+					}
+					else
+					{
+						path_item = parent;
+					}
+
+					return _AddItem(path_item, label, prop);
+				}
+				else if (pathnames.Length == 3)
+				{
+					label = PathName;
+					label = label.Substring(label.LastIndexOf('.') + 1);
+
+					fullname = path + pathnames[0] + ".";
+					path_item = _AddOrGetPath(parent, fullname, pathnames[0]);
+
+					fullname = path + pathnames[1] + ".";
+					path_item = _AddOrGetPath(parent, fullname, pathnames[1]);
+
+					return _AddItem(path_item, label, prop);
+				}
+				Log.Warning("AddClassRecurs: What to do with '{0}'?", PathName);
+			}
+
+			label = PathName;
+			label = label.Substring(label.IndexOf('.') + 1);
+			return _AddItem(parent, label, prop);
+		}
+
+		internal TreeViewItem _AddOrGetPath(TreeViewItem parent, string fullname, string pathname)
+		{
+			if (_paths.ContainsKey(fullname))
+				return _paths[fullname];
+			TreeViewItem path_item = _AddItem(parent, pathname);
+			_paths.Add(fullname, path_item);
+			return path_item;
+		}
+
+		internal Dictionary<string,TreeViewItem> _paths;
 
 	}
 
