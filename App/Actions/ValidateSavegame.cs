@@ -121,7 +121,7 @@ namespace SatisfactorySavegameTool.Actions
 			foreach (Property prop in _savegame.Objects)
 				_CleanErrorsRecurs(prop);
 
-			foreach (Property prop in _savegame.Objects)
+			foreach (Property prop in _savegame.Collected)
 				_CleanErrorsRecurs(prop);
 
 			//_CleanErrorsRecurs(_savegame.Missing);
@@ -264,7 +264,7 @@ namespace SatisfactorySavegameTool.Actions
 					_AddToReport("");
 			}
 
-			foreach (Property prop in _savegame.Objects)
+			foreach (Property prop in _savegame.Collected)
 			{
 				if (_CreateReportRecurs(prop))
 					_AddToReport("");
