@@ -414,10 +414,10 @@ namespace SatisfactorySavegameTool.Panels
 				_AddTreeRecurs(root, "", prop);
 
 			foreach (Property prop in savegame.Collected)
-				_AddTreeRecurs(root, "", (Savegame.Properties.Object) prop);
+				_AddTreeRecurs(root, "", prop);
 		}
 
-		internal TreeViewItem _AddTreeRecurs(TreeViewItem parent, string path, Savegame.Properties.Property prop)
+		internal TreeViewItem _AddTreeRecurs(TreeViewItem parent, string path, Property prop)
 		{
 			string pathname, fullname, label;
 			TreeViewItem path_item;
@@ -432,6 +432,11 @@ namespace SatisfactorySavegameTool.Panels
 			{
 				Savegame.Properties.Object obj = (Savegame.Properties.Object) prop;
 				PathName = obj.PathName.ToString();
+			}
+			else if (prop is Collected)
+			{
+				Collected coll = (Collected) prop;
+				PathName = coll.PathName.ToString();
 			}
 			else
 				throw new Exception(string.Format("Can't handle {0}", prop));
