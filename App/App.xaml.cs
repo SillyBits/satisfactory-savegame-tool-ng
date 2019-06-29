@@ -24,6 +24,7 @@ namespace SatisfactorySavegameTool
 		public static string TRANSLATIONFILE = "Translation.res";
 		public static string LANGUAGE        = null;
 		public static string EXPORTS         = "exports";
+		public static string EXPORTPATH      = null;
 		//public static string ...
 
 
@@ -50,8 +51,9 @@ namespace SatisfactorySavegameTool
 			path = @"E:\GitHub\satisfactory-savegame-tool-ng\App";
 #endif
 
-			APPPATH = path;
+			APPPATH      = path;
 			RESOURCEPATH = Path.Combine(path, RESOURCES);
+			EXPORTPATH   = Path.Combine(path, EXPORTS);
 
 			_logger = new Logger(Path.Combine(APPPATH, "logs"), APPNAME, Logger.Level.Debug);
 			_config = new ConfigFile(APPPATH, APPNAME);
