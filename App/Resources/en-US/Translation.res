@@ -7,6 +7,7 @@
 	<Abort>Abort</Abort>
 	<Yes>Yes</Yes>
 	<No>No</No>
+	<Save>Save ...</Save>
 
 	<MainWindow.Title>Satisfactory Savegame Tool</MainWindow.Title>
 	
@@ -67,6 +68,16 @@
 	<DetailsPanel.Empty>&lt;empty&gt;</DetailsPanel.Empty>
 	
 	<ImageDialog.Title>Image</ImageDialog.Title>
+	<ImageDialog.Save.Title>Save as ...</ImageDialog.Save.Title>
+	<ImageDialog.Save.Filter>PNG file (*.png)|*.png|All files (*.*)|*.*</ImageDialog.Save.Filter>
+	<ImageDialog.Save.DefaultExt>.png</ImageDialog.Save.DefaultExt>
+	<ImageDialog.Save.UnknownFormat>Selected image format is not supported!</ImageDialog.Save.UnknownFormat>
+	<ImageDialog.Save.Failed>Error occured while saving!\n\n{0}</ImageDialog.Save.Failed>
+
+	<ShowRawTextDialog.Title>Raw text</ShowRawTextDialog.Title>
+	<ShowRawTextDialog.Save.Title>Save as ...</ShowRawTextDialog.Save.Title>
+	<ShowRawTextDialog.Save.Filter>Text file (*.txt)|*.txt|All files (*.*)|*.*</ShowRawTextDialog.Save.Filter>
+	<ShowRawTextDialog.Save.DefaultExt>.txt</ShowRawTextDialog.Save.DefaultExt>
 
 	<ImageControl.Label>Bitmap of size {0}x{1} with {2} color channels</ImageControl.Label>
 	<ImageControl.Button>Show ...</ImageControl.Button>

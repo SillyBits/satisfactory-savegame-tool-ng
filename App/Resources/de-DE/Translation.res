@@ -7,6 +7,7 @@
 	<Abort>Abbrechen</Abort>
 	<Yes>Ja</Yes>
 	<No>Nein</No>
+	<Save>Speichern ...</Save>
 	
 	<MainWindow.Title>Satisfactory Spielstand Helfer</MainWindow.Title>
 	
@@ -67,6 +68,16 @@
 	<DetailsPanel.Empty>&lt;leer&gt;</DetailsPanel.Empty>
 
 	<ImageDialog.Title>Bild</ImageDialog.Title>
+	<ImageDialog.Save.Title>Speichern unter ...</ImageDialog.Save.Title>
+	<ImageDialog.Save.Filter>PNG Datei (*.png)|*.png|Alle Dateien (*.*)|*.*</ImageDialog.Save.Filter>
+	<ImageDialog.Save.DefaultExt>.png</ImageDialog.Save.DefaultExt>
+	<ImageDialog.Save.UnknownFormat>Das gewählte Bildformat wird nicht unterstützt!</ImageDialog.Save.UnknownFormat>
+	<ImageDialog.Save.Failed>Fehler beim Speichern!\n\n{0}</ImageDialog.Save.Failed>
+
+	<ShowRawTextDialog.Title>Rohtext</ShowRawTextDialog.Title>
+	<ShowRawTextDialog.Save.Title>Speichern unter ...</ShowRawTextDialog.Save.Title>
+	<ShowRawTextDialog.Save.Filter>Textdatei (*.txt)|*.txt|Alle Dateien (*.*)|*.*</ShowRawTextDialog.Save.Filter>
+	<ShowRawTextDialog.Save.DefaultExt>.txt</ShowRawTextDialog.Save.DefaultExt>
 	
 	<ImageControl.Label>Bild der Größe {0}x{1} mit {2} Farbkanälen</ImageControl.Label>
 	<ImageControl.Button>Anzeigen ...</ImageControl.Button>
