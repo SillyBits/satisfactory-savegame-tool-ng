@@ -8,5 +8,12 @@ namespace CoreLib
 {
     public class CoreLib
     {
+
+#if DEBUG
+		public const bool VERBOSITY = true;
+#else
+		public const bool VERBOSITY = false;
+#endif
+
     }
 }
