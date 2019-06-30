@@ -227,6 +227,11 @@ public static class Log
 		L.Error(msg, exc);
 	}
 
+	public static void _(string msg, CoreLib.Logger.Level level = CoreLib.Logger.Level.Info, bool add_ts = true, bool add_nl = true)
+	{
+		L.Log(msg, level, add_ts, add_nl);
+	}
+
 
 	private static CoreLib.Logger L
 	{
