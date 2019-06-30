@@ -52,10 +52,12 @@ namespace Savegame
 		// Caches all Property-based classes in assembly and allows for constructing those with .Invoke(Object[])
 		static void Create()
 		{
-			Log::Debug("Discovering all available property types ...");
+			if (VERBOSITY)
+				Log::Debug("Discovering all available property types ...");
 
 			Assembly^ ass = Assembly::GetCallingAssembly();
-			Log::Debug("(in " + ass->FullName + ")");
+			if (VERBOSITY)
+				Log::Debug("(in " + ass->FullName + ")");
 
 			// Signature of constructor were looking for
 			//array<Type^>^ cons = { Property::typeid, str::typeid, int::typeid, int::typeid, Object::typeid };
@@ -77,12 +79,14 @@ namespace Savegame
 					if (ci)
 					{
 						Cons.Add(ti->Name, ci);
-						Log::Debug("- {0} ({1})", ti->Name, ti->FullName);
+						if (VERBOSITY)
+							Log::Debug("- {0} ({1})", ti->Name, ti->FullName);
 					}
 				}
 			}
 
-			Log::Debug("... discovered a total of {0} property types", Cons.Count);
+			if (VERBOSITY)
+				Log::Debug("... discovered a total of {0} property types", Cons.Count);
 		}
 
 		//static Dictionary<String^, TypeInfo^> Types;
@@ -104,7 +108,8 @@ namespace Savegame
 		}
 		static Published^ Retrieve(Type^ t)
 		{
-			Log::Debug("Discovering all published members for '{0}' ...", t);
+			if (VERBOSITY)
+				Log::Debug("Discovering all published members for '{0}' ...", t);
 
 			Published^ published = gcnew Published();
 
@@ -128,7 +133,8 @@ namespace Savegame
 					{
 						if (!published->ContainsKey(mi->Name))
 						{
-							Log::Debug("- " + mi);
+							if (VERBOSITY)
+								Log::Debug("- " + mi);
 							published->Add(mi->Name, mi);
 						}
 						else
@@ -148,7 +154,8 @@ namespace Savegame
 
 			}
 
-			Log::Debug("... discovered a total of {0} property types", published->Count);
+			if (VERBOSITY)
+				Log::Debug("... discovered a total of {0} property types", published->Count);
 
 			return published;
 		}

@@ -23,6 +23,13 @@ using namespace CoreLib;
 using namespace PubSub;
 
 
+#ifdef _DEBUG
+const bool VERBOSITY = true;
+#else
+const bool VERBOSITY = false;
+#endif
+
+
 #include "Types.h"
 #include "Reader.h"
 #include "Properties.h"
