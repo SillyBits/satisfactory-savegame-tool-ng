@@ -65,6 +65,11 @@ namespace Savegame {
 		}
 
 
+		static void LogRedirect(String^ s)
+		{
+			Log::_(s, Logger::Level::Info, false, false);
+		}
+
 		void _Load(ICallback^ callback)
 		{
 			_callback = callback;
@@ -86,11 +91,9 @@ namespace Savegame {
 				_cbUpdate(reader, nullptr, "Header");
 
 				// Writing header to log
-				//dumper = PropertyDumper.Dumper(
-				//	lambda text: Log.Log(text, add_ts=False, add_newline=False))
-				//dumper.Dump(self.Header)
-				//dumper = None
-				Log::Info("-> {0}", Header);
+				//Log::Info("-> {0}", Header);
+				Properties::Dumper::WriteFunc^ writer = gcnew Properties::Dumper::WriteFunc(&LogRedirect);
+				Properties::Dumper::Dump(Header, writer);
 
 				Objects = gcnew Properties::Properties;
 				Collected = gcnew Properties::Properties;
