@@ -51,6 +51,7 @@
     <Compile Include="Callback.cs" />
     <Compile Include="ConfigFile.cs" />
     <Compile Include="CoreLib.cs" />
+    <Compile Include="FactoryHelpers.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="ImageHandler.cs" />
     <Compile Include="Language.cs" />
