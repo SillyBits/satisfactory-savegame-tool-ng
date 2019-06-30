@@ -9,7 +9,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 using CoreLib;
-using Savegame.Properties;
+using P = Savegame.Properties;
 
 using SatisfactorySavegameTool.Dialogs;
 
@@ -168,7 +168,7 @@ namespace SatisfactorySavegameTool.Panels
 		internal ICallback _callback;
 		internal int _count;
 
-		internal TreeViewItem _AddItem(TreeViewItem parent, string label, Property prop = null)
+		internal TreeViewItem _AddItem(TreeViewItem parent, string label, P.Property prop = null)
 		{
 			_count ++;
 			return Dispatcher.Invoke(() => {
@@ -196,7 +196,7 @@ namespace SatisfactorySavegameTool.Panels
 			if (!tvi.IsSelected)
 				tvi.IsSelected = true;
 
-			Property prop = tvi.Tag as Property;
+			P.Property prop = tvi.Tag as P.Property;
 			if (prop == null)
 			{
 				e.Handled = true;
@@ -212,13 +212,13 @@ namespace SatisfactorySavegameTool.Panels
 			if (tvi == null)
 				return;
 
-			Property prop = tvi.Tag as Property;
+			P.Property prop = tvi.Tag as P.Property;
 			if (prop == null)
 				return;
 
 			StringBuilder sb = new StringBuilder();
-			Dumper.WriteFunc writer = (s) => { sb.Append(s); };
-			Dumper.Dump(prop, writer);
+			P.Dumper.WriteFunc writer = (s) => { sb.Append(s); };
+			P.Dumper.Dump(prop, writer);
 
 			ShowRawTextDialog.Show(Translate._("Dialog.PropertyDump.Title"), sb.ToString());
 		}
@@ -238,12 +238,12 @@ namespace SatisfactorySavegameTool.Panels
 		{
 			String label = string.Format(Translate._("TreePanel.Tree.Objects"), savegame.Objects.Count);
 			TreeViewItem objects = _AddItem(root, label, null);
-			foreach (Property prop in savegame.Objects)
+			foreach (P.Property prop in savegame.Objects)
 				_AddItem(objects, prop.ToString(), prop);
 
 			label = string.Format(Translate._("TreePanel.Tree.Collected"), savegame.Collected.Count);
 			TreeViewItem collected = _AddItem(root, label, null);
-			foreach (Property prop in savegame.Collected)
+			foreach (P.Property prop in savegame.Collected)
 				_AddItem(collected, prop.ToString(), prop);
 
 			//if self.__savegame.Missing:
@@ -266,7 +266,7 @@ namespace SatisfactorySavegameTool.Panels
 		{
 			_classes = new Dictionary<string,TreeViewItem>();
 
-			foreach (Property prop in savegame.Objects)
+			foreach (P.Property prop in savegame.Objects)
 				_AddClassRecurs(root, "/", prop);
 
 			//foreach (Property prop in savegame.Collected)
@@ -283,13 +283,13 @@ namespace SatisfactorySavegameTool.Panels
 			TreeViewItem class_item;
 
 			string ClassName, PathName;
-			if (prop is Actor)//.TypeName == "Actor")
+			if (prop is P.Actor)//.TypeName == "Actor")
 			{
-				Actor actor = (Actor) prop;
+				P.Actor actor = (P.Actor) prop;
 				ClassName = actor.ClassName.ToString();
 				PathName = actor.PathName.ToString();
 			}
-			else if (prop is Savegame.Properties.Object)//.TypeName == "Object")
+			else if (prop is P.Object)//.TypeName == "Object")
 			{
 				Savegame.Properties.Object obj = (Savegame.Properties.Object) prop;
 				ClassName = obj.ClassName.ToString();
@@ -410,32 +410,32 @@ namespace SatisfactorySavegameTool.Panels
 		{
 			_paths = new Dictionary<string,TreeViewItem>();
 
-			foreach (Property prop in savegame.Objects)
+			foreach (P.Property prop in savegame.Objects)
 				_AddTreeRecurs(root, "", prop);
 
-			foreach (Property prop in savegame.Collected)
+			foreach (P.Property prop in savegame.Collected)
 				_AddTreeRecurs(root, "", prop);
 		}
 
-		internal TreeViewItem _AddTreeRecurs(TreeViewItem parent, string path, Property prop)
+		internal TreeViewItem _AddTreeRecurs(TreeViewItem parent, string path, P.Property prop)
 		{
 			string pathname, fullname, label;
 			TreeViewItem path_item;
 
 			string PathName;
-			if (prop is Actor)
+			if (prop is P.Actor)
 			{
-				Actor actor = (Actor) prop;
+				P.Actor actor = (P.Actor) prop;
 				PathName = actor.PathName.ToString();
 			}
-			else if (prop is Savegame.Properties.Object)
+			else if (prop is P.Object)
 			{
-				Savegame.Properties.Object obj = (Savegame.Properties.Object) prop;
+				Savegame.Properties.Object obj = (P.Object) prop;
 				PathName = obj.PathName.ToString();
 			}
-			else if (prop is Collected)
+			else if (prop is P.Collected)
 			{
-				Collected coll = (Collected) prop;
+				P.Collected coll = (P.Collected) prop;
 				PathName = coll.PathName.ToString();
 			}
 			else
