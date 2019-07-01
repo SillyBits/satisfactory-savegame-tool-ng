@@ -114,15 +114,21 @@ namespace SatisfactorySavegameTool.Actions
 		{
 			int total = 1 + _savegame.TotalElements * 10;
 			Log.Info("Cleaning a {0} elements ...", total);
-			_cbStart(total, Translate._("Action.Prepare"), "");
+			_cbStart(total, Translate._("Action.Prepare"), " ");
 
 			_CleanErrorsRecurs(_savegame.Header);
 
 			foreach (Property prop in _savegame.Objects)
+			{
+				_cbUpdate(null, prop.ToString());
 				_CleanErrorsRecurs(prop);
+			}
 
 			foreach (Property prop in _savegame.Collected)
+			{
+				_cbUpdate(null, prop.ToString());
 				_CleanErrorsRecurs(prop);
+			}
 
 			//_CleanErrorsRecurs(_savegame.Missing);
 
