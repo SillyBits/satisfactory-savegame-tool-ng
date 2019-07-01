@@ -49,7 +49,7 @@
 	<MainWindow.LoadGamefile.Filter>Spielstände (*.sav)|*.sav|Alle Dateien (*.*)|*.*</MainWindow.LoadGamefile.Filter>
 	<MainWindow.LoadGamefile.Progress.Title>Lade Spielstand ...</MainWindow.LoadGamefile.Progress.Title>
 	<MainWindow.LoadGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} Bytes</MainWindow.LoadGamefile.Progress.CounterFormat>
-	<MainWindow.LoadGamefile.Progress.Title.2>Erzeuge Baumstruktur ...</MainWindow.LoadGamefile.Progress.Title.2>
+	<MainWindow.LoadGamefile.Progress.Title.2>Erzeuge Baumstrukturen ...</MainWindow.LoadGamefile.Progress.Title.2>
 	<MainWindow.LoadGamefile.Progress.CounterFormat.2>{0:#,#0} / {1:#,#0} Elemente</MainWindow.LoadGamefile.Progress.CounterFormat.2>
 
 	<Dialog.About.Title>Über ...</Dialog.About.Title>
