@@ -30,11 +30,16 @@ namespace CoreLib
 		public static LanguageHandler LANG = null;
 
 		public LanguageHandler(string path, string langid = null, string translationfilename = null)
+			: this(path, langid, new string[] { translationfilename })
+		{
+		}
+
+		public LanguageHandler(string path, string langid = null, string[] translationfilenames = null)
 		{
 			_path = path;
 
-			if (translationfilename != null)
-				_langfile = translationfilename;
+			if (translationfilenames != null)
+				_langfiles = translationfilenames;
 
 			_LoadLanguages();
 
@@ -55,9 +60,9 @@ namespace CoreLib
 		public IReadOnlyCollection<string> LanguagesAvail { get { return _languages.AsReadOnly(); } }
 		public IReadOnlyDictionary<string,string> TranslationsAvail { get { return _translations; } }
 
-		public bool SelectLanguage(string langid)
+		public void SelectLanguage(string langid)
 		{
-			return _LoadTranslations(langid);
+			_LoadTranslations(langid);
 		}
 
 		public bool HasTranslation(string id)
@@ -82,9 +87,8 @@ namespace CoreLib
 			return t;
 		}
 
-
 		internal string _path = null;
-		internal string _langfile = "lang.dat";
+		internal string[] _langfiles = { "lang.dat" };
 		internal List<string> _languages = null;
 		internal string _version = null;
 		internal string _langid = null;
@@ -104,22 +108,45 @@ namespace CoreLib
 			IEnumerable<string> dirs = Directory.EnumerateDirectories(_path);
 			foreach (string dir in dirs)
 			{
-				if (File.Exists(Path.Combine(dir, _langfile)))
+				foreach (string filename in _langfiles)
 				{
-					string langid = Path.GetFileName(dir);
-					Log.Info("- adding '{0}'", langid);
-					_languages.Add(langid);
+					if (File.Exists(Path.Combine(dir, filename)))
+					{
+						// At least on translation file found, so language is valid
+						string langid = Path.GetFileName(dir);
+						Log.Info("- adding '{0}'", langid);
+						_languages.Add(langid);
+						break;
+					}
 				}
 			}
 			Log.Info("... found a total of {0} languages", _languages.Count);
 		}
 
-		internal bool _LoadTranslations(string langid)
+		internal void _LoadTranslations(string langid)
 		{
-			if (_languages == null || !_languages.Contains(langid))
-				return false;
+			Log.Info("Loading translations for language '{0}' ...", langid);
 
-			string filename = Path.Combine(_path, langid, _langfile);
+			if (_languages == null || !_languages.Contains(langid))
+				return;
+
+			_langid = langid;
+			_translations = new Dictionary<string, string>();
+
+			foreach (string filename in _langfiles)
+			{
+				string filepath = Path.Combine(_path, _langid, filename);
+				if (File.Exists(filepath))
+					_LoadTranslationFile(filepath);
+				else
+					Log.Warning("Translation missing: '{0}\\{1}'", _langid, filename);
+			}
+
+			Log.Info("... loaded a total of {0} translations", _translations.Count);
+		}
+
+		internal void _LoadTranslationFile(string filename)
+		{
 			Log.Info("Loading translations from '{0}'", filename);
 
 			XmlDocument xml = new XmlDocument();
@@ -135,7 +162,7 @@ namespace CoreLib
 							+ exc.StackTrace.ToString() + "\n"
 							;
 				Log.Error(msg);
-				return false;
+				return;
 			}
 			if (xml.ChildNodes.Count != 2)
 				throw new Exception("INVALID LANGUAGE FILE!");
@@ -150,31 +177,30 @@ namespace CoreLib
 				|| node.Attributes.Count < 2)
 				throw new Exception("INVALID LANGUAGE FILE!");
 
-			_version = null;
-			_langid = null;
+			string version = null;
+			string langid = null;
 			foreach (XmlAttribute attr in node.Attributes)
 			{
 				switch (attr.Name)
 				{
-					case "version": _version = attr.InnerText; break;
-					case "langid": _langid = attr.InnerText; break;
+					case "version": version = attr.InnerText; break;
+					case "langid": langid = attr.InnerText; break;
 				}
 			}
-			if (_version == null || _langid != langid)
+			if (version == null || langid != _langid)
 				throw new Exception("INVALID LANGUAGE FILE!");
 
-			_translations = new Dictionary<string, string>();
+			int added = 0;
 			foreach (XmlNode childnode in node.ChildNodes)
 			{
 				XmlElement element = childnode as XmlElement;
 				if (element == null)
 					continue; // Skip comments and such
 				_translations.Add(element.Name, element.InnerText);
+				++added;
 			}
 
-			Log.Info("... loaded a total of {0} translations", _translations.Count);
-
-			return true;
+			Log.Info("... loaded an additional {0} translations", added);
 		}
 
 	}
@@ -185,7 +211,16 @@ namespace CoreLib
 // To allow for easy access
 public class Translate
 {
-	public static string _(string id) { return L.Translate(id); }
+	public static string _(string id)
+	{
+		return L.Translate(id);
+	}
+
+	public static bool Has(string id)
+	{
+		return L.HasTranslation(id);
+	}
+
 
 	private static CoreLib.LanguageHandler L
 	{
