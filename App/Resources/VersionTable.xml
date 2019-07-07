@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<versions>
+	<version build="95718"  type="1" version="0.1"    remarks="Update 1" />		<!-- Early Access Release - v0.1, Update 1 - CL 95718 -->
+	<version build="96032"  type="1" version="0.101"  remarks="Hotfix 1" />	<!-- Early Access - v0.101, Hotfix 1 - CL 96032 -->
+	<version build="96463"  type="1" version="0.102"  remarks="Hotfix 2" />	<!-- Early Access - v0.102, Hotfix 2 - CL 96463 -->
+	<version build="96731"  type="1" version="0.103"  remarks="Hotfix 3" />	<!-- Early Access - v0.103, Hotfix 3 - CL 96731 -->
+	<version build="97236"  type="1" version="0.104" />										<!-- Early Access - v0.104 - CL 97236 -->
+	<version build="98202"  type="0" version="0.1.5" />										<!-- Early Access (EXPERIMENTAL) - v0.1.5 - Build 98202 -->
+	<version build="98224"  type="0" version="0.1.5" />										<!-- Early Access (EXPERIMENTAL) - v0.1.5 - Build 98224 -->
+	<version build="98394"  type="0" version="0.1.6" />										<!-- Early Access (EXPERIMENTAL) - v0.1.6 - Build 98394 -->
+	<version build="98445"  type="0" version="0.1.6"  remarks="Hotfix 1" />	<!-- Early Access (EXPERIMENTAL) - v0.1.6 - Build 98445 (For real this time) -->
+	<version build="98611"  type="0" version="0.1.7"  remarks="Hotfix 2" />	<!-- Early Access (EXPERIMENTAL) - v0.1.7 - Build 98611 -->
+	<version build="98779"  type="0" version="0.1.8"  remarks="Hotfix 3" />	<!-- Early Access (EXPERIMENTAL) - v0.1.8 - Build 98779 -->
+	<version build="98904"  type="0" version="0.1.9"  remarks="Hotfix 4" />	<!-- Early Access (EXPERIMENTAL) - v0.1.9 - Build 98904 -->
+	<version build="98994"  type="0" version="0.1.10" remarks="Hotfix 5" /><!-- Early Access (EXPERIMENTAL) - v0.1.10 - Build 98994 -->
+	<version build="99133"  type="1" version="0.1.11" />										<!-- Early Access - v0.1.11 - Build 99133 -->
+	<version build="99303"  type="1" version="0.1.12" />										<!-- Early Access - v0.1.12 - Build 99303 -->
+	<version build="99427"  type="1" version="0.1.13" />										<!-- Early Access - v0.1.13 - Build 99427 -->
+	<version build="100692" type="0" version="0.1.14" />									<!-- Early Access (EXPERIMENTAL) - v0.1.14 - Build 100692 -->
+	<version build="100979" type="0" version="0.1.15" />									<!-- Early Access (EXPERIMENTAL) - v0.1.15 - Build 100979 -->
+	<version build="101177" type="0" version="0.1.16" />									<!-- Early Access (EXPERIMENTAL) - v0.1.16 - Build 101177 -->
+	<version build="101256" type="0" version="0.1.17" />									<!-- Early Access (EXPERIMENTAL) - v0.1.17 - Build 101256 -->
+	<version build="101353" type="0" version="0.1.17" />									<!-- Early Access (EXPERIMENTAL) - v0.1.17 - Build 101353 -->
+<!--<version build="101###" type="0" version="0.1.18" />								No 0.1.18?? -->
+	<version build="101486" type="0" version="0.1.19" />									<!-- Early Access (EXPERIMENTAL) - v0.1.19 - Build 101486 -->
+	<version build="101547" type="0" version="0.1.20" />									<!-- Early Access (EXPERIMENTAL) - v0.1.20 - Build 101547 -->
+	<version build="101665" type="1" version="0.2.1" />										<!-- Early Access - v0.2.1 - Build 101665 -->
+	<version build="101829" type="1" version="0.2.1.1" />									<!-- Early Access - v0.2.1.1 - Build 101829 -->
+	<version build="101873" type="1" version="0.2.1.2" />									<!-- Early Access - v0.2.1.2 - Build 101873 -->
+</versions>

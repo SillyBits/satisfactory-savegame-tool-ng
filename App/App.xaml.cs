@@ -10,6 +10,8 @@ using System.Windows;
 
 using CoreLib;
 
+using SatisfactorySavegameTool.Supplements;
+
 namespace SatisfactorySavegameTool
 {
     /// <summary>
@@ -32,6 +34,7 @@ namespace SatisfactorySavegameTool
 		protected Logger _logger = null;
 		protected ConfigFile _config = null;
 		protected LanguageHandler _languages = null;
+		protected VersionTable _versions = null;
 
 		protected override void OnStartup(StartupEventArgs e)
 		{
@@ -60,6 +63,7 @@ namespace SatisfactorySavegameTool
 			_config = new ConfigFile(APPPATH, APPNAME);
 			_languages = new LanguageHandler(RESOURCEPATH, null, 
 				new string[] { TRANSLATIONFILE_MAIN, TRANSLATIONFILE_FG });
+			_versions = new Supplements.VersionTable();
 
 			// Select suitable language for translations
 			string langid = null;

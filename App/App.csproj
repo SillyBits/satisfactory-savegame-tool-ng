@@ -73,6 +73,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Supplements\VersionTable.cs" />
     <Page Include="Dialogs\ShowHtmlResDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -184,6 +185,7 @@
     <Content Include="Resources\en-US\About.res" />
     <Content Include="Resources\en-US\Changelog.res" />
     <Content Include="Resources\en-US\Translation.res" />
+    <Resource Include="Resources\VersionTable.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
