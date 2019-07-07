@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -41,10 +42,10 @@ namespace SatisfactorySavegameTool.Panels
 			_ClearAll();
 
 			Log.Debug("Visualizing property '{0}'", prop != null ? prop.ToString() : EMPTY);
-			IElement element = ElementFactory.Create(null, null, prop);
+			Details.IElement element = Details.ElementFactory.Create(null, null, prop);
 			if (element == null)
 			{
-				Expando expando = new Expando(null, EMPTY, null);
+				Details.Expando expando = new Details.Expando(null, EMPTY, null);
 				expando.IsEnabled = false;
 				element = expando;
 			}
@@ -58,8 +59,11 @@ namespace SatisfactorySavegameTool.Panels
 		}
 
 	}
+}
 
 
+namespace SatisfactorySavegameTool.Panels.Details
+{
 	// Combines all known factories into one type-based Create method
 	// to reduce tedious copy&paste with creating our elements
 	//
@@ -69,38 +73,16 @@ namespace SatisfactorySavegameTool.Panels
 		{
 			string s = (obj != null) ? string.Format("{0}:'{1}'", obj.GetType().Name, obj) : DetailsPanel.EMPTY;
 			Log.Debug("- Creating element for label:'{0}', obj={1}", label, s);
-
 			IElement element = null;
 
-			if (label != null)
-			{
-				element = CreateNamed(parent, label, obj);
-				if (element != null)
-					return element;
-			}
+			if (label != null)							element = CreateNamed(parent, label, obj);
+			if (element == null && obj is P.Property)	element = ElementFactory.Create(parent, label, obj);
+			if (element == null && obj is IDictionary)	element = new DictControl(parent, label, obj);
+			if (element == null && obj is ICollection)	element = new ListControl(parent, label, obj);
+			if (element == null)						element = ValueControlFactory.Create(parent, label, obj);
 
-			if (obj is P.Property)
-			{
-				element = ElementFactory.Create(parent, label, obj);
-				if (element != null)
-					return element;
-			}
-
-			if (obj is IDictionary)
-			{
-				element = new DictControl(parent, label, obj);
-				if (element != null)
-					return element;
-			}
-
-			if (obj is ICollection)
-			{
-				element = new ListControl(parent, label, obj);
-				if (element != null)
-					return element;
-			}
-
-			return ValueControlFactory.Create(parent, label, obj);
+			Log.Debug("=> created {0}", element);
+			return element;
 		}
 
 
@@ -120,9 +102,70 @@ namespace SatisfactorySavegameTool.Panels
 			{ "NeedTransform",		(p,l,o) => ValueControlFactory.Create(p, l, (int) o == 1) },// Force boolean display
 			{ "IsValid",			(p,l,o) => ValueControlFactory.Create(p, l, (byte)o == 1) },// Force boolean display
 			{ "mFogOfWarRawData",	(p,l,o) => new ImageControl(p, l, (byte[]) o) },//<-- TESTING
-
+			//more to come
 		};
+	}
 
+
+	// Extension methods
+	//
+	internal static class Extensions
+	{
+		internal static bool IsNullOrEmpty(this byte[] arr) { return _IsNullOrEmpty(arr); }
+		internal static bool IsNullOrEmpty(this int[] arr)  { return _IsNullOrEmpty(arr); }
+		private static bool _IsNullOrEmpty<_ValueType>(_ValueType[] arr)
+			where _ValueType : IConvertible
+		{
+			if (arr == null || arr.Length == 0)
+				return true;
+			double sum = arr.Sum((v) => v.ToDouble(System.Globalization.CultureInfo.InvariantCulture));
+			return (sum == 0);
+		}
+
+		
+		// Used to extract last portion of a string which can be split using given separator
+		// (e.g. "/Script/FactoryGame.FGInventoryComponent" -> "FGInventoryComponent")
+		internal static string LastName(this str name, char separator = '.')
+		{
+			if (str.IsNull(name))
+				return null;
+			return LastName(name.ToString(), separator);
+		}
+
+		internal static string LastName(this string name, char separator = '.')
+		{
+			if (!string.IsNullOrEmpty(name))
+			{
+				string[] names = name.Split(separator);
+				if (names.Length >= 2)
+					return names.Last();
+			}
+			return null;
+		}
+
+
+		// Find a value property by name
+		internal static P.Property Named(this List<P.Property> props, string name)
+		{
+			return props.Find(prop => {
+				if (prop is P.ValueProperty)
+				{
+					str prop_name = (prop as P.ValueProperty).Name;
+					if (!str.IsNull(prop_name))
+						return prop_name.ToString() == name;
+				}
+				return false;
+			});
+		}
+
+
+		// Convert a List<Property> into another type, e.g. List<InventoryStack>
+		internal static List<_PropertyType> ListOf<_PropertyType>(this object props)
+		{
+			if (props is List<P.Property>)
+				return (props as List<P.Property>).Cast<_PropertyType>().ToList();
+			throw new ArgumentException("Invalid list object passed!");
+		}
 	}
 
 
@@ -135,10 +178,10 @@ namespace SatisfactorySavegameTool.Panels
 		FrameworkElement Visual { get; }
 
 		bool HasLabel { get; }
-		string Label { get; }
+		string Label { get; set; }
 
 		bool HasValue { get; }
-		//object Value { get; }
+		//object Value { get; set; }
 	}
 
 	// More specific, typed element
@@ -148,10 +191,10 @@ namespace SatisfactorySavegameTool.Panels
 		// Constructor required: IElement parent, string label, object obj
 		//FrameworkElement Visual { get; }
 		//bool HasLabel { get; }
-		//string Label { get; }
+		//string Label { get; set; }
 		//bool HasValue { get; }
 
-		_ValueType Value { get; }
+		_ValueType Value { get; set; }
 	}
 
 
@@ -164,7 +207,7 @@ namespace SatisfactorySavegameTool.Panels
 
 		//FrameworkElement Visual { get; }
 		//bool HasLabel { get; }
-		//string Label { get; }
+		//string Label { get; set; }
 		//bool HasValue { get; }
 
 		// Needed for traversing later with saving?
@@ -182,9 +225,16 @@ namespace SatisfactorySavegameTool.Panels
 	{
 		internal static IElement Create(IElement parent, string label, object obj)
 		{
+			IElement element = null;
 			if (obj != null)
-				return INSTANCE[obj.GetType().Name, parent, label, obj];
-			return null;
+			{
+				P.Property prop = obj as P.Property;
+				if (prop.GetKeys().Contains("ClassName"))
+					element = INSTANCE[(prop.GetChilds()["ClassName"] as str).LastName(), parent, label, obj];
+				if (element == null)
+					element = INSTANCE[prop.TypeName, parent, label, obj];
+			}
+			return element;
 		}
 
 		internal static ElementFactory INSTANCE = new ElementFactory();
@@ -228,16 +278,16 @@ namespace SatisfactorySavegameTool.Panels
 		}
 
 		public bool HasLabel { get { return false; } }
-		public string Label { get { return null; } }
+		public string Label { get { return null; } set { } }
 
 		public bool HasValue { get { return false; } }
-		public object Value { get { return null; } }
+		public object Value { get { return null; } set { } }
 
 		// IElementContainer
 		public int Count { get { return _grid.RowDefinitions.Count; } }
 		public List<IElement> Childs { get; }
 
-		public void Add(IElement element)
+		public virtual void Add(IElement element)
 		{
 			if (element == null)
 				throw new ArgumentNullException();
@@ -281,7 +331,11 @@ namespace SatisfactorySavegameTool.Panels
 		// Override this method if expando needs to be modified
 		internal virtual void _CreateVisual()
 		{
-			Header = _label;
+			if (Tag is P.Property)
+				Header = (Tag as P.Property).ToString();
+			else
+				Header = _label;
+
 			HorizontalContentAlignment = HorizontalAlignment.Stretch;
 
 			_grid = new Grid();
@@ -327,67 +381,64 @@ namespace SatisfactorySavegameTool.Panels
 			{
 				Property prop = Tag as Property;
 
-				Header = prop.ToString();
-
 				Dictionary<string,object> childs = prop.GetChilds();
 				if (childs == null)
 					throw new Exception("Childs collection returned a null pointer!");
 
-				#region Sort children
-				var names = childs.Keys.OrderBy((s) => s);
-				List<string> simple = new List<string>();
-				List<string> simple2 = new List<string>();
-				List<string> props = new List<string>();
-				List<string> sets = new List<string>();
-				List<string> last = new List<string>();
-				foreach (string name in names)
-				{
-					object sub = childs[name];
-					if (sub is ICollection)
-					{
-						if (name == "Missing")
-							last.Add(name);
-						else if (name == "Unknown")
-							last.Add(name);
-						else
-							sets.Add(name);
-					}
-					else if (sub is Property)
-					{
-						//Property prop = sub as Property;
-						//if (prop.TypeName in globals)
-						//if (sub is Entity)
-						//	simple2.Add(name);
-						//else
-						//	props.Add(name);
-						if (sub is Entity)
-							sets.Add(name);
-						else if (sub is ValueProperty)						
-							simple2.Add(name);
-						else
-							props.Add(name);
-					}
-					else
-						simple.Add(name);
-				}
-				List<string> order = new List<string>();
-				order.AddRange(simple);
-				order.AddRange(simple2);
-				order.AddRange(props);
-				order.AddRange(sets);
-				order.AddRange(last);
-				#endregion
-
-				foreach (string key in order)
-				{
-					object obj = childs[key];
-					IElement element = MainFactory.Create(this, key, obj);
-					_childs.Add(element);
-				}
-
+				_CreateChilds(childs);
 			}
-			//else .... more types to come? IDict + IColl
-			//=> Those should land in DictControl resp. ListControl!!
+		}
+
+		internal virtual void _CreateChilds(Dictionary<string,object> childs)
+		{
+			if (childs == null)
+				throw new Exception("_CreateChilds was passed a null ponter!");
+
+			#region Sort children
+			var names = childs.Keys.OrderBy((s) => s);
+			List<string> simple = new List<string>();
+			List<string> simple2 = new List<string>();
+			List<string> props = new List<string>();
+			List<string> sets = new List<string>();
+			List<string> last = new List<string>();
+			foreach (string name in names)
+			{
+				object sub = childs[name];
+				if (sub is ICollection)
+				{
+					if (name == "Missing")
+						last.Add(name);
+					else if (name == "Unknown")
+						last.Add(name);
+					else
+						sets.Add(name);
+				}
+				else if (sub is Property)
+				{
+					if (sub is Entity)
+						sets.Add(name);
+					else if (sub is ValueProperty)						
+						simple2.Add(name);
+					else
+						props.Add(name);
+				}
+				else
+					simple.Add(name);
+			}
+			List<string> order = new List<string>();
+			order.AddRange(simple);
+			order.AddRange(simple2);
+			order.AddRange(props);
+			order.AddRange(sets);
+			order.AddRange(last);
+			#endregion
+
+			foreach (string key in order)
+			{
+				object obj = childs[key];
+				IElement element = MainFactory.Create(this, key, obj);
+				_childs.Add(element);
+			}
 		}
 
 		internal IElement _parent;
@@ -913,7 +964,7 @@ namespace SatisfactorySavegameTool.Panels
 		}
 
 		public bool HasLabel { get { return (_label != null)/*true*/; } }
-		public string Label { get { return _label; } internal set { _label = value; } }
+		public string Label { get { return _label; } set { _label = value; } }
 
 		public bool HasValue { get { return (_value != null)/*true*/; } }
 		public virtual _ValueType Value
@@ -1158,10 +1209,10 @@ namespace SatisfactorySavegameTool.Panels
 			}
 		}
 
-		public bool HasLabel { get { return !string.IsNullOrEmpty(_label); } }
-		public string Label { get { return _label; } }
+		public virtual bool HasLabel { get { return !string.IsNullOrEmpty(_label); } }
+		public virtual string Label { get { return _label; } set { _label = value; } }
 
-		public bool HasValue { get { return true; } }
+		public virtual bool HasValue { get { return true; } }
 
 		public virtual int Count { get { throw new NotImplementedException(); } }
 		public virtual List<IElement> Childs { get { throw new NotImplementedException(); } }
@@ -1231,12 +1282,12 @@ namespace SatisfactorySavegameTool.Panels
 	{
 		public PropertyList(IElement parent, string label, object obj)
 			: base(parent, label, obj)
-		{ }
+		{
+			_childs = new List<IElement>();
+		}
 
 		internal override void _CreateChilds()
 		{
-			_childs = new List<IElement>();
-
 			P.PropertyList prop_list = Tag as P.PropertyList;
 			foreach (Property prop in prop_list.Value)
 			{
@@ -1355,6 +1406,8 @@ namespace SatisfactorySavegameTool.Panels
 			_label = null;
 		}
 
+		//public override string Label { get { return _prop.Name.ToString(); } }
+
 		//public int Count { get { throw new NotImplementedException(); } }
 		//public List<IElement> Childs { get { throw new NotImplementedException(); } }
 
@@ -1367,15 +1420,7 @@ namespace SatisfactorySavegameTool.Panels
 		{
 			if (_prop.Value != null && _prop.Index == 0 && !_prop.IsArray)
 			{
-				bool process = (_prop.Unknown == null) || (_prop.Unknown.Length == 0);
-				if (!process)
-				{
-					long sum = 0;
-					foreach (byte b in _prop.Unknown)
-						sum += b;
-					process = (sum == 0);
-				}
-				if (process)
+				if (_prop.Unknown.IsNullOrEmpty())
 				{
 					// Replace it with type of actual value
 					/*TODO:
@@ -1546,19 +1591,6 @@ namespace SatisfactorySavegameTool.Panels
 			_value = new float[] { _prop.X, _prop.Y, _prop.Z };
 		}
 
-		/*internal override void _CreateVisual()
-		{
-			StackPanel panel = new StackPanel() {
-				Orientation = Orientation.Horizontal,
-			};
-
-			panel.Children.Add(new FloatControl(_value.X));
-			panel.Children.Add(new FloatControl(_value.Y));
-			panel.Children.Add(new FloatControl(_value.Z));
-
-			_visual = panel;
-		}*/
-
 		internal P.Vector _prop;
 	}
 
@@ -1722,14 +1754,41 @@ namespace SatisfactorySavegameTool.Panels
 		{ }
 	}
 
-	internal class InventoryStack : PropertyList
+#if false //=> Replaced with specialization FGInventory*
+	internal class InventoryStack : ElementContainer<P.InventoryStack> // PropertyList
 	{
 		public InventoryStack(IElement parent, string label, object obj)
 			: base(parent, label, obj)
 		{ }
-	}
 
-	internal class InventoryItem : Expando
+		internal override void _CreateVisual()
+		{
+			if (_prop.Value.Count == 1)
+			{
+				P.StructProperty struct_p = _prop.Value[0] as P.StructProperty;
+				P.InventoryItem invitem = struct_p.Value as P.InventoryItem;
+				string label = DetailsPanel.EMPTY;
+				if (!str.IsNull(invitem.ItemName))
+				{
+					label = invitem.ItemName.ToString();
+					if (label.Contains('.'))
+					{
+						string[] labels = label.Split('.');
+						string last = labels.Last();
+						if (Translate.Has(last))
+							label = Translate._(last);
+					}
+				}
+				_impl = ValueControlFactory.Create(_parent, label, invitem.Value.Value);
+			}
+
+			base._CreateVisual();
+		}
+	}
+#endif
+
+#if false //=> Replaced with specialization FGInventory*
+	internal class InventoryItem : ElementContainer<P.InventoryItem> //Expando
 	{
 	//CLS(InventoryItem)
 	//	//TODO: Might also be some PropertyList? Investigate	
@@ -1750,7 +1809,22 @@ namespace SatisfactorySavegameTool.Panels
 		public InventoryItem(IElement parent, string label, object obj)
 			: base(parent, label, obj)
 		{ }
+
+		internal override void _CreateVisual()
+		{
+			if (str.IsNull(_prop.LevelName) 
+				&& str.IsNull(_prop.PathName)
+				&& str.IsNull(_prop.Unknown))
+			{
+				string label = _prop.ItemName != null ? _prop.ItemName.ToString() : DetailsPanel.EMPTY;
+				_impl = ValueControlFactory.Create(_parent, null, _prop.Value.Value);
+				_impl.Label = label;
+			}
+
+			base._CreateVisual();
+		}
 	}
+#endif
 
 	internal class PhaseCost : PropertyList
 	{
@@ -1918,136 +1992,7 @@ namespace SatisfactorySavegameTool.Panels
 		//{
 		//}
 	}
-#if false
-	internal class ObjectProperty : IElementContainer //Expando //ValueProperty
-	{
-	//CLS_(ObjectProperty,ValueProperty)
-	//	// Note that ObjectProperty is somewhat special with having
-	//	// two different faces: w/ .Name + .Value and w/o those.
-	//	// (depending on its 'context' when loaded)
-	//	PUB_s(LevelName)
-	//	PUB_s(PathName)
-	//	READ
-	//		Read(reader, true);
-	//	READ_END
-	//	Property^ Read(IReader^ reader, bool null_check)
-	//	{
-	//		if (null_check)
-	//			CheckNullByte(reader);
-	//		LevelName = reader->ReadString();
-	//		PathName = reader->ReadString();
-	//		return this;
-	//	}
-	//	STR_(PathName)
-	//CLS_END
-		public ObjectProperty(IElement parent, string label, object obj)
-		//	: base(parent, label, obj)
-		{
-			_parent = parent;
-			_label = label;
-			_prop = obj as P.ObjectProperty;
-		}
 
-		public FrameworkElement Visual
-		{
-			get
-			{
-				if (_visual == null)
-					_CreateVisual();
-				return _visual;
-			}
-		}
-
-		public bool HasLabel { get { return true; } }
-		public string Label { get { return _label; } }
-
-		public bool HasValue { get { return true; } }
-
-		public int Count { get { throw new NotImplementedException(); } }
-		public List<IElement> Childs { get { throw new NotImplementedException(); } }
-
-		public void Add(IElement element)
-		{
-			throw new NotImplementedException();
-		}
-
-		internal void _CreateVisual()
-		{
-			// Have seen 4 different combinations so far:
-			// - (1) Only PathName valid, LevelName + Name + Value = empty (sub in an ArrayProperty)
-			// - (2) PathName + LevelName, but Name + Value are empty (also with ArrayProperty)
-			// - (2) PathName + Name valid, but LevelName + Value empty (sub in a StructProperty)
-			// - (3) PathName, LevelName + Name, but empty Value (sub in an EntityObj)
-			//
-			//=> PathName  LevelName  Name  Value
-			//      x          -       -      -
-			//      x          x       -      -
-			//      x          -       x      -
-			//      x          x       x      -
-
-			if (str.IsNull(_prop.LevelName) || _prop.LevelName.ToString() == "Persistent_Level")
-			{
-				if (str.IsNull(_prop.Name))
-				{
-					// Only PathName (... are we in an ArrayProperty?)
-					_impl = MainFactory.Create(_parent, _label, _prop.PathName);
-				}
-				else
-				{
-					// PathName + Name, so Name is our label
-					_impl = MainFactory.Create(_parent, _prop.Name.ToString(), _prop.PathName);
-				}
-			}
-
-			// Last report: Expando
-			if (_impl == null)
-				_impl = new Expando(_parent, _label, _prop);
-
-			_label = _impl.Label;
-			_visual = _impl.Visual;
-		}
-
-		internal void _CreateChilds()
-		{
-		}
-
-		internal IElement _parent;
-		internal string _label;
-		internal P.ObjectProperty _prop;
-		internal FrameworkElement _visual;
-		internal IElement _impl;
-
-	//{ "ObjectProperty", (l,p) => {
-	//	ObjectProperty obj_p = p as ObjectProperty;
-	//
-	//	// Have seen 4 different combinations so far:
-	//	// - (1) Only PathName valid, LevelName + Name + Value = empty (sub in an ArrayProperty)
-	//	// - (2) PathName + LevelName, but Name + Value are empty (also with ArrayProperty)
-	//	// - (2) PathName + Name valid, but LevelName + Value empty (sub in a StructProperty)
-	//	// - (3) PathName, LevelName + Name, but empty Value (sub in an EntityObj)
-	//	//
-	//	//=> PathName  LevelName  Name  Value
-	//	//      x          -       -      -
-	//	//      x          x       -      -
-	//	//      x          -       x      -
-	//	//      x          x       x      -
-	//
-	//	if (str.IsNull(obj_p.LevelName) || obj_p.LevelName.ToString() == "Persistent_Level")
-	//	{
-	//		if (str.IsNull(obj_p.Name))
-	//		{
-	//			// Only PathName (... are we in an ArrayProperty?)
-	//			return CreateSimple(l, obj_p.PathName);
-	//		}
-	//		// PathName + Name, so Name is our label
-	//		return CreateSimple(obj_p.Name.ToString(), obj_p.PathName);
-	//	}
-	//	return null;
-	//	} },
-	}
-#endif
-
-	// /Game/FactoryGame/-Shared/Blueprint/BP_GameState.BP_GameState_C
 	internal class ArrayProperty : ElementContainer<P.ArrayProperty> //: Expando //: IElement //ValueProperty
 	{
 	//CLS_(ArrayProperty,ValueProperty)
@@ -2386,6 +2331,243 @@ namespace SatisfactorySavegameTool.Panels
 	//	STR_(PathName)
 	//CLS_END
 		public Actor(IElement parent, string label, object obj)
+			: base(parent, label, obj)
+		{ }
+	}
+
+
+	// Highly specialized visualizers
+	//
+	// Those will "condense" complex hierachies into a more readable form,
+	// selected by .ClassName given.
+	//
+
+	internal abstract class SpecializedViewer : Expando
+	{
+		public SpecializedViewer(IElement parent, string label, object obj)
+			: base(parent, label, obj)
+		{ }
+
+		internal override void _CreateChilds(Dictionary<string,object> childs)
+		{
+			// Remove any "complex" child, such as sub-properties, lists, ...
+			Dictionary<string,object> filtered = new Dictionary<string,object>();
+			foreach (KeyValuePair<string,object> pair in childs)
+			{
+				if (!_excluded.Contains(pair.Key))
+					filtered.Add(pair.Key, pair.Value);
+			}
+			base._CreateChilds(filtered);
+		}
+
+		// Will contain all property names which are to be handled in a more specialized way
+		internal List<string> _excluded = new List<string>();
+	}
+
+	internal class FGInventoryComponent : SpecializedViewer
+	{
+		public FGInventoryComponent(IElement parent, string label, object obj)
+			: base(parent, label, obj)
+		{
+			_excluded.Add("EntityObj");
+		}
+
+		internal override void _CreateChilds()
+		{
+			base._CreateChilds();
+
+			P.Object prop = Tag as P.Object;
+			P.Entity entity = prop.EntityObj as P.Entity;
+			List<P.Property> values = entity.Value;
+
+			P.ValueProperty inv_size = values.Named("mAdjustedSizeDiff") as P.ValueProperty;
+			_childs.Add(MainFactory.Create(this, "Inventory slots", inv_size != null ? inv_size.Value : "?"));
+
+			P.ArrayProperty arr;
+			P.StructProperty stru;
+
+			/*
+				|-> [ArrayProperty] mInventoryStacks
+				|  .InnerType = str:'StructProperty'
+				|  .Value =
+				|	-> [StructProperty] mInventoryStacks
+				|	  .Value =
+				|		/ List with 55 elements:
+				|		|-> [InventoryStack].Value[0-0]
+			*/
+			arr = values.Named("mInventoryStacks") as P.ArrayProperty;
+			if (arr == null)
+				return;//TODO:
+			stru = arr.Value as P.StructProperty;
+			if (stru == null || stru.Value == null)
+				return;//TODO:
+			List<P.InventoryStack> stacks = stru.Value.ListOf<P.InventoryStack>();
+
+			/*
+				|-> [ArrayProperty] mArbitrarySlotSizes
+				|  .InnerType = str:'IntProperty'
+				|  .Value = list<Int32>(55):[0,]
+			*/
+			arr = values.Named("mArbitrarySlotSizes") as P.ArrayProperty;
+			if (arr == null)
+				return;//TODO:
+			int[] sizes = arr.Value as int[];
+
+			/*
+				|-> [ArrayProperty] mAllowedItemDescriptors
+				|  .InnerType = str:'ObjectProperty'
+				|  .Value =
+				|	/ List with 55 elements:
+				|	|-> [ObjectProperty] 
+				|	|  .LevelName = <empty>
+				|	|  .PathName = <empty>
+				|	|  .Length = Int32:0
+				|	|  .Index = Int32:0
+			*/
+			arr = values.Named("mAllowedItemDescriptors") as P.ArrayProperty;
+			if (arr == null)
+				return;//TODO:
+			List<P.ObjectProperty> allowed = arr.Value.ListOf<P.ObjectProperty>();
+
+			if (stacks.Count != sizes.Length || sizes.Length != allowed.Count)
+				throw new Exception("FGInventoryComponent: Mismatch in collection sizes!");
+
+			GridView gridview = new GridView() {
+				AllowsColumnReorder = false,
+				//HorizontalContentAlignment = HorizontalAlignment.Stretch,
+				//VerticalContentAlignment = VerticalAlignment.Stretch,
+			};
+			gridview.Columns.Add(new GridViewColumn() { Header = "#", DisplayMemberBinding = new Binding("[0]") });
+			gridview.Columns.Add(new GridViewColumn() { Header = "Item", DisplayMemberBinding = new Binding("[1]") });
+			gridview.Columns.Add(new GridViewColumn() { Header = "Count", DisplayMemberBinding = new Binding("[2]") });
+			gridview.Columns.Add(new GridViewColumn() { Header = "Stack limit", DisplayMemberBinding = new Binding("[3]") });
+			gridview.Columns.Add(new GridViewColumn() { Header = "Allowed", DisplayMemberBinding = new Binding("[4]") });
+
+
+			List<string[]> rows = new List<string[]>();
+			for (int i = 0; i < stacks.Count(); ++i)
+			{
+				/*
+				|		|-> [InventoryStack].Value[0-0]
+				|		|  .Value =
+				|		|	/ List with 1 elements:
+				|		|	|-> [StructProperty] Item
+				|		|	|  .Unknown = list<Byte>(17):[0,]
+				|		|	|  .Name = str:'Item'
+				|		|	|  .Length = Int32:120
+				|		|	|  .Index = Int32:0
+				|		|	|  .Value =
+				|		|	|	-> [InventoryItem] /Game/FactoryGame/Resource/Equipment/Beacon/BP_EquipmentDescriptorBeacon.BP_EquipmentDescriptorBeacon_C
+				|		|	|	  .Unknown = <empty>
+				|		|	|	  .ItemName = str:'/Game/FactoryGame/Resource/Equipment/Beacon/BP_EquipmentDescriptorBeacon.BP_EquipmentDescriptorBeacon_C'
+				|		|	|	  .LevelName = <empty>
+				|		|	|	  .PathName = <empty>
+				|		|	|	  .Value =
+				|		|	|		-> [IntProperty] NumItems
+				|		|	|		  .Name = str:'NumItems'
+				|		|	|		  .Length = Int32:4
+				|		|	|		  .Index = Int32:0
+				|		|	|		  .Value = Int32:34
+				|		|	\ end of list
+				*/
+				string item_name = "?", item_count = "?";
+				List<P.StructProperty> vals = stacks[i].Value.ListOf<P.StructProperty>();
+				if (vals.Count == 1)
+				{
+					stru = vals[0];
+					if (stru.Name != null && stru.Name.ToString() == "Item")
+					{
+						P.InventoryItem item = stru.Value as P.InventoryItem;
+						if (item != null)
+						{
+							if (str.IsNull(item.ItemName))
+								item_name = DetailsPanel.EMPTY;
+							else
+							{
+								item_name = item.ItemName.LastName();
+								if (Translate.Has(item_name))
+									item_name = Translate._(item_name);
+							}
+
+							if (item.Value != null && item.Value is P.IntProperty)
+							{
+								P.IntProperty int_prop = item.Value as P.IntProperty;
+								if (int_prop != null && int_prop.Value != null)
+									item_count = int_prop.Value.ToString();
+							}
+						}
+					}
+				}
+
+				string size_limit = sizes[i].ToString();
+
+				/*
+				|	|-> [ObjectProperty] 
+				|	|  .LevelName = <empty>
+				|	|  .PathName = <empty>
+				|	|  .Length = Int32:0
+				|	|  .Index = Int32:0
+				*/
+				string item_limit = "?";
+				P.ObjectProperty limit = allowed[i] as P.ObjectProperty;
+				if (limit != null)
+				{
+					if (str.IsNull(limit.PathName))
+						item_limit = DetailsPanel.EMPTY;
+					else
+					{
+						item_limit = limit.PathName.LastName();
+						if (Translate.Has(item_limit))
+							item_limit = Translate._(item_limit);
+					}
+				}
+
+				rows.Add(new string[] {
+					i.ToString(),
+					item_name,
+					item_count,
+					size_limit,
+					item_limit
+				});
+			}
+
+			_listview = new ListView() {
+				HorizontalContentAlignment = HorizontalAlignment.Stretch,
+				VerticalContentAlignment = VerticalAlignment.Stretch,
+			};
+			_listview.View = gridview;
+			_listview.ItemsSource = rows;
+		}
+
+		internal override void _CreateVisual()
+		{
+			base._CreateVisual();
+
+			RowDefinition rowdef = new RowDefinition() {
+				Height = new GridLength(0, GridUnitType.Auto),
+			};
+			_grid.RowDefinitions.Add(rowdef);
+			int row = _grid.RowDefinitions.Count - 1;
+
+			Grid.SetColumnSpan(_listview, 2);
+			Grid.SetColumn(_listview, 0);
+			Grid.SetRow(_listview, row);
+			_grid.Children.Add(_listview);
+		}
+
+		ListView _listview;
+	}
+
+	internal class FGInventoryComponentTrash : FGInventoryComponent
+	{
+		public FGInventoryComponentTrash(IElement parent, string label, object obj)
+			: base(parent, label, obj)
+		{ }
+	}
+
+	internal class FGInventoryComponentEquipment : FGInventoryComponent
+	{
+		public FGInventoryComponentEquipment(IElement parent, string label, object obj)
 			: base(parent, label, obj)
 		{ }
 	}
