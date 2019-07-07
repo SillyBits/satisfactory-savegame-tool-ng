@@ -512,7 +512,7 @@ namespace Savegame
 
 	CLS(Header)
 		PUB_i(Type)
-		PUB_i(Version)
+		PUB_i(SaveVersion)
 		PUB_i(BuildVersion)
 		PUB_s(MapName)
 		PUB_s(MapOptions)
@@ -522,7 +522,7 @@ namespace Savegame
 		PUB_b(Visibility)
 		READ
 			Type = reader->ReadInt();
-			Version = reader->ReadInt();
+			SaveVersion = reader->ReadInt();
 			BuildVersion = reader->ReadInt();
 			MapName = reader->ReadString();
 			MapOptions = reader->ReadString();
