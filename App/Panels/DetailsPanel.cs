@@ -101,7 +101,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 			{ "WasPlacedInLevel",	(p,l,o) => ValueControlFactory.Create(p, l, (int) o == 1) },// Force boolean display
 			{ "NeedTransform",		(p,l,o) => ValueControlFactory.Create(p, l, (int) o == 1) },// Force boolean display
 			{ "IsValid",			(p,l,o) => ValueControlFactory.Create(p, l, (byte)o == 1) },// Force boolean display
-			{ "mFogOfWarRawData",	(p,l,o) => new ImageControl(p, l, (byte[]) o) },//<-- TESTING
 			//more to come
 		};
 	}
@@ -2130,7 +2129,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 		{ }
 	}
 
-	internal class MapProperty //: IElement
+#if false //=> Replaced Replaced with specialization FGMapManager
+	internal class MapProperty : Expando //: IElement
 	{
 	//CLS_(MapProperty,ValueProperty)
 	//	ref class Entry : PropertyList
@@ -2163,9 +2163,10 @@ namespace SatisfactorySavegameTool.Panels.Details
 	//	READ_END
 	//CLS_END
 		public MapProperty(IElement parent, string label, object obj)
-		//	: base(parent, label, obj)
+			: base(parent, label, obj)
 		{ }
 	}
+#endif
 
 	internal class TextProperty : ValueProperty<str>
 	{
@@ -2607,5 +2608,32 @@ namespace SatisfactorySavegameTool.Panels.Details
 		{ }
 	}
 
+	internal class FGMapManager : SpecializedViewer
+	{
+		public FGMapManager(IElement parent, string label, object obj)
+			: base(parent, label, obj)
+		{
+			_excluded.Add("EntityObj");
+		}
+
+		internal override void _CreateChilds()
+		{
+			base._CreateChilds();
+
+			P.Actor prop = Tag as P.Actor;
+			P.Entity entity = prop.EntityObj as P.Entity;
+			List<P.Property> values = entity.Value;
+
+			if (values.Count == 1)
+			{
+				P.ArrayProperty arr = values[0] as P.ArrayProperty;
+				if (arr != null && !str.IsNull(arr.Name) && arr.Name.ToString() == "mFogOfWarRawData")
+				{
+					IElement element = new ImageControl(this, arr.Name.ToString(), arr.Value);
+					_childs.Add(element);
+				}
+			}
+		}
+	}
 
 }
