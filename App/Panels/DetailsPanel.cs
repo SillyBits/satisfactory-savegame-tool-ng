@@ -2189,7 +2189,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 		{ }
 	}
 
-#if false //=> Replaced Replaced with specialization FGMapManager
+#if false //=> Replaced Replaced with specialization FGFoundationSubsystem
 	internal class MapProperty : Expando //: IElement
 	{
 	//CLS_(MapProperty,ValueProperty)
@@ -2690,4 +2690,82 @@ namespace SatisfactorySavegameTool.Panels.Details
 		}
 	}
 
+	internal class FGFoundationSubsystem : SpecializedViewer
+	{
+		//TODO: Display each entry in dict as an individual chunk, Expando with "Chunk #/# (# objects)" as label
+
+		public FGFoundationSubsystem(IElement parent, string label, object obj)
+			: base(parent, label, obj)
+		{
+			_excluded.Add("EntityObj");
+		}
+
+		internal override void _CreateChilds()
+		{
+			base._CreateChilds();
+
+			P.Actor prop = Tag as P.Actor;
+			P.Entity entity = prop.EntityObj as P.Entity;
+			List<P.Property> values = entity.Value;
+
+			if (values.Count != 1)
+				return;//TODO:
+			P.MapProperty map_prop = values[0] as P.MapProperty;
+			if (map_prop == null || str.IsNull(map_prop.Name) || map_prop.Name.ToString() != "mBuildings")
+				return;//TODO:
+
+			List<object[]> rows = new List<object[]>();
+			foreach(KeyValuePair<int, P.MapProperty.Entry> pair in map_prop.Value)
+			{
+				List<P.ArrayProperty> entries = pair.Value.Value.ListOf<P.ArrayProperty>();
+				if (entries == null || entries.Count != 1)
+					continue;//TODO:
+				P.ArrayProperty entry = entries[0];
+				if (entry == null || entry.Value == null || str.IsNull(entry.Name) || entry.Name.ToString() != "Buildables")
+					continue;//TODO:
+				List<P.ObjectProperty> objects = (entry.Value as List<P.Property>).ListOf<P.ObjectProperty>();
+				if (objects == null)
+					continue;//TODO:
+
+				int index = 0;
+				foreach (P.ObjectProperty obj_prop in objects)
+				{
+					rows.Add(new object[] {
+						pair.Key,
+						index,
+						!str.IsNull(obj_prop.PathName) ? obj_prop.PathName.LastName() : DetailsPanel.EMPTY,
+					});
+					++index;
+				}
+			}
+
+			ListViewControl.ColumnDefinition[] columns = {
+				new ListViewControl.ColumnDefinition("Chunk"),
+				new ListViewControl.ColumnDefinition("#"),
+				new ListViewControl.ColumnDefinition("Building"),
+			};
+			ListViewControl lvc = new ListViewControl(columns);
+			lvc.Value = rows;
+
+			_listview = lvc;
+		}
+
+		internal override void _CreateVisual()
+		{
+			base._CreateVisual();
+
+			RowDefinition rowdef = new RowDefinition() {
+				Height = new GridLength(0, GridUnitType.Auto),
+			};
+			_grid.RowDefinitions.Add(rowdef);
+			int row = _grid.RowDefinitions.Count - 1;
+
+			Grid.SetColumnSpan(_listview, 2);
+			Grid.SetColumn(_listview, 0);
+			Grid.SetRow(_listview, row);
+			_grid.Children.Add(_listview);
+		}
+
+		ListView _listview;
+	}
 }
