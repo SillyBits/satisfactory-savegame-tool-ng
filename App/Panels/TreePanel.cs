@@ -316,21 +316,6 @@ namespace SatisfactorySavegameTool.Panels
 				string[] classnames = remain.Split('.');
 				if (classnames.Length == 2)
 				{
-					/*
-					fullname = path + classnames[0] + ".";
-					class_item = _AddOrGetClass(parent, fullname, classnames[0]);
-
-					// Ignore [1] or add both?
-					if (classnames[0] + "_C" != classnames[1])
-					{
-						fullname += classnames[1];
-						class_item = _AddOrGetClass(class_item, fullname, classnames[1]);
-					}
-					//TODO: Add BP_... and FG...
-
-					label = PathName;
-					label = label.Substring(label.IndexOf('.') + 1);
-					*/
 					label = PathName;
 					label = label.Substring(label.LastIndexOf('.') + 1);
 
@@ -345,6 +330,22 @@ namespace SatisfactorySavegameTool.Panels
 						{
 							fullname += classnames[1];
 							class_item = _AddOrGetClass(class_item, fullname, classnames[1]);
+						}
+
+						// To collect things following into a sub node ('BP_PlayerState_C_0' with data below):
+						//		.PathName = str:'Persistent_Level:PersistentLevel.BP_PlayerState_C_0.FGRecipeShortcut_#'
+						// with # = [0,9]
+						// Or following ('Char_Player_C_0' with data below):
+						//		.PathName = str:'Persistent_Level:PersistentLevel.Char_Player_C_0.BackSlot'
+						//		.PathName = str:'Persistent_Level:PersistentLevel.Char_Player_C_0.ArmSlot'
+						// Will also take care of showing actual entity in case we're showing
+						// something like an inventory:
+						//		.PathName = str:'Persistent_Level:PersistentLevel.Char_Player_C_0.inventory'
+						string[] labels = PathName.Split('.');
+						if (labels.Length == 3)
+						{
+							fullname += "." + labels[1];
+							class_item = _AddOrGetClass(class_item, fullname, labels[1]);
 						}
 					}
 					else
@@ -397,6 +398,7 @@ namespace SatisfactorySavegameTool.Panels
 		internal Dictionary<string,TreeViewItem> _classes;
 
 	}
+
 
 	public class PathTree : BasicTree
 	{
@@ -486,6 +488,8 @@ namespace SatisfactorySavegameTool.Panels
 				Log.Warning("AddClassRecurs: What to do with '{0}'?", PathName);
 			}
 
+	
+			// At the end of our path, now add property
 			label = PathName;
 			label = label.Substring(label.IndexOf('.') + 1);
 			return _AddItem(parent, label, prop);
