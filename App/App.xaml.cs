@@ -17,14 +17,15 @@ namespace SatisfactorySavegameTool
     /// </summary>
     public partial class App : Application
     {
-		public static string APPNAME         = "SatisfactorySavegameTool";
-		public static string APPPATH         = null;
-		public static string RESOURCES       = "Resources";
-		public static string RESOURCEPATH    = null;
-		public static string TRANSLATIONFILE = "Translation.res";
-		public static string LANGUAGE        = null;
-		public static string EXPORTS         = "exports";
-		public static string EXPORTPATH      = null;
+		public static string APPNAME              = "SatisfactorySavegameTool";
+		public static string APPPATH              = null;
+		public static string RESOURCES            = "Resources";
+		public static string RESOURCEPATH         = null;
+		public static string TRANSLATIONFILE_MAIN = "Translation.res";
+		public static string TRANSLATIONFILE_FG   = "FactoryGame.res";
+		public static string LANGUAGE             = null;
+		public static string EXPORTS              = "exports";
+		public static string EXPORTPATH           = null;
 		//public static string ...
 
 
@@ -57,7 +58,8 @@ namespace SatisfactorySavegameTool
 
 			_logger = new Logger(Path.Combine(APPPATH, "logs"), APPNAME, Logger.Level.Debug);
 			_config = new ConfigFile(APPPATH, APPNAME);
-			_languages = new LanguageHandler(RESOURCEPATH, null, TRANSLATIONFILE);
+			_languages = new LanguageHandler(RESOURCEPATH, null, 
+				new string[] { TRANSLATIONFILE_MAIN, TRANSLATIONFILE_FG });
 
 			// Select suitable language for translations
 			string langid = null;
