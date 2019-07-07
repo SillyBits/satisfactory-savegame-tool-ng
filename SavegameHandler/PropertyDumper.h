@@ -268,7 +268,7 @@ namespace Savegame
 					while (e->MoveNext())
 						sum += isByte ? (byte) (e->Current) : (int) (e->Current);
 					if (sum == 0)
-						return String::Format("list<%s>({0:#,#0}):[0,]", val->GetType()->Name, coll->Count);
+						return String::Format("list<{0}>({1:#,#0}):[0,]", val->GetType()->Name, coll->Count);
 
 					sb->EnsureCapacity(coll->Count*(isByte ? 5 : 10));
 					sb->Append("[ ");
