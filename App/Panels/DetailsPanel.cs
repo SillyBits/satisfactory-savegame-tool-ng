@@ -902,6 +902,66 @@ namespace SatisfactorySavegameTool.Panels.Details
 		internal P.LinearColor _value;
 	}
 
+	internal class ListViewControl : ListView, IValueContainer<List<object[]>>
+	{
+		internal ListViewControl(ColumnDefinition[] columns = null)
+		{
+			_columns = columns != null ? columns.ToList() : null;
+
+			_gridview = new GridView() {
+				AllowsColumnReorder = false,
+			};
+
+			foreach (ColumnDefinition coldef in _columns)
+			{
+				GridViewColumn col = new GridViewColumn() {
+					Header = coldef._header,
+					//TODO: Alignment
+					//TODO: Converter
+					DisplayMemberBinding = new Binding("[" + _gridview.Columns.Count + "]"),
+				};
+				_gridview.Columns.Add(col);
+			}
+
+			HorizontalContentAlignment = HorizontalAlignment.Stretch;
+			VerticalContentAlignment = VerticalAlignment.Stretch;
+			MaxHeight = 400;
+			View = _gridview;
+		}
+
+		public List<object[]> Value
+		{
+			//get { return _values; }
+			//set	{ _values = value; }
+			get { return ItemsSource as List<object[]>; }
+			set	{ ItemsSource = value; }
+		}
+
+		internal List<ColumnDefinition> _columns;
+		internal GridView _gridview;
+
+		internal class ColumnDefinition
+		{
+			internal ColumnDefinition(string header, HorizontalAlignment align = HorizontalAlignment.Left)
+				: this(header, align, DefaultConverter)
+			{ }
+
+			internal ColumnDefinition(string header, HorizontalAlignment align, Converter converter)
+			{
+				_header = header;
+				_align = align;
+				_converter = converter;
+			}
+
+			public delegate string Converter(object obj);
+			internal static string DefaultConverter(object obj) { return obj.ToString(); }
+
+			internal string _header;
+			internal HorizontalAlignment _align;
+			internal Converter _converter;
+		}
+	}
+
 
 	// Actual value controls
 	//
@@ -2468,19 +2528,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 			if (stacks.Count != sizes.Length || sizes.Length != allowed.Count)
 				throw new Exception("FGInventoryComponent: Mismatch in collection sizes!");
 
-			GridView gridview = new GridView() {
-				AllowsColumnReorder = false,
-				//HorizontalContentAlignment = HorizontalAlignment.Stretch,
-				//VerticalContentAlignment = VerticalAlignment.Stretch,
-			};
-			gridview.Columns.Add(new GridViewColumn() { Header = "#", DisplayMemberBinding = new Binding("[0]") });
-			gridview.Columns.Add(new GridViewColumn() { Header = "Item", DisplayMemberBinding = new Binding("[1]") });
-			gridview.Columns.Add(new GridViewColumn() { Header = "Count", DisplayMemberBinding = new Binding("[2]") });
-			gridview.Columns.Add(new GridViewColumn() { Header = "Stack limit", DisplayMemberBinding = new Binding("[3]") });
-			gridview.Columns.Add(new GridViewColumn() { Header = "Allowed", DisplayMemberBinding = new Binding("[4]") });
 
-
-			List<string[]> rows = new List<string[]>();
+			List<object[]> rows = new List<object[]>();
 			for (int i = 0; i < stacks.Count(); ++i)
 			{
 				/*
@@ -2558,7 +2607,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 					}
 				}
 
-				rows.Add(new string[] {
+				rows.Add(new object[] {
 					i.ToString(),
 					item_name,
 					item_count,
@@ -2567,12 +2616,17 @@ namespace SatisfactorySavegameTool.Panels.Details
 				});
 			}
 
-			_listview = new ListView() {
-				HorizontalContentAlignment = HorizontalAlignment.Stretch,
-				VerticalContentAlignment = VerticalAlignment.Stretch,
+			ListViewControl.ColumnDefinition[] columns = {
+				new ListViewControl.ColumnDefinition("#"),
+				new ListViewControl.ColumnDefinition("Item"),
+				new ListViewControl.ColumnDefinition("Count"),
+				new ListViewControl.ColumnDefinition("Stack limit"),
+				new ListViewControl.ColumnDefinition("Allowed"),
 			};
-			_listview.View = gridview;
-			_listview.ItemsSource = rows;
+			ListViewControl lvc = new ListViewControl(columns);
+			lvc.Value = rows;
+
+			_listview = lvc;
 		}
 
 		internal override void _CreateVisual()
