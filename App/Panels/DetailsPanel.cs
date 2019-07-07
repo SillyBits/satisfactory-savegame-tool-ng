@@ -1349,7 +1349,42 @@ namespace SatisfactorySavegameTool.Panels.Details
 	{
 		public Header(IElement parent, string label, object obj)
 			: base(parent, label, obj)
-		{ }
+		{
+			_header = obj as P.Header;
+		}
+
+		internal override void _CreateChilds()
+		{
+			_childs.Add(ValueControlFactory.Create(this, "Type"        , _header.Type, true));
+
+			_childs.Add(ValueControlFactory.Create(this, "SaveVersion" , _header.SaveVersion, true));
+
+			int build_version = _header.BuildVersion + 34682;
+			Supplements.VersionTable.Version v = Supplements.VersionTable.INSTANCE.Find(build_version);
+			string build_v = v != null ? v.ToString() : string.Format("#{0}", build_version);
+			_childs.Add(ValueControlFactory.Create(this, "BuildVersion", build_v, true));
+
+			_childs.Add(ValueControlFactory.Create(this, "MapName"     , _header.MapName, true));
+
+			_childs.Add(ValueControlFactory.Create(this, "MapOptions"  , _header.MapOptions, true));
+
+			_childs.Add(ValueControlFactory.Create(this, "SessionName" , _header.SessionName, true));
+
+			DateTime dur = new DateTime();
+			dur = dur.AddSeconds(_header.PlayDuration);
+			_childs.Add(ValueControlFactory.Create(this, "PlayDuration", dur.ToString("HH:mm:ss"), true));
+
+			DateTime saved = new DateTime();
+			saved = saved.AddSeconds(_header.SaveDateTime / 10000000.0);
+			saved = saved.ToLocalTime();//<- Note that time was created in GMT, so we've to adjust to local!
+			_childs.Add(ValueControlFactory.Create(this, "SaveDateTime", saved.ToString("G"), true));
+
+			_childs.Add(ValueControlFactory.Create(this, "Visibility"  , ((Visibilities)_header.Visibility).ToString(), true));
+		}
+
+		internal P.Header _header;
+
+		internal enum Visibilities { Private=0, FriendsOnly=1 };
 	}
 
 	internal class Collected : Expando
