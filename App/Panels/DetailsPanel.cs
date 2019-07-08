@@ -178,6 +178,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 		bool HasLabel { get; }
 		string Label { get; set; }
+		VerticalAlignment LabelVerticalAlign { get; }
 
 		bool HasValue { get; }
 		//object Value { get; set; }
@@ -263,6 +264,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			_parent = parent;
 			_label = label;
 			Tag = obj;
+			_childs = new List<IElement>();
 		}
 
 		// IElement
@@ -278,6 +280,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 		public bool HasLabel { get { return false; } }
 		public string Label { get { return null; } set { } }
+		public VerticalAlignment LabelVerticalAlign { get { return VerticalAlignment.Center; } }
 
 		public bool HasValue { get { return false; } }
 		public object Value { get { return null; } set { } }
@@ -308,7 +311,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 					Content = element.Label + ":",
 					HorizontalAlignment = HorizontalAlignment.Left,
 					VerticalAlignment = VerticalAlignment.Stretch,
-					VerticalContentAlignment = VerticalAlignment.Center,
+					VerticalContentAlignment = element.LabelVerticalAlign,
 				};
 				Thickness t = lbl.Padding;
 				t.Top = t.Bottom = 0;
@@ -351,7 +354,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 			b.Child = _grid;
 			Content = b;
 
-			_childs = new List<IElement>();
 			_CreateChilds();
 			if (_childs.Count == 0)
 			{
@@ -442,6 +444,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 		internal IElement _parent;
 		internal string _label;
+		internal VerticalAlignment _label_valign = VerticalAlignment.Center;
 		internal Grid _grid;
 		internal List<IElement> _childs;
 	}
@@ -1024,6 +1027,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 		public bool HasLabel { get { return (_label != null)/*true*/; } }
 		public string Label { get { return _label; } set { _label = value; } }
+		public VerticalAlignment LabelVerticalAlign { get { return VerticalAlignment.Center; } }
 
 		public bool HasValue { get { return (_value != null)/*true*/; } }
 		public virtual _ValueType Value
@@ -1270,6 +1274,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 		public virtual bool HasLabel { get { return !string.IsNullOrEmpty(_label); } }
 		public virtual string Label { get { return _label; } set { _label = value; } }
+		public VerticalAlignment LabelVerticalAlign { get { return VerticalAlignment.Center; } }
 
 		public virtual bool HasValue { get { return true; } }
 
