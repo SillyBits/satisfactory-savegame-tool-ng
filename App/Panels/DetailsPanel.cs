@@ -905,7 +905,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 		internal P.LinearColor _value;
 	}
 
-	internal class ListViewControl : ListView, IValueContainer<List<object[]>>
+
+	internal class ListViewControl : ListView, IElement<List<object[]>>
 	{
 		internal ListViewControl(ColumnDefinition[] columns = null)
 		{
@@ -932,14 +933,20 @@ namespace SatisfactorySavegameTool.Panels.Details
 			View = _gridview;
 		}
 
+		public bool HasLabel { get { return (_label != null); } }
+		public string Label { get { return _label; } set { _label = value; } }
+		public VerticalAlignment LabelVerticalAlign { get { return VerticalAlignment.Top; } }
+
+		public bool HasValue { get { return true; } }
 		public List<object[]> Value
 		{
-			//get { return _values; }
-			//set	{ _values = value; }
 			get { return ItemsSource as List<object[]>; }
 			set	{ ItemsSource = value; }
 		}
 
+		public FrameworkElement Visual { get { return this; } }
+
+		internal string _label;
 		internal List<ColumnDefinition> _columns;
 		internal GridView _gridview;
 
