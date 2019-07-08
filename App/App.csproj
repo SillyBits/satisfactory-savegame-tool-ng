@@ -181,9 +181,11 @@
   <ItemGroup>
     <Content Include="Resources\de-DE\About.res" />
     <Content Include="Resources\de-DE\Changelog.res" />
+    <Content Include="Resources\de-DE\FactoryGame.res" />
     <Content Include="Resources\de-DE\Translation.res" />
     <Content Include="Resources\en-US\About.res" />
     <Content Include="Resources\en-US\Changelog.res" />
+    <Content Include="Resources\en-US\FactoryGame.res" />
     <Content Include="Resources\en-US\Translation.res" />
     <Resource Include="Resources\VersionTable.xml" />
   </ItemGroup>
