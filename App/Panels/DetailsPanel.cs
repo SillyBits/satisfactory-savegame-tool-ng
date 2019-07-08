@@ -2636,28 +2636,11 @@ namespace SatisfactorySavegameTool.Panels.Details
 				new ListViewControl.ColumnDefinition("Allowed"),
 			};
 			ListViewControl lvc = new ListViewControl(columns);
+			lvc.Label = "Items";
 			lvc.Value = rows;
 
-			_listview = lvc;
+			_childs.Add(lvc);
 		}
-
-		internal override void _CreateVisual()
-		{
-			base._CreateVisual();
-
-			RowDefinition rowdef = new RowDefinition() {
-				Height = new GridLength(0, GridUnitType.Auto),
-			};
-			_grid.RowDefinitions.Add(rowdef);
-			int row = _grid.RowDefinitions.Count - 1;
-
-			Grid.SetColumnSpan(_listview, 2);
-			Grid.SetColumn(_listview, 0);
-			Grid.SetRow(_listview, row);
-			_grid.Children.Add(_listview);
-		}
-
-		ListView _listview;
 	}
 
 	internal class FGInventoryComponentTrash : FGInventoryComponent
@@ -2726,7 +2709,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 			if (map_prop == null || str.IsNull(map_prop.Name) || map_prop.Name.ToString() != "mBuildings")
 				return;//TODO:
 
-			List<object[]> rows = new List<object[]>();
 			foreach(KeyValuePair<int, P.MapProperty.Entry> pair in map_prop.Value)
 			{
 				List<P.ArrayProperty> entries = pair.Value.Value.ListOf<P.ArrayProperty>();
@@ -2739,45 +2721,30 @@ namespace SatisfactorySavegameTool.Panels.Details
 				if (objects == null)
 					continue;//TODO:
 
-				int index = 0;
+				List<object[]> rows = new List<object[]>();
 				foreach (P.ObjectProperty obj_prop in objects)
 				{
 					rows.Add(new object[] {
-						pair.Key,
-						index,
+						rows.Count,
 						!str.IsNull(obj_prop.PathName) ? obj_prop.PathName.LastName() : DetailsPanel.EMPTY,
 					});
-					++index;
 				}
+
+				ListViewControl.ColumnDefinition[] columns = {
+					new ListViewControl.ColumnDefinition("#"),
+					new ListViewControl.ColumnDefinition("Building"),
+				};
+				ListViewControl lvc = new ListViewControl(columns);
+				lvc.Value = rows;
+
+				string label = string.Format("Chunk {0} ({1:#,#0} build{2})", 
+					pair.Key, rows.Count, rows.Count==1 ? "" : "s");
+				Expando expando = new Expando(this, label, null);
+				expando._childs.Add(lvc);
+
+				_childs.Add(expando);
 			}
-
-			ListViewControl.ColumnDefinition[] columns = {
-				new ListViewControl.ColumnDefinition("Chunk"),
-				new ListViewControl.ColumnDefinition("#"),
-				new ListViewControl.ColumnDefinition("Building"),
-			};
-			ListViewControl lvc = new ListViewControl(columns);
-			lvc.Value = rows;
-
-			_listview = lvc;
 		}
-
-		internal override void _CreateVisual()
-		{
-			base._CreateVisual();
-
-			RowDefinition rowdef = new RowDefinition() {
-				Height = new GridLength(0, GridUnitType.Auto),
-			};
-			_grid.RowDefinitions.Add(rowdef);
-			int row = _grid.RowDefinitions.Count - 1;
-
-			Grid.SetColumnSpan(_listview, 2);
-			Grid.SetColumn(_listview, 0);
-			Grid.SetRow(_listview, row);
-			_grid.Children.Add(_listview);
-		}
-
-		ListView _listview;
 	}
+
 }
