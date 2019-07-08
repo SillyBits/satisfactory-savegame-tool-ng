@@ -2808,4 +2808,175 @@ namespace SatisfactorySavegameTool.Panels.Details
 		}
 	}
 
+	internal class BP_GamePhaseManager_C : SpecializedViewer
+	{
+		public BP_GamePhaseManager_C(IElement parent, string label, object obj)
+			: base(parent, label, obj)
+		{
+			_excluded.Add("NeedTransform");
+			_excluded.Add("Rotation");
+			_excluded.Add("Translate");
+			_excluded.Add("Scale");
+			_excluded.Add("WasPlacedInLevel");
+			_excluded.Add("EntityObj");
+		}
+
+		internal override void _CreateChilds()
+		{
+			base._CreateChilds();
+
+			P.Actor prop = Tag as P.Actor;
+			P.NamedEntity entity = prop.EntityObj as P.NamedEntity;
+			List<P.Property> values = entity.Value;
+
+			// Add "mGamePhase"
+			P.ValueProperty mGamePhase = values.Named("mGamePhase") as P.ValueProperty;
+			_childs.Add(MainFactory.Create(this, "Game phase", mGamePhase != null ? mGamePhase.Value : "?"));
+
+			//TODO: Add ListView
+			P.ArrayProperty arr;
+			P.StructProperty stru;
+
+			/*
+				|-> [ArrayProperty] mGamePhaseCosts
+				|  .InnerType = str:'StructProperty'
+				|  .Name = str:'mGamePhaseCosts'
+				|  .Length = Int32:1.946
+				|  .Index = Int32:0
+				|  .Value =
+				|	-> [StructProperty] mGamePhaseCosts
+				|	  .Value =
+				|		/ List with 3 elements:
+				|		|-> [PhaseCost].Value[0-1]
+			*/
+			arr = values.Named("mGamePhaseCosts") as P.ArrayProperty;
+			if (arr == null)
+				return;//TODO:
+			stru = arr.Value as P.StructProperty;
+			if (stru == null || stru.Value == null)
+				return;//TODO:
+			List<P.PhaseCost> costs = stru.Value.ListOf<P.PhaseCost>();
+
+			ListViewControl.ColumnDefinition[] columns = {
+				new ListViewControl.ColumnDefinition("#", 50),
+				new ListViewControl.ColumnDefinition("Item", 250),
+				new ListViewControl.ColumnDefinition("Count", 50),
+			};
+
+			//TODO: Re-order using same order as GamePhase enum
+			//TODO: Add missing "phases" (disabled expando?)
+			for (int i = 0; i < costs.Count(); ++i)
+			{
+				/*
+				|		|-> [PhaseCost].Value[0-1]
+				|		|  .Value =
+				|		|	/ List with 2 elements:
+				|		|	|-> [ByteProperty] gamePhase
+				|		|	|  .Unknown = str:'EGamePhase'
+				|		|	|  .Name = str:'gamePhase'
+				|		|	|  .Length = Int32:16
+				|		|	|  .Index = Int32:0
+				|		|	|  .Value = str:'EGP_MidGame'
+				|		|	|-> [ArrayProperty] Cost
+				|		|	|  .InnerType = str:'StructProperty'
+				|		|	|  .Name = str:'Cost'
+				|		|	|  .Length = Int32:438
+				|		|	|  .Index = Int32:0
+				|		|	|  .Value =
+				|		|	|	-> [StructProperty] Cost
+				|		|	|	  .Unknown = list(17):[0,]
+				|		|	|	  .Name = str:'Cost'
+				|		|	|	  .Length = Int32:366
+				|		|	|	  .Index = Int32:0
+				|		|	|	  .Value =
+				|		|	|		/ List with 2 elements:
+				|		|	|		|-> [ItemAmount].Value[0-1]
+				*/
+				P.PhaseCost phasecost = costs[i];
+				if (phasecost.Value == null)
+					continue;//TODO:
+
+				P.ValueProperty gamephase = phasecost.Value.Named("gamePhase") as P.ValueProperty;
+				if (gamephase == null || gamephase.Value == null)
+					continue;//TODO:
+
+				arr = phasecost.Value.Named("Cost") as P.ArrayProperty;
+				if (arr == null)
+					continue;//TODO:
+				P.StructProperty cost = arr.Value as P.StructProperty;
+				if (cost == null || cost.Value == null)
+					continue;//TODO:
+				List<P.ItemAmount> items = (cost.Value as List<P.Property>).ListOf<P.ItemAmount>();
+				if (items == null)
+					continue;//TODO:
+
+				/*
+				|		|	|		/ List with 2 elements:
+				|		|	|		|-> [ItemAmount].Value[0-1]
+				|		|	|		|  .Value =
+				|		|	|		|	/ List with 2 elements:
+				|		|	|		|	|-> [ObjectProperty] /Game/FactoryGame/Resource/Parts/IronPlateReinforced/Desc_IronPlateReinforced.Desc_IronPlateReinforced_C
+				|		|	|		|	|  .LevelName = <empty>
+				|		|	|		|	|  .PathName = str:'/Game/FactoryGame/Resource/Parts/IronPlateReinforced/Desc_IronPlateReinforced.Desc_IronPlateReinforced_C'
+				|		|	|		|	|  .Name = str:'ItemClass'
+				|		|	|		|	|  .Length = Int32:113
+				|		|	|		|	|  .Index = Int32:0
+				|		|	|		|	|  .Value = <empty>
+				|		|	|		|	|-> [IntProperty] amount
+				|		|	|		|	|  .Name = str:'amount'
+				|		|	|		|	|  .Length = Int32:4
+				|		|	|		|	|  .Index = Int32:0
+				|		|	|		|	|  .Value = Int32:0
+				|		|	|		|	\ end of list
+				*/
+				List<object[]> rows = new List<object[]>();
+				foreach (P.ItemAmount item_amount in items)
+				{
+					if (item_amount.Value == null)
+						continue;//TODO:
+
+					P.ObjectProperty itemclass = item_amount.Value.Named("ItemClass") as P.ObjectProperty;
+					string name = DetailsPanel.EMPTY;
+					if (itemclass != null && !str.IsNull(itemclass.PathName))
+					{
+						name = itemclass.PathName.LastName();
+						if (Translate.Has(name))
+							name = Translate._(name);
+					}
+
+					P.ValueProperty amount = item_amount.Value.Named("amount") as P.ValueProperty;
+					
+					rows.Add(new object[] {
+						rows.Count,
+						name,
+						amount != null ? amount.Value : DetailsPanel.EMPTY,
+					});
+				}
+
+				ListViewControl lvc = new ListViewControl(columns);
+				lvc.Label = "Items";
+				lvc.Value = rows;
+
+				string label = string.Format("Phase: {0}", gamephase.Value);
+				Expando expando = new Expando(this, label, null);
+				expando._childs.Add(lvc);
+
+				_childs.Add(expando);
+			}
+		}
+
+		internal enum GamePhases {
+			EGP_EarlyGame,
+			EGP_MidGame,
+			EGP_LateGame,
+			EGP_EndGame,
+			EGP_FoodCourt,//???
+			EGP_LaunchTowTruck,//???
+			EGP_Victory,
+			EGP_MAX };
+		//TODO: Find correct order
+		//TODO: Add suitable tiers to those phases
+		//TODO: Move such info into some other place to be re-usable (true for all enums and such)
+	}
+
 }
