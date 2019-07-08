@@ -908,6 +908,10 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 	internal class ListViewControl : ListView, IElement<List<object[]>>
 	{
+		//TODO: Add dedicated Value class which allows for more control 
+		//      on how to display value, e.g. coloring
+		//TODO: Also allow for adding framework elements like buttons,
+		//      checkboxes, dropdowns and alike
 		internal ListViewControl(ColumnDefinition[] columns = null)
 		{
 			_columns = columns != null ? columns.ToList() : null;
@@ -920,6 +924,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			{
 				GridViewColumn col = new GridViewColumn() {
 					Header = coldef._header,
+					Width = coldef._width,
 					//TODO: Alignment
 					//TODO: Converter
 					DisplayMemberBinding = new Binding("[" + _gridview.Columns.Count + "]"),
@@ -952,13 +957,14 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 		internal class ColumnDefinition
 		{
-			internal ColumnDefinition(string header, HorizontalAlignment align = HorizontalAlignment.Left)
-				: this(header, align, DefaultConverter)
+			internal ColumnDefinition(string header, double width, HorizontalAlignment align = HorizontalAlignment.Left)
+				: this(header, width, align, DefaultConverter)
 			{ }
 
-			internal ColumnDefinition(string header, HorizontalAlignment align, Converter converter)
+			internal ColumnDefinition(string header, double width, HorizontalAlignment align, Converter converter)
 			{
 				_header = header;
+				_width = width;
 				_align = align;
 				_converter = converter;
 			}
@@ -967,6 +973,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			internal static string DefaultConverter(object obj) { return obj.ToString(); }
 
 			internal string _header;
+			internal double _width;
 			internal HorizontalAlignment _align;
 			internal Converter _converter;
 		}
@@ -2629,11 +2636,11 @@ namespace SatisfactorySavegameTool.Panels.Details
 			}
 
 			ListViewControl.ColumnDefinition[] columns = {
-				new ListViewControl.ColumnDefinition("#"),
-				new ListViewControl.ColumnDefinition("Item"),
-				new ListViewControl.ColumnDefinition("Count"),
-				new ListViewControl.ColumnDefinition("Stack limit"),
-				new ListViewControl.ColumnDefinition("Allowed"),
+				new ListViewControl.ColumnDefinition("#", 50),
+				new ListViewControl.ColumnDefinition("Item", 250),
+				new ListViewControl.ColumnDefinition("Count", 50),
+				new ListViewControl.ColumnDefinition("Stack limit", 50),
+				new ListViewControl.ColumnDefinition("Allowed", 250),
 			};
 			ListViewControl lvc = new ListViewControl(columns);
 			lvc.Label = "Items";
@@ -2687,8 +2694,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 	internal class FGFoundationSubsystem : SpecializedViewer
 	{
-		//TODO: Display each entry in dict as an individual chunk, Expando with "Chunk #/# (# objects)" as label
-
 		public FGFoundationSubsystem(IElement parent, string label, object obj)
 			: base(parent, label, obj)
 		{
@@ -2708,6 +2713,11 @@ namespace SatisfactorySavegameTool.Panels.Details
 			P.MapProperty map_prop = values[0] as P.MapProperty;
 			if (map_prop == null || str.IsNull(map_prop.Name) || map_prop.Name.ToString() != "mBuildings")
 				return;//TODO:
+
+			ListViewControl.ColumnDefinition[] columns = {
+				new ListViewControl.ColumnDefinition("#", 50),
+				new ListViewControl.ColumnDefinition("Building", 250),
+			};
 
 			foreach(KeyValuePair<int, P.MapProperty.Entry> pair in map_prop.Value)
 			{
@@ -2730,10 +2740,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 					});
 				}
 
-				ListViewControl.ColumnDefinition[] columns = {
-					new ListViewControl.ColumnDefinition("#"),
-					new ListViewControl.ColumnDefinition("Building"),
-				};
 				ListViewControl lvc = new ListViewControl(columns);
 				lvc.Value = rows;
 
@@ -2791,8 +2797,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 			}
 
 			ListViewControl.ColumnDefinition[] columns = {
-				new ListViewControl.ColumnDefinition("#"),
-				new ListViewControl.ColumnDefinition("Recipe"),
+				new ListViewControl.ColumnDefinition("#", 50),
+				new ListViewControl.ColumnDefinition("Recipe", 250),
 			};
 			ListViewControl lvc = new ListViewControl(columns);
 			lvc.Label = "Recipes";
