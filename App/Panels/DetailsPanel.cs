@@ -2747,4 +2747,59 @@ namespace SatisfactorySavegameTool.Panels.Details
 		}
 	}
 
+	internal class FGRecipeManager : SpecializedViewer
+	{
+		public FGRecipeManager(IElement parent, string label, object obj)
+			: base(parent, label, obj)
+		{
+			_excluded.Add("EntityObj");
+		}
+
+		internal override void _CreateChilds()
+		{
+			base._CreateChilds();
+
+			P.Actor prop = Tag as P.Actor;
+			P.NamedEntity entity = prop.EntityObj as P.NamedEntity;
+			List<P.Property> values = entity.Value;
+
+			if (values.Count != 1)
+				return;//TODO:
+			P.ArrayProperty arr = values[0] as P.ArrayProperty;
+			if (arr == null || str.IsNull(arr.Name) || arr.Name.ToString() != "mAvailableRecipes")
+				return;//TODO:
+
+			List<P.ObjectProperty> objects = (arr.Value as List<P.Property>).ListOf<P.ObjectProperty>();
+			if (objects == null)
+				return;//TODO:
+
+			List<object[]> rows = new List<object[]>();
+			foreach (P.ObjectProperty obj_prop in objects)
+			{
+				string name = DetailsPanel.EMPTY;
+				if (!str.IsNull(obj_prop.PathName))
+				{
+					name = obj_prop.PathName.LastName();
+					if (Translate.Has(name))
+						name = Translate._(name);
+				}
+
+				rows.Add(new object[] {
+					rows.Count,
+					name,
+				});
+			}
+
+			ListViewControl.ColumnDefinition[] columns = {
+				new ListViewControl.ColumnDefinition("#"),
+				new ListViewControl.ColumnDefinition("Recipe"),
+			};
+			ListViewControl lvc = new ListViewControl(columns);
+			lvc.Label = "Recipes";
+			lvc.Value = rows;
+
+			_childs.Add(lvc);
+		}
+	}
+
 }
