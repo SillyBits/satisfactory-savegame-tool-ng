@@ -73,6 +73,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Supplements\Enums.cs" />
     <Compile Include="Supplements\VersionTable.cs" />
     <Page Include="Dialogs\ShowHtmlResDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
