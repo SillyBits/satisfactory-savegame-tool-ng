@@ -18,7 +18,11 @@ namespace SatisfactorySavegameTool.Panels
 	/*
 	 * TODO:
 	 * 
+	 * - Add options to select which trees to build, and which one to show initially
+	 * 
 	 * - Add better tree style handling
+	 * 
+	 * - Building trees in background an option? (all besides the initial one)
 	 * 
 	 */
 	
