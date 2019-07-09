@@ -2639,7 +2639,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 				new ListViewControl.ColumnDefinition("#", 50),
 				new ListViewControl.ColumnDefinition("Item", 250),
 				new ListViewControl.ColumnDefinition("Count", 50),
-				new ListViewControl.ColumnDefinition("Stack limit", 50),
+				new ListViewControl.ColumnDefinition("Stack limit", 75),
 				new ListViewControl.ColumnDefinition("Allowed", 250),
 			};
 			ListViewControl lvc = new ListViewControl(columns);
@@ -2669,6 +2669,11 @@ namespace SatisfactorySavegameTool.Panels.Details
 		public FGMapManager(IElement parent, string label, object obj)
 			: base(parent, label, obj)
 		{
+			_excluded.Add("NeedTransform");
+			_excluded.Add("Rotation");
+			_excluded.Add("Translate");
+			_excluded.Add("Scale");
+			_excluded.Add("WasPlacedInLevel");
 			_excluded.Add("EntityObj");
 		}
 
@@ -2697,6 +2702,11 @@ namespace SatisfactorySavegameTool.Panels.Details
 		public FGFoundationSubsystem(IElement parent, string label, object obj)
 			: base(parent, label, obj)
 		{
+			_excluded.Add("NeedTransform");
+			_excluded.Add("Rotation");
+			_excluded.Add("Translate");
+			_excluded.Add("Scale");
+			_excluded.Add("WasPlacedInLevel");
 			_excluded.Add("EntityObj");
 		}
 
@@ -2758,6 +2768,11 @@ namespace SatisfactorySavegameTool.Panels.Details
 		public FGRecipeManager(IElement parent, string label, object obj)
 			: base(parent, label, obj)
 		{
+			_excluded.Add("NeedTransform");
+			_excluded.Add("Rotation");
+			_excluded.Add("Translate");
+			_excluded.Add("Scale");
+			_excluded.Add("WasPlacedInLevel");
 			_excluded.Add("EntityObj");
 		}
 
@@ -2960,23 +2975,12 @@ namespace SatisfactorySavegameTool.Panels.Details
 				string label = string.Format("Phase: {0}", gamephase.Value);
 				Expando expando = new Expando(this, label, null);
 				expando._childs.Add(lvc);
+				expando.IsExpanded = true; // Ok to expand those
 
 				_childs.Add(expando);
 			}
 		}
 
-		internal enum GamePhases {
-			EGP_EarlyGame,
-			EGP_MidGame,
-			EGP_LateGame,
-			EGP_EndGame,
-			EGP_FoodCourt,//???
-			EGP_LaunchTowTruck,//???
-			EGP_Victory,
-			EGP_MAX };
-		//TODO: Find correct order
-		//TODO: Add suitable tiers to those phases
-		//TODO: Move such info into some other place to be re-usable (true for all enums and such)
 	}
 
 }
