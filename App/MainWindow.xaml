@@ -55,7 +55,7 @@
 						  Click="Edit_Options_Click" />
 			</MenuItem>
 			<MenuItem Header="{lang:Translate Key=MainWindow.Menu.Actions}">
-				<MenuItem Header="{lang:Translate Key=MainWindow.Menu.Actions.Validate}" 
+				<MenuItem x:Name="Actions_Validate" Header="{lang:Translate Key=MainWindow.Menu.Actions.Validate}" 
 						  ToolTip="{lang:Translate Key=MainWindow.Menu.Actions.Validate.TT}" 
 						  Click="Actions_Validate_Click" />
 			</MenuItem>
