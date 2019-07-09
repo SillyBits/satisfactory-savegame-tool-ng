@@ -85,7 +85,7 @@
 			<panels:TreePanel x:Name="TreeView" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
 							  BorderThickness="1" BorderBrush="DarkGray" TabStripPlacement="Bottom" />
 
-			<GridSplitter Grid.Column="1" Width="3" Background="Gray" HorizontalAlignment="Center" VerticalAlignment="Stretch" 
+			<GridSplitter Grid.Column="1" Width="4" Background="Gray" HorizontalAlignment="Center" VerticalAlignment="Stretch" 
 						  ShowsPreview="False" />
 
 			<Border Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="auto" Height="auto"
