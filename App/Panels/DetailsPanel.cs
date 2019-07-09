@@ -2980,6 +2980,172 @@ namespace SatisfactorySavegameTool.Panels.Details
 				_childs.Add(expando);
 			}
 		}
+	}
+
+	internal class BP_ResearchManager_C : SpecializedViewer
+	{
+		public BP_ResearchManager_C(IElement parent, string label, object obj)
+			: base(parent, label, obj)
+		{
+			_excluded.Add("NeedTransform");
+			_excluded.Add("Rotation");
+			_excluded.Add("Translate");
+			_excluded.Add("Scale");
+			_excluded.Add("WasPlacedInLevel");
+			_excluded.Add("EntityObj");
+		}
+
+		internal override void _CreateChilds()
+		{
+			base._CreateChilds();
+
+			P.Actor prop = Tag as P.Actor;
+			P.NamedEntity entity = prop.EntityObj as P.NamedEntity;
+			List<P.Property> values = entity.Value;
+
+			// Add ListView
+			P.ArrayProperty arr;
+			P.StructProperty stru;
+
+			/*
+				|-> [ArrayProperty] mResearchCosts
+				|  .InnerType = str:'StructProperty'
+				|  .Name = str:'mResearchCosts'
+				|  .Length = Int32:9.660
+				|  .Index = Int32:0
+				|  .Value =
+				|	-> [StructProperty] mResearchCosts
+				|	  .Unknown = list(17):[0,]
+				|	  .Name = str:'mResearchCosts'
+				|	  .Length = Int32:9.576
+				|	  .Index = Int32:0
+				|	  .Value =
+				|		/ List with 21 elements:
+				|		|-> [ResearchCost].Value[0-1]
+			*/
+			arr = values.Named("mResearchCosts") as P.ArrayProperty;
+			if (arr == null)
+				return;//TODO:
+			stru = arr.Value as P.StructProperty;
+			if (stru == null || stru.Value == null)
+				return;//TODO:
+			List<P.ResearchCost> costs = stru.Value.ListOf<P.ResearchCost>();
+
+			ListViewControl.ColumnDefinition[] columns = {
+				new ListViewControl.ColumnDefinition("#", 50),
+				new ListViewControl.ColumnDefinition("Research", 250),
+				new ListViewControl.ColumnDefinition("Item", 250),
+				new ListViewControl.ColumnDefinition("Count", 50),
+			};
+			List<object[]> rows = new List<object[]>();
+
+			//TODO: Add missing "researches" from "TODO:ResearchTable" (as disabled rows?)
+			for (int i = 0; i < costs.Count(); ++i)
+			{
+				/*
+				|		|-> [ResearchCost].Value[0-1]
+				|		|  .Value =
+				|		|	/ List with 2 elements:
+				|		|	|-> [ObjectProperty] /Game/FactoryGame/Recipes/Research/ResearchRecipe_Slug1.ResearchRecipe_Slug1_C
+				|		|	|  .LevelName = <empty>
+				|		|	|  .PathName = str:'/Game/FactoryGame/Recipes/Research/ResearchRecipe_Slug1.ResearchRecipe_Slug1_C'
+				|		|	|  .Name = str:'researchRecipe'
+				|		|	|  .Length = Int32:87
+				|		|	|  .Index = Int32:0
+				|		|	|  .Value = <empty>
+				|		|	|-> [ArrayProperty] Cost
+				|		|	|  .InnerType = str:'StructProperty'
+				|		|	|  .Name = str:'Cost'
+				|		|	|  .Length = Int32:246
+				|		|	|  .Index = Int32:0
+				|		|	|  .Value =
+				|		|	|	-> [StructProperty] Cost
+				|		|	|	  .Unknown = list(17):[0,]
+				|		|	|	  .Name = str:'Cost'
+				|		|	|	  .Length = Int32:174
+				|		|	|	  .Index = Int32:0
+				|		|	|	  .Value =
+				|		|	|		/ List with 1 elements:
+				|		|	|		|-> [ItemAmount].Value[0-1]
+				|		|	|		|  .Value =
+				|		|	\ end of list
+				*/
+				P.ResearchCost researchcost = costs[i];
+				if (researchcost.Value == null)
+					continue;//TODO:
+
+				P.ObjectProperty recipe = researchcost.Value.Named("researchRecipe") as P.ObjectProperty;
+				if (recipe == null || str.IsNull(recipe.PathName))
+					continue;//TODO:
+				string recipe_name = recipe.PathName.LastName();
+				if (Translate.Has(recipe_name))
+					recipe_name = Translate._(recipe_name);
+
+				arr = researchcost.Value.Named("Cost") as P.ArrayProperty;
+				if (arr == null)
+					continue;//TODO:
+				P.StructProperty cost = arr.Value as P.StructProperty;
+				if (cost == null || cost.Value == null)
+					continue;//TODO:
+				List<P.ItemAmount> items = (cost.Value as List<P.Property>).ListOf<P.ItemAmount>();
+				if (items == null || items.Count != 1) // There's only one item per research
+					continue;//TODO:
+
+				/*
+				|		|	|		/ List with 1 elements:
+				|		|	|		|-> [ItemAmount].Value[0-1]
+				|		|	|		|  .Value =
+				|		|	|		|	/ List with 2 elements:
+				|		|	|		|	|-> [ObjectProperty] /Game/FactoryGame/Resource/Environment/Crystal/Desc_Crystal.Desc_Crystal_C
+				|		|	|		|	|  .LevelName = <empty>
+				|		|	|		|	|  .PathName = str:'/Game/FactoryGame/Resource/Environment/Crystal/Desc_Crystal.Desc_Crystal_C'
+				|		|	|		|	|  .Name = str:'ItemClass'
+				|		|	|		|	|  .Length = Int32:83
+				|		|	|		|	|  .Index = Int32:0
+				|		|	|		|	|  .Value = <empty>
+				|		|	|		|	|-> [IntProperty] amount
+				|		|	|		|	|  .Name = str:'amount'
+				|		|	|		|	|  .Length = Int32:4
+				|		|	|		|	|  .Index = Int32:0
+				|		|	|		|	|  .Value = Int32:1
+				|		|	|		|	\ end of list
+				|		|	|		\ end of list
+				*/
+				P.ItemAmount item_amount = items[0];
+				if (item_amount.Value == null)
+					continue;//TODO:
+
+				P.ObjectProperty itemclass = item_amount.Value.Named("ItemClass") as P.ObjectProperty;
+				string name = DetailsPanel.EMPTY;
+				if (itemclass != null && !str.IsNull(itemclass.PathName))
+				{
+					name = itemclass.PathName.LastName();
+					if (Translate.Has(name))
+						name = Translate._(name);
+				}
+
+				P.ValueProperty amount = item_amount.Value.Named("amount") as P.ValueProperty;
+					
+				rows.Add(new object[] {
+					rows.Count,
+					recipe_name,
+					name,
+					amount != null ? amount.Value : DetailsPanel.EMPTY,
+				});
+			}
+
+			ListViewControl lvc = new ListViewControl(columns);
+			lvc.Label = "Researchs";
+			lvc.Value = rows;
+
+			_childs.Add(lvc);
+			/*
+			Expando expando = new Expando(this, "Research", null);
+			expando._childs.Add(lvc);
+
+			_childs.Add(expando);
+			*/
+		}
 
 	}
 
