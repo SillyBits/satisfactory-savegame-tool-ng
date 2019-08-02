@@ -252,7 +252,7 @@ namespace SatisfactorySavegameTool
 #endregion
 
 #region Handling for savegame
-		public Savegame.Savegame CurrFile;
+		public static Savegame.Savegame CurrFile;
 
 		private async void _LoadGamefile(string filename)
 		{
