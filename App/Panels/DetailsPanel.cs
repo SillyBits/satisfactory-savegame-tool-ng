@@ -70,17 +70,17 @@ namespace SatisfactorySavegameTool.Panels.Details
 	//
 	internal static class MainFactory
 	{
-		internal static IElement Create(IElement parent, string label, object obj)
+		internal static IElement Create(IElement parent, string label, object obj, bool read_only = false)
 		{
 			string s = (obj != null) ? string.Format("{0}:'{1}'", obj.GetType().Name, obj) : DetailsPanel.EMPTY;
 			Log.Debug("- Creating element for label:'{0}', obj={1}", label, s);
 			IElement element = null;
 
-			if (label != null)							element = CreateNamed(parent, label, obj);
+			if (label != null)							element = CreateNamed(parent, label, obj, read_only);
 			if (element == null && obj is P.Property)	element = ElementFactory.Create(parent, label, obj);
 			if (element == null && obj is IDictionary)	element = new DictControl(parent, label, obj);
 			if (element == null && obj is ICollection)	element = new ListControl(parent, label, obj);
-			if (element == null)						element = ValueControlFactory.Create(parent, label, obj);
+			if (element == null)						element = ValueControlFactory.Create(parent, label, obj, read_only);
 
 			Log.Debug("=> created {0}", element);
 			return element;
