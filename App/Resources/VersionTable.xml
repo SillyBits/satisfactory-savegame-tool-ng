@@ -21,11 +21,17 @@
 	<version build="101177" type="0" version="0.1.16" />									<!-- Early Access (EXPERIMENTAL) - v0.1.16 - Build 101177 -->
 	<version build="101256" type="0" version="0.1.17" />									<!-- Early Access (EXPERIMENTAL) - v0.1.17 - Build 101256 -->
 	<version build="101353" type="0" version="0.1.17" />									<!-- Early Access (EXPERIMENTAL) - v0.1.17 - Build 101353 -->
-<!--<version build="101###" type="0" version="0.1.18" />								No 0.1.18?? -->
+<!--<version build="101###" type="0" version="0.1.18" remarks="Reverted?" No 0.1.18?? Might have be reverted as with 0.2.1.4 lately -->
 	<version build="101486" type="0" version="0.1.19" />									<!-- Early Access (EXPERIMENTAL) - v0.1.19 - Build 101486 -->
 	<version build="101547" type="0" version="0.1.20" />									<!-- Early Access (EXPERIMENTAL) - v0.1.20 - Build 101547 -->
 	<version build="101665" type="1" version="0.2.1" />										<!-- Early Access - v0.2.1 - Build 101665 -->
 	<version build="101829" type="1" version="0.2.1.1" />									<!-- Early Access - v0.2.1.1 - Build 101829 -->
 	<version build="101873" type="1" version="0.2.1.2" />									<!-- Early Access - v0.2.1.2 - Build 101873 -->
 	<version build="102023" type="1" version="0.2.1.3" />									<!-- Early Access - v0.2.1.3 - Build 102023 -->
+<!--version build="102279" type="1" version="0.2.1.4" remarks="Reverted"     Early Access - v0.2.1.4 - Build 102279 -->
+	<version build="102385" type="1" version="0.2.1.5" />									<!-- Early Access - v0.2.1.5 - Build 102385 -->
+	<version build="102556" type="0" version="0.2.1.6" />									<!-- Early Access (EXPERIMENTAL) - v0.2.1.6 - Build 102556 -->
+<!--version build="102599" type="0" version="0.2.1.7" remarks="Moved"				 Early Access (EXPERIMENTAL) - v0.2.1.7 - Build 102599 -->
+	<version build="102599" type="1" version="0.2.1.7" />									<!-- Early Access - v0.2.1.7 - Build 102599 -->
+	<version build="102736" type="0" version="0.2.1.8" />									<!-- Early Access (EXPERIMENTAL) - v0.2.1.8 - Build 102736 -->
 </versions>
