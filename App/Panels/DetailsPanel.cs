@@ -106,68 +106,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 	}
 
 
-	// Extension methods
-	//
-	internal static class Extensions
-	{
-		internal static bool IsNullOrEmpty(this byte[] arr) { return _IsNullOrEmpty(arr); }
-		internal static bool IsNullOrEmpty(this int[] arr)  { return _IsNullOrEmpty(arr); }
-		private static bool _IsNullOrEmpty<_ValueType>(_ValueType[] arr)
-			where _ValueType : IConvertible
-		{
-			if (arr == null || arr.Length == 0)
-				return true;
-			double sum = arr.Sum((v) => v.ToDouble(System.Globalization.CultureInfo.InvariantCulture));
-			return (sum == 0);
-		}
-
-		
-		// Used to extract last portion of a string which can be split using given separator
-		// (e.g. "/Script/FactoryGame.FGInventoryComponent" -> "FGInventoryComponent")
-		internal static string LastName(this str name, char separator = '.')
-		{
-			if (str.IsNull(name))
-				return null;
-			return LastName(name.ToString(), separator);
-		}
-
-		internal static string LastName(this string name, char separator = '.')
-		{
-			if (!string.IsNullOrEmpty(name))
-			{
-				string[] names = name.Split(separator);
-				if (names.Length >= 2)
-					return names.Last();
-			}
-			return null;
-		}
-
-
-		// Find a value property by name
-		internal static P.Property Named(this List<P.Property> props, string name)
-		{
-			return props.Find(prop => {
-				if (prop is P.ValueProperty)
-				{
-					str prop_name = (prop as P.ValueProperty).Name;
-					if (!str.IsNull(prop_name))
-						return prop_name.ToString() == name;
-				}
-				return false;
-			});
-		}
-
-
-		// Convert a List<Property> into another type, e.g. List<InventoryStack>
-		internal static List<_PropertyType> ListOf<_PropertyType>(this object props)
-		{
-			if (props is List<P.Property>)
-				return (props as List<P.Property>).Cast<_PropertyType>().ToList();
-			throw new ArgumentException("Invalid list object passed!");
-		}
-	}
-
-
 	// Basic visual element (with or without a label)
 	//
 	internal interface IElement
