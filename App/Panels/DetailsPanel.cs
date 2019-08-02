@@ -2614,7 +2614,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			if (equipped != null)
 			{
 				// Select real instance from save using PathName
-				P.Actor equipment = MainWindow.GetSavegame().Objects.FindByPathName(equipped.PathName) as P.Actor;
+				P.Actor equipment = MainWindow.CurrFile.Objects.FindByPathName(equipped.PathName) as P.Actor;
 				string item_name;
 				if (equipment == null)
 				{

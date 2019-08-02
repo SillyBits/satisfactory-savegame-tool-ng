@@ -246,8 +246,11 @@ namespace SatisfactorySavegameTool
 			TreeViewItem tvi = tv.SelectedItem as TreeViewItem;
 			if (tvi == null)
 				return;
-			Property prop = tvi.Tag as Property;
-			Details.ShowProperty(prop);
+			if (tvi.Tag is Property)
+			{
+				Property prop = tvi.Tag as Property;
+				Details.ShowProperty(prop);
+			}
 		}
 #endregion
 
@@ -279,9 +282,9 @@ namespace SatisfactorySavegameTool
 
 				Log.Info("Creating tree ...");
 				progress.CounterFormat = Translate._("MainWindow.LoadGamefile.Progress.CounterFormat.2");
-				progress.Interval = 1000;
-				//TreeView.CreateTree(CurrFile, progress.Events);
-				TreeView.CreateTrees(CurrFile, progress.Events);
+				//progress.Interval = 1000;
+				//TreeView.CreateTree(progress.Events);
+				TreeView.CreateTrees(progress.Events);
 				Log.Info("... finished creating tree");
 
 				DateTime end_time = DateTime.Now;

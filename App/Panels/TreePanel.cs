@@ -49,46 +49,46 @@ namespace SatisfactorySavegameTool.Panels
 				return tab;
 			};
 
-			//TODO: Suitable icon for 'simple'
-			_treeSimple = new SimpleTree();
-			_tabSimple = new TabItem() { Header = Translate._("TreePanel.Tab.Simple"), };
-			_tabSimple.Content = _treeSimple;
-			AddChild(_tabSimple);
+			////TODO: Suitable icon for 'simple'
+			//_treeSimple = new SimpleTree();
+			//_tabSimple = new TabItem() { Header = Translate._("TreePanel.Tab.Simple"), };
+			//_tabSimple.Content = _treeSimple;
+			//AddChild(_tabSimple);
 
 			_treeClasses = new ClassesTree();
 			_tabClasses = createTab("TreePanel.Tab.Classes", "Icon.TreePanel.Classes.png", _treeClasses);
 			AddChild(_tabClasses);
 
-			_treePaths = new PathTree();
-			_tabPaths = createTab("TreePanel.Tab.Paths", "Icon.TreePanel.Paths.png", _treePaths);
-			AddChild(_tabPaths);
+			//_treePaths = new PathTree();
+			//_tabPaths = createTab("TreePanel.Tab.Paths", "Icon.TreePanel.Paths.png", _treePaths);
+			//AddChild(_tabPaths);
 		}
 
-		public void CreateTrees(Savegame.Savegame savegame, ICallback callback)
+		public void CreateTrees(ICallback callback)
 		{
-			_treeSimple.CreateTree(savegame, callback);
-			_treeClasses.CreateTree(savegame, callback);
-			_treePaths.CreateTree(savegame, callback);
+			//if (_treeSimple != null) _treeSimple.CreateTree(callback);
+			if (_treeClasses != null) _treeClasses.CreateTree(callback);
+			//if (_treePaths != null) _treePaths.CreateTree(callback);
 
 			Dispatcher.Invoke(() => SelectedItem = _tabClasses);
 		}
 
 		public void ClearTrees()
 		{
-			_treeSimple.ClearTree();
-			_treeClasses.ClearTree();
-			_treePaths.ClearTree();
+			//if (_treeSimple != null) _treeSimple.ClearTree();
+			if (_treeClasses != null) _treeClasses.ClearTree();
+			//if (_treePaths != null) _treePaths.ClearTree();
 		}
 
 
-		internal TabItem _tabSimple;
-		internal BasicTree _treeSimple;
+		//internal TabItem _tabSimple;
+		//internal BasicTree _treeSimple;
 
 		internal TabItem _tabClasses;
 		internal BasicTree _treeClasses;
 
-		internal TabItem _tabPaths;
-		internal BasicTree _treePaths;
+		//internal TabItem _tabPaths;
+		//internal BasicTree _treePaths;
 
 		protected override void OnSelectionChanged(SelectionChangedEventArgs e)
 		{
@@ -120,17 +120,11 @@ namespace SatisfactorySavegameTool.Panels
 
 			SelectedItemChanged += (Application.Current.MainWindow as SatisfactorySavegameTool.MainWindow).TreeView_SelectedItemChanged;
 
-			ContextMenu = new ContextMenu();
-
-			MenuItem item = new MenuItem() {
-				Header = Translate._("TreePanel.Context.Inspect"),
-			};
-			item.Click += Contextmenu_Inspect_Click;
-			ContextMenu.Items.Add(item);
+			_CreateContextMenu();
 		}
 
 
-		public void CreateTree(Savegame.Savegame savegame, ICallback callback)
+		public void CreateTree(ICallback callback)
 		{
 			_callback = callback;
 
@@ -140,17 +134,17 @@ namespace SatisfactorySavegameTool.Panels
 
 			Dispatcher.Invoke(() => {
 				Items.Clear();
-				_callback.Start(savegame.TotalElements + extra, Translate._("MainWindow.LoadGamefile.Progress.Title.2"), "");
+				_callback.Start(MainWindow.CurrFile.TotalElements + extra, Translate._("MainWindow.LoadGamefile.Progress.Title.2"), "");
 			});
 
 			_count = 0;
 
-			TreeViewItem root = _AddItem(null, System.IO.Path.GetFileName(savegame.Filename), null);
+			TreeViewItem root = _AddItem(null, System.IO.Path.GetFileName(MainWindow.CurrFile.Filename), null);
 			Dispatcher.Invoke(() => {
-				root.Tag = savegame.Header;
+				root.Tag = MainWindow.CurrFile.Header;
 			});
 
-			_CreateTree(savegame, root);
+			_CreateTree(root);
 
 			Dispatcher.Invoke(() => {
 				root.IsExpanded = true;
@@ -166,19 +160,19 @@ namespace SatisfactorySavegameTool.Panels
 
 
 		internal abstract int NoOfExtraElements { get; }
-		internal abstract void _CreateTree(Savegame.Savegame savegame, TreeViewItem root);
+		internal abstract void _CreateTree(TreeViewItem root);
 
 
 		internal ICallback _callback;
 		internal int _count;
 
-		internal TreeViewItem _AddItem(TreeViewItem parent, string label, P.Property prop = null)
+		internal TreeViewItem _AddItem(TreeViewItem parent, string label, object tag = null)
 		{
 			_count ++;
 			return Dispatcher.Invoke(() => {
 				TreeViewItem item = new TreeViewItem();
 				item.Header = label;
-				item.Tag = prop;
+				item.Tag = tag;
 				if (parent != null)
 					parent.Items.Add(item);
 				else
@@ -188,6 +182,17 @@ namespace SatisfactorySavegameTool.Panels
 			});
 		}
 
+
+		protected virtual void _CreateContextMenu()
+		{
+			ContextMenu = new ContextMenu();
+
+			MenuItem item = new MenuItem() {
+				Header = Translate._("TreePanel.Context.Inspect"),
+			};
+			item.Click += Contextmenu_Inspect_Click;
+			ContextMenu.Items.Add(item);
+		}
 
 		protected override void OnContextMenuOpening(ContextMenuEventArgs e)
 		{
@@ -200,8 +205,10 @@ namespace SatisfactorySavegameTool.Panels
 			if (!tvi.IsSelected)
 				tvi.IsSelected = true;
 
-			P.Property prop = tvi.Tag as P.Property;
-			if (prop == null)
+			if (tvi.Tag is P.Property) // || ...)
+			{
+			}
+			else
 			{
 				e.Handled = true;
 				return;
@@ -238,16 +245,16 @@ namespace SatisfactorySavegameTool.Panels
 
 		internal override int NoOfExtraElements { get { return 3; } }
 
-		internal override void _CreateTree(Savegame.Savegame savegame, TreeViewItem root)
+		internal override void _CreateTree(TreeViewItem root)
 		{
-			String label = string.Format(Translate._("TreePanel.Tree.Objects"), savegame.Objects.Count);
+			String label = string.Format(Translate._("TreePanel.Tree.Objects"), MainWindow.CurrFile.Objects.Count);
 			TreeViewItem objects = _AddItem(root, label, null);
-			foreach (P.Property prop in savegame.Objects)
+			foreach (P.Property prop in MainWindow.CurrFile.Objects)
 				_AddItem(objects, prop.ToString(), prop);
 
-			label = string.Format(Translate._("TreePanel.Tree.Collected"), savegame.Collected.Count);
+			label = string.Format(Translate._("TreePanel.Tree.Collected"), MainWindow.CurrFile.Collected.Count);
 			TreeViewItem collected = _AddItem(root, label, null);
-			foreach (P.Property prop in savegame.Collected)
+			foreach (P.Property prop in MainWindow.CurrFile.Collected)
 				_AddItem(collected, prop.ToString(), prop);
 
 			//if self.__savegame.Missing:
@@ -266,14 +273,14 @@ namespace SatisfactorySavegameTool.Panels
 
 		internal override int NoOfExtraElements { get { return 150; } }
 
-		internal override void _CreateTree(Savegame.Savegame savegame, TreeViewItem root)
+		internal override void _CreateTree(TreeViewItem root)
 		{
 			_classes = new Dictionary<string,TreeViewItem>();
 
-			foreach (P.Property prop in savegame.Objects)
+			foreach (P.Property prop in MainWindow.CurrFile.Objects)
 				_AddClassRecurs(root, "/", prop);
 
-			//foreach (Property prop in savegame.Collected)
+			//foreach (Property prop in MainWindow.GetSavegame().Collected)
 			//	AddClassRecurs(root, "/", (Savegame.Properties.Object) prop);
 
 			//if self.__savegame.Missing:
@@ -412,14 +419,14 @@ namespace SatisfactorySavegameTool.Panels
 
 		internal override int NoOfExtraElements { get { return 150; } }
 
-		internal override void _CreateTree(Savegame.Savegame savegame, TreeViewItem root)
+		internal override void _CreateTree(TreeViewItem root)
 		{
 			_paths = new Dictionary<string,TreeViewItem>();
 
-			foreach (P.Property prop in savegame.Objects)
+			foreach (P.Property prop in MainWindow.CurrFile.Objects)
 				_AddTreeRecurs(root, "", prop);
 
-			foreach (P.Property prop in savegame.Collected)
+			foreach (P.Property prop in MainWindow.CurrFile.Collected)
 				_AddTreeRecurs(root, "", prop);
 		}
 
