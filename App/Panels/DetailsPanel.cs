@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 using SatisfactorySavegameTool.Dialogs;
+using SatisfactorySavegameTool.Supplements;
 
 using CoreLib;
 
