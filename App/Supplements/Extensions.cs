@@ -88,6 +88,30 @@ namespace SatisfactorySavegameTool.Supplements
 			});
 		}
 
+		// Check float for being with range of value given
+		internal static bool IsNear(this float val, float near, float range = float.Epsilon)
+		{
+			return (near - range <= val) && (val <= near + range);
+		}
+
+		// Check float for being near 0
+		internal static bool IsNearZero(this float val, float range = 10 * float.Epsilon)
+		{
+			return (-range <= val) && (val <= +range);
+		}
+
+		// Check vector for being identity
+		internal static bool IsIdentity(this P.Vector val)
+		{
+			return val.X.IsNear(1.0f) && val.Y.IsNear(1.0f) && val.Z.IsNear(1.0f);
+		}
+
+		// Check scale for being identity
+		internal static bool IsIdentity(this P.Scale val)
+		{
+			return (val as P.Vector).IsIdentity();
+		}
+
 	}
 
 }
