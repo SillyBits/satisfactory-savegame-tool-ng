@@ -193,6 +193,8 @@
     <Content Include="Resources\en-US\FactoryGame.res" />
     <Content Include="Resources\en-US\Translation.res" />
     <Resource Include="Resources\Logo-128x128.ico" />
+    <Resource Include="Resources\Icon.TreePanel.Classes.png" />
+    <Resource Include="Resources\Icon.TreePanel.Paths.png" />
     <Resource Include="Resources\VersionTable.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
