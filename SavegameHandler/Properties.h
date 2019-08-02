@@ -436,7 +436,8 @@ namespace Savegame
 
 	CLS_END
 
-	typedef List<Property^> Properties;
+	//typedef List<Property^> Properties;
+	public ref class Properties : List<Property^> { };
 
 
 	// Multiple properties as array
