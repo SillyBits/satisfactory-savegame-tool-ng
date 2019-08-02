@@ -251,6 +251,11 @@ namespace SatisfactorySavegameTool
 				Property prop = tvi.Tag as Property;
 				Details.ShowProperty(prop);
 			}
+			else if (tvi.Tag is Panels.LivingTree.Living)
+			{
+				Panels.LivingTree.Living living = tvi.Tag as Panels.LivingTree.Living;
+				Details.ShowLiving(living);
+			}
 		}
 #endregion
 

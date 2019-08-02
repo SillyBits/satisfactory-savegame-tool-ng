@@ -62,6 +62,10 @@ namespace SatisfactorySavegameTool.Panels
 			//_treePaths = new PathTree();
 			//_tabPaths = createTab("TreePanel.Tab.Paths", "Icon.TreePanel.Paths.png", _treePaths);
 			//AddChild(_tabPaths);
+
+			_treeLiving = new LivingTree();
+			_tabLiving = createTab("TreePanel.Tab.Living", "Icon.TreePanel.Living.png", _treeLiving);
+			AddChild(_tabLiving);
 		}
 
 		public void CreateTrees(ICallback callback)
@@ -69,6 +73,7 @@ namespace SatisfactorySavegameTool.Panels
 			//if (_treeSimple != null) _treeSimple.CreateTree(callback);
 			if (_treeClasses != null) _treeClasses.CreateTree(callback);
 			//if (_treePaths != null) _treePaths.CreateTree(callback);
+			if (_treeLiving != null) _treeLiving.CreateTree(callback);
 
 			Dispatcher.Invoke(() => SelectedItem = _tabClasses);
 		}
@@ -78,6 +83,7 @@ namespace SatisfactorySavegameTool.Panels
 			//if (_treeSimple != null) _treeSimple.ClearTree();
 			if (_treeClasses != null) _treeClasses.ClearTree();
 			//if (_treePaths != null) _treePaths.ClearTree();
+			if (_treeLiving != null) _treeLiving.ClearTree();
 		}
 
 
@@ -89,6 +95,10 @@ namespace SatisfactorySavegameTool.Panels
 
 		//internal TabItem _tabPaths;
 		//internal BasicTree _treePaths;
+
+		internal TabItem _tabLiving;
+		internal BasicTree _treeLiving;
+
 
 		protected override void OnSelectionChanged(SelectionChangedEventArgs e)
 		{
@@ -516,6 +526,173 @@ namespace SatisfactorySavegameTool.Panels
 		}
 
 		internal Dictionary<string,TreeViewItem> _paths;
+
+	}
+
+
+	public class LivingTree : BasicTree
+	{
+		public LivingTree()
+			: base()
+		{ }
+
+		internal override int NoOfExtraElements { get { return 0; } }
+
+		internal override void _CreateTree(TreeViewItem root)
+		{
+			_classes = new Dictionary<string,TreeViewItem>();
+
+			var living = MainWindow.CurrFile.Objects
+				.Where(p => p is P.Actor)
+				.Cast<P.Actor>()
+				.Where(a => a.ClassName.ToString().StartsWith("/Game/FactoryGame/Character/"))
+				;
+
+			TreeViewItem players = _AddItem(root, "Players");
+			var subset = living.Where(a => a.ClassName.ToString().StartsWith("/Game/FactoryGame/Character/Player/BP_PlayerState"));
+			foreach (P.Actor prop in subset)
+				_AddPlayer(players, prop);
+
+			TreeViewItem enemies = _AddItem(root, "Enemies");
+			subset = living.Where(a => a.ClassName.ToString().StartsWith("/Game/FactoryGame/Character/Creature/Enemy"));
+			foreach (P.Actor prop in subset)
+				_AddEnemy(enemies, prop);
+
+			TreeViewItem wildlife = _AddItem(root, "Wildlife");
+			subset = living.Where(a => a.ClassName.ToString().StartsWith("/Game/FactoryGame/Character/Creature/Wildlife"));
+			foreach (P.Actor prop in subset)
+				_AddWildlife(wildlife, prop);
+
+			Dispatcher.Invoke(() => {
+				players.IsExpanded = true;
+				enemies.IsExpanded = true;
+				wildlife.IsExpanded = true;
+			});
+		}
+
+		internal void _AddPlayer(TreeViewItem parent, P.Actor blueprint)
+		{
+			P.NamedEntity named = blueprint.EntityObj as P.NamedEntity;
+			P.ObjectProperty player_obj = named.Value.Named("mOwnedPawn") as P.ObjectProperty;
+			if (player_obj == null)
+			{
+				string pl = blueprint.PathName.LastName();
+				string short_title = string.Format("Player #{0} [INVALID]", pl.Split('_').Last());
+				TreeViewItem p = _AddItem(parent, short_title, null);
+				Dispatcher.Invoke(() => p.IsEnabled = false);
+			}
+			else
+			{
+				string pathname = player_obj.PathName.ToString();
+				string name = pathname.LastName();
+
+				string short_title = string.Format("Player #{0}", name.Split('_').Last());
+				string title = short_title + string.Format(" ({0})", name);
+				P.Actor player = MainWindow.CurrFile.Objects.FindByPathName(pathname) as P.Actor;
+
+				if (player == null)
+				{
+					short_title += " [NO ACTOR]";
+					TreeViewItem p = _AddItem(parent, short_title, null);
+					Dispatcher.Invoke(() => p.IsEnabled = false);
+				}
+				else
+				{
+					Living living = new Living(title, player, blueprint);
+					_AddItem(parent, short_title, living);
+				}
+			}
+		}
+
+		internal void _AddEnemy(TreeViewItem parent, P.Actor entity)
+		{
+			// Add grouping
+			//From: /Game/FactoryGame/Character/Creature/Enemy/Crab/BabyCrab/Char_BabyCrab.Char_BabyCrab_C
+			//  To:                                            Crab/BabyCrab/Char_BabyCrab.Char_BabyCrab_C
+			string[] groups = entity
+				.ClassName.ToString()
+				.Replace("/Game/FactoryGame/Character/Creature/Enemy/", "")
+				.Split('/');
+			TreeViewItem group = _AddOrGetClass(parent, groups[0]);
+			if (groups.Length == 3)
+				group = _AddOrGetClass(group, groups[1]);
+
+			string name = entity.PathName.LastName();
+			string classname = entity.ClassName.LastName();
+			if (Translate.Has(classname))
+				classname = Translate._(classname);
+			string short_title = string.Format("{0} #{1}", classname, name.Split('_').Last());
+			string title = short_title + string.Format(" ({0})", name);
+
+			Living living = new Living(title, entity, null);
+			_AddItem(group, short_title, living);
+		}
+
+		internal void _AddWildlife(TreeViewItem parent, P.Actor entity)
+		{
+			// Add grouping
+			//From: /Game/FactoryGame/Character/Creature/Wildlife/SpaceRabbit/Char_SpaceRabbit.Char_SpaceRabbit_C
+			//  To:                                               SpaceRabbit/Char_SpaceRabbit.Char_SpaceRabbit_C
+			string group_name = entity
+				.ClassName.ToString()
+				.Replace("/Game/FactoryGame/Character/Creature/Wildlife/", "")
+				.Split('/').First();
+			TreeViewItem group = _AddOrGetClass(parent, group_name);
+
+			string name = entity.PathName.LastName();
+			string classname = entity.ClassName.LastName();
+			if (Translate.Has(classname))
+				classname = Translate._(classname);
+			string short_title = string.Format("{0} #{1}", classname, name.Split('_').Last());
+			string title = short_title + string.Format(" ({0})", name);
+
+			Living living = new Living(title, entity, null);
+			_AddItem(group, short_title, living);
+		}
+
+		internal TreeViewItem _AddOrGetClass(TreeViewItem parent, string name)
+		{
+			if (!_classes.ContainsKey(name))
+			{
+				TreeViewItem class_item = _AddItem(parent, name);
+				Dispatcher.Invoke(() => class_item.IsExpanded = true);
+				_classes.Add(name, class_item);
+			}
+			return _classes[name];
+		}
+
+		protected override void _CreateContextMenu()
+		{
+			/* NO context menu for now
+			ContextMenu = new ContextMenu();
+
+			MenuItem item = new MenuItem() {
+				Header = Translate._("TreePanel.Context.Inspect"),
+			};
+			item.Click += Contextmenu_Inspect_Click;
+			ContextMenu.Items.Add(item);
+			*/
+		}
+
+
+		internal Dictionary<string,TreeViewItem> _classes;
+
+
+		internal class Living
+		{
+			internal string  Title;
+			internal P.Actor Entity;
+			internal P.Actor Blueprint;
+
+			internal bool IsPlayer { get { return Blueprint != null; } }
+
+			internal Living(string title, P.Actor entity, P.Actor blueprint)
+			{
+				Title = title;
+				Entity = entity;
+				Blueprint = blueprint;
+			}
+		}
 
 	}
 

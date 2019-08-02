@@ -38,7 +38,7 @@ namespace SatisfactorySavegameTool.Panels
 		{ }
 
 
-		public void ShowProperty(Property prop)
+		internal void ShowProperty(Property prop)
 		{
 			_ClearAll();
 
@@ -50,6 +50,15 @@ namespace SatisfactorySavegameTool.Panels
 				expando.IsEnabled = false;
 				element = expando;
 			}
+			Children.Add(element.Visual);
+		}
+
+		internal void ShowLiving(LivingTree.Living living)
+		{
+			_ClearAll();
+
+			Log.Debug("Visualizing living entity '{0}'", living != null ? living.Title : EMPTY);
+			Details.IElement element = new Details.LivingEntity(living);
 			Children.Add(element.Visual);
 		}
 
@@ -3134,6 +3143,345 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 			_childs.Add(expando);
 			*/
+		}
+
+	}
+
+
+	// More specialized visualizers
+	//
+	// Those are to be created explicitely using a Show... method!
+	// Used for things like living entities, vehicles and such
+	//
+
+	internal class LivingEntity : Expando
+	{
+		public LivingEntity(LivingTree.Living living)
+			: base(null, living.Title, living)
+		{ }
+
+		internal override void _CreateChilds()
+		{
+			LivingTree.Living living = Tag as LivingTree.Living;
+			P.NamedEntity ent_named = living.Entity.EntityObj as P.NamedEntity;
+			P.Actor blueprint = living.Blueprint;
+			P.NamedEntity bp_named = (living.IsPlayer) ? blueprint.EntityObj as P.NamedEntity : null;
+
+			P.Property prop;
+			//P.Properties props;
+			P.ArrayProperty arr;
+			P.Object obj;
+			P.Entity entity;
+			IElement element;
+
+			string[] excluded = new string[] { "ClassName", "LevelName", "PathName", "OuterPathName" };
+
+			if (living.IsPlayer)
+			{
+				byte[] missing = bp_named.Missing;
+				if (missing != null && missing.Length == 18)
+				{
+					string id = BitConverter.ToString(missing, 2).Replace("-", "");
+					_childs.Add(MainFactory.Create(this, "Player-Id", id, true));
+				}
+			}
+
+			// pl.C:Persistent_Level:PersistentLevel.BP_PlayerState_C_0.HealthComponent -> SG.O.Find* 
+			//   => Object . EntityObj -> Entity . Value -> [0] mCurrentHealth;
+			prop = MainWindow.CurrFile.Objects.FindByPathName(living.Entity.PathName.ToString() + ".HealthComponent");
+			if (prop != null)
+			{
+				float health = 100;
+				obj = prop as P.Object;
+				entity = obj.EntityObj as P.Entity;
+				if (entity != null)
+				{
+					prop = entity.Value.Named("mCurrentHealth");
+					if (prop is P.FloatProperty)
+						health = (float) (prop as P.FloatProperty).Value;
+				}
+				_childs.Add(MainFactory.Create(this, "Health", string.Format("{0:#,#0} %", health)));
+			}
+
+			_childs.Add(MainFactory.Create(this, "Position", living.Entity.Translate));
+			_childs.Add(MainFactory.Create(this, "Rotation", living.Entity.Rotation));
+			_childs.Add(MainFactory.Create(this, "Scale"   , living.Entity.Scale));
+
+			if (living.IsPlayer)
+			{
+				prop = ent_named.Value.Named("mFlashlightOn");
+				if (prop != null)
+					_childs.Add(MainFactory.Create(this, "Flashlight on?", prop));
+
+				// What to do with those?
+				//pl:
+				//|-> [ObjectProperty] Persistent_Level:PersistentLevel.BP_BuildGun_C_0
+				//|  .LevelName = str:'Persistent_Level'
+				//|  .PathName = str:'Persistent_Level:PersistentLevel.BP_BuildGun_C_0'
+				//|  .Name = str:'mBuildGun'
+				//|  .Length = Int32:74
+				//|  .Index = Int32:0
+				//|  .Value = <empty>
+				//|-> [ObjectProperty] Persistent_Level:PersistentLevel.BP_ResourceScanner_C_0
+				//|  .LevelName = str:'Persistent_Level'
+				//|  .PathName = str:'Persistent_Level:PersistentLevel.BP_ResourceScanner_C_0'
+				//|  .Name = str:'mResourceScanner'
+				//|  .Length = Int32:81
+				//|  .Index = Int32:0
+				//|  .Value = <empty>
+				//|-> [ObjectProperty] Persistent_Level:PersistentLevel.Equip_ResourceMiner_C_0
+				//|  .LevelName = str:'Persistent_Level'
+				//|  .PathName = str:'Persistent_Level:PersistentLevel.Equip_ResourceMiner_C_0'
+				//|  .Name = str:'mResourceMiner'
+				//|  .Length = Int32:82
+				//|  .Index = Int32:0
+				//|  .Value = <empty>
+
+				prop = bp_named.Value.Named("mHasReceivedInitialItems");
+				if (prop != null)
+					_childs.Add(MainFactory.Create(this, "Received initial items", prop));
+
+				prop = bp_named.Value.Named("mLastSchematicTierInUI");
+				if (prop != null)
+					_childs.Add(MainFactory.Create(this, "Last schematic tier", prop));
+
+				// pl:mLastSafeGroundPositions -> StructProperty -> [.Index] .Value -> Vector; (mLastSafeGroundPositionLoopHead ????)
+				var grounds = ent_named.Value
+					.Where(p => p is P.StructProperty)
+					.Select(p => p as P.StructProperty)
+					.Where(p => (p.Name != null) && (p.Name.ToString() == "mLastSafeGroundPositions"))
+					.Select(p => p.Value as P.Vector)
+					;
+				_childs.Add(new LastSaveGroundPositions(this, null, grounds.ToList()));
+
+				// bp:mHasSetupDefaultShortcuts -> BoolProperty + mHotbarShortcuts -> ArrayProperty -> [0-9] ObjectProperty.PathName -> SG.Obj.Find*;
+				List<string> shortcuts = new List<string>();
+				P.BoolProperty has_shortcuts = bp_named.Value.Named("mHasSetupDefaultShortcuts") as P.BoolProperty;
+				if (has_shortcuts != null && has_shortcuts.Value is byte && (byte)(has_shortcuts.Value) == 1)
+				{
+					arr = bp_named.Value.Named("mHotbarShortcuts") as P.ArrayProperty;
+					foreach (P.ObjectProperty shortcut in (arr.Value as P.Properties).ListOf<P.ObjectProperty>())
+					{
+						obj = MainWindow.CurrFile.Objects.FindByPathName(shortcut.PathName) as P.Object;
+						entity = obj.EntityObj as P.Entity;
+						P.ObjectProperty recipe = entity.Value.Named("mRecipeToActivate") as P.ObjectProperty;
+						string recipe_name = (recipe != null) ? recipe.PathName.ToString() : null;
+						shortcuts.Add(recipe_name);
+					}
+				}
+				_childs.Add(new KeyboardShortcuts(this, null, shortcuts));
+			}
+
+			// pl.C:Persistent_Level:PersistentLevel.BP_PlayerState_C_0.inventory       + pl:mInventory      (why?);
+			prop = MainWindow.CurrFile.Objects.FindByPathName(living.Entity.PathName.ToString() + ".inventory");
+			if (prop == null)
+				prop = MainWindow.CurrFile.Objects.FindByPathName(living.Entity.PathName.ToString() + ".mInventory");
+			if (prop != null && prop is P.Object)
+			{
+				element = MainFactory.Create(this, null, prop);
+				(element as SpecializedViewer)._excluded.AddRange(excluded);
+				((element as Expando).Visual as Expando).Header = "Inventory";
+				_childs.Add(element);
+			}
+
+			if (living.IsPlayer)
+			{
+				// pl.C:Persistent_Level:PersistentLevel.BP_PlayerState_C_0.ArmSlot;
+				prop = MainWindow.CurrFile.Objects.FindByPathName(living.Entity.PathName.ToString() + ".ArmSlot");
+				if (prop != null && prop is P.Object)
+				{
+					element = MainFactory.Create(this, null, prop);
+					(element as SpecializedViewer)._excluded.AddRange(excluded);
+					((element as Expando).Visual as Expando).Header = "Arm slots";
+					_childs.Add(element);
+				}
+
+				// pl.C:Persistent_Level:PersistentLevel.BP_PlayerState_C_0.BackSlot;
+				prop = MainWindow.CurrFile.Objects.FindByPathName(living.Entity.PathName.ToString() + ".BackSlot");
+				if (prop != null && prop is P.Object)
+				{
+					element = MainFactory.Create(this, null, prop);
+					(element as SpecializedViewer)._excluded.AddRange(excluded);
+					((element as Expando).Visual as Expando).Header = "Back slot";
+					_childs.Add(element);
+				}
+
+				// bp:mTutorialSubsystem -> ObjectProperty.PathName -> SG.Obj.Find*;
+				//P.ObjectProperty tut = named.Value.Named("mTutorialSubsystem") as P.ObjectProperty;
+				//if (tut != null)
+				//	living.AddByPathName("Tutorial steps", tut.PathName.ToString());
+				prop = bp_named.Value.Named("mTutorialSubsystem");
+				if (prop != null)
+				{
+					obj = prop as P.Object;
+					entity = obj.EntityObj as P.Entity;
+					prop = entity.Value.Named("mHasSeenIntroTutorial");
+					if (prop != null)
+						_childs.Add(MainFactory.Create(this, null, prop));
+				}
+
+				//bp:mNewRecipes -> ArrayProperty -> [0-N] ObjectProperty . PathName;
+				//|-> [ArrayProperty] mNewRecipes
+				//|  .InnerType = str:'ObjectProperty'
+				//|  .Name = str:'mNewRecipes'
+				//|  .Length = Int32:6.349
+				//|  .Index = Int32:0
+				//|  .Value =
+				//|	/ List with 72 elements:
+				//|	|-> [ObjectProperty] /Game/FactoryGame/Recipes/Equipment/Recipe_PortableMiner.Recipe_PortableMiner_C
+				//|	|  .LevelName = <empty>
+				//|	|  .PathName = str:'/Game/FactoryGame/Recipes/Equipment/Recipe_PortableMiner.Recipe_PortableMiner_C'
+				//|	|  .Length = Int32:0
+				//|	|  .Index = Int32:0
+				//living.Add("Recipes", ...);
+
+				// bp:mMessageData -> ArrayProperty -> StructProperty -> [0-N] MessageData;
+				//|-> [ArrayProperty] mMessageData
+				//|  .InnerType = str:'StructProperty'
+				//|  .Name = str:'mMessageData'
+				//|  .Length = Int32:16.501
+				//|  .Index = Int32:0
+				//|  .Value =
+				//|	-> [StructProperty] mMessageData
+				//|	  .Unknown = list<%s>(Byte):[0,]
+				//|	  .Name = str:'mMessageData'
+				//|	  .Length = Int32:16.420
+				//|	  .Index = Int32:0
+				//|	  .Value =
+				//|		/ List with 76 elements:
+				//|		|-> [MessageData].Value[0-1]
+				//|		|  .Value =
+				//|		|	/ List with 2 elements:
+				//|		|	|-> [BoolProperty] WasRead
+				//|		|	|  .Name = str:'WasRead'
+				//|		|	|  .Length = Int32:0
+				//|		|	|  .Index = Int32:0
+				//|		|	|  .Value = Byte:0
+				//|		|	|-> [ObjectProperty] /Game/FactoryGame/Interface/UI/Message/Tutorial/IntroTutorial/IntroTutorial_Greeting.IntroTutorial_Greeting_C
+				//|		|	|  .LevelName = <empty>
+				//|		|	|  .PathName = str:'/Game/FactoryGame/Interface/UI/Message/Tutorial/IntroTutorial/IntroTutorial_Greeting.IntroTutorial_Greeting_C'
+				//|		|	|  .Name = str:'MessageClass'
+				//|		|	|  .Length = Int32:118
+				//|		|	|  .Index = Int32:0
+				//|		|	|  .Value = <empty>
+				//|		|	\ end of list
+				//living.Add("Messages"        , pathname + ".");
+
+				// pl.C:Persistent_Level:PersistentLevel.BP_PlayerState_C_0.TrashSlot;
+				prop = MainWindow.CurrFile.Objects.FindByPathName(living.Entity.PathName.ToString() + ".TrashSlot");
+				if (prop != null && prop is P.Object)
+				{
+					element = MainFactory.Create(this, null, prop);
+					(element as SpecializedViewer)._excluded.AddRange(excluded);
+					((element as Expando).Visual as Expando).Header = "Trash slot";
+					_childs.Add(element);
+				}
+
+				// bp:mRememberedFirstTimeEquipmentClasses -> ArrayProperty -> [0-N] ObjectProperty.PathName -> SG.Obj.Find*;
+				_childs.Add(new FirstTimeEquipped(this, null, bp_named.Value.Named("mRememberedFirstTimeEquipmentClasses")));
+			}
+			else
+			{
+				//prop = ent_named.Value.Named("mSpline");
+				//if (prop != null)
+				//{
+				//	element = MainFactory.Create(this, "Movement data?", prop);
+				//	_childs.Add(element);
+				//}
+				//=> PathName not found within save, must be stored internally
+
+
+			}
+		}
+
+
+		internal class LastSaveGroundPositions : PropertyList
+		{
+			public LastSaveGroundPositions(IElement parent, string label, List<P.Vector> vectors)
+				: base(parent, label, vectors)
+			{ }
+
+			internal override void _CreateChilds()
+			{
+				Header = "Last save ground positions";
+
+				_childs = new List<IElement>();
+				List<P.Vector> vectors = Tag as List<P.Vector>;
+				foreach (P.Vector vector in vectors)
+				{
+					string label = "Position";
+					IElement element = MainFactory.Create(this, label, vector);
+					_childs.Add(element);
+				}
+			}
+		}
+
+		internal class KeyboardShortcuts : PropertyList
+		{
+			public KeyboardShortcuts(IElement parent, string label, List<string> shortcuts)
+				: base(parent, label, shortcuts)
+			{ }
+
+			internal override void _CreateChilds()
+			{
+				Header = "Keyboard shortcuts";
+
+				int key = 0;
+				_childs = new List<IElement>();
+				List<string> shortcuts = Tag as List<string>;
+				foreach (string shortcut in shortcuts)
+				{
+					key++;
+					if (key > 9)
+						key = 0;
+
+					string label = string.Format("Key [{0}]", key);
+					string pathname = DetailsPanel.EMPTY;
+					if (shortcut != null)
+					{
+						pathname = shortcut.LastName();
+						if (Translate.Has(pathname))
+							pathname = Translate._(pathname);
+					}
+
+					IElement element = MainFactory.Create(this, label, pathname);
+					//element.Label = label;
+					_childs.Add(element);
+				}
+			}
+		}
+
+		internal class FirstTimeEquipped : Expando
+		{
+			public FirstTimeEquipped(IElement parent, string label, object obj)
+				: base(parent, label, obj)
+			{ }
+
+			internal override void _CreateChilds()
+			{
+				P.ArrayProperty arr = Tag as P.ArrayProperty;
+
+				_childs = new List<IElement>();
+				List<P.ObjectProperty> coll = arr.Value.ListOf<P.ObjectProperty>();
+				int index = 0;
+
+				Header = "First-time equipped (skips animation)";
+				if (coll.Count == 0)
+					IsEnabled = false;
+
+				foreach (P.ObjectProperty obj in coll)
+				{
+					++index;
+					string label = index.ToString();
+					string item_name = obj.PathName.LastName();
+					if (Translate.Has(item_name))
+						item_name = Translate._(item_name);
+
+					IElement element = MainFactory.Create(this, label, item_name);
+					_childs.Add(element);
+				}
+			}
+
 		}
 
 	}

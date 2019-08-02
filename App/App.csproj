@@ -192,6 +192,7 @@
     <Content Include="Resources\en-US\Changelog.res" />
     <Content Include="Resources\en-US\FactoryGame.res" />
     <Content Include="Resources\en-US\Translation.res" />
+    <Resource Include="Resources\Icon.TreePanel.Living.png" />
     <Resource Include="Resources\Logo-128x128.ico" />
     <Resource Include="Resources\Icon.TreePanel.Classes.png" />
     <Resource Include="Resources\Icon.TreePanel.Paths.png" />
