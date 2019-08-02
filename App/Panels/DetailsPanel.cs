@@ -1311,7 +1311,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 				//IElement element = ElementFactory.Create(this, null, prop);
 				//if (element == null)
 				//	element = ValueControlFactory.Create(this, null, prop);
-				string label = prop.ToString();
+				string label = prop != null ? prop.ToString() : null;
 				IElement element = MainFactory.Create(this, label, prop);
 				_childs.Add(element);
 			}
