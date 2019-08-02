@@ -2432,10 +2432,10 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 			P.Object prop = Tag as P.Object;
 			P.Entity entity = prop.EntityObj as P.Entity;
-			List<P.Property> values = entity.Value;
 
-			P.ValueProperty inv_size = values.Named("mAdjustedSizeDiff") as P.ValueProperty;
-			_childs.Add(MainFactory.Create(this, "Inventory slots", inv_size != null ? inv_size.Value : "?"));
+			// Add "mAdjustedSizeDiff"
+			P.ValueProperty inv_size = entity.Value.Named("mAdjustedSizeDiff") as P.ValueProperty;
+			_childs.Add(MainFactory.Create(this, "Extra slots", inv_size != null ? inv_size.Value : 0));
 
 			P.ArrayProperty arr;
 			P.StructProperty stru;
@@ -2449,7 +2449,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 				|		/ List with 55 elements:
 				|		|-> [InventoryStack].Value[0-0]
 			*/
-			arr = values.Named("mInventoryStacks") as P.ArrayProperty;
+			arr = entity.Value.Named("mInventoryStacks") as P.ArrayProperty;
 			if (arr == null)
 				return;//TODO:
 			stru = arr.Value as P.StructProperty;
@@ -2462,7 +2462,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 				|  .InnerType = str:'IntProperty'
 				|  .Value = list<Int32>(55):[0,]
 			*/
-			arr = values.Named("mArbitrarySlotSizes") as P.ArrayProperty;
+			arr = entity.Value.Named("mArbitrarySlotSizes") as P.ArrayProperty;
 			if (arr == null)
 				return;//TODO:
 			int[] sizes = arr.Value as int[];
@@ -2478,7 +2478,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 				|	|  .Length = Int32:0
 				|	|  .Index = Int32:0
 			*/
-			arr = values.Named("mAllowedItemDescriptors") as P.ArrayProperty;
+			arr = entity.Value.Named("mAllowedItemDescriptors") as P.ArrayProperty;
 			if (arr == null)
 				return;//TODO:
 			List<P.ObjectProperty> allowed = arr.Value.ListOf<P.ObjectProperty>();
@@ -2486,7 +2486,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			if (stacks.Count != sizes.Length || sizes.Length != allowed.Count)
 				throw new Exception("FGInventoryComponent: Mismatch in collection sizes!");
 
-
+			bool add_allowed = false;
 			List<object[]> rows = new List<object[]>();
 			for (int i = 0; i < stacks.Count(); ++i)
 			{
@@ -2559,6 +2559,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 						item_limit = DetailsPanel.EMPTY;
 					else
 					{
+						add_allowed = true;
 						item_limit = limit.PathName.LastName();
 						if (Translate.Has(item_limit))
 							item_limit = Translate._(item_limit);
@@ -2574,14 +2575,15 @@ namespace SatisfactorySavegameTool.Panels.Details
 				});
 			}
 
-			ListViewControl.ColumnDefinition[] columns = {
+			List<ListViewControl.ColumnDefinition> columns = new List<ListViewControl.ColumnDefinition>() {
 				new ListViewControl.ColumnDefinition("#", 50),
 				new ListViewControl.ColumnDefinition("Item", 250),
 				new ListViewControl.ColumnDefinition("Count", 50),
 				new ListViewControl.ColumnDefinition("Stack limit", 75),
-				new ListViewControl.ColumnDefinition("Allowed", 250),
 			};
-			ListViewControl lvc = new ListViewControl(columns);
+			if (add_allowed)
+				columns.Add(new ListViewControl.ColumnDefinition("Allowed", 250));
+			ListViewControl lvc = new ListViewControl(columns.ToArray());
 			lvc.Label = "Items";
 			lvc.Value = rows;
 
@@ -2601,6 +2603,59 @@ namespace SatisfactorySavegameTool.Panels.Details
 		public FGInventoryComponentEquipment(IElement parent, string label, object obj)
 			: base(parent, label, obj)
 		{ }
+
+		internal override void _CreateChilds()
+		{
+			P.Object prop = Tag as P.Object;
+			P.Entity entity = prop.EntityObj as P.Entity;
+
+			// Add "mEquipmentInSlot"
+			P.ObjectProperty equipped = entity.Value.Named("mEquipmentInSlot") as P.ObjectProperty;
+			if (equipped != null)
+			{
+				// Select real instance from save using PathName
+				P.Actor equipment = MainWindow.GetSavegame().Objects.FindByPathName(equipped.PathName) as P.Actor;
+				string item_name;
+				if (equipment == null)
+				{
+					item_name = "[NOT FOUND] " + equipped.PathName.ToString();
+
+					//=> Might be consumable like berries and such, 
+					//Solution: Get "mActiveEquipmentIndex" and try to find in "mInventoryStacks" by index
+					P.IntProperty index_prop = entity.Value.Named("mActiveEquipmentIndex") as P.IntProperty;
+					if (index_prop != null && index_prop.Value is int)
+					{
+						int index = (int) index_prop.Value;
+						P.ArrayProperty arr = entity.Value.Named("mInventoryStacks") as P.ArrayProperty;
+						if (arr != null && arr.Value != null && arr.Value is P.StructProperty)
+						{
+							P.StructProperty stru = arr.Value as P.StructProperty;
+							List<P.InventoryStack> inv = stru.Value.ListOf<P.InventoryStack>();
+							if (inv != null && inv.Count >= index && inv[index].Value != null)
+							{
+								stru = inv[index].Value[0] as P.StructProperty;
+								if (stru != null)
+								{
+									P.InventoryItem item = stru.Value as P.InventoryItem;
+									item_name = item.ItemName.LastName();
+									if (Translate.Has(item_name))
+										item_name = Translate._(item_name);
+								}
+							}
+						}
+					}
+				}
+				else
+				{
+					item_name = equipment.ClassName.LastName();
+					if (Translate.Has(item_name))
+						item_name = Translate._(item_name);
+				}
+				_childs.Add(MainFactory.Create(this, "Equipped", item_name));
+			}
+
+			base._CreateChilds();
+		}
 	}
 
 	internal class FGMapManager : SpecializedViewer
@@ -2622,11 +2677,10 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 			P.Actor prop = Tag as P.Actor;
 			P.Entity entity = prop.EntityObj as P.Entity;
-			List<P.Property> values = entity.Value;
 
-			if (values.Count == 1)
+			if (entity.Value.Count == 1)
 			{
-				P.ArrayProperty arr = values[0] as P.ArrayProperty;
+				P.ArrayProperty arr = entity.Value[0] as P.ArrayProperty;
 				if (arr != null && !str.IsNull(arr.Name) && arr.Name.ToString() == "mFogOfWarRawData")
 				{
 					IElement element = new ImageControl(this, arr.Name.ToString(), arr.Value);
@@ -2655,11 +2709,10 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 			P.Actor prop = Tag as P.Actor;
 			P.Entity entity = prop.EntityObj as P.Entity;
-			List<P.Property> values = entity.Value;
 
-			if (values.Count != 1)
+			if (entity.Value.Count != 1)
 				return;//TODO:
-			P.MapProperty map_prop = values[0] as P.MapProperty;
+			P.MapProperty map_prop = entity.Value[0] as P.MapProperty;
 			if (map_prop == null || str.IsNull(map_prop.Name) || map_prop.Name.ToString() != "mBuildings")
 				return;//TODO:
 
@@ -2721,11 +2774,10 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 			P.Actor prop = Tag as P.Actor;
 			P.NamedEntity entity = prop.EntityObj as P.NamedEntity;
-			List<P.Property> values = entity.Value;
 
-			if (values.Count != 1)
+			if (entity.Value.Count != 1)
 				return;//TODO:
-			P.ArrayProperty arr = values[0] as P.ArrayProperty;
+			P.ArrayProperty arr = entity.Value[0] as P.ArrayProperty;
 			if (arr == null || str.IsNull(arr.Name) || arr.Name.ToString() != "mAvailableRecipes")
 				return;//TODO:
 
@@ -2781,10 +2833,9 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 			P.Actor prop = Tag as P.Actor;
 			P.NamedEntity entity = prop.EntityObj as P.NamedEntity;
-			List<P.Property> values = entity.Value;
 
 			// Add "mGamePhase"
-			P.ValueProperty mGamePhase = values.Named("mGamePhase") as P.ValueProperty;
+			P.ValueProperty mGamePhase = entity.Value.Named("mGamePhase") as P.ValueProperty;
 			_childs.Add(MainFactory.Create(this, "Game phase", mGamePhase != null ? mGamePhase.Value : "?"));
 
 			//TODO: Add ListView
@@ -2803,7 +2854,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 				|		/ List with 3 elements:
 				|		|-> [PhaseCost].Value[0-1]
 			*/
-			arr = values.Named("mGamePhaseCosts") as P.ArrayProperty;
+			arr = entity.Value.Named("mGamePhaseCosts") as P.ArrayProperty;
 			if (arr == null)
 				return;//TODO:
 			stru = arr.Value as P.StructProperty;
@@ -2940,7 +2991,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 			P.Actor prop = Tag as P.Actor;
 			P.NamedEntity entity = prop.EntityObj as P.NamedEntity;
-			List<P.Property> values = entity.Value;
 
 			// Add ListView
 			P.ArrayProperty arr;
@@ -2962,7 +3012,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 				|		/ List with 21 elements:
 				|		|-> [ResearchCost].Value[0-1]
 			*/
-			arr = values.Named("mResearchCosts") as P.ArrayProperty;
+			arr = entity.Value.Named("mResearchCosts") as P.ArrayProperty;
 			if (arr == null)
 				return;//TODO:
 			stru = arr.Value as P.StructProperty;
