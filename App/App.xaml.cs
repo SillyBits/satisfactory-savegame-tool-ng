@@ -139,5 +139,10 @@ namespace SatisfactorySavegameTool
 			_config = null;
 		}
 
+		public void SaveConfig()
+		{
+			_config.Flush();
+		}
+
 	}
 }

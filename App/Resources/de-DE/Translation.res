@@ -8,6 +8,7 @@
 	<Yes>Ja</Yes>
 	<No>Nein</No>
 	<Save>Speichern ...</Save>
+	<Browse>Durchsuchen ...</Browse>
 	
 	<MainWindow.Title>Satisfactory Spielstand Helfer</MainWindow.Title>
 	
@@ -67,6 +68,47 @@
 	<TreePanel.Tree.Collected>Sammlung ({0:#,#0} Elemente)</TreePanel.Tree.Collected>
 
 	<DetailsPanel.Empty>&lt;leer&gt;</DetailsPanel.Empty>
+
+	<OptionsDialog.Title>Optionen</OptionsDialog.Title>
+	<OptionsDialog.Save>Speichern</OptionsDialog.Save>
+	<OptionsDialog.General.Title>Generell</OptionsDialog.General.Title>
+	<OptionsDialog.Language>Sprache</OptionsDialog.Language>
+	<OptionsDialog.Language.Hint>Bevorzugte Sprache bei Programmstart.</OptionsDialog.Language.Hint>
+	<OptionsDialog.Language.English>Englisch (en-US)</OptionsDialog.Language.English>
+	<OptionsDialog.Language.German>Deutsch (de-DE)</OptionsDialog.Language.German>
+	<OptionsDialog.DefaultPath>Standardpfad</OptionsDialog.DefaultPath>
+	<OptionsDialog.DefaultPath.Hint>Pfad zum Ordner mit Deinen Spielständen.</OptionsDialog.DefaultPath.Hint>
+	<OptionsDialog.DefaultPath.Browse>Pfad zum Ordner mit Deinen Spielständen:</OptionsDialog.DefaultPath.Browse>
+	<OptionsDialog.ExportPath>Export Pfad</OptionsDialog.ExportPath>
+	<OptionsDialog.ExportPath.Hint>Pfad zum Ordner wo Exporte gespeichert werden sollen.</OptionsDialog.ExportPath.Hint>
+	<OptionsDialog.ExportPath.Browse>Pfad zum Ordner wo Exporte gespeichert werden sollen:</OptionsDialog.ExportPath.Browse>
+	<OptionsDialog.DeepAnalysis>Tiefenanalyse</OptionsDialog.DeepAnalysis>
+	<OptionsDialog.DeepAnalysis.Hint>Dieses Programm ist fähig auch Objektspezifische private Daten zu analysieren.\n
+Dies beinhaltet z.B. die Gegenstände auf einem Band oder Stromverbindungen.\n
+Wenn aktiv wird dies aber beträchtlichen Einfluss auf die Ladezeit haben!\n
+Sollte nur aktiviert werden wenn die normale Analyse erfolglos war.</OptionsDialog.DeepAnalysis.Hint>
+	<OptionsDialog.DeepAnalysis.Enable>Tiefenanalyse aktivieren</OptionsDialog.DeepAnalysis.Enable>
+	<OptionsDialog.Reporting.Title>Berichte</OptionsDialog.Reporting.Title>
+	<OptionsDialog.CrashReports>Absturzberichte</OptionsDialog.CrashReports>
+	<OptionsDialog.CrashReports.Hint>Dieses Programm ist fähig Absturzberichte zu versenden.\n
+Solche Berichte helfen dem Author das Programm zu verbessern.</OptionsDialog.CrashReports.Hint>
+	<OptionsDialog.CrashReports.Enable>Absturzberichte versenden</OptionsDialog.CrashReports.Enable>
+	<OptionsDialog.IncidentReports>Berichte über Vorkommnisse</OptionsDialog.IncidentReports>
+	<OptionsDialog.IncidentReports.Hint>Dieses Programm kann bis dato unbekannte Daten als Bericht versenden.\n
+Wenn aktiv wird Dir beim auffinden unbekannter Daten ein Bericht angezeigt\n
+und Du hast vor dem Absenden die Möglichkeit jegliches Detail zu editieren.\n
+Solche Berichte helfen dem Author das Programm zu verbessern.</OptionsDialog.IncidentReports.Hint>
+	<OptionsDialog.IncidentReports.Enable>Berichte über Vorkommnisse aktivieren</OptionsDialog.IncidentReports.Enable>
+	<OptionsDialog.Contribute>Onlinekarte</OptionsDialog.Contribute>
+	<OptionsDialog.Contribute.Hint>Dieses Programm kann zu unserer Onlinekarte beitragen.\n
+Wenn aktiv werden die Position und Typ Deiner aktiv genutzten Erzvorkommen an
+Satisfactory-Community.de berichtet um unsere Onlinekarte zu verbessern.</OptionsDialog.Contribute.Hint>
+	<OptionsDialog.Contribute.Enable>Zum Projekt beitragen</OptionsDialog.Contribute.Enable>
+	<OptionsDialog.Privacy>Datenschutz</OptionsDialog.Privacy>
+	<OptionsDialog.Privacy.Hint>Alle Bericht werden, soweit möglich, anonymisiert versendet\n
+und die Daten nur im Rahmen der oben genannten Zwecke ausgewertet.\n
+Mit aktivieren einer Berichtsoption stimmt der Nutzer dieser Verwendung zu.</OptionsDialog.Privacy.Hint>
+	<OptionsDialog.Saved>Änderungen gespeichert.\n\nÄnderungen werden erst beim nächsten Programmstart aktiv.</OptionsDialog.Saved>
 
 	<ImageDialog.Title>Bild</ImageDialog.Title>
 	<ImageDialog.Save.Title>Speichern unter ...</ImageDialog.Save.Title>

@@ -8,6 +8,7 @@
 	<Yes>Yes</Yes>
 	<No>No</No>
 	<Save>Save ...</Save>
+	<Browse>Browse ...</Browse>
 
 	<MainWindow.Title>Satisfactory Savegame Tool</MainWindow.Title>
 	
@@ -67,6 +68,47 @@
 	<TreePanel.Tree.Collected>Collected ({0:#,#0} elements)</TreePanel.Tree.Collected>
 
 	<DetailsPanel.Empty>&lt;empty&gt;</DetailsPanel.Empty>
+
+	<OptionsDialog.Title>Options</OptionsDialog.Title>
+	<OptionsDialog.Save>Save</OptionsDialog.Save>
+	<OptionsDialog.General.Title>General</OptionsDialog.General.Title>
+	<OptionsDialog.Language>Language</OptionsDialog.Language>
+	<OptionsDialog.Language.Hint>Default language on program start.</OptionsDialog.Language.Hint>
+	<OptionsDialog.Language.English>English (en-US)</OptionsDialog.Language.English>
+	<OptionsDialog.Language.German>German (de-DE)</OptionsDialog.Language.German>
+	<OptionsDialog.DefaultPath>Default path</OptionsDialog.DefaultPath>
+	<OptionsDialog.DefaultPath.Hint>Location where your save games do reside.</OptionsDialog.DefaultPath.Hint>
+	<OptionsDialog.DefaultPath.Browse>Select location where your save games do reside:</OptionsDialog.DefaultPath.Browse>
+	<OptionsDialog.ExportPath>Export path</OptionsDialog.ExportPath>
+	<OptionsDialog.ExportPath.Hint>Location where exports will be stored.</OptionsDialog.ExportPath.Hint>
+	<OptionsDialog.ExportPath.Browse>Select location where exports will be stored:</OptionsDialog.ExportPath.Browse>
+	<OptionsDialog.DeepAnalysis>Deep Analysis</OptionsDialog.DeepAnalysis>
+	<OptionsDialog.DeepAnalysis.Hint>This program is capable of parsing any object-specific private data.
+This includes, for example, items on conveyors or wire connections.
+But if activated, this will increase load times dramatically!
+So activate only in case normal analysis won't do.</OptionsDialog.DeepAnalysis.Hint>
+	<OptionsDialog.DeepAnalysis.Enable>Enable deep analysis</OptionsDialog.DeepAnalysis.Enable>
+	<OptionsDialog.Reporting.Title>Reporting</OptionsDialog.Reporting.Title>
+	<OptionsDialog.CrashReports>Crash Reports</OptionsDialog.CrashReports>
+	<OptionsDialog.CrashReports.Hint>This program is capable of reporting crashes.
+Sending such reports will help the author in advancing this program.</OptionsDialog.CrashReports.Hint>
+	<OptionsDialog.CrashReports.Enable>Send crash reports</OptionsDialog.CrashReports.Enable>
+	<OptionsDialog.IncidentReports>Incident Reports</OptionsDialog.IncidentReports>
+	<OptionsDialog.IncidentReports.Hint>This program is capable of reporting yet unknown data.
+If activated, you'll be shown a report when unknown data was found and
+you're free to edit out any details you want before actual transmission
+Sending such reports will help the author in advancing this program.</OptionsDialog.IncidentReports.Hint>
+	<OptionsDialog.IncidentReports.Enable>Send incident reports</OptionsDialog.IncidentReports.Enable>
+	<OptionsDialog.Contribute>Contributions</OptionsDialog.Contribute>
+	<OptionsDialog.Contribute.Hint>This program can contribute in mapping the world.
+If activated, your actively used resource nodes are reported to
+Satisfactory-Community.de to help with advancing our online map.</OptionsDialog.Contribute.Hint>
+	<OptionsDialog.Contribute.Enable>Send anonymous contributions</OptionsDialog.Contribute.Enable>
+	<OptionsDialog.Privacy>Privacy protection</OptionsDialog.Privacy>
+	<OptionsDialog.Privacy.Hint>All reports will be sent anonymously as far as possible,
+and it's data will only be used for the purposes stated.
+By activating such an option you do agree to those terms.</OptionsDialog.Privacy.Hint>
+	<OptionsDialog.Saved>Changes saved.\n\nThose changes will take effect with next program start.</OptionsDialog.Saved>
 	
 	<ImageDialog.Title>Image</ImageDialog.Title>
 	<ImageDialog.Save.Title>Save as ...</ImageDialog.Save.Title>

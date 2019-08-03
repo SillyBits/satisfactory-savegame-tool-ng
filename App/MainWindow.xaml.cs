@@ -213,6 +213,8 @@ namespace SatisfactorySavegameTool
 
 		private void Edit_Options_Click(object sender, RoutedEventArgs e)
 		{
+			var dlg = new OptionsDialog();
+			dlg.Show();
 		}
 
 

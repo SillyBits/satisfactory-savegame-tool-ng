@@ -1,0 +1,253 @@
+﻿<Window x:Class="SatisfactorySavegameTool.Dialogs.OptionsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SatisfactorySavegameTool.Dialogs"
+        xmlns:coll="clr-namespace:SatisfactorySavegameTool.Dialogs.Collections"
+        xmlns:conv="clr-namespace:SatisfactorySavegameTool.Dialogs.Converters"
+		xmlns:lang="clr-namespace:CoreLib.Language.XAML;assembly=CoreLib"
+        mc:Ignorable="d"
+        Title="{lang:Translate Key=OptionsDialog.Title}" Height="300" Width="300"
+		WindowStartupLocation="CenterOwner" ResizeMode="NoResize" SizeToContent="WidthAndHeight" ShowInTaskbar="False">
+
+	<Window.Resources>
+		<Style TargetType="{x:Type TabControl}" BasedOn="{StaticResource {x:Type TabControl}}">
+			<Setter Property="Width" Value="auto" />
+			<Setter Property="Height" Value="auto" />
+		</Style>
+		<Style TargetType="{x:Type GroupBox}" BasedOn="{StaticResource {x:Type GroupBox}}">
+			<Setter Property="Padding" Value="4,0,4,2" />
+			<Setter Property="Margin" Value="0,2" />
+			<Setter Property="Width" Value="auto" />
+			<Setter Property="Height" Value="auto" />
+		</Style>
+		<Style TargetType="{x:Type Label}" BasedOn="{StaticResource {x:Type Label}}">
+			<Setter Property="Margin" Value="0" />
+			<Setter Property="VerticalContentAlignment" Value="Center" />
+		</Style>
+		<Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+			<Setter Property="Margin" Value="0" />
+			<Setter Property="VerticalAlignment" Value="Center" />
+		</Style>
+		<Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+			<Setter Property="Margin" Value="0" />
+			<Setter Property="Height" Value="25" />
+			<Setter Property="VerticalContentAlignment" Value="Center" />
+		</Style>
+		<Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
+			<Setter Property="Height" Value="25" />
+			<Setter Property="VerticalContentAlignment" Value="Center" />
+		</Style>
+		<Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource {x:Type CheckBox}}">
+			<Setter Property="Margin" Value="5,2,5,0" />
+			<Setter Property="VerticalAlignment" Value="Stretch" />
+			<Setter Property="VerticalContentAlignment" Value="Stretch" />
+		</Style>
+		<Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+			<Setter Property="Width" Value="75" />
+		</Style>
+		<coll:Languages x:Key="langData" />
+		<conv:LanguageConverter x:Key="langConvert" />
+	</Window.Resources>
+
+	<Grid x:Name="grid" Margin="5,5">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto"/>
+			<RowDefinition Height="10" />
+			<RowDefinition Height="25"/>
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		
+		<TabControl Grid.Row="0" Grid.IsSharedSizeScope="True">
+			
+			<TabItem Header="{lang:Translate Key=OptionsDialog.General.Title}">
+				<Grid Margin="5,5">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="auto" />
+						<RowDefinition Height="auto" />
+						<RowDefinition Height="auto" />
+						<RowDefinition Height="auto" />
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" SharedSizeGroup="colGroup" />
+					</Grid.ColumnDefinitions>
+
+					<GroupBox Grid.Row="0" x:Name="language_group">
+						<GroupBox.Header>
+							<Label Content="{lang:Translate Key=OptionsDialog.Language}" />
+						</GroupBox.Header>
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*" />
+							</Grid.ColumnDefinitions>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="auto" />
+								<RowDefinition Height="auto" />
+							</Grid.RowDefinitions>
+							<Label Grid.Row="0" Content="{lang:Translate Key=OptionsDialog.Language.Hint}" />
+							<ComboBox x:Name="languages" Grid.Row="1" ItemsSource="{StaticResource langData}">
+								<ComboBox.ItemTemplate>
+									<DataTemplate>
+										<TextBlock Padding="1" Height="auto" Text="{Binding Converter={StaticResource langConvert}}" />
+									</DataTemplate>
+								</ComboBox.ItemTemplate>
+							</ComboBox>
+						</Grid>
+					</GroupBox>
+
+					<GroupBox Grid.Row="1" x:Name="defaultpath_group">
+						<GroupBox.Header>
+							<Label Content="{lang:Translate Key=OptionsDialog.DefaultPath}" />
+						</GroupBox.Header>
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*" />
+								<ColumnDefinition Width="80" />
+							</Grid.ColumnDefinitions>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="auto" />
+								<RowDefinition Height="auto" />
+							</Grid.RowDefinitions>
+							<Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="{lang:Translate Key=OptionsDialog.DefaultPath.Hint}" />
+							<TextBox x:Name="defaultpath" Grid.Row="1" Grid.Column="0" />
+							<Button Grid.Row="1" Grid.Column="1" Content="{lang:Translate Key=Browse}" HorizontalAlignment="Right"
+									Click="Browse_DefaultPath_Click" />
+						</Grid>
+					</GroupBox>
+
+					<GroupBox Grid.Row="2" x:Name="exportpath_group">
+						<GroupBox.Header>
+							<Label Content="{lang:Translate Key=OptionsDialog.ExportPath}" />
+						</GroupBox.Header>
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*" />
+								<ColumnDefinition Width="80" />
+							</Grid.ColumnDefinitions>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="auto" />
+								<RowDefinition Height="auto" />
+							</Grid.RowDefinitions>
+							<Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="{lang:Translate Key=OptionsDialog.ExportPath.Hint}" />
+							<TextBox x:Name="exportpath" Grid.Row="1" Grid.Column="0" />
+							<Button Grid.Row="1" Grid.Column="1" Content="{lang:Translate Key=Browse}" HorizontalAlignment="Right"
+									Click="Browse_ExportPath_Click" />
+						</Grid>
+					</GroupBox>
+
+					<GroupBox Grid.Row="3" x:Name="deep_analysis_group">
+						<GroupBox.Header>
+							<Label Content="{lang:Translate Key=OptionsDialog.DeepAnalysis}" />
+						</GroupBox.Header>
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*" />
+							</Grid.ColumnDefinitions>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="auto" />
+								<RowDefinition Height="auto" />
+							</Grid.RowDefinitions>
+							<Label Grid.Row="0" Content="{lang:Translate Key=OptionsDialog.DeepAnalysis.Hint}" />
+							<CheckBox x:Name="deep_analysis" Grid.Row="1" Content="{lang:Translate Key=OptionsDialog.DeepAnalysis.Enable}" />
+						</Grid>
+					</GroupBox>
+					
+				</Grid>
+			</TabItem>
+
+			<TabItem Header="{lang:Translate Key=OptionsDialog.Reporting.Title}" IsEnabled="False">
+				<Grid Margin="5,5">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="auto" />
+						<RowDefinition Height="auto" />
+						<RowDefinition Height="auto" />
+						<RowDefinition Height="auto" />
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" SharedSizeGroup="colGroup" />
+					</Grid.ColumnDefinitions>
+
+					<GroupBox Grid.Row="0" x:Name="crash_reports_group">
+						<GroupBox.Header>
+							<Label Content="{lang:Translate Key=OptionsDialog.CrashReports}" />
+						</GroupBox.Header>
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*" />
+							</Grid.ColumnDefinitions>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="auto" />
+								<RowDefinition Height="auto" />
+							</Grid.RowDefinitions>
+							<Label Grid.Row="0" Content="{lang:Translate Key=OptionsDialog.CrashReports.Hint}" />
+							<CheckBox x:Name="crash_reports" Grid.Row="1" Content="{lang:Translate Key=OptionsDialog.CrashReports.Enable}" />
+						</Grid>
+					</GroupBox>
+
+					<GroupBox Grid.Row="1" x:Name="incident_reports_group">
+						<GroupBox.Header>
+							<Label Content="{lang:Translate Key=OptionsDialog.IncidentReports}" />
+						</GroupBox.Header>
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*" />
+							</Grid.ColumnDefinitions>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="auto" />
+								<RowDefinition Height="auto" />
+							</Grid.RowDefinitions>
+							<Label Grid.Row="0" Content="{lang:Translate Key=OptionsDialog.IncidentReports.Hint}" />
+							<CheckBox x:Name="incident_reports" Grid.Row="1" Content="{lang:Translate Key=OptionsDialog.IncidentReports.Enable}" />
+						</Grid>
+					</GroupBox>
+
+					<GroupBox Grid.Row="2" x:Name="online_map_group">
+						<GroupBox.Header>
+							<Label Content="{lang:Translate Key=OptionsDialog.Contribute}" />
+						</GroupBox.Header>
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*" />
+							</Grid.ColumnDefinitions>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="auto" />
+								<RowDefinition Height="auto" />
+							</Grid.RowDefinitions>
+							<Label Grid.Row="0" Content="{lang:Translate Key=OptionsDialog.Contribute.Hint}" />
+							<CheckBox x:Name="online_map" Grid.Row="1" Content="{lang:Translate Key=OptionsDialog.Contribute.Enable}" />
+						</Grid>
+					</GroupBox>
+
+					<GroupBox Grid.Row="3" x:Name="privacy_group">
+						<GroupBox.Header>
+							<Label Content="{lang:Translate Key=OptionsDialog.Privacy}" />
+						</GroupBox.Header>
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*" />
+							</Grid.ColumnDefinitions>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="auto" />
+							</Grid.RowDefinitions>
+							<Label Grid.Row="0" Content="{lang:Translate Key=OptionsDialog.Privacy.Hint}" />
+						</Grid>
+					</GroupBox>
+				</Grid>
+			</TabItem>
+			
+		</TabControl>
+		
+		<StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" >
+			<Button x:Name="SaveBtn" HorizontalAlignment="Center" VerticalAlignment="Center"
+					Height="21" Content="{lang:Translate Key=OptionsDialog.Save}" Click="Save_Click"
+					Margin="0,0,10,0" />
+
+			<Button x:Name="AbortBtn" HorizontalAlignment="Center" VerticalAlignment="Center"
+					Height="21" Content="{lang:Translate Key=Abort}" Click="Abort_Click" />
+		</StackPanel>
+
+	</Grid>
+</Window>
