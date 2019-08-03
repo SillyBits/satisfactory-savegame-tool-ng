@@ -77,10 +77,10 @@ namespace SatisfactorySavegameTool.Dialogs
 				Config.Root.core.defaultpath = Path.GetFullPath(defaultpath.Text);
 			if (exportpath.Text.Length > 0)
 				Config.Root.core.exportpath = Path.GetFullPath(exportpath.Text);
-			Config.Root.deep_analysis.enabled = deep_analysis.IsEnabled;
-			Config.Root.crash_reports.enabled = crash_reports.IsEnabled;
-			Config.Root.incident_reports.enabled = incident_reports.IsEnabled;
-			Config.Root.online_mapping.enabled = online_map.IsEnabled;
+			Config.Root.deep_analysis.enabled = deep_analysis.IsChecked;
+			Config.Root.crash_reports.enabled = crash_reports.IsChecked;
+			Config.Root.incident_reports.enabled = incident_reports.IsChecked;
+			Config.Root.online_mapping.enabled = online_map.IsChecked;
 
 			(Application.Current as App).SaveConfig();
 
