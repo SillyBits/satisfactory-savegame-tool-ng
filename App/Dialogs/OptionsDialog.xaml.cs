@@ -82,10 +82,11 @@ namespace SatisfactorySavegameTool.Dialogs
 			Config.Root.incident_reports.enabled = incident_reports.IsEnabled;
 			Config.Root.online_mapping.enabled = online_map.IsEnabled;
 
-			// Trigger updating statics in App
 			(Application.Current as App).SaveConfig();
 
 			MessageBox.Show(Translate._("OptionsDialog.Saved"));
+
+			Close();
 		}
 
 		private void Abort_Click(object sender, RoutedEventArgs e)
