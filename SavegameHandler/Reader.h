@@ -297,38 +297,29 @@ namespace Reader
 
 		virtual const long Seek(long offset, Positioning pos) override
 		{
+			long new_pos;
+
 			switch (pos)
 			{
 			case Positioning::Start:
-				if (0 <= offset && offset <= Size)
-				{
-					_prev_pos = _pos;
-					_pos = offset;
-					return _pos;
-				}
+				new_pos = offset;
 				break;
 
 			case Positioning::Relative:
-				long new_pos = _pos + offset;
-				if (0 <= new_pos && new_pos <= Size)
-				{
-					_prev_pos = _pos;
-					_pos = new_pos;
-					return _pos;
-				}
+				new_pos = _pos + offset;
 				break;
 
 			case Positioning::End:
-				long new_pos = Size + offset;
-				if (0 <= new_pos && new_pos <= Size)
-				{
-					_prev_pos = _pos;
-					_pos = new_pos;
-					return _pos;
-				}
+				new_pos = Size + offset;
 				break;
 			}
 
+			if (0 <= new_pos && new_pos <= Size)
+			{
+				_prev_pos = _pos;
+				_pos = new_pos;
+				return _pos;
+			}
 			return -1;
 		}
 
