@@ -444,7 +444,7 @@ namespace Savegame
 				Value->Add(prop);
 			}
 		READ_END
-		STR(String::Format("[{0}].Value[0-{1}]", TypeName, Value->Count - 1))
+		STR(String::Format("[{0}].Value[{1}]", TypeName, Value->Count))
 	CLS_END
 
 
