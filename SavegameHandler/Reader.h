@@ -8,9 +8,9 @@ namespace Reader
 	{
 	public:
 		// Properties
-		property const int Pos { const int get() abstract; };
-		property const int PrevPos { const int get() abstract; };
-		property const int Size { const int get() abstract; };
+		property const long Pos { const long get() abstract; };
+		property const long PrevPos { const long get() abstract; };
+		property const long Size { const long get() abstract; };
 		property String^ Name { String^ get() abstract; };
 
 
@@ -76,13 +76,18 @@ namespace Reader
 		}
 
 		// Properties
-		virtual property const int Pos { const int get() { return _pos; } };
-		virtual property const int PrevPos { const int get() { return _prev_pos; } };
-		virtual property const int Size { const int get() abstract; };
+		virtual property const long Pos { const long get() { return _pos; } };
+		virtual property const long PrevPos { const long get() { return _prev_pos; } };
+		virtual property const long Size { const long get() abstract; };
 		virtual property String^ Name { String^ get() abstract; };
+
+		// Enums
+		enum class Positioning { Start=SEEK_SET, Relative=SEEK_CUR, End=SEEK_END };
 
 		// Methods
 		virtual void Close() { _pos = _prev_pos = -1; }
+
+		virtual const long Seek(long offset, Positioning pos) abstract;
 
 		virtual const bool ReadBool() { return _Read<bool>(); }
 		virtual const int ReadBool(bool* buff, const int count) { return _Read(buff, count); }
@@ -109,7 +114,7 @@ namespace Reader
 		virtual str^ ReadString() { return ReadString(0); }
 		virtual str^ ReadString(const int length)
 		{
-			int last = _prev_pos = _pos;
+			long last = _prev_pos = _pos;
 
 			int len = length ? length : ReadInt();
 
@@ -151,8 +156,8 @@ namespace Reader
 
 	protected:
 		ICallback^ _callback;
-		int _pos;
-		int _prev_pos;
+		long _pos;
+		long _prev_pos;
 
 
 		virtual void __Start() { _callback->Start(Size); }
@@ -220,7 +225,7 @@ namespace Reader
 
 
 		// Properties not handled by ReaderBase
-		virtual property const int Size { const int get() override { return _size; } };
+		virtual property const long Size { const long get() override { return _size; } };
 		virtual property String^ Name { String^ get() override { return System::IO::Path::GetFileName(_filename); } };
 
 		virtual void Close() override
@@ -232,9 +237,21 @@ namespace Reader
 			ReaderBase::Close();
 		}
 
+		virtual const long Seek(long offset, Positioning pos) override
+		{
+			if (fseek(_handle, offset, (int)pos) == 0)
+			{
+				_prev_pos = _pos;
+				_pos = ftell(_handle);
+				return _pos;
+			}
+
+			return -1;
+		}
+
 	protected:
 		String^ _filename;
-		int _size;
+		long _size;
 		FILE *_handle;
 
 
@@ -268,7 +285,7 @@ namespace Reader
 
 
 		// Properties not handled by ReaderBase
-		virtual property const int Size { const int get() override { return _size; } };
+		virtual property const long Size { const long get() override { return _size; } };
 		virtual property String^ Name { String^ get() override { return ToString(); } };
 
 		virtual void Close() override
@@ -278,10 +295,47 @@ namespace Reader
 			ReaderBase::Close();
 		}
 
+		virtual const long Seek(long offset, Positioning pos) override
+		{
+			switch (pos)
+			{
+			case Positioning::Start:
+				if (0 <= offset && offset <= Size)
+				{
+					_prev_pos = _pos;
+					_pos = offset;
+					return _pos;
+				}
+				break;
+
+			case Positioning::Relative:
+				long new_pos = _pos + offset;
+				if (0 <= new_pos && new_pos <= Size)
+				{
+					_prev_pos = _pos;
+					_pos = new_pos;
+					return _pos;
+				}
+				break;
+
+			case Positioning::End:
+				long new_pos = Size + offset;
+				if (0 <= new_pos && new_pos <= Size)
+				{
+					_prev_pos = _pos;
+					_pos = new_pos;
+					return _pos;
+				}
+				break;
+			}
+
+			return -1;
+		}
+
 
 	protected:
 		byte* _buff;
-		int _size;
+		long _size;
 
 
 		// Read N bytes from underlying 'data object', returning no. of bytes read
