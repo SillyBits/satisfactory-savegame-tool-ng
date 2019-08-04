@@ -280,6 +280,9 @@ namespace SatisfactorySavegameTool
 
 				CurrFile = new Savegame.Savegame(filename);
 
+				// Activate features as configured by user
+				CurrFile.EnableDeepAnalysis(Config.Root.deep_analysis.enabled);
+
 				Log.Info("Loading file '{0}'", filename);
 				progress.CounterFormat = Translate._("MainWindow.LoadGamefile.Progress.CounterFormat");
 				CurrFile.Load(progress.Events);//, self.treeview)

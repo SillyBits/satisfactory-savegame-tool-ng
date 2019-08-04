@@ -22,9 +22,16 @@ namespace Savegame {
 			, Collected(nullptr)
 			, Missing(nullptr)
 		{
+			Properties::Property::DeepAnalysis = false;
 		}
 
-		
+
+		void EnableDeepAnalysis(bool enable)
+		{
+			Properties::Property::DeepAnalysis = enable;
+		}
+
+
 		void Load(ICallback^ callback)
 		{
 			_Load(callback);//, treeview)

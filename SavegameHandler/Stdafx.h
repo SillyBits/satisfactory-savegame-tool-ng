@@ -30,6 +30,10 @@ const bool VERBOSITY = false;
 #endif
 
 
+// Enables experimental deep analysis code
+#define EXPERIMENTAL
+
+
 #include "Types.h"
 #include "Reader.h"
 #include "Properties.h"

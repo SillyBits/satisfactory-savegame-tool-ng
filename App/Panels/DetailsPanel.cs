@@ -3363,4 +3363,298 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 	}
 
+
+	// EXPERIMENTAL viewers
+	//
+
+	// Container for private, class-related data extracted from .Missing array with deep analysis options being enabled.
+	// Both reading and visualizing might cause an unwanted exception or even crash our program, so be careful!
+	internal class PrivateData : PropertyList
+	{
+		public PrivateData(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+	}
+
+
+	// * /Game/FactoryGame/Character/Player/...
+
+	//class BP_PlayerState_C(Accessor):
+	//	pass #TODO: Data yet unknown -> Keep .Missing and create report
+
+
+	// * /Game/FactoryGame/-Shared/Blueprint/...
+
+	// Stores a list of circuit classes, e.g.
+	//		.PathName = Persistent_Level:PersistentLevel.CircuitSubsystem.FGPowerCircuit_15
+	// with .Index being the same as appended to .PathName (in this case =15)
+	//
+	// Those are the ones listed in
+	//		/Script/FactoryGame/FGPowerCircuit/*
+	internal class BP_CircuitSubsystem_C : Collected
+	{
+	//CLS_(BP_CircuitSubsystem_C, Collected)
+	//	PUB_i(Index)
+	//	READ
+	//		Index = reader->ReadInt();
+	//		//LevelName = reader.readStr()
+	//		//PathName = reader.readInt()
+	//		return Collected::Read(reader);
+	//	READ_END
+	//CLS_END
+		public BP_CircuitSubsystem_C(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+	}
+
+	// Contains path to player state which this tied to this game state, e.g.:
+	//		.PathName = Persistent_Level:PersistentLevel.BP_PlayerState_C_0
+	internal class BP_GameState_C : Collected
+	{
+	//CLS_(BP_GameState_C, Collected)
+	//CLS_END
+		public BP_GameState_C(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+	}
+
+	//class BP_RailroadSubsystem_C(Accessor):
+	//	pass #TODO: Yet no data avail to inspect -> Keep .Missing and create report
+
+	//class BP_GameMode_C(Accessor):
+	//	pass #TODO: Yet no data avail to inspect -> Keep .Missing and create report
+
+
+	// * /Game/FactoryGame/Buildable/Factory/...
+
+	// Describes an item on a belt:
+	//		.PathName = /Game/FactoryGame/Resource/Parts/Fuel/Desc_Fuel.Desc_Fuel_C
+	// with its offset along belt's "movement vector"(?):
+	//		.Translate = [Vector] 0 / 0 / 300,8046000
+	// (X+Y always empty?)
+	internal class Build_ConveyorBelt : Expando
+	{
+	//CLS_(Build_ConveyorBelt, Property)
+	//	PUB_i(Index)
+	//	PUB_s(ItemName)
+	//	PUB(Translate, Vector^)
+	//	READ
+	//		Index = reader->ReadInt();
+	//		ItemName = reader->ReadString();
+	//		// Might be a translation for object?
+	//		//self.Unknown = reader.readStruct(TYPE_UNKNOWN_12)#reader.readNByte(12)
+	//		Translate = gcnew Vector(this);
+	//		Translate->Read(reader); // At least no error reading :D
+	//	READ_END
+	//CLS_END
+		public Build_ConveyorBelt(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+	}
+
+	internal class Build_ConveyorBeltMk1_C : Build_ConveyorBelt
+	{
+	//CLS_(Build_ConveyorBeltMk1_C, Build_ConveyorBelt)
+	//CLS_END
+		public Build_ConveyorBeltMk1_C(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+	}
+
+	internal class Build_ConveyorBeltMk2_C : Build_ConveyorBelt
+	{
+	//CLS_(Build_ConveyorBeltMk2_C, Build_ConveyorBelt)
+	//CLS_END
+		public Build_ConveyorBeltMk2_C(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+	}
+
+	internal class Build_ConveyorBeltMk3_C : Build_ConveyorBelt
+	{
+	//CLS_(Build_ConveyorBeltMk3_C, Build_ConveyorBelt)
+	//CLS_END
+		public Build_ConveyorBeltMk3_C(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+	}
+
+	internal class Build_ConveyorBeltMk4_C : Build_ConveyorBelt
+	{
+	//CLS_(Build_ConveyorBeltMk4_C, Build_ConveyorBelt)
+	//CLS_END
+		public Build_ConveyorBeltMk4_C(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+	}
+
+	internal class Build_ConveyorBeltMk5_C : Build_ConveyorBelt
+	{
+	//CLS_(Build_ConveyorBeltMk5_C, Build_ConveyorBelt)
+	//CLS_END
+		public Build_ConveyorBeltMk5_C(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+	}
+
+	internal class Build_ConveyorBeltMk6_C : Build_ConveyorBelt
+	{
+	//CLS_(Build_ConveyorBeltMk6_C, Build_ConveyorBelt)
+	//CLS_END
+		public Build_ConveyorBeltMk6_C(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+	}
+
+
+	// Lift has exact same data layout as belts, but this might change
+	// with future releases so an extra base class is used here
+	// Describes an item on a lift:
+	//		.PathName = /Game/FactoryGame/Resource/Parts/Fuel/Desc_Fuel.Desc_Fuel_C
+	// with its offset along lift's "movement vector"(?):
+	//		.Translate = [Vector] 0 / 0 / 300,8046000
+	// (X+Y always empty?)
+	internal class Build_ConveyorLift : Expando
+	{
+	//CLS_(Build_ConveyorLift, Property)
+	//	PUB_i(Index)
+	//	PUB_s(ItemName)
+	//	PUB(Translate, Vector^)
+	//	READ
+	//		Index = reader->ReadInt();
+	//		ItemName = reader->ReadString();
+	//		Translate = gcnew Vector(this);
+	//		Translate->Read(reader);
+	//	READ_END
+	//CLS_END
+		public Build_ConveyorLift(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+	}
+
+	internal class Build_ConveyorLiftMk1_C : Build_ConveyorLift
+	{
+	//CLS_(Build_ConveyorLiftMk1_C, Build_ConveyorLift)
+	//CLS_END
+		public Build_ConveyorLiftMk1_C(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+	}
+
+	internal class Build_ConveyorLiftMk2_C : Build_ConveyorLift
+	{
+	//CLS_(Build_ConveyorLiftMk2_C, Build_ConveyorLift)
+	//CLS_END
+		public Build_ConveyorLiftMk2_C(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+	}
+
+	internal class Build_ConveyorLiftMk3_C : Build_ConveyorLift
+	{
+	//CLS_(Build_ConveyorLiftMk3_C, Build_ConveyorLift)
+	//CLS_END
+		public Build_ConveyorLiftMk3_C(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+	}
+
+	internal class Build_ConveyorLiftMk4_C : Build_ConveyorLift
+	{
+	//CLS_(Build_ConveyorLiftMk4_C, Build_ConveyorLift)
+	//CLS_END
+		public Build_ConveyorLiftMk4_C(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+	}
+
+	internal class Build_ConveyorLiftMk5_C : Build_ConveyorLift
+	{
+	//CLS_(Build_ConveyorLiftMk5_C, Build_ConveyorLift)
+	//CLS_END
+		public Build_ConveyorLiftMk5_C(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+	}
+
+	internal class Build_ConveyorLiftMk6_C : Build_ConveyorLift
+	{
+	//CLS_(Build_ConveyorLiftMk6_C, Build_ConveyorLift)
+	//CLS_END
+		public Build_ConveyorLiftMk6_C(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+	}
+
+
+	// Contains exactly 2 connectors this line connects. 
+	// Could be either power poles or machines, e.g.:
+	//		.PathName = Persistent_Level:PersistentLevel.Build_PowerPoleMk1_C_960.PowerConnection
+	// and
+	//		.PathName = Persistent_Level:PersistentLevel.Build_PowerPoleMk1_C_935.PowerConnection
+	// (There might be more connection "types" in future, e.g. logistical ones as with Factorio?)
+	internal class Build_PowerLine_C : Collected
+	{
+	//[FixedCount(2)]
+	//CLS_(Build_PowerLine_C, Collected)
+	//CLS_END
+		public Build_PowerLine_C(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+
+		//internal override void _CreateChilds()
+		//{
+		//	P.Collected c = Tag as P.Collected;
+		//
+		//	foreach (P.Property prop in c.V )
+		//}
+	}
+
+
+	// * /Game/FactoryGame/Buildable/Vehicle/...
+
+	internal class BP_Vehicle : Expando
+	{
+	//CLS_(BP_Vehicle, Property)
+	//	PUB_s(Node)
+	//	PUB_ab(Unknown)
+	//	READ
+	//		// Seems like some animation data?
+	//		Node = reader->ReadString();
+	//		//TODO: Crack those 53 bytes
+	//		Unknown = ReadBytes(reader, 53);
+	//	READ_END
+	//CLS_END
+		public BP_Vehicle(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+	}
+
+	internal class BP_Tractor_C : BP_Vehicle
+	{
+	//CLS_(BP_Tractor_C, BP_Vehicle)
+	//CLS_END
+		public BP_Tractor_C(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+	}
+
+	internal class BP_Truck_C : BP_Vehicle
+	{
+	//CLS_(BP_Truck_C, BP_Vehicle)
+	//CLS_END
+		public BP_Truck_C(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+	}
+
+	internal class BP_Explorer_C : BP_Vehicle
+	{
+	//CLS_(BP_Explorer_C, BP_Vehicle)
+	//CLS_END
+		public BP_Explorer_C(IElement parent, string label, object obj) 
+			: base(parent, label, obj)
+		{ }
+	}
+
 }

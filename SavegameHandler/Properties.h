@@ -37,6 +37,15 @@ namespace Savegame
 			return (Property^) ci->Invoke(params);
 		}
 
+		static bool IsKnown(str^ type_name)
+		{
+			return IsKnown(type_name->ToString());
+		}
+		static bool IsKnown(String^ type_name)
+		{
+			return Cons.ContainsKey(type_name);
+		}
+
 	protected:
 		// Caches all Property-based classes in assembly and allows for constructing those with .Invoke(Object[])
 		static void Create()
@@ -230,6 +239,13 @@ namespace Savegame
 		}
 
 
+		property static bool DeepAnalysis 
+		{ 
+			bool get() { return _DeepAnalysis; }
+			void set(bool enable) { _DeepAnalysis = enable; }
+		}
+
+
 		String^ ToString() override { return "[" + TypeName + "]"; }
 
 
@@ -243,6 +259,8 @@ namespace Savegame
 
 
 	protected:
+		static bool _DeepAnalysis = false;
+
 		static Dictionary<String^, Publish::Published^> _keys;
 
 		Keys^ _GetKeys(List<String^>^ excludeList)
@@ -879,14 +897,19 @@ namespace Savegame
 			, Children(children)
 			, Unknown(0)
 			, Missing(nullptr)
-			//, Private(nullptr)
+#ifdef EXPERIMENTAL
+			, Private(nullptr)
+#endif
 		{ }
 		PUB_s(LevelName)
 		PUB_s(PathName)
 		PUB(Children, Properties^)
 		PUB_i(Unknown)
 		PUB_ab(Missing)
-		//PUB_o(Private, ...)
+#ifdef EXPERIMENTAL
+		PUB(Private, Property^)
+		//Property^ Private;
+#endif
 
 		Property^ Read(IReader^ reader, int length)
 		{
@@ -951,6 +974,13 @@ namespace Savegame
 		}
 	};
 
+
+#ifdef EXPERIMENTAL
+	template<typename _Parent>
+	static Property^ ReadPrivateData(_Parent^ parent);
+#endif
+
+
 	CLS(Object)
 		//int Type;
 		PUB_s(ClassName)
@@ -971,15 +1001,23 @@ namespace Savegame
 			Entity^ entity = gcnew Entity(this, nullptr, nullptr, nullptr);
 			entity->Read(reader, length);
 			EntityObj = entity;
+
 			// EXPERIMENTAL
-			//if self.Entity.Missing and Config.Get().deep_analysis.enabled:
-			//	try:
-			//		self.Entity.Private = self.__read_sub()
-			//	except:
-			//		self.Entity.Private = None
-			//		# For now, just raise it to get more info on what went wrong
-			//		if AppConfig.DEBUG:
-			//			raise
+#ifdef EXPERIMENTAL
+			if (entity->Missing != nullptr && entity->Missing->Length > 0 && Property::DeepAnalysis)
+			{
+				try 
+				{
+					entity->Private = ReadPrivateData(this);
+				}
+				catch (Exception^ exc)
+				{
+					entity->Private = nullptr;
+					Log::Debug(String::Format("Error loading private data for '{0}'", PathName), exc);
+				}
+			}
+#endif
+
 			return this;
 		}
 		STR_(ClassName)
@@ -1013,19 +1051,316 @@ namespace Savegame
 			NamedEntity^ entity = gcnew NamedEntity(this, nullptr, nullptr, nullptr);
 			entity->Read(reader, length);
 			EntityObj = entity;
+
 			// EXPERIMENTAL
-			//if self.Entity.Missing and Config.Get().deep_analysis.enabled:
-			//	try:
-			//		self.Entity.Private = self.__read_sub()
-			//	except:
-			//		self.Entity.Private = None
-			//		# For now, just raise it to get more info on what went wrong
-			//		if AppConfig.DEBUG:
-			//			raise
+#ifdef EXPERIMENTAL
+			if (entity->Missing != nullptr && entity->Missing->Length > 0 && Property::DeepAnalysis)
+			{
+				try 
+				{
+					entity->Private = ReadPrivateData(this);
+				}
+				catch (Exception^ exc)
+				{
+					entity->Private = nullptr;
+					Log::Debug(String::Format("Error loading private data for '{0}'", PathName), exc);
+				}
+			}
+#endif
+
 			return this;
 		}
 		STR_(PathName)
 	CLS_END
 
+
+#ifdef EXPERIMENTAL
+
+	// Attribute used with private nodes which are using hard-coded counts for their contained data
+	public ref class FixedCount : Attribute
+	{
+	public:
+		int Count;
+
+		FixedCount(int count) 
+		{
+			Count = count;
+		}
+
+		// Used to retrieve attribute instance, or null if type given has no such attribute
+		static FixedCount^ Retrieve(String^ type_name)
+		{
+			return Retrieve(Type::GetType(type_name));
+		}
+		static FixedCount^ Retrieve(Type^ t)
+		{
+			IEnumerable<Object^>^ attrs = t->GetCustomAttributes(false);
+			IEnumerator<Object^>^ iter = attrs->GetEnumerator();
+
+			while (iter->MoveNext())
+			{
+				Object^ curr = iter->Current;
+				if (curr->GetType() == FixedCount::typeid)
+				{
+					return (FixedCount^)curr;
+				}
+			}
+
+			return nullptr;
+		}
+	};
+
+
+	template<typename _Parent>
+	static Property^ ReadPrivateData(_Parent^ parent)
+	{
+		/*
+			* List of "something" ... no clues on what as seen only empty lists by now:
+				/Game/FactoryGame/-Shared/Blueprint/BP_RailroadSubsystem.BP_RailroadSubsystem_C
+				/Game/FactoryGame/-Shared/Blueprint/BP_GameMode.BP_GameMode_C
+				/Game/FactoryGame/Buildable/Vehicle/Explorer/BP_Explorer.BP_Explorer_C
+
+			* List of "Collected", every now and then with some extra data either before or after:
+				/Game/FactoryGame/-Shared/Blueprint/BP_CircuitSubsystem.BP_CircuitSubsystem_C
+				/Game/FactoryGame/-Shared/Blueprint/BP_GameState.BP_GameState_C
+
+			* Conveyors do have their transported items stored, same with lifts:
+				/Game/FactoryGame/Buildable/Factory/ConveyorBeltMk#/Build_ConveyorBeltMk#.Build_ConveyorBeltMk#_C
+				/Game/FactoryGame/Buildable/Factory/ConveyorLiftMk#/Build_ConveyorLiftMk#.Build_ConveyorLiftMk#_C
+
+			* Power lines will have EXACTLY two poles stored, or machine connectors:
+				/Game/FactoryGame/Buildable/Factory/PowerLine/Build_PowerLine.Build_PowerLine_C
+ 	
+			* Special data, might be some animation states with node names (e.g. hook, antenna, ...)
+				/Game/FactoryGame/Buildable/Vehicle/Tractor/BP_Tractor.BP_Tractor_C
+				/Game/FactoryGame/Buildable/Vehicle/Truck/BP_Truck.BP_Truck_C
+
+			* Ignored: Yet no clues on whats contained (either unknown or no data yet)
+				/Game/FactoryGame/Character/Player/BP_PlayerState.BP_PlayerState_C
+
+			* Name guesses:
+				./.
+		*/
+
+		String^ classname = parent->ClassName->ToString();
+		if (classname->StartsWith("/Game/FactoryGame/"))
+		{
+			/*
+				Following exact same scheme:
+					/Game/FactoryGame/<ItemType>/<ItemSubType0>[/<...N>/<TypeName>.<ClassName>
+				with
+					<ItemType>		<ItemSubType0>		<ItemSubType1>
+					-Shared			Blueprint	
+					Buildable		Factory				Conyevor[Belt|Lift]Mk# | PowerLine
+									Vehicle				Tractor | Truck | Explorer
+					Character		Player				./.
+				and
+					<ClassName> == <TypeName>"_C"
+			*/
+
+			Entity^ entity = dynamic_cast<Entity^>(parent->EntityObj);
+			array<String^>^ classes = classname->Split('.');
+			String^ type_name = classes[classes->Length - 1];
+
+			if (!PropertyFactory::IsKnown(type_name))
+			{
+				Log::Debug("No match for private type '{0}' found, .Missing ignored", classname);
+				return nullptr;
+			}
+
+			pin_ptr<byte> pinned = &(entity->Missing[0]);//(dynamic_cast<array<byte>^>(entity->Missing));
+			MemoryReader^ reader = gcnew MemoryReader(pinned, entity->Missing->Length, nullptr);
+
+			// Some structures have a hardcoded length not contained in stream
+			String^ full_type_name = "Savegame.Properties." + type_name;
+			FixedCount^ fixed_count = FixedCount::Retrieve(full_type_name);
+			int count;
+			if (fixed_count != nullptr)
+				count = fixed_count->Count;
+			else
+				count = reader->ReadInt();
+
+			PrivateData^ instance = gcnew PrivateData(entity);
+			instance->Value = gcnew Properties();
+			for (int i = 0; i < count; ++i)
+			{
+				Property^ prop = PropertyFactory::Construct(type_name, instance);
+				instance->Value->Add(prop->Read(reader));
+			}
+
+			if (reader->Pos != reader->Size)
+				Log::Debug("Still some dangling bytes, .Missing kept");
+			else
+				entity->Missing = nullptr;
+
+			reader = nullptr;
+
+			Log::Debug("Injected private type for '{0}'", classname);
+			return instance;
+		}
+
+		// (Yet) Unknown
+		return nullptr;
+	}
+
+
+	//
+	// Sub-data for entities
+	//
+
+	// 'PrivateData' is a pseudo-class and not contained, 
+	// just added for UI to let it know origin of data
+	CLS_(PrivateData,PropertyList)
+		READ
+		READ_END
+	CLS_END
+
+
+	// * /Game/FactoryGame/Character/Player/...
+
+	//class BP_PlayerState_C(Accessor):
+	//	pass #TODO: Data yet unknown -> Keep .Missing and create report
+
+
+	//* /Game/FactoryGame/-Shared/Blueprint/...
+
+	// Stores a list of circuit classes, e.g.
+	//		.PathName = Persistent_Level:PersistentLevel.CircuitSubsystem.FGPowerCircuit_15
+	// with .Index being the same as appended to .PathName (in this case =15)
+	//
+	// Those are the ones listed in
+	//		/Script/FactoryGame/FGPowerCircuit/*
+	CLS_(BP_CircuitSubsystem_C, Collected)
+		PUB_i(Index)
+		READ
+			Index = reader->ReadInt();
+			//LevelName = reader.readStr()
+			//PathName = reader.readInt()
+			return Collected::Read(reader);
+		READ_END
+	CLS_END
+
+	// Contains path to player state which this tied to this game state, e.g.:
+	//		.PathName = Persistent_Level:PersistentLevel.BP_PlayerState_C_0
+	CLS_(BP_GameState_C, Collected)
+	CLS_END
+
+	//class BP_RailroadSubsystem_C(Accessor):
+	//	pass #TODO: Yet no data avail to inspect -> Keep .Missing and create report
+
+	//class BP_GameMode_C(Accessor):
+	//	pass #TODO: Yet no data avail to inspect -> Keep .Missing and create report
+
+
+	// * /Game/FactoryGame/Buildable/Factory/...
+
+	// Describes an item on a belt:
+	//		.PathName = /Game/FactoryGame/Resource/Parts/Fuel/Desc_Fuel.Desc_Fuel_C
+	// with its offset along belt's "movement vector"(?):
+	//		.Translate = [Vector] 0 / 0 / 300,8046000
+	// (X+Y always empty?)
+	CLS_(Build_ConveyorBelt, Property)
+		PUB_i(Index)
+		PUB_s(ItemName)
+		PUB(Translate, Vector^)
+		READ
+			Index = reader->ReadInt();
+			ItemName = reader->ReadString();
+			Translate = (Vector^) (gcnew Vector(this))->Read(reader);
+		READ_END
+	CLS_END
+
+	CLS_(Build_ConveyorBeltMk1_C, Build_ConveyorBelt)
+	CLS_END
+
+	CLS_(Build_ConveyorBeltMk2_C, Build_ConveyorBelt)
+	CLS_END
+
+	CLS_(Build_ConveyorBeltMk3_C, Build_ConveyorBelt)
+	CLS_END
+
+	CLS_(Build_ConveyorBeltMk4_C, Build_ConveyorBelt)
+	CLS_END
+
+	CLS_(Build_ConveyorBeltMk5_C, Build_ConveyorBelt)
+	CLS_END
+
+	CLS_(Build_ConveyorBeltMk6_C, Build_ConveyorBelt)
+	CLS_END
+
+
+	// Lift has exact same data layout as belts, but this might change
+	// with future releases so an extra base class is used here
+	// Describes an item on a lift:
+	//		.PathName = /Game/FactoryGame/Resource/Parts/Fuel/Desc_Fuel.Desc_Fuel_C
+	// with its offset along lift's "movement vector"(?):
+	//		.Translate = [Vector] 0 / 0 / 300,8046000
+	// (X+Y always empty?)
+	CLS_(Build_ConveyorLift, Property)
+		PUB_i(Index)
+		PUB_s(ItemName)
+		PUB(Translate, Vector^)
+		READ
+			Index = reader->ReadInt();
+			ItemName = reader->ReadString();
+			Translate = (Vector^) (gcnew Vector(this))->Read(reader);
+		READ_END
+	CLS_END
+
+	CLS_(Build_ConveyorLiftMk1_C, Build_ConveyorLift)
+	CLS_END
+
+	CLS_(Build_ConveyorLiftMk2_C, Build_ConveyorLift)
+	CLS_END
+
+	CLS_(Build_ConveyorLiftMk3_C, Build_ConveyorLift)
+	CLS_END
+
+	CLS_(Build_ConveyorLiftMk4_C, Build_ConveyorLift)
+	CLS_END
+
+	CLS_(Build_ConveyorLiftMk5_C, Build_ConveyorLift)
+	CLS_END
+
+	CLS_(Build_ConveyorLiftMk6_C, Build_ConveyorLift)
+	CLS_END
+
+
+	// Contains exactly 2 connectors this line connects. 
+	// Could be either power poles or machines, e.g.:
+	//		.PathName = Persistent_Level:PersistentLevel.Build_PowerPoleMk1_C_960.PowerConnection
+	// and
+	//		.PathName = Persistent_Level:PersistentLevel.Build_PowerPoleMk1_C_935.PowerConnection
+	// (There might be more connection "types" in future, e.g. logistical ones as with Factorio?)
+	[FixedCount(2)]
+	CLS_(Build_PowerLine_C, Collected)
+	CLS_END
+
+
+	// * /Game/FactoryGame/Buildable/Vehicle/...
+
+	CLS_(BP_Vehicle, Property)
+		PUB_s(Node)
+		PUB_ab(Unknown)
+		READ
+			// Seems like some animation data?
+			Node = reader->ReadString();
+			//TODO: Crack those 53 bytes
+			Unknown = ReadBytes(reader, 53);
+		READ_END
+	CLS_END
+
+	CLS_(BP_Tractor_C, BP_Vehicle)
+	CLS_END
+
+	CLS_(BP_Truck_C, BP_Vehicle)
+	CLS_END
+
+	CLS_(BP_Explorer_C, BP_Vehicle)
+	CLS_END
+
+
+#endif
   }
+
 }
