@@ -281,7 +281,14 @@ namespace SatisfactorySavegameTool.Panels
 			: base()
 		{ }
 
-		internal override int NoOfExtraElements { get { return 150; } }
+		internal override int NoOfExtraElements
+		{
+			get
+			{
+				// A 25% as rough estimate should be ok
+				return MainWindow.CurrFile.Objects.Count / 4;
+			}
+		}
 
 		internal override void _CreateTree(TreeViewItem root)
 		{
