@@ -178,8 +178,12 @@ namespace SatisfactorySavegameTool.Panels.Details
 			{
 				P.Property prop = obj as P.Property;
 				if (prop.GetKeys().Contains("ClassName"))
-					element = INSTANCE[(prop.GetChilds()["ClassName"] as str).LastName(), parent, label, obj];
-				if (element == null)
+				{
+					string type_name = (prop.GetChilds()["ClassName"] as str).LastName();
+					if (INSTANCE.IsKnown(type_name))
+						element = INSTANCE[type_name, parent, label, obj];
+				}
+				if (element == null && INSTANCE.IsKnown(prop.TypeName))
 					element = INSTANCE[prop.TypeName, parent, label, obj];
 			}
 			return element;
