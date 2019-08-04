@@ -32,6 +32,11 @@ namespace CoreLib
 			_CreateLookup();
 		}
 
+		public bool IsKnown(string typename)
+		{
+			return _lookup.IsKnown(typename);
+		}
+
 		public _InstanceType this[string typename, params object[] parms]
 		{
 			get { return _CreateInstance(typename, parms); }
@@ -161,6 +166,11 @@ namespace CoreLib
 		public int Count
 		{
 			get	{ return _lookup.Count; }
+		}
+
+		public bool IsKnown(string typename)
+		{
+			return _lookup.ContainsKey(typename);
 		}
 
 		public _LookupType this[string typename]
