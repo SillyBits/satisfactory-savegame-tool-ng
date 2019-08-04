@@ -12,6 +12,8 @@ using CoreLib;
 using P = Savegame.Properties;
 
 using SatisfactorySavegameTool.Dialogs;
+using SatisfactorySavegameTool.Supplements;
+
 
 namespace SatisfactorySavegameTool.Panels
 {
