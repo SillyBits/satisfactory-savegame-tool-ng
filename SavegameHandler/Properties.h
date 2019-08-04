@@ -20,17 +20,6 @@ namespace Savegame
 	static public ref class PropertyFactory
 	{
 	public:
-		//static TypeInfo^ Get(String^ type_name)
-		//{
-		//	if (Types.Count == 0)
-		//		Create();
-		//
-		//	if (!Types.ContainsKey(type_name))
-		//		return nullptr;
-		//
-		//	return Types[type_name];
-		//}
-
 		static Property^ Construct(str^ type_name, Property^ parent)
 		{
 			return Construct(type_name->ToString(), parent);
@@ -72,9 +61,6 @@ namespace Savegame
 
 				if (ti->IsSubclassOf(Property::typeid))
 				{
-					// Not sure if we do need this
-					//Types.Add(ti->Name, ti);
-
 					ConstructorInfo^ ci = ti->GetConstructor(cons);
 					if (ci)
 					{
@@ -89,7 +75,6 @@ namespace Savegame
 				Log::Debug("... discovered a total of {0} property types", Cons.Count);
 		}
 
-		//static Dictionary<String^, TypeInfo^> Types;
 		static Dictionary<String^, ConstructorInfo^> Cons;
 	};
 
@@ -118,16 +103,12 @@ namespace Savegame
 			for (int index=0; index < members->Length; ++index)
 			{
 				MemberInfo^ mi = (MemberInfo^) members->GetValue(index);
-				//Debug::Write("? " + mi);
-
 				IEnumerable<CustomAttributeData^>^ attrs = mi->CustomAttributes;
 				IEnumerator<CustomAttributeData^>^ iter = attrs->GetEnumerator();
 
 				while (iter->MoveNext())
 				{
 					CustomAttributeData^ cad = iter->Current;
-
-					//Debug::Write("? ? " + cad);
 
 					if (cad->AttributeType == Publish::typeid)
 					{
@@ -169,7 +150,7 @@ namespace Savegame
 		Property^ Parent;
 
 		/*[Publish]*/ String^ TypeName;//TODO: Use a property instead to reduce memory usage
-		/*[Publish]*/ List<String^>^ Errors = nullptr; //TODO:
+		/*[Publish]*/ List<String^>^ Errors = nullptr; //TODO: Place this somewhere else
 
 
 		Property(Property^ parent)
@@ -427,21 +408,12 @@ namespace Savegame
 
 		String^ ToString() override { return "[" + TypeName + "] " + (Name ? Name : str::Statics::empty); };
 
-	/*
-	class Property(Accessor):
-		@staticmethod
-		def raise_error(pos, msg):
-			raise "ERROR at pos {:,d}: {}".format(pos, msg)
-	*/
-
 	CLS_END
 
-	//typedef List<Property^> Properties;
 	public ref class Properties : List<Property^> { };
 
 
 	// Multiple properties as array
-	//public ref class PropertyList : Property
 	CLS(PropertyList)
 		PUB(Value,Properties^)
 		READ

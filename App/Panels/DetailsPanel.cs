@@ -14,7 +14,6 @@ using SatisfactorySavegameTool.Supplements;
 
 using CoreLib;
 
-using Savegame;
 using Savegame.Properties;
 using P = Savegame.Properties;
 
@@ -74,6 +73,7 @@ namespace SatisfactorySavegameTool.Panels
 
 namespace SatisfactorySavegameTool.Panels.Details
 {
+	
 	// Combines all known factories into one type-based Create method
 	// to reduce tedious copy&paste with creating our elements
 	//
@@ -791,28 +791,11 @@ namespace SatisfactorySavegameTool.Panels.Details
 	// Needed later to allow for modification, for now just a dumb display
 	internal class ColorControl : Label, IValueContainer<P.Color>
 	{
-		/*
-		class ColorControl(wx.ColourPickerCtrl):
-			"""
-			Shows current color, opening wx.ColourDialog if clicked
-			"""
-			def __init__(self, parent, val:wx.Colour):
-				super().__init__(parent)
-	# self.Disable()# Let's hope this won't ruin visualization
-				self.Unbind(wx.EVT_BUTTON)
-				self.Set(val)
-
-			def Set(self, val): self.Colour = val
-			def Get(self):      return self.Colour
-	# As disabling will change color to gray, we will use a simple 
-	# display until we've added modifying savegames and saving.
-		 */
-
 		internal ColorControl(P.Color color)
 		{
 			Content = "";
 			Width = new GridLength(100).Value;
-			BorderBrush = System.Windows.Media.Brushes.DarkGray;
+			BorderBrush = Brushes.DarkGray;
 			BorderThickness = new Thickness(1);
 			Value = color;
 		}
@@ -838,7 +821,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 		{
 			Content = "";
 			Width = new GridLength(100).Value;
-			BorderBrush = System.Windows.Media.Brushes.DarkGray;
+			BorderBrush = Brushes.DarkGray;
 			BorderThickness = new Thickness(1);
 			Value = color;
 		}
@@ -886,6 +869,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 			HorizontalContentAlignment = HorizontalAlignment.Stretch;
 			VerticalContentAlignment = VerticalAlignment.Stretch;
+			
 			MaxHeight = 400;
 			View = _gridview;
 		}
@@ -1819,78 +1803,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 		{ }
 	}
 
-#if false //=> Replaced with specialization FGInventory*
-	internal class InventoryStack : ElementContainer<P.InventoryStack> // PropertyList
-	{
-		public InventoryStack(IElement parent, string label, object obj)
-			: base(parent, label, obj)
-		{ }
-
-		internal override void _CreateVisual()
-		{
-			if (_prop.Value.Count == 1)
-			{
-				P.StructProperty struct_p = _prop.Value[0] as P.StructProperty;
-				P.InventoryItem invitem = struct_p.Value as P.InventoryItem;
-				string label = DetailsPanel.EMPTY;
-				if (!str.IsNull(invitem.ItemName))
-				{
-					label = invitem.ItemName.ToString();
-					if (label.Contains('.'))
-					{
-						string[] labels = label.Split('.');
-						string last = labels.Last();
-						if (Translate.Has(last))
-							label = Translate._(last);
-					}
-				}
-				_impl = ValueControlFactory.Create(_parent, label, invitem.Value.Value);
-			}
-
-			base._CreateVisual();
-		}
-	}
-#endif
-
-#if false //=> Replaced with specialization FGInventory*
-	internal class InventoryItem : ElementContainer<P.InventoryItem> //Expando
-	{
-	//CLS(InventoryItem)
-	//	//TODO: Might also be some PropertyList? Investigate	
-	//	PUB_s(Unknown)
-	//	PUB_s(ItemName)
-	//	PUB_s(LevelName)
-	//	PUB_s(PathName)
-	//	PUB_p(Value)
-	//	READ
-	//		Unknown = reader->ReadString();
-	//		ItemName = reader->ReadString();
-	//		LevelName = reader->ReadString();
-	//		PathName = reader->ReadString();
-	//		Value = ValueProperty::Read(reader, this);
-	//	READ_END
-	//	STR_(ItemName)
-	//CLS_END
-		public InventoryItem(IElement parent, string label, object obj)
-			: base(parent, label, obj)
-		{ }
-
-		internal override void _CreateVisual()
-		{
-			if (str.IsNull(_prop.LevelName) 
-				&& str.IsNull(_prop.PathName)
-				&& str.IsNull(_prop.Unknown))
-			{
-				string label = _prop.ItemName != null ? _prop.ItemName.ToString() : DetailsPanel.EMPTY;
-				_impl = ValueControlFactory.Create(_parent, null, _prop.Value.Value);
-				_impl.Label = label;
-			}
-
-			base._CreateVisual();
-		}
-	}
-#endif
-
 	internal class PhaseCost : PropertyList
 	{
 		public PhaseCost(IElement parent, string label, object obj)
@@ -2159,45 +2071,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 			: base(parent, label, obj)
 		{ }
 	}
-
-#if false //=> Replaced Replaced with specialization FGFoundationSubsystem
-	internal class MapProperty : Expando //: IElement
-	{
-	//CLS_(MapProperty,ValueProperty)
-	//	ref class Entry : PropertyList
-	//	{
-	//	public:
-	//		PUB(Parent, MapProperty^)
-	//		PUB_i(Key)
-	//		Entry(MapProperty^ parent, int key) 
-	//			: PropertyList(parent)
-	//			, Key(key)
-	//		{ }
-	//	};
-	//	typedef Dictionary<int, Entry^> Entries;
-
-	//	PUB_s(MapName)
-	//	PUB_s(ValueType)
-	//	PUB(Value, Entries^)
-	//	READ
-	//		MapName = reader->ReadString();
-	//		ValueType = reader->ReadString();
-	//		/*5* / CheckNullByte(reader); CheckNullByte(reader); CheckNullByte(reader); CheckNullByte(reader); CheckNullByte(reader);
-	//		int count = reader->ReadInt();
-	//		Value = gcnew Entries;
-	//		for (int i = 0; i < count; ++i)
-	//		{
-	//			int key = reader->ReadInt();
-	//			Entry^ entry = gcnew Entry(this, key);
-	//			Value->Add(key, (Entry^)entry->Read(reader));
-	//		}
-	//	READ_END
-	//CLS_END
-		public MapProperty(IElement parent, string label, object obj)
-			: base(parent, label, obj)
-		{ }
-	}
-#endif
 
 	internal class TextProperty : ValueProperty<str>
 	{

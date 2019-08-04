@@ -148,7 +148,6 @@ namespace SatisfactorySavegameTool
 
 		private void File_Open_Click(object sender, RoutedEventArgs e)
 		{
-
 			OpenFileDialog dlg = new OpenFileDialog();
 			dlg.Title = Translate._("MainWindow.LoadGamefile.Title");//"Select savegame to load";
 			dlg.InitialDirectory = Config.Root.core.defaultpath;
