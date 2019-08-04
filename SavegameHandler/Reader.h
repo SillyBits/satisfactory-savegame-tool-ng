@@ -14,8 +14,14 @@ namespace Reader
 		property String^ Name { String^ get() abstract; };
 
 
+		// Enums
+		enum class Positioning { Start=SEEK_SET, Relative=SEEK_CUR, End=SEEK_END };
+
+
 		// Methods
 		void Close();
+
+		const long Seek(long offset, Positioning pos);
 
 		const bool ReadBool();
 		const int ReadBool(bool* buff, const int count);
@@ -81,13 +87,10 @@ namespace Reader
 		virtual property const long Size { const long get() abstract; };
 		virtual property String^ Name { String^ get() abstract; };
 
-		// Enums
-		enum class Positioning { Start=SEEK_SET, Relative=SEEK_CUR, End=SEEK_END };
-
 		// Methods
 		virtual void Close() { _pos = _prev_pos = -1; }
 
-		virtual const long Seek(long offset, Positioning pos) abstract;
+		virtual const long Seek(long offset, IReader::Positioning pos) abstract;
 
 		virtual const bool ReadBool() { return _Read<bool>(); }
 		virtual const int ReadBool(bool* buff, const int count) { return _Read(buff, count); }
@@ -237,7 +240,7 @@ namespace Reader
 			ReaderBase::Close();
 		}
 
-		virtual const long Seek(long offset, Positioning pos) override
+		virtual const long Seek(long offset, IReader::Positioning pos) override
 		{
 			if (fseek(_handle, offset, (int)pos) == 0)
 			{
@@ -295,21 +298,21 @@ namespace Reader
 			ReaderBase::Close();
 		}
 
-		virtual const long Seek(long offset, Positioning pos) override
+		virtual const long Seek(long offset, IReader::Positioning pos) override
 		{
 			long new_pos;
 
 			switch (pos)
 			{
-			case Positioning::Start:
+			case IReader::Positioning::Start:
 				new_pos = offset;
 				break;
 
-			case Positioning::Relative:
+			case IReader::Positioning::Relative:
 				new_pos = _pos + offset;
 				break;
 
-			case Positioning::End:
+			case IReader::Positioning::End:
 				new_pos = Size + offset;
 				break;
 			}
