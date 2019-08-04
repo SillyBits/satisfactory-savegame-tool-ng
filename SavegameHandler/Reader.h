@@ -32,11 +32,20 @@ namespace Reader
 		const __int16 ReadShort();
 		const int ReadShort(__int16* buff, const int count);
 
+		const unsigned __int16 ReadUShort();
+		const int ReadUShort(unsigned __int16* buff, const int count);
+
 		const __int32 ReadInt();
 		const int ReadInt(__int32* buff, const int count);
 
+		const unsigned __int32 ReadUInt();
+		const int ReadUInt(unsigned __int32* buff, const int count);
+
 		const __int64 ReadLong();
 		const int ReadLong(__int64* buff, const int count);
+
+		const unsigned __int64 ReadULong();
+		const int ReadULong(unsigned __int64* buff, const int count);
 
 		const float ReadFloat();
 		const int ReadFloat(float* buff, const int count);
@@ -49,6 +58,17 @@ namespace Reader
 
 		str^ ReadString();
 		str^ ReadString(const int length);
+
+		ByteArray^ ReadBytes(int count);
+
+		array<__int16>^ ReadShorts(int count);
+		array<unsigned __int16>^ ReadUShorts(int count);
+
+		array<__int32>^ ReadInts(int count);
+		array<unsigned __int32>^ ReadUInts( int count);
+
+		array<__int64>^ ReadLongs(int count);
+		array<unsigned __int64>^ ReadULongs(int count);
 
 	};
 
@@ -101,11 +121,20 @@ namespace Reader
 		virtual const __int16 ReadShort() { return _Read<__int16>(); }
 		virtual const int ReadShort(__int16* buff, const int count) { return _Read(buff, count); }
 
+		virtual const unsigned __int16 ReadUShort() { return _Read<unsigned __int16>(); }
+		virtual const int ReadUShort(unsigned __int16* buff, const int count) { return _Read(buff, count); }
+
 		virtual const __int32 ReadInt() { return _Read<__int32>(); }
 		virtual const int ReadInt(__int32* buff, const int count) { return _Read(buff, count); }
 
+		virtual const unsigned __int32 ReadUInt() { return _Read<unsigned __int32>(); }
+		virtual const int ReadUInt(unsigned __int32* buff, const int count) { return _Read(buff, count); }
+
 		virtual const __int64 ReadLong() { return _Read<__int64>(); }
 		virtual const int ReadLong(__int64* buff, const int count) { return _Read(buff, count); }
+
+		virtual const unsigned __int64 ReadULong() { return _Read<unsigned __int64>(); }
+		virtual const int ReadULong(unsigned __int64* buff, const int count) { return _Read(buff, count); }
 
 		virtual const float ReadFloat() { return _Read<float>(); }
 		virtual const int ReadFloat(float* buff, const int count) { return _Read(buff, count); }
@@ -156,6 +185,17 @@ namespace Reader
 			return s;
 		}
 
+		virtual ByteArray^ ReadBytes(int count) { return _Read<byte>(count); }
+
+		virtual array<__int16>^ ReadShorts(int count) { return _Read<__int16>(count); }
+		virtual array<unsigned __int16>^ ReadUShorts(int count) { return _Read<unsigned __int16>(count); }
+
+		virtual array<__int32>^ ReadInts(int count) { return _Read<__int32>(count); }
+		virtual array<unsigned __int32>^ ReadUInts( int count) { return _Read<unsigned __int32>(count); }
+
+		virtual array<__int64>^ ReadLongs(int count) { return _Read<__int64>(count); }
+		virtual array<unsigned __int64>^ ReadULongs(int count) { return _Read<unsigned __int64>(count); }
+
 
 	protected:
 		ICallback^ _callback;
@@ -187,6 +227,16 @@ namespace Reader
 
 		// Read N bytes from underlying 'data object', returning no. of bytes read
 		virtual int _Read(byte* buff, const int count) abstract;
+
+		// Read N values of type 'Type', returning as managed array
+		template<typename Type>
+		array<Type>^ _Read(const int count)
+		{
+			array<Type>^ arr = gcnew array<Type>(count);
+			pin_ptr<Type> p = &arr[0];
+			_Read<Type>(p, count);
+			return arr;
+		}
 
 	};
 
