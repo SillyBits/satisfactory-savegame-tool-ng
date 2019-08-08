@@ -348,7 +348,7 @@ namespace SatisfactorySavegameTool.Actions
 		*/
 
 
-		internal static void _cbStart(int total, string status, string info)
+		internal static void _cbStart(long total, string status, string info)
 		{
 			_count = 0;
 			_errors = 0;
@@ -372,7 +372,7 @@ namespace SatisfactorySavegameTool.Actions
 		internal static Savegame.Savegame _savegame;
 		internal static ProgressDialog _progress;
 		internal static ICallback _callback;
-		internal static int _count;
+		internal static long _count;
 		internal static int _errors;
 		internal static StringBuilder _report_sb;
 		internal static int _report_depth;
