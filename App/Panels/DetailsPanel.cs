@@ -2414,7 +2414,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 							else
 							{
 								item_name = item.ItemName.LastName();
-								if (Translate.Has(item_name))
+								if (item_name != null && Translate.Has(item_name))
 									item_name = Translate._(item_name);
 							}
 
@@ -2447,7 +2447,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 					{
 						add_allowed = true;
 						item_limit = limit.PathName.LastName();
-						if (Translate.Has(item_limit))
+						if (item_limit != null && Translate.Has(item_limit))
 							item_limit = Translate._(item_limit);
 					}
 				}
@@ -3190,11 +3190,18 @@ namespace SatisfactorySavegameTool.Panels.Details
 				prop = bp_named.Value.Named("mTutorialSubsystem");
 				if (prop != null)
 				{
-					obj = prop as P.Object;
-					entity = obj.EntityObj as P.Entity;
-					prop = entity.Value.Named("mHasSeenIntroTutorial");
-					if (prop != null)
-						_childs.Add(MainFactory.Create(this, null, prop));
+					if (prop is P.Object)
+					{
+						obj = prop as P.Object;
+						entity = obj.EntityObj as P.Entity;
+						prop = entity.Value.Named("mHasSeenIntroTutorial");
+						if (prop != null)
+							_childs.Add(MainFactory.Create(this, null, prop));
+					}
+					//else if (prop is P.ObjectProperty)
+					//{
+					//	P.ObjectProperty obj_prop = prop as P.ObjectProperty;
+					//}
 				}
 
 				//bp:mNewRecipes -> ArrayProperty -> [0-N] ObjectProperty . PathName;
