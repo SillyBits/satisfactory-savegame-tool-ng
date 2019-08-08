@@ -129,7 +129,7 @@ namespace Savegame {
 				Log::Info("-> {0:#,#0} game objects", count);
 				for (int i=0; i<count; ++i)
 				{
-					int prev_pos = reader->Pos;
+					__int64 prev_pos = reader->Pos;
 					int type = reader->ReadInt();
 					Properties::Property^ new_child;
 					if (type == 1)
@@ -150,7 +150,7 @@ namespace Savegame {
 					//-> Entity not yet read, so down below instead
 				}
 
-				int prev_pos = reader->Pos;
+				__int64 prev_pos = reader->Pos;
 				int count_next = reader->ReadInt();
 				if (count != count_next)
 					throw gcnew Exception(
@@ -187,10 +187,10 @@ namespace Savegame {
 					//TODO: treeview.sideload_update(obj)
 				}
 
-				int missing = reader->Size - reader->Pos;
+				__int64 missing = reader->Size - reader->Pos;
 				if (missing > 0)
 				{
-					Missing = Properties::Property::ReadBytes(reader, missing);
+					Missing = Properties::Property::ReadBytes(reader, (int)missing);
 					Log::Info("-> Found extra data of size {0:#,#0} at end of file", missing);
 					TotalElements++;
 				}

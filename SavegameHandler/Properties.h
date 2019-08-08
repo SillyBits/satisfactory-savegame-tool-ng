@@ -392,7 +392,7 @@ namespace Savegame
 
 		static ValueProperty^ Read(IReader^ reader, Property^ parent)
 		{
-			int last = reader->Pos;
+			__int64 last = reader->Pos;
 
 			str^ name = reader->ReadString();
 			if (name == "None")
@@ -913,18 +913,18 @@ namespace Savegame
 
 		Property^ Read(IReader^ reader, int length)
 		{
-			int last_pos = reader->Pos;
+			__int64 last_pos = reader->Pos;
 			PropertyList::Read(reader);
 			//TODO: There is an extra 'int' following, investigate!
 			// Not sure if this is valid for all elements which are of type
 			// PropertyList. For now,  we will handle it only here
 			// Might this be the same "int" discovered with entities below???
 			Unknown = reader->ReadInt();
-			int bytes_read = reader->Pos - last_pos;
+			__int64 bytes_read = reader->Pos - last_pos;
 			if (bytes_read < 0)
 				throw gcnew ReadException(reader, "Negative offset!");
 			if (bytes_read != length)
-				Missing = ReadBytes(reader, length - bytes_read);
+				Missing = ReadBytes(reader, (int)(length - bytes_read));
 			return this;
 		}
 		STR_(PathName)
@@ -954,7 +954,7 @@ namespace Savegame
 
 		Property^ Read(IReader^ reader, int length)
 		{
-			int last_pos = reader->Pos;
+			__int64 last_pos = reader->Pos;
 			LevelName = reader->ReadString();
 			PathName = reader->ReadString();
 			int count = reader->ReadInt();
@@ -964,12 +964,12 @@ namespace Savegame
 				Name^ name = gcnew Name(this);
 				Children->Add(name->Read(reader));
 			}
-			int bytes_read = reader->Pos - last_pos;
+			__int64 bytes_read = reader->Pos - last_pos;
 			if (bytes_read < 0)
 				throw gcnew ReadException(reader, "Negative offset!");
 			//if (bytes_read != length)
 			//	Missing = ReadBytes(reader, length - bytes_read);
-			Entity::Read(reader, length - bytes_read);
+			Entity::Read(reader, (int)(length - bytes_read));
 			return this;
 		}
 	};

@@ -8,9 +8,9 @@ namespace Reader
 	{
 	public:
 		// Properties
-		property const long Pos { const long get() abstract; };
-		property const long PrevPos { const long get() abstract; };
-		property const long Size { const long get() abstract; };
+		property const __int64 Pos { const __int64 get() abstract; };
+		property const __int64 PrevPos { const __int64 get() abstract; };
+		property const __int64 Size { const __int64 get() abstract; };
 		property String^ Name { String^ get() abstract; };
 
 
@@ -21,7 +21,7 @@ namespace Reader
 		// Methods
 		void Close();
 
-		const long Seek(long offset, Positioning pos);
+		const __int64 Seek(__int64 offset, Positioning pos);
 
 		const bool ReadBool();
 		const int ReadBool(bool* buff, const int count);
@@ -102,15 +102,15 @@ namespace Reader
 		}
 
 		// Properties
-		virtual property const long Pos { const long get() { return _pos; } };
-		virtual property const long PrevPos { const long get() { return _prev_pos; } };
-		virtual property const long Size { const long get() abstract; };
+		virtual property const __int64 Pos { const __int64 get() { return _pos; } };
+		virtual property const __int64 PrevPos { const __int64 get() { return _prev_pos; } };
+		virtual property const __int64 Size { const __int64 get() abstract; };
 		virtual property String^ Name { String^ get() abstract; };
 
 		// Methods
 		virtual void Close() { _pos = _prev_pos = -1; }
 
-		virtual const long Seek(long offset, IReader::Positioning pos) abstract;
+		virtual const __int64 Seek(__int64 offset, IReader::Positioning pos) abstract;
 
 		virtual const bool ReadBool() { return _Read<bool>(); }
 		virtual const int ReadBool(bool* buff, const int count) { return _Read(buff, count); }
@@ -146,7 +146,7 @@ namespace Reader
 		virtual str^ ReadString() { return ReadString(0); }
 		virtual str^ ReadString(const int length)
 		{
-			long last = _prev_pos = _pos;
+			__int64 last = _prev_pos = _pos;
 
 			int len = length ? length : ReadInt();
 
@@ -199,8 +199,8 @@ namespace Reader
 
 	protected:
 		ICallback^ _callback;
-		long _pos;
-		long _prev_pos;
+		__int64 _pos;
+		__int64 _prev_pos;
 
 
 		virtual void __Start() { _callback->Start(Size); }
@@ -257,9 +257,25 @@ namespace Reader
 			if (!_handle)
 				throw gcnew FileNotFoundException(_filename);
 
-			fseek(_handle, 0, SEEK_END);
-			_size = ftell(_handle);
-			fseek(_handle, 0, SEEK_SET);
+			if (_fseeki64(_handle, 0, SEEK_END) != 0)
+			{
+				int err = errno;
+				throw gcnew Exception(
+					String::Format("Unable to seek to end of file, error {0}", err));
+			}
+			_size = _ftelli64(_handle);
+			if (_size == -1)
+			{
+				int err = errno;
+				throw gcnew Exception(
+					String::Format("Unable to retrieve file size, error {0}", err));
+			}
+			if (_fseeki64(_handle, 0, SEEK_SET) != 0)
+			{
+				int err = errno;
+				throw gcnew Exception(
+					String::Format("Unable to seek to beginning of file, error {0}", err));
+			}
 
 			_pos = 0;
 
@@ -278,7 +294,7 @@ namespace Reader
 
 
 		// Properties not handled by ReaderBase
-		virtual property const long Size { const long get() override { return _size; } };
+		virtual property const __int64 Size { const __int64 get() override { return _size; } };
 		virtual property String^ Name { String^ get() override { return System::IO::Path::GetFileName(_filename); } };
 
 		virtual void Close() override
@@ -290,12 +306,12 @@ namespace Reader
 			ReaderBase::Close();
 		}
 
-		virtual const long Seek(long offset, IReader::Positioning pos) override
+		virtual const __int64 Seek(__int64 offset, IReader::Positioning pos) override
 		{
-			if (fseek(_handle, offset, (int)pos) == 0)
+			if (_fseeki64(_handle, offset, (int)pos) == 0)
 			{
 				_prev_pos = _pos;
-				_pos = ftell(_handle);
+				_pos = _ftelli64(_handle);
 				return _pos;
 			}
 
@@ -304,7 +320,7 @@ namespace Reader
 
 	protected:
 		String^ _filename;
-		long _size;
+		__int64 _size;
 		FILE *_handle;
 
 
@@ -338,7 +354,7 @@ namespace Reader
 
 
 		// Properties not handled by ReaderBase
-		virtual property const long Size { const long get() override { return _size; } };
+		virtual property const __int64 Size { const __int64 get() override { return _size; } };
 		virtual property String^ Name { String^ get() override { return ToString(); } };
 
 		virtual void Close() override
@@ -348,9 +364,9 @@ namespace Reader
 			ReaderBase::Close();
 		}
 
-		virtual const long Seek(long offset, IReader::Positioning pos) override
+		virtual const __int64 Seek(__int64 offset, IReader::Positioning pos) override
 		{
-			long new_pos;
+			__int64 new_pos;
 
 			switch (pos)
 			{
@@ -379,7 +395,7 @@ namespace Reader
 
 	protected:
 		byte* _buff;
-		long _size;
+		__int64 _size;
 
 
 		// Read N bytes from underlying 'data object', returning no. of bytes read

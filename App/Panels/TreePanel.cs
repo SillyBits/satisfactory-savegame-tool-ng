@@ -140,9 +140,7 @@ namespace SatisfactorySavegameTool.Panels
 		{
 			_callback = callback;
 
-			//int extra = 3; // SimpleTree
-			//int extra = 150; // ClassesTree
-			int extra = NoOfExtraElements;
+			long extra = NoOfExtraElements;
 
 			Dispatcher.Invoke(() => {
 				Items.Clear();
@@ -176,7 +174,7 @@ namespace SatisfactorySavegameTool.Panels
 
 
 		internal ICallback _callback;
-		internal int _count;
+		internal long _count;
 
 		internal TreeViewItem _AddItem(TreeViewItem parent, string label, object tag = null)
 		{

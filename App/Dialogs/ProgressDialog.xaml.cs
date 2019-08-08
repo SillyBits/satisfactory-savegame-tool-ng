@@ -60,10 +60,10 @@ namespace SatisfactorySavegameTool.Dialogs
 
 		private Publisher _publisher;
 		private Callback _callback;
-		private int _max_val;
-		private int _last_val;
+		private long _max_val;
+		private long _last_val;
 
-		private void Update(int value, string status, string info)
+		private void Update(long value, string status, string info)
 		{
 			Progress.Value = value;
 			Counts.Text = string.Format(CounterFormat, value, _max_val);
@@ -101,7 +101,7 @@ namespace SatisfactorySavegameTool.Dialogs
 		private void OnStop(Publisher sender, Callback.StopData data)
 		{
 			Dispatcher.Invoke/*Async*/(() => {
-				Update((int)Progress.Maximum, data.Status, data.Info);
+				Update((long)Progress.Maximum, data.Status, data.Info);
 				Hide();
 			});
 		}
@@ -136,7 +136,7 @@ namespace SatisfactorySavegameTool.Dialogs
 			public class StartData 
 				: EventData
 			{
-				public int MaxVal;
+				public long MaxVal;
 				public string Status;
 				public string Info;
 
@@ -146,7 +146,12 @@ namespace SatisfactorySavegameTool.Dialogs
 					if (data.Length != 3)
 						throw new ArgumentException();
 
-					MaxVal = (int)data[0];
+					// Temporary workaround until old code migrated to using long
+					if (data[0] is long)
+						MaxVal = (long)data[0];
+					else
+						MaxVal = (int)data[0];
+
 					Status = (string)data[1];
 					Info = (string)data[2];
 
@@ -169,7 +174,7 @@ namespace SatisfactorySavegameTool.Dialogs
 			public class UpdateData 
 				: EventData
 			{
-				public int CurrVal;
+				public long CurrVal;
 				public string Status;
 				public string Info;
 
@@ -179,7 +184,12 @@ namespace SatisfactorySavegameTool.Dialogs
 					if (data.Length != 3)
 						throw new ArgumentException();
 
-					CurrVal = (int)data[0];
+					// Temporary workaround until old code migrated to using long
+					if (data[0] is long)
+						CurrVal = (long)data[0];
+					else
+						CurrVal = (int)data[0];
+
 					Status = (string)data[1];
 					Info = (string)data[2];
 
