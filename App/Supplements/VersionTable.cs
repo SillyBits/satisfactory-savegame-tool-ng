@@ -12,7 +12,7 @@ namespace SatisfactorySavegameTool.Supplements
 
 		public VersionTable()
 		{
-			_versions = new List<Version>();
+			_versions = new List<VersionEntry>();
 
 			_Load();
 
@@ -20,7 +20,7 @@ namespace SatisfactorySavegameTool.Supplements
 		}
 
 
-		public Version Find(int buildno)
+		public VersionEntry Find(int buildno)
 		{
 			return _versions.Find(v => v._cl == buildno);
 		}
@@ -71,22 +71,31 @@ namespace SatisfactorySavegameTool.Supplements
 				string version = element.Attributes["version"].InnerText;
 				string remarks = element.HasAttribute("remarks") ? element.Attributes["remarks"].InnerText : null;
 
-				Version v = new Version(cl, type, version, remarks);
+				VersionEntry v = new VersionEntry(cl, type, version, remarks);
 
 				_versions.Add(v);				
 			}
 
 		}
 
-		private List<Version> _versions;
+		private List<VersionEntry> _versions;
 
-		public class Version
+
+		public enum Version {
+			Experimental = 0,
+			EarlyAccess  = 1,
+		}
+
+		public class VersionEntry
 		{
+			public Version Release { get { return _release; } }
+
+
 			// release: 0=Experimental, 1=Early Access
-			internal Version(int cl, int release, string version_num, string remarks = null)
+			internal VersionEntry(int cl, int release, string version_num, string remarks = null)
 			{
 				_cl = cl;
-				_release = release;
+				_release = (Version) release;
 				_version = version_num;
 				_remarks = remarks;
 			}
@@ -94,7 +103,7 @@ namespace SatisfactorySavegameTool.Supplements
 			public override string ToString()
 			{
 				// Early Access Release - v0.1, Update 1 - CL 95718
-				string s = (_release == 1) ? "Early Access" : "Experimental";
+				string s = (_release == Version.EarlyAccess) ? "Early Access" : "Experimental";
 				s += " - v" + _version;
 				if (_remarks != null)
 					s += ", " + _remarks;
@@ -103,7 +112,7 @@ namespace SatisfactorySavegameTool.Supplements
 			}
 
 			internal int _cl;
-			internal int _release;
+			internal Version _release;
 			internal string _version, _remarks;
 		}
 
