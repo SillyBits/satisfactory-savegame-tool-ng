@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 
 using CoreLib;
 
@@ -49,10 +50,9 @@ namespace SatisfactorySavegameTool.Dialogs
 				string base64;
 				if (!images.ContainsKey(imgfile))
 				{
-					//TODO: Load from assembly instead
-					string imgpath = Path.Combine(Settings.RESOURCEPATH, imgfile);
-					string ext = Path.GetExtension(imgfile).Substring(1).ToLower();
-					base64 = "data:image/" + ext + ";base64," + ImageHandler.Image2Base64(imgpath);
+					BitmapSource img = new BitmapImage(Helpers.GetResourceUri(imgfile));
+					base64 = "data:image/png;base64," + ImageHandler.Image2Base64(img);
+					images.Add(imgfile, base64);
 				}
 				else
 				{
