@@ -16,6 +16,14 @@ namespace SatisfactorySavegameTool.Supplements
 	/// </summary>
 	public static class Extensions
 	{
+
+		private static readonly Action EmptyDelegate = delegate { };
+		public static void Refresh(this UIElement uiElement)
+		{
+			uiElement.Dispatcher.Invoke(DispatcherPriority.Render, EmptyDelegate);
+		}
+
+
 		internal static bool IsNullOrEmpty(this byte[] arr) { return _IsNullOrEmpty(arr); }
 		internal static bool IsNullOrEmpty(this int[] arr)  { return _IsNullOrEmpty(arr); }
 		private static bool _IsNullOrEmpty<_ValueType>(_ValueType[] arr)
@@ -27,7 +35,7 @@ namespace SatisfactorySavegameTool.Supplements
 			return (sum == 0);
 		}
 
-		
+
 		// Used to extract last portion of a string which can be split using given separator
 		// (e.g. "/Script/FactoryGame.FGInventoryComponent" -> "FGInventoryComponent")
 		internal static string LastName(this str name, char separator = '.')

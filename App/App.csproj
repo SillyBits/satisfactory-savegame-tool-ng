@@ -56,6 +56,7 @@
     <ApplicationIcon>Resources\Logo-128x128.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationFramework.Classic" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
@@ -83,6 +84,9 @@
     <Compile Include="Supplements\Callback.cs" />
     <Compile Include="Supplements\Enums.cs" />
     <Compile Include="Supplements\Extensions.cs" />
+    <Compile Include="Supplements\Splashscreen.xaml.cs">
+      <DependentUpon>Splashscreen.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Supplements\VersionTable.cs" />
     <Page Include="Dialogs\OptionsDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -134,6 +138,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Supplements\Splashscreen.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -201,6 +209,7 @@
     <Content Include="Resources\en-US\Changelog.res" />
     <Content Include="Resources\en-US\FactoryGame.res" />
     <Content Include="Resources\en-US\Translation.res" />
+    <Resource Include="Resources\Splashscreen.png" />
     <Resource Include="Resources\Icon.TreePanel.Living.png" />
     <Resource Include="Resources\Logo-128x128.ico" />
     <Resource Include="Resources\Icon.TreePanel.Classes.png" />
