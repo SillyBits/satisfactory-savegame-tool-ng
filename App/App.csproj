@@ -80,6 +80,7 @@
     <Compile Include="Dialogs\OptionsDialog.xaml.cs">
       <DependentUpon>OptionsDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Supplements\Callback.cs" />
     <Compile Include="Supplements\Enums.cs" />
     <Compile Include="Supplements\Extensions.cs" />
     <Compile Include="Supplements\VersionTable.cs" />

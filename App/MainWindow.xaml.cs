@@ -375,7 +375,7 @@ namespace SatisfactorySavegameTool
 				((ICallback)progress.Events).Stop("Done", "");
 			});
 
-			progress.Events.Destroy();
+			progress.Events.Stop();
 			MessageBox.Show("Done");
 		}
 #endregion
