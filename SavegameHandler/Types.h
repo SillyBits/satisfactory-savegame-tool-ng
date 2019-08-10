@@ -109,8 +109,8 @@ public:
 
 	bool IsEmpty()
 	{
-		return (_ascii   != nullptr && _ascii   == "")
-			|| (_unicode != nullptr && _unicode == L"")
+		return (_ascii   != nullptr && strlen(_ascii)   == 0)
+			|| (_unicode != nullptr && wcslen(_unicode) == 0)
 			;
 	}
 
