@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Win32;
@@ -133,6 +134,29 @@ namespace CoreLib
 			return key;
 		}
 
+
+		/// <summary>
+		/// Build Uri based on calling assembly and resource path given.
+		/// </summary>
+		/// <param name="resourcepath">Relative path to resource</param>
+		/// <returns>Uri describing resource location</returns>
+		public static Uri GetResourceUri(string resourcepath)
+		{
+			return GetResourceUri(Assembly.GetCallingAssembly(), resourcepath);
+		}
+
+		/// <summary>
+		/// Build Uri based on assembly and resource path given.
+		/// </summary>
+		/// <param name="assembly">Assembly to reference</param>
+		/// <param name="resourcepath">Relative path to resource</param>
+		/// <returns>Uri describing resource location</returns>
+		public static Uri GetResourceUri(Assembly assembly, string resourcepath)
+		{
+			string path = string.Format("pack://application:,,,/{0};component/Resources/{1}",
+										assembly.GetName(), resourcepath);
+			return new Uri(path);
+		}
 
 	}
 
