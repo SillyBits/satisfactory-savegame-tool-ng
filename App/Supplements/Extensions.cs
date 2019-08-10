@@ -32,7 +32,7 @@ namespace SatisfactorySavegameTool.Supplements
 		// (e.g. "/Script/FactoryGame.FGInventoryComponent" -> "FGInventoryComponent")
 		internal static string LastName(this str name, char separator = '.')
 		{
-			if (str.IsNull(name))
+			if (str.IsNullOrEmpty(name))
 				return null;
 			return LastName(name.ToString(), separator);
 		}
@@ -56,7 +56,7 @@ namespace SatisfactorySavegameTool.Supplements
 				if (prop is P.ValueProperty)
 				{
 					str prop_name = (prop as P.ValueProperty).Name;
-					if (!str.IsNull(prop_name))
+					if (!str.IsNullOrEmpty(prop_name))
 						return prop_name.ToString() == name;
 				}
 				return false;

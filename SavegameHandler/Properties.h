@@ -769,7 +769,7 @@ namespace Savegame
 	protected:
 		List<String^>^ _GetExcludes()
 		{
-			if (str::IsNull(Name) || Name->ToString()->Equals(str::Statics::EMPTY))
+			if (str::IsNullOrEmpty(Name))
 			{
 				// No name, so no value
 				if (_excludes == nullptr)

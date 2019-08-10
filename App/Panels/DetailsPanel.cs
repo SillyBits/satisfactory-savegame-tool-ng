@@ -1948,9 +1948,9 @@ namespace SatisfactorySavegameTool.Panels.Details
 			//      x          -       x      -
 			//      x          x       x      -
 
-			if (str.IsNull(_prop.LevelName) || _prop.LevelName.ToString() == "Persistent_Level")
+			if (str.IsNullOrEmpty(_prop.LevelName) || _prop.LevelName.ToString() == "Persistent_Level")
 			{
-				if (str.IsNull(_prop.Name))
+				if (str.IsNullOrEmpty(_prop.Name))
 				{
 					// Only PathName (... are we in an ArrayProperty?)
 					_impl = MainFactory.Create(_parent, _label, _prop.PathName);
@@ -2409,7 +2409,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 						P.InventoryItem item = stru.Value as P.InventoryItem;
 						if (item != null)
 						{
-							if (str.IsNull(item.ItemName))
+							if (str.IsNullOrEmpty(item.ItemName))
 								item_name = DetailsPanel.EMPTY;
 							else
 							{
@@ -2441,7 +2441,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 				P.ObjectProperty limit = allowed[i] as P.ObjectProperty;
 				if (limit != null)
 				{
-					if (str.IsNull(limit.PathName))
+					if (str.IsNullOrEmpty(limit.PathName))
 						item_limit = DetailsPanel.EMPTY;
 					else
 					{
@@ -2567,7 +2567,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			if (entity.Value.Count == 1)
 			{
 				P.ArrayProperty arr = entity.Value[0] as P.ArrayProperty;
-				if (arr != null && !str.IsNull(arr.Name) && arr.Name.ToString() == "mFogOfWarRawData")
+				if (arr != null && !str.IsNullOrEmpty(arr.Name) && arr.Name.ToString() == "mFogOfWarRawData")
 				{
 					IElement element = new ImageControl(this, arr.Name.ToString(), arr.Value);
 					_childs.Add(element);
@@ -2599,7 +2599,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			if (entity.Value.Count != 1)
 				return;//TODO:
 			P.MapProperty map_prop = entity.Value[0] as P.MapProperty;
-			if (map_prop == null || str.IsNull(map_prop.Name) || map_prop.Name.ToString() != "mBuildings")
+			if (map_prop == null || str.IsNullOrEmpty(map_prop.Name) || map_prop.Name.ToString() != "mBuildings")
 				return;//TODO:
 
 			ListViewControl.ColumnDefinition[] columns = {
@@ -2613,7 +2613,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 				if (entries == null || entries.Count != 1)
 					continue;//TODO:
 				P.ArrayProperty entry = entries[0];
-				if (entry == null || entry.Value == null || str.IsNull(entry.Name) || entry.Name.ToString() != "Buildables")
+				if (entry == null || entry.Value == null || str.IsNullOrEmpty(entry.Name) || entry.Name.ToString() != "Buildables")
 					continue;//TODO:
 				List<P.ObjectProperty> objects = (entry.Value as List<P.Property>).ListOf<P.ObjectProperty>();
 				if (objects == null)
@@ -2624,7 +2624,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 				{
 					rows.Add(new object[] {
 						rows.Count,
-						!str.IsNull(obj_prop.PathName) ? obj_prop.PathName.LastName() : DetailsPanel.EMPTY,
+						!str.IsNullOrEmpty(obj_prop.PathName) ? obj_prop.PathName.LastName() : DetailsPanel.EMPTY,
 					});
 				}
 
@@ -2664,7 +2664,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			if (entity.Value.Count != 1)
 				return;//TODO:
 			P.ArrayProperty arr = entity.Value[0] as P.ArrayProperty;
-			if (arr == null || str.IsNull(arr.Name) || arr.Name.ToString() != "mAvailableRecipes")
+			if (arr == null || str.IsNullOrEmpty(arr.Name) || arr.Name.ToString() != "mAvailableRecipes")
 				return;//TODO:
 
 			List<P.ObjectProperty> objects = (arr.Value as List<P.Property>).ListOf<P.ObjectProperty>();
@@ -2675,7 +2675,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			foreach (P.ObjectProperty obj_prop in objects)
 			{
 				string name = DetailsPanel.EMPTY;
-				if (!str.IsNull(obj_prop.PathName))
+				if (!str.IsNullOrEmpty(obj_prop.PathName))
 				{
 					name = obj_prop.PathName.LastName();
 					if (Translate.Has(name))
@@ -2828,7 +2828,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 					P.ObjectProperty itemclass = item_amount.Value.Named("ItemClass") as P.ObjectProperty;
 					string name = DetailsPanel.EMPTY;
-					if (itemclass != null && !str.IsNull(itemclass.PathName))
+					if (itemclass != null && !str.IsNullOrEmpty(itemclass.PathName))
 					{
 						name = itemclass.PathName.LastName();
 						if (Translate.Has(name))
@@ -2950,7 +2950,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 					continue;//TODO:
 
 				P.ObjectProperty recipe = researchcost.Value.Named("researchRecipe") as P.ObjectProperty;
-				if (recipe == null || str.IsNull(recipe.PathName))
+				if (recipe == null || str.IsNullOrEmpty(recipe.PathName))
 					continue;//TODO:
 				string recipe_name = recipe.PathName.LastName();
 				if (Translate.Has(recipe_name))
@@ -2992,7 +2992,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 				P.ObjectProperty itemclass = item_amount.Value.Named("ItemClass") as P.ObjectProperty;
 				string name = DetailsPanel.EMPTY;
-				if (itemclass != null && !str.IsNull(itemclass.PathName))
+				if (itemclass != null && !str.IsNullOrEmpty(itemclass.PathName))
 				{
 					name = itemclass.PathName.LastName();
 					if (Translate.Has(name))

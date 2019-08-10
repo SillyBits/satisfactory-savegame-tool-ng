@@ -107,9 +107,27 @@ public:
 		return (wcscmp(_unicode, s) == 0);
 	}
 
+	bool IsEmpty()
+	{
+		return (_ascii   != nullptr && _ascii   == "")
+			|| (_unicode != nullptr && _unicode == L"")
+			;
+	}
+
+
 	static bool IsNull(str^ s)
 	{
 		return (s == (str^)nullptr) || (!s->_ascii && !s->_unicode);
+	}
+
+	static bool IsEmpty(str^ s)
+	{
+		return s != (str^)nullptr && (s->IsEmpty() || s == Statics::empty);
+	}
+
+	static bool IsNullOrEmpty(str^ s)
+	{
+		return IsNull(s) || IsEmpty(s);
 	}
 
 
