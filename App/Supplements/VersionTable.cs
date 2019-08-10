@@ -82,6 +82,7 @@ namespace SatisfactorySavegameTool.Supplements
 
 
 		public enum Version {
+			Unknown      = -1,
 			Experimental = 0,
 			EarlyAccess  = 1,
 		}
