@@ -6,12 +6,23 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 
+
 namespace CoreLib
 {
-	// Random helpers
 
+	// Random helpers
 	public static class Helpers
 	{
+
+		/// <summary>
+		/// Create a hexdump for data given.
+		/// </summary>
+		/// <param name="data">Data to dump</param>
+		/// <param name="width">No. of bytes per row</param>
+		/// <param name="offsets">Whether or not to include offset in string returned</param>
+		/// <param name="ascii">Whether or not to include ASCII chars in string returned</param>
+		/// <param name="indent">No. of tab chars to add in front of each row</param>
+		/// <returns>String containing dump</returns>
 		public static string Hexdump(byte[] data, int width = 16, bool offsets = true, bool ascii = true, int indent = 1)
 		{
 			if (data == null)
