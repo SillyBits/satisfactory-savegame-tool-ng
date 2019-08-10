@@ -23,6 +23,26 @@ namespace CoreLib
 		}
 
 		/// <summary>
+		/// Convert given image to base64 notation.
+		/// </summary>
+		/// <param name="bitmap">Image to convert</param>
+		/// <returns>Base64 representation</returns>
+		public static string Image2Base64(BitmapSource bitmap)
+		{
+			byte[] bytes;
+			using (MemoryStream stream = new MemoryStream())
+			{
+				PngBitmapEncoder enc = new PngBitmapEncoder();
+				enc.Frames.Add(BitmapFrame.Create(bitmap));
+				enc.Save(stream);
+				stream.Flush();
+				bytes = stream.ToArray();
+			}
+			return Convert.ToBase64String(bytes);
+		}
+
+
+		/// <summary>
 		/// Create image from raw bytes
 		/// </summary>
 		/// <param name="data">Pixels (row-major)</param>
