@@ -2372,6 +2372,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			if (stacks.Count != sizes.Length || sizes.Length != allowed.Count)
 				throw new Exception("FGInventoryComponent: Mismatch in collection sizes!");
 
+			bool add_stacklimit = false;
 			bool add_allowed = false;
 			List<object[]> rows = new List<object[]>();
 			for (int i = 0; i < stacks.Count(); ++i)
@@ -2428,6 +2429,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 					}
 				}
 
+				if (sizes[i] != 0)
+					add_stacklimit = true;
 				string size_limit = sizes[i].ToString();
 
 				/*
@@ -2465,8 +2468,9 @@ namespace SatisfactorySavegameTool.Panels.Details
 				new ListViewControl.ColumnDefinition("#", 50),
 				new ListViewControl.ColumnDefinition("Item", 250),
 				new ListViewControl.ColumnDefinition("Count", 50),
-				new ListViewControl.ColumnDefinition("Stack limit", 75),
 			};
+			if (add_stacklimit)
+				new ListViewControl.ColumnDefinition("Stack limit", 75);
 			if (add_allowed)
 				columns.Add(new ListViewControl.ColumnDefinition("Allowed", 250));
 			ListViewControl lvc = new ListViewControl(columns.ToArray());
