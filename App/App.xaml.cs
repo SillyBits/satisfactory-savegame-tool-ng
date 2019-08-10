@@ -31,6 +31,9 @@ namespace SatisfactorySavegameTool
 			_config    = new ConfigFile(Settings.APPPATH, Settings.APPNAME);
 			_languages = new LanguageHandler(Settings.RESOURCEPATH, null, TRANSLATIONFILES);
 
+			Splashscreen.ShowSplash("Starting up...");
+			MainWindow = null;
+
 			Settings.Init();
 
 			_versions = new VersionTable();
@@ -145,6 +148,7 @@ namespace SatisfactorySavegameTool
 		internal static void Init()
 		{
 			// Pick suitable default language if setting is missing
+			Splashscreen.SetMessage("Setting up language");
 			if (!Config.Root.HasSection("core") 
 				|| !Config.Root.core.HasItem("language")
 				|| string.IsNullOrEmpty(Config.Root.core.language))
@@ -156,11 +160,14 @@ namespace SatisfactorySavegameTool
 #endif
 			}
 			// Setup actual language for translations
+			Splashscreen.SetMessage("Loading language resources");
 			LANGUAGE = Config.Root.core.language;
 			LanguageHandler.LANG.SelectLanguage(LANGUAGE);
 			Thread.CurrentThread.CurrentUICulture = new CultureInfo(LANGUAGE);
+			
 
 			// Create defaultpath setting if not set up yet
+			Splashscreen.SetMessage("Setting up default savegame path");
 			if (!Config.Root.HasSection("core") 
 				|| !Config.Root.core.HasItem("defaultpath") 
 				|| Config.Root.core.defaultpath == "")

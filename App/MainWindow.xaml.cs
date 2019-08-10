@@ -15,6 +15,8 @@ using Savegame.Properties;
 
 using SatisfactorySavegameTool.Actions;
 using SatisfactorySavegameTool.Dialogs;
+using SatisfactorySavegameTool.Supplements;
+
 
 #pragma warning disable CS1998 // async method called from synchronous context
 
@@ -31,6 +33,8 @@ namespace SatisfactorySavegameTool
 		public MainWindow()
 			: base()
         {
+			Application.Current.MainWindow = this;
+
             InitializeComponent();
 
 			_Init();
@@ -39,6 +43,7 @@ namespace SatisfactorySavegameTool
 		protected void _Init()
 		{
 			// Load options
+			Splashscreen.SetMessage("Creating main window");
 
 			// - Position window
 			if (Config.Root.HasSection("window"))
@@ -75,6 +80,9 @@ namespace SatisfactorySavegameTool
 
 			// Finally, update menu states
 			_UpdateUIState();
+
+			// Close splash
+			Splashscreen.HideSplash();
         }
 
 		protected override void OnClosing(CancelEventArgs e)

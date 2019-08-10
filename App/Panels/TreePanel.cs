@@ -130,9 +130,6 @@ namespace SatisfactorySavegameTool.Panels
 			SetValue(VirtualizingPanel.IsVirtualizingProperty, true);
 			SetValue(VirtualizingPanel.VirtualizationModeProperty, VirtualizationMode.Recycling);
 
-			SelectedItemChanged += (Application.Current.MainWindow as SatisfactorySavegameTool.MainWindow).TreeView_SelectedItemChanged;
-
-			_CreateContextMenu();
 		}
 
 
@@ -143,6 +140,9 @@ namespace SatisfactorySavegameTool.Panels
 			long extra = NoOfExtraElements;
 
 			Dispatcher.Invoke(() => {
+				SelectedItemChanged -= (Application.Current.MainWindow as MainWindow).TreeView_SelectedItemChanged;
+				SelectedItemChanged += (Application.Current.MainWindow as MainWindow).TreeView_SelectedItemChanged;
+				_CreateContextMenu();
 				Items.Clear();
 				_callback.Start(MainWindow.CurrFile.TotalElements + extra, Translate._("MainWindow.LoadGamefile.Progress.Title.2"), "");
 			});
