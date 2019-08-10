@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 
 
 using P = Savegame.Properties;
@@ -33,6 +33,17 @@ namespace SatisfactorySavegameTool.Supplements
 				return true;
 			double sum = arr.Sum((v) => v.ToDouble(System.Globalization.CultureInfo.InvariantCulture));
 			return (sum == 0);
+		}
+
+
+		// Used to get game version from savegame header
+		internal static VersionTable.Version GetVersion(this P.Header header)
+		{
+			int build_version = header.BuildVersion + 34682;
+			VersionTable.VersionEntry version = VersionTable.INSTANCE.Find(build_version);
+			if (version == null)
+				return VersionTable.Version.Unknown;
+			return version.Release;
 		}
 
 
