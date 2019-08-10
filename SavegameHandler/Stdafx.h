@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <memory.h>
+#include <share.h>
 
 
 using namespace System;

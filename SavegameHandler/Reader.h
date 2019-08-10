@@ -253,7 +253,8 @@ namespace Reader
 		{
 			pin_ptr<const wchar_t> fname = PtrToStringChars(_filename);
 
-			_handle = _wfopen(fname, L"rb");
+			// Shareable by other processes, and optimized for sequential access
+			_handle = _wfsopen(fname, L"rbS", _SH_DENYNO);
 			if (!_handle)
 				throw gcnew FileNotFoundException(_filename);
 
