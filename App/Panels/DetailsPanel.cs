@@ -861,9 +861,11 @@ namespace SatisfactorySavegameTool.Panels.Details
 					Header = coldef._header,
 					Width = coldef._width,
 					//TODO: Alignment
-					//TODO: Converter
-					DisplayMemberBinding = new Binding("[" + _gridview.Columns.Count + "]"),
 				};
+				if (coldef._template == null)
+					col.DisplayMemberBinding = new Binding("[" + _gridview.Columns.Count + "]");
+				else
+					col.CellTemplate = coldef._template;
 				_gridview.Columns.Add(col);
 			}
 
@@ -894,24 +896,21 @@ namespace SatisfactorySavegameTool.Panels.Details
 		internal class ColumnDefinition
 		{
 			internal ColumnDefinition(string header, double width, HorizontalAlignment align = HorizontalAlignment.Left)
-				: this(header, width, align, DefaultConverter)
+				: this(header, width, align, null)
 			{ }
 
-			internal ColumnDefinition(string header, double width, HorizontalAlignment align, Converter converter)
+			internal ColumnDefinition(string header, double width, HorizontalAlignment align, DataTemplate template)
 			{
 				_header = header;
 				_width = width;
 				_align = align;
-				_converter = converter;
+				_template = template;
 			}
-
-			public delegate string Converter(object obj);
-			internal static string DefaultConverter(object obj) { return obj.ToString(); }
 
 			internal string _header;
 			internal double _width;
 			internal HorizontalAlignment _align;
-			internal Converter _converter;
+			internal DataTemplate _template;
 		}
 	}
 
