@@ -28,7 +28,7 @@ namespace SatisfactorySavegameTool.Supplements
 
 		private void _Load()
 		{
-			string filename = Path.Combine(App.RESOURCEPATH, "VersionTable.xml");
+			string filename = Path.Combine(Settings.RESOURCEPATH, "VersionTable.xml");
 
 			XmlDocument xml = new XmlDocument();
 			try

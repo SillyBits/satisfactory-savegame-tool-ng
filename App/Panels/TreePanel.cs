@@ -39,7 +39,7 @@ namespace SatisfactorySavegameTool.Panels
 					Orientation = Orientation.Horizontal,
 				};
 				sp.Children.Add(new Image() {
-					Source = new BitmapImage(new Uri(Path.Combine(App.RESOURCEPATH, icon))),
+					Source = new BitmapImage(Helpers.GetResourceUri(icon)),
 					Width = 20,
 					Height = 20,
 				});

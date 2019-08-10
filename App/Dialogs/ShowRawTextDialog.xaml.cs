@@ -50,7 +50,7 @@ namespace SatisfactorySavegameTool.Dialogs
 		{
 			SaveFileDialog dlg = new SaveFileDialog();
 			dlg.Title = Translate._("ShowRawTextDialog.Save.Title");
-			dlg.InitialDirectory = App.EXPORTPATH;
+			dlg.InitialDirectory = Settings.EXPORTPATH;
 			dlg.DefaultExt = Translate._("ShowRawTextDialog.Save.DefaultExt");
 			dlg.Filter = Translate._("ShowRawTextDialog.Save.Filter");
 			if (dlg.ShowDialog().GetValueOrDefault(false) == true)

@@ -182,7 +182,7 @@ namespace SatisfactorySavegameTool
 			{
 				string path = Config.Root.core.exportpath;
 				if (path == "")
-					path = Path.Combine(App.APPPATH, App.EXPORTS);
+					path = Path.Combine(Settings.APPPATH, Settings.EXPORTS);
 				string filename = Path.GetFileName(CurrFile.Filename) + ".export";
 				export_file = Path.Combine(path, filename);
 			}
@@ -225,14 +225,14 @@ namespace SatisfactorySavegameTool
 
 		private void Help_Changelog_Click(object sender, RoutedEventArgs e)
 		{
-			string filename = Path.Combine(App.RESOURCEPATH, App.LANGUAGE, "Changelog.res");
+			string filename = Path.Combine(Settings.RESOURCEPATH, Settings.LANGUAGE, "Changelog.res");
 			string content = File.ReadAllText(filename);
 			ShowHtmlResDialog.Show(Translate._("Dialog.Changelog.Title"), content);
 		}
 
 		private void Help_About_Click(object sender, RoutedEventArgs e)
 		{
-			string filename = Path.Combine(App.RESOURCEPATH, App.LANGUAGE, "About.res");
+			string filename = Path.Combine(Settings.RESOURCEPATH, Settings.LANGUAGE, "About.res");
 			string content = File.ReadAllText(filename);
 			ShowHtmlResDialog.Show(Translate._("Dialog.About.Title"), content);
 		}

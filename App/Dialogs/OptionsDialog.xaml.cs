@@ -36,9 +36,9 @@ namespace SatisfactorySavegameTool.Dialogs
 				Title = title;
 
 			Collections.Languages langs = FindResource("langData") as Collections.Languages;
-			languages.SelectedItem = langs.FirstOrDefault(lang => lang.ID == App.LANGUAGE);
+			languages.SelectedItem = langs.FirstOrDefault(lang => lang.ID == Settings.LANGUAGE);
 			defaultpath.Text = Path.GetFullPath(Config.Root.core.defaultpath);
-			exportpath.Text = Path.GetFullPath(Config.Root.core.exportpath.Length > 0 ? Config.Root.core.exportpath : App.EXPORTPATH);
+			exportpath.Text = Path.GetFullPath(Config.Root.core.exportpath.Length > 0 ? Config.Root.core.exportpath : Settings.EXPORTPATH);
 			deep_analysis.IsChecked = Config.Root.deep_analysis.enabled;
 			crash_reports.IsChecked = Config.Root.crash_reports.enabled;
 			incident_reports.IsChecked = Config.Root.incident_reports.enabled;

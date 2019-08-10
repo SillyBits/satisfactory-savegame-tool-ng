@@ -47,7 +47,7 @@ namespace SatisfactorySavegameTool.Dialogs
 		{
 			SaveFileDialog dlg = new SaveFileDialog();
 			dlg.Title = Translate._("ImageDialog.Save.Title");
-			dlg.InitialDirectory = App.EXPORTPATH;
+			dlg.InitialDirectory = Settings.EXPORTPATH;
 			dlg.DefaultExt = Translate._("ImageDialog.Save.DefaultExt");
 			dlg.Filter = Translate._("ImageDialog.Save.Filter");
 			if (dlg.ShowDialog().GetValueOrDefault(false) == true)

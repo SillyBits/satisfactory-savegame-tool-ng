@@ -49,7 +49,8 @@ namespace SatisfactorySavegameTool.Dialogs
 				string base64;
 				if (!images.ContainsKey(imgfile))
 				{
-					string imgpath = Path.Combine(App.RESOURCEPATH, imgfile);
+					//TODO: Load from assembly instead
+					string imgpath = Path.Combine(Settings.RESOURCEPATH, imgfile);
 					string ext = Path.GetExtension(imgfile).Substring(1).ToLower();
 					base64 = "data:image/" + ext + ";base64," + ImageHandler.Image2Base64(imgpath);
 				}
