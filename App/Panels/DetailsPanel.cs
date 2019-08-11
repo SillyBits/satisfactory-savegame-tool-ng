@@ -294,10 +294,16 @@ namespace SatisfactorySavegameTool.Panels.Details
 			HorizontalContentAlignment = HorizontalAlignment.Stretch;
 
 			_grid = new Grid();
-			_grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength( 0, GridUnitType.Auto ) });
+			_grid.ColumnDefinitions.Add(new ColumnDefinition() {
+				Width = new GridLength( 0, GridUnitType.Auto ),
+				SharedSizeGroup = "FirstColGroup",
+			});
 			_grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength( 1, GridUnitType.Star ) });
 			_grid.Margin = new Thickness(10, 4, 5, 4);//LTRB
 			_grid.Background = Brushes.Transparent;
+
+			if (_parent != null)
+				Grid.SetIsSharedSizeScope(_parent.Visual, true);
 
 			Border b = new Border() {
 				BorderBrush = Brushes.DarkGray,
