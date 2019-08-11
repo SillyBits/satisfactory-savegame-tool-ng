@@ -1013,7 +1013,8 @@ namespace Savegame
 				catch (Exception^ exc)
 				{
 					entity->Private = nullptr;
-					Log::Debug(String::Format("Error loading private data for '{0}'", PathName), exc);
+					if (VERBOSITY)
+						Log::Debug(String::Format("Error loading private data for '{0}'", PathName), exc);
 				}
 			}
 #endif
@@ -1063,7 +1064,8 @@ namespace Savegame
 				catch (Exception^ exc)
 				{
 					entity->Private = nullptr;
-					Log::Debug(String::Format("Error loading private data for '{0}'", PathName), exc);
+					if (VERBOSITY)
+						Log::Debug(String::Format("Error loading private data for '{0}'", PathName), exc);
 				}
 			}
 #endif
@@ -1164,7 +1166,8 @@ namespace Savegame
 
 			if (!PropertyFactory::IsKnown(type_name))
 			{
-				Log::Debug("No match for private type '{0}' found, .Missing ignored", classname);
+				if (VERBOSITY)
+					Log::Debug("No match for private type '{0}' found, .Missing ignored", classname);
 				return nullptr;
 			}
 
@@ -1188,14 +1191,16 @@ namespace Savegame
 				instance->Value->Add(prop->Read(reader));
 			}
 
-			if (reader->Pos != reader->Size)
-				Log::Debug("Still some dangling bytes, .Missing kept");
-			else
+			if (reader->Pos == reader->Size)
 				entity->Missing = nullptr;
+			else if (VERBOSITY)
+				Log::Debug("Still some dangling bytes, .Missing kept");
 
 			reader = nullptr;
 
-			Log::Debug("Injected private type for '{0}'", classname);
+			if (VERBOSITY)
+				Log::Debug("Injected private type for '{0}'", classname);
+
 			return instance;
 		}
 

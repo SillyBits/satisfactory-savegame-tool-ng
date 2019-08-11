@@ -12,6 +12,7 @@
 	<DockPanel>
 
 		<Menu DockPanel.Dock="Top" HorizontalAlignment="Left" Background="White" BorderBrush="Black" >
+
 			<MenuItem Header="{lang:Translate Key=MainWindow.Menu.File}">
 				<MenuItem Header="{lang:Translate Key=MainWindow.Menu.File.Open}" 
 						  ToolTip="{lang:Translate Key=MainWindow.Menu.File.Open.TT}" 
@@ -49,16 +50,19 @@
 						  ToolTip="{lang:Translate Key=MainWindow.Menu.File.Exit.TT}" 
 						  Click="File_Exit_Click" />
 			</MenuItem>
+
 			<MenuItem Header="{lang:Translate Key=MainWindow.Menu.Edit}">
 				<MenuItem Header="{lang:Translate Key=MainWindow.Menu.Edit.Options}" 
 						  ToolTip="{lang:Translate Key=MainWindow.Menu.Edit.Options.TT}" 
 						  Click="Edit_Options_Click" />
 			</MenuItem>
+
 			<MenuItem Header="{lang:Translate Key=MainWindow.Menu.Actions}">
 				<MenuItem x:Name="Actions_Validate" Header="{lang:Translate Key=MainWindow.Menu.Actions.Validate}" 
 						  ToolTip="{lang:Translate Key=MainWindow.Menu.Actions.Validate.TT}" 
 						  Click="Actions_Validate_Click" />
 			</MenuItem>
+
 			<MenuItem Header="{lang:Translate Key=MainWindow.Menu.Help}">
 				<MenuItem Header="{lang:Translate Key=MainWindow.Menu.Help.Changelog}" 
 						  ToolTip="{lang:Translate Key=MainWindow.Menu.Help.Changelog.TT}" 
@@ -67,6 +71,7 @@
 						  ToolTip="{lang:Translate Key=MainWindow.Menu.Help.About.TT}" 
 						  Click="Help_About_Click" />
 			</MenuItem>
+
 		</Menu>
 
 		<StatusBar DockPanel.Dock="Bottom" Background="Beige">

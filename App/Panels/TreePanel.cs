@@ -129,7 +129,6 @@ namespace SatisfactorySavegameTool.Panels
 		{
 			SetValue(VirtualizingPanel.IsVirtualizingProperty, true);
 			SetValue(VirtualizingPanel.VirtualizationModeProperty, VirtualizationMode.Recycling);
-
 		}
 
 

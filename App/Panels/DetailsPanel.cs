@@ -68,6 +68,7 @@ namespace SatisfactorySavegameTool.Panels
 		}
 
 	}
+
 }
 
 
@@ -400,204 +401,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 		internal Grid _grid;
 		internal List<IElement> _childs;
 	}
-
-
-#if false
-		internal Expando _Add(Expando parent, string name, Property prop)
-		{
-			string label;
-			ValueControl ctrl;
-
-			//IElement element = ElementFactory.Create(parent, label, prop);
-
-			if (prop != null)
-			{
-				if (prop is ObjectProperty)
-				{
-					ObjectProperty obj_p = prop as ObjectProperty;
-
-					// Have seen 4 different combinations so far:
-					// - (1) Only PathName valid, LevelName + Name + Value = empty (sub in an ArrayProperty)
-					// - (2) PathName + LevelName, but Name + Value are empty (also with ArrayProperty)
-					// - (2) PathName + Name valid, but LevelName + Value empty (sub in a StructProperty)
-					// - (3) PathName, LevelName + Name, but empty Value (sub in an EntityObj)
-					//
-					//=> PathName  LevelName  Name  Value
-					//      x          -       -      -
-					//      x          x       -      -
-					//      x          -       x      -
-					//      x          x       x      -
-
-					if (str.IsNull(obj_p.LevelName) || obj_p.LevelName.ToString() == "Persistent_Level")
-					{
-						if (str.IsNull(obj_p.Name))
-						{
-							// Only PathName (... are we in an ArrayProperty?)
-							UIElement single = ControlFactory.Create(obj_p.PathName);
-							parent.AddRow(single);
-						}
-						else
-						{
-							// PathName + Name, so Name is our label
-							ctrl = ControlFactory.CreateSimple(obj_p.Name.ToString(), obj_p.PathName);
-							parent.AddRow(ctrl);
-						}
-						return parent;
-					}
-				}
-
-				/*TODO:
-				t = prop.TypeName
-				if t in globals():
-					cls = globals()[t]
-					cls(parent_pane, parent_sizer, name, prop)
-					return parent_pane, parent_sizer
-				*/
-				ctrl = ControlFactory.Create(name, prop);
-				if (ctrl != null)
-				{
-					parent.AddRow(ctrl);
-					return parent;
-				}
-			}
-
-			label = (prop != null) ? prop.ToString() : name;
-			Expando exp = new Expando(parent, label);
-
-			if (prop != null)
-			{
-				Dictionary<string,object> childs = prop.GetChilds();
-				if (childs.Count == 0)
-					exp.IsEnabled = false;
-				else
-					_AddRecurs(exp, childs);
-			}
-
-			return exp;
-		}
-
-		internal void _AddRecurs(Expando parent, Dictionary<string,object> childs)
-		{
-			// Sort children first by both their "type" and name
-	#region Sort children
-			var names = childs.Keys.OrderBy((s) => s);
-			List<string> simple = new List<string>();
-			List<string> simple2 = new List<string>();
-			List<string> props = new List<string>();
-			List<string> sets = new List<string>();
-			List<string> last = new List<string>();
-			foreach (string name in names)
-			{
-				object sub = childs[name];
-				if (sub is System.Collections.ICollection)//isinstance(sub, (list,dict)):
-				{
-					if (name == "Missing")
-						last.Add(name);
-					else if (name == "Unknown")//and isinstance(sub, list)):
-						last.Add(name);
-					else
-						sets.Add(name);
-				}
-				else if (sub is Property)
-				{
-					//Property prop = sub as Property;
-					//if (prop.TypeName in globals)
-					//if (sub is Entity)
-					//	simple2.Add(name);
-					//else
-					//	props.Add(name);
-					if (sub is Entity)
-						sets.Add(name);
-					else if (sub is ValueProperty)						
-						simple2.Add(name);
-					else
-						props.Add(name);
-				}
-				else
-					simple.Add(name);
-			}
-			List<string> order = new List<string>();
-			order.AddRange(simple);
-			order.AddRange(simple2);
-			order.AddRange(props);
-			order.AddRange(sets);
-			order.AddRange(last);
-	#endregion
-
-			foreach (string name in order)
-			{
-				object sub = childs[name];
-				Log.Info("_AddRecurs: {0}", sub != null ? sub.GetType() : sub);
-
-				// Some "specific" property names will do need special handling, e.g.
-				// - Length : Must be readonly as this will be calculated based on properties stored.
-				// - Missing: Should show a (readonly?) hex dump
-				ValueControl ctrl = ControlFactory.CreateNamed(name, sub);
-				if (ctrl != null)
-				{
-					parent.AddRow(ctrl);
-				}
-				else if (sub is System.Collections.IDictionary)
-				{
-					System.Collections.IDictionary e = sub as System.Collections.IDictionary;
-					string label = string.Format("{0} [{1}]", name, e.Count);
-					Expando sub_exp = _Add(parent, label, null);
-					if (e.Count == 0)
-					{
-						sub_exp.IsEnabled = false;
-					}
-					else
-					{
-						foreach (object key in e.Keys)
-						{
-							object obj = e[key];
-
-							label = key.ToString();
-							if (obj is Property)
-							{
-								_Add(sub_exp, label, (Property)obj);
-							}
-							else
-							{
-								sub_exp.AddRow(ControlFactory.CreateSimple(label, obj));
-							}
-						}
-					}
-				}
-				else if (sub is System.Collections.ICollection)
-				{
-					System.Collections.ICollection e = sub as System.Collections.ICollection;
-					string label = string.Format("{0} [{1}]", name, e.Count);
-					Expando sub_exp = _Add(parent, label, null);
-					if (e.Count == 0)
-						sub_exp.IsEnabled = false;
-					else
-						foreach (object obj in e)
-						{
-							label = obj.ToString();
-							if (obj is Property)
-							{
-								_Add(sub_exp, label, (Property)obj);
-							}
-							else
-							{
-								sub_exp.AddRow(ControlFactory.CreateSimple(label, obj));
-							}
-						}
-				}
-				else if (sub is Property)
-				{
-					_Add(parent, name, sub as Property);
-				}
-				else
-				{
-					parent.AddRow(ControlFactory.CreateSimple(name, sub));
-				}
-			}
-		}
-
-	}
-#endif
 
 
 	// Basic controls avail
@@ -2318,9 +2121,10 @@ namespace SatisfactorySavegameTool.Panels.Details
 			P.Object prop = Tag as P.Object;
 			P.Entity entity = prop.EntityObj as P.Entity;
 
-			// Add "mAdjustedSizeDiff"
+			// Add optional "mAdjustedSizeDiff"
 			P.ValueProperty inv_size = entity.Value.Named("mAdjustedSizeDiff") as P.ValueProperty;
-			_childs.Add(MainFactory.Create(this, "Extra slots", inv_size != null ? inv_size.Value : 0));
+			if (inv_size != null)
+				_childs.Add(MainFactory.Create(this, "Extra slots", inv_size.Value));
 
 			P.ArrayProperty arr;
 			P.StructProperty stru;
@@ -3376,6 +3180,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 	}
 
 
+	#region EXPERIMENTAL
 	// EXPERIMENTAL viewers
 	//
 
@@ -3668,5 +3473,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 			: base(parent, label, obj)
 		{ }
 	}
+	#endregion
 
 }

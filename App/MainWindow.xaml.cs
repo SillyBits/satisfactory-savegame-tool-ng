@@ -282,6 +282,7 @@ namespace SatisfactorySavegameTool
 			}
 
 			ProgressDialog progress = new ProgressDialog(this, Translate._("MainWindow.LoadGamefile.Progress.Title"));
+			progress.Interval = 1024 * 128;
 
 			await Task.Run(() => {
 				DateTime start_time = DateTime.Now;
@@ -298,8 +299,8 @@ namespace SatisfactorySavegameTool
 				Log.Info("... loaded a total of {0} elements", CurrFile.TotalElements);
 
 				Log.Info("Creating tree ...");
-				progress.CounterFormat = Translate._("MainWindow.LoadGamefile.Progress.CounterFormat.2");
-				//progress.Interval = 1000;
+				//progress.CounterFormat = Translate._("MainWindow.LoadGamefile.Progress.CounterFormat.2");
+				progress.Interval = 10000;
 				//TreeView.CreateTree(progress.Events);
 				TreeView.CreateTrees(progress.Events);
 				Log.Info("... finished creating tree");
@@ -327,7 +328,7 @@ namespace SatisfactorySavegameTool
 		{
 			ProgressDialog progress = new ProgressDialog(this, "Exporting save ..."/*Translate._("MainWindow.LoadGamefile.Progress.Title")*/);
 			progress.CounterFormat = "{0} / {1} elements";//Translate._("MainWindow.LoadGamefile.Progress.CounterFormat.2");
-			progress.Interval = 100;
+			progress.Interval = 1000;
 
 			int count = 0;
 
@@ -335,7 +336,7 @@ namespace SatisfactorySavegameTool
 				Log.Info("Exporting file '{0}'\n"
 					   + "-> to          '{1}'", 
 					   CurrFile.Filename, export_file);
-				((ICallback)progress.Events).Start(CurrFile.TotalElements, "Exporting ...", "");
+				progress.Events.Start(CurrFile.TotalElements, "Exporting ...", "");
 
 				DateTime start_time = DateTime.Now;
 
@@ -344,9 +345,8 @@ namespace SatisfactorySavegameTool
 				sw.Write("/ Header\n");
 				//Dumper.Indent(1, 9);
 				++count;
-				((ICallback)progress.Events).Update(count, null, CurrFile.Header.ToString());
+				progress.Events.Update(count, null, CurrFile.Header.ToString());
 				Dumper.Dump(CurrFile.Header, sw.Write);
-				sw.Flush();
 				//Dumper.Unindent(1);
 				sw.Write("\\ Header\n");
 
@@ -355,9 +355,8 @@ namespace SatisfactorySavegameTool
 				foreach (Property prop in CurrFile.Objects)
 				{
 					++count;
-					((ICallback)progress.Events).Update(count, null, prop.ToString());
+					progress.Events.Update(count, null, prop.ToString());
 					Dumper.Dump(prop, sw.Write);
-					sw.Flush();
 				}
 				//Dumper.Unindent(1);
 				sw.Write("\\ Objects\n");
@@ -367,9 +366,8 @@ namespace SatisfactorySavegameTool
 				foreach (Property prop in CurrFile.Collected)
 				{
 					++count;
-					((ICallback)progress.Events).Update(count, null, prop.ToString());
+					progress.Events.Update(count, null, prop.ToString());
 					Dumper.Dump(prop, sw.Write);
-					sw.Flush();
 				}
 				//Dumper.Unindent(1);
 				sw.Write("\\ Collected\n");
@@ -380,10 +378,9 @@ namespace SatisfactorySavegameTool
 				TimeSpan ofs = end_time - start_time;
 				Log.Info("Finished exporting, took {0}", ofs);
 
-				((ICallback)progress.Events).Stop("Done", "");
+				progress.Events.Stop("Done", "");
 			});
 
-			progress.Events.Stop();
 			MessageBox.Show("Done");
 		}
 #endregion
