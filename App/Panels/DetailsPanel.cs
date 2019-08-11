@@ -2470,6 +2470,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 			};
 			if (add_stacklimit)
 				new ListViewControl.ColumnDefinition("Stack limit", 75);
+			else
+				columns.Add(new ListViewControl.ColumnDefinition("", 0));
 			if (add_allowed)
 				columns.Add(new ListViewControl.ColumnDefinition("Allowed", 250));
 			ListViewControl lvc = new ListViewControl(columns.ToArray());
