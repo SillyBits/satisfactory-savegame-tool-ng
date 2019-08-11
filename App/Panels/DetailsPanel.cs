@@ -2279,7 +2279,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 				new ListViewControl.ColumnDefinition("Count", 50),
 			};
 			if (add_stacklimit)
-				new ListViewControl.ColumnDefinition("Stack limit", 75);
+				columns.Add(new ListViewControl.ColumnDefinition("Stack limit", 75));
 			else
 				columns.Add(new ListViewControl.ColumnDefinition("", 0));
 			if (add_allowed)
