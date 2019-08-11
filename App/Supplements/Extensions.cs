@@ -93,19 +93,30 @@ namespace SatisfactorySavegameTool.Supplements
 
 
 		// Find a property by it's path name
-		internal static P.Property FindByPathName(this P.Properties props, str pathname)
+		internal static P.Property FindByPathName(this P.Properties props, str pathname, bool case_insensitive = false)
 		{
-			return props.FindByPathName(pathname.ToString());
+			return props.FindByPathName(pathname.ToString(), case_insensitive);
 		}
 
-		internal static P.Property FindByPathName(this P.Properties props, string pathname)
+		internal static P.Property FindByPathName(this P.Properties props, string pathname, bool case_insensitive = false)
 		{
+			if (case_insensitive)
+			{
+				string _pathname = pathname.ToLower();
+				return props.Find(prop => {
+					return ((prop is P.Object) && (prop as P.Object).PathName.ToString().ToLower() == _pathname) 
+						|| ((prop is P.Actor ) && (prop as P.Actor ).PathName.ToString().ToLower() == _pathname)
+						;
+				});
+			}
+
 			return props.Find(prop => {
 				return ((prop is P.Object) && (prop as P.Object).PathName.ToString() == pathname) 
 					|| ((prop is P.Actor ) && (prop as P.Actor ).PathName.ToString() == pathname)
 					;
 			});
 		}
+
 
 		// Check float for being with range of value given
 		internal static bool IsNear(this float val, float near, float range = float.Epsilon)
