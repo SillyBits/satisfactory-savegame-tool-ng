@@ -2284,19 +2284,18 @@ namespace SatisfactorySavegameTool.Panels.Details
 				});
 			}
 
-			List<ListViewControl.ColumnDefinition> columns = new List<ListViewControl.ColumnDefinition>() {
-				new ListViewControl.ColumnDefinition("#", 50),
-				new ListViewControl.ColumnDefinition("Item", 250),
-				new ListViewControl.ColumnDefinition("Count", 50),
-			};
+			List<ListViewControl.ColumnDefinition> columns = new List<ListViewControl.ColumnDefinition>();
+			columns.Add(new ListViewControl.ColumnDefinition("#", 25));
+			columns.Add(new ListViewControl.ColumnDefinition("Item", 150));
+			columns.Add(new ListViewControl.ColumnDefinition("Count", 50));
 			if (add_stacklimit)
-				columns.Add(new ListViewControl.ColumnDefinition("Stack limit", 75));
+				columns.Add(new ListViewControl.ColumnDefinition("Stack limit", 60));
 			else
 				columns.Add(new ListViewControl.ColumnDefinition("", 0));
 			if (add_allowed)
-				columns.Add(new ListViewControl.ColumnDefinition("Allowed", 250));
+				columns.Add(new ListViewControl.ColumnDefinition("Allowed", 150));
 			ListViewControl lvc = new ListViewControl(columns.ToArray());
-			lvc.Label = "Items";
+			//lvc.Label = "Items";
 			lvc.Value = rows;
 
 			_childs.Add(lvc);
@@ -2430,7 +2429,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 			ListViewControl.ColumnDefinition[] columns = {
 				new ListViewControl.ColumnDefinition("#", 50),
-				new ListViewControl.ColumnDefinition("Building", 250),
+				new ListViewControl.ColumnDefinition("Building", 300),
 			};
 
 			foreach(KeyValuePair<int, P.MapProperty.Entry> pair in map_prop.Value)
@@ -2515,11 +2514,11 @@ namespace SatisfactorySavegameTool.Panels.Details
 			}
 
 			ListViewControl.ColumnDefinition[] columns = {
-				new ListViewControl.ColumnDefinition("#", 50),
-				new ListViewControl.ColumnDefinition("Recipe", 250),
+				new ListViewControl.ColumnDefinition("#", 25),
+				new ListViewControl.ColumnDefinition("Recipe", 300),
 			};
 			ListViewControl lvc = new ListViewControl(columns);
-			lvc.Label = "Recipes";
+			//lvc.Label = "Recipes";
 			lvc.Value = rows;
 
 			_childs.Add(lvc);
@@ -2575,8 +2574,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 			List<P.PhaseCost> costs = stru.Value.ListOf<P.PhaseCost>();
 
 			ListViewControl.ColumnDefinition[] columns = {
-				new ListViewControl.ColumnDefinition("#", 50),
-				new ListViewControl.ColumnDefinition("Item", 250),
+				new ListViewControl.ColumnDefinition("#", 25),
+				new ListViewControl.ColumnDefinition("Item", 300),
 				new ListViewControl.ColumnDefinition("Count", 50),
 			};
 
@@ -2671,7 +2670,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 				}
 
 				ListViewControl lvc = new ListViewControl(columns);
-				lvc.Label = "Items";
+				//lvc.Label = "Items";
 				lvc.Value = rows;
 
 				string label = string.Format("Phase: {0}", gamephase.Value);
@@ -2733,9 +2732,9 @@ namespace SatisfactorySavegameTool.Panels.Details
 			List<P.ResearchCost> costs = stru.Value.ListOf<P.ResearchCost>();
 
 			ListViewControl.ColumnDefinition[] columns = {
-				new ListViewControl.ColumnDefinition("#", 50),
-				new ListViewControl.ColumnDefinition("Research", 250),
-				new ListViewControl.ColumnDefinition("Item", 250),
+				new ListViewControl.ColumnDefinition("#", 25),
+				new ListViewControl.ColumnDefinition("Research", 150),
+				new ListViewControl.ColumnDefinition("Item", 150),
 				new ListViewControl.ColumnDefinition("Count", 50),
 			};
 			List<object[]> rows = new List<object[]>();
@@ -2836,7 +2835,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			}
 
 			ListViewControl lvc = new ListViewControl(columns);
-			lvc.Label = "Researchs";
+			//lvc.Label = "Researchs";
 			lvc.Value = rows;
 
 			_childs.Add(lvc);

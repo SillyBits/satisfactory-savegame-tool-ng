@@ -355,7 +355,7 @@ namespace SatisfactorySavegameTool
 				//Dumper.Indent(1, 9);
 				++count;
 				progress.Events.Update(count, null, CurrFile.Header.ToString());
-				Dumper.Dump(CurrFile.Header, sw.Write);
+				Savegame.Properties.Dumper.Dump(CurrFile.Header, sw.Write);
 				//Dumper.Unindent(1);
 				sw.Write("\\ Header\n");
 
@@ -365,7 +365,7 @@ namespace SatisfactorySavegameTool
 				{
 					++count;
 					progress.Events.Update(count, null, prop.ToString());
-					Dumper.Dump(prop, sw.Write);
+					Savegame.Properties.Dumper.Dump(prop, sw.Write);
 				}
 				//Dumper.Unindent(1);
 				sw.Write("\\ Objects\n");
@@ -376,7 +376,7 @@ namespace SatisfactorySavegameTool
 				{
 					++count;
 					progress.Events.Update(count, null, prop.ToString());
-					Dumper.Dump(prop, sw.Write);
+					Savegame.Properties.Dumper.Dump(prop, sw.Write);
 				}
 				//Dumper.Unindent(1);
 				sw.Write("\\ Collected\n");

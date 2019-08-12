@@ -170,6 +170,7 @@
 	<Desc_CartridgeStandard_C>Cartridge Standard</Desc_CartridgeStandard_C>
 	<Desc_Cement_C>Cement</Desc_Cement_C>
 	<Desc_CircuitBoard_C>Circuit Board</Desc_CircuitBoard_C>
+	<Desc_CircuitBoardHighSpeed_C>A.I. Limiter</Desc_CircuitBoardHighSpeed_C>
 	<Desc_Coal_C>Coal</Desc_Coal_C>
 	<Desc_ColorCartridge_C>Color Cartridge</Desc_ColorCartridge_C>
 	<Desc_CompactedCoal_C>Compacted Coal</Desc_CompactedCoal_C>
