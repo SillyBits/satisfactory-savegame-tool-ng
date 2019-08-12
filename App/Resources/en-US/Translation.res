@@ -9,6 +9,8 @@
 	<No>No</No>
 	<Save>Save ...</Save>
 	<Browse>Browse ...</Browse>
+	<Up>Up</Up>
+	<Down>Down</Down>
 
 	<MainWindow.Title>Satisfactory Savegame Tool</MainWindow.Title>
 	
@@ -89,6 +91,12 @@ This includes, for example, items on conveyors or wire connections.
 But if activated, this will increase load times dramatically!
 So activate only in case normal analysis won't do.</OptionsDialog.DeepAnalysis.Hint>
 	<OptionsDialog.DeepAnalysis.Enable>Enable deep analysis</OptionsDialog.DeepAnalysis.Enable>
+	<OptionsDialog.Trees.Title>Trees</OptionsDialog.Trees.Title>
+	<OptionsDialog.Trees.Hint>Here you can select which trees to show and populate when loading a save.
+
+Use the checkbox to en-/disable specific trees.
+Use the Up/Down buttons to change a trees position.
+</OptionsDialog.Trees.Hint>
 	<OptionsDialog.Reporting.Title>Reporting</OptionsDialog.Reporting.Title>
 	<OptionsDialog.CrashReports>Crash Reports</OptionsDialog.CrashReports>
 	<OptionsDialog.CrashReports.Hint>This program is capable of reporting crashes.

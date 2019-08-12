@@ -511,9 +511,9 @@ namespace SatisfactorySavegameTool.Panels
 	}
 
 
-	public class PathTree : BasicTree
+	public class PathsTree : BasicTree
 	{
-		public PathTree()
+		public PathsTree()
 			: base()
 		{ }
 

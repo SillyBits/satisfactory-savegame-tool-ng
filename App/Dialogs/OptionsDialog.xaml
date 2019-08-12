@@ -49,6 +49,7 @@
 		</Style>
 		<coll:Languages x:Key="langData" />
 		<conv:LanguageConverter x:Key="langConvert" />
+		<coll:TreeOptions x:Key="treeoptionsData" />
 	</Window.Resources>
 
 	<Grid x:Name="grid" Margin="5,5">
@@ -154,6 +155,53 @@
 							<CheckBox x:Name="deep_analysis" Grid.Row="1" Content="{lang:Translate Key=OptionsDialog.DeepAnalysis.Enable}" />
 						</Grid>
 					</GroupBox>
+					
+				</Grid>
+			</TabItem>
+			
+			<TabItem Header="{lang:Translate Key=OptionsDialog.Trees.Title}">
+				<Grid Margin="5,5">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="300" />
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" SharedSizeGroup="colGroup" />
+					</Grid.ColumnDefinitions>
+
+					<Grid Grid.Row="0" Grid.Column="0">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="auto" />
+							<RowDefinition Height="auto" />
+						</Grid.RowDefinitions>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="5" />
+							<ColumnDefinition Width="80" />
+						</Grid.ColumnDefinitions>
+
+						<Label Grid.Row="0" Grid.ColumnSpan="2" Content="{lang:Translate Key=OptionsDialog.Trees.Hint}" />
+						
+						<ListBox Grid.Row="1" Grid.Column="0" x:Name="trees" SelectionMode="Single" SelectionChanged="trees_SelectionChanged"
+								 HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalAlignment="Stretch"
+								 ItemsSource="{StaticResource treeoptionsData}" >
+							<ListBox.ItemTemplate>
+								<DataTemplate>
+									<StackPanel Orientation="Horizontal" Margin="3" HorizontalAlignment="Stretch">
+										<CheckBox IsChecked="{Binding Enabled}" Margin="0,0,10,0" VerticalAlignment="Center" />
+										<Image Width="20" Height="20" Source="{Binding Image}" Margin="0,0,10,0" VerticalAlignment="Center" />
+										<TextBlock Text="{Binding Title}" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
+									</StackPanel>
+								</DataTemplate>
+							</ListBox.ItemTemplate>
+						</ListBox>
+					
+						<StackPanel Grid.Row="1" Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center">
+							<Button x:Name="upButton" Content="{lang:Translate Key=Up}" Click="upButton_Click" 
+									Width="50" Margin="0,0,0,5" />
+							<Button x:Name="downButton" Content="{lang:Translate Key=Down}" Click="downButton_Click"
+									Width="50" />
+						</StackPanel>
+					</Grid>
 					
 				</Grid>
 			</TabItem>

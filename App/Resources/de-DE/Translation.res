@@ -9,6 +9,8 @@
 	<No>Nein</No>
 	<Save>Speichern ...</Save>
 	<Browse>Durchsuchen ...</Browse>
+	<Up>Hoch</Up>
+	<Down>Runter</Down>
 	
 	<MainWindow.Title>Satisfactory Spielstand Helfer</MainWindow.Title>
 	
@@ -89,6 +91,13 @@ Dies beinhaltet z.B. die Gegenstände auf einem Band oder Stromverbindungen.\n
 Wenn aktiv wird dies aber beträchtlichen Einfluss auf die Ladezeit haben!\n
 Sollte nur aktiviert werden wenn die normale Analyse erfolglos war.</OptionsDialog.DeepAnalysis.Hint>
 	<OptionsDialog.DeepAnalysis.Enable>Tiefenanalyse aktivieren</OptionsDialog.DeepAnalysis.Enable>
+	<OptionsDialog.Trees.Title>Bäume</OptionsDialog.Trees.Title>
+	<OptionsDialog.Trees.Hint>Hier kannst Sichtbarkeit und Reihenfolge der Bäume konfigurieren die beim 
+Laden eines Spielstands erzeugt werden sollen.
+
+Mit dem Kontrollkästchen werden die Bäume aktiviert bzw. deaktiviert.
+Mit den Hoch/Runter Knöpfen kannst Du die Reihenfolge beeinflussen.
+</OptionsDialog.Trees.Hint>
 	<OptionsDialog.Reporting.Title>Berichte</OptionsDialog.Reporting.Title>
 	<OptionsDialog.CrashReports>Absturzberichte</OptionsDialog.CrashReports>
 	<OptionsDialog.CrashReports.Hint>Dieses Programm ist fähig Absturzberichte zu versenden.\n

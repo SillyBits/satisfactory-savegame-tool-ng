@@ -13,6 +13,8 @@ using Microsoft.Win32;
 
 using F = System.Windows.Forms;
 
+using CoreLib;
+
 
 namespace SatisfactorySavegameTool.Dialogs
 {
@@ -40,6 +42,9 @@ namespace SatisfactorySavegameTool.Dialogs
 			defaultpath.Text = Path.GetFullPath(Config.Root.core.defaultpath);
 			exportpath.Text = Path.GetFullPath(Config.Root.core.exportpath.Length > 0 ? Config.Root.core.exportpath : Settings.EXPORTPATH);
 			deep_analysis.IsChecked = Config.Root.deep_analysis.enabled;
+
+			trees.SelectedIndex = 0;
+									
 			crash_reports.IsChecked = Config.Root.crash_reports.enabled;
 			incident_reports.IsChecked = Config.Root.incident_reports.enabled;
 			online_map.IsEnabled = Config.Root.online_mapping.enabled;
@@ -69,6 +74,32 @@ namespace SatisfactorySavegameTool.Dialogs
 			}
 		}
 
+		private void trees_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			upButton.IsEnabled   = trees.SelectedIndex > 0;
+			downButton.IsEnabled = trees.SelectedIndex < (trees.Items.Count - 1);
+		}
+
+		private void upButton_Click(object sender, RoutedEventArgs e)
+		{
+			int index = trees.SelectedIndex;
+			Collections.TreeOptions options = trees.ItemsSource as Collections.TreeOptions;
+			Collections.TreeOption selected = options[index];
+			options.RemoveAt(index);
+			options.Insert(index - 1, selected);
+			trees.SelectedIndex = index - 1;
+		}
+
+		private void downButton_Click(object sender, RoutedEventArgs e)
+		{
+			int index = trees.SelectedIndex;
+			Collections.TreeOptions options = trees.ItemsSource as Collections.TreeOptions;
+			Collections.TreeOption selected = options[index];
+			options.RemoveAt(index);
+			options.Insert(index + 1, selected);
+			trees.SelectedIndex = index + 1;
+		}
+
 		private void Save_Click(object sender, RoutedEventArgs e)
 		{
 			if (languages.SelectedItem != null)
@@ -78,6 +109,15 @@ namespace SatisfactorySavegameTool.Dialogs
 			if (exportpath.Text.Length > 0)
 				Config.Root.core.exportpath = Path.GetFullPath(exportpath.Text);
 			Config.Root.deep_analysis.enabled = deep_analysis.IsChecked;
+
+			int order = 0;
+			foreach (Collections.TreeOption option in trees.ItemsSource as Collections.TreeOptions)
+			{
+				Config.Root.trees.order[order] = option.Name;
+				Config.Root.trees.Items[option.Name].Value = option.Enabled;
+				++order;
+			}
+
 			Config.Root.crash_reports.enabled = crash_reports.IsChecked;
 			Config.Root.incident_reports.enabled = incident_reports.IsChecked;
 			Config.Root.online_mapping.enabled = online_map.IsChecked;
@@ -119,6 +159,34 @@ namespace SatisfactorySavegameTool.Dialogs.Collections
 		{
 			Add(new Language(Translate._("OptionsDialog.Language.English"), "en-US" ));
 			Add(new Language(Translate._("OptionsDialog.Language.German"), "de-DE" ));
+		}
+	}
+
+
+	public class TreeOption
+	{
+		public string       Name    { get; private set; }
+		public string       Title   { get; private set; }
+		public bool         Enabled { get; set; }
+		public BitmapSource Image   { get; private set; }
+
+		internal TreeOption(string name)
+		{
+			string capital = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(name);
+
+			Name    = name;
+			Title   = Translate._("TreePanel.Tab." + capital);
+			Enabled = (bool) Config.Root.trees.Items[name].Value;
+			Image   = new BitmapImage(Helpers.GetResourceUri("Icon.TreePanel." + capital + ".png"));
+		}
+	}
+
+	public class TreeOptions : ObservableCollection<TreeOption>
+	{
+		public TreeOptions()
+		{
+			foreach(string tree in Config.Root.trees.order)
+				Add(new TreeOption(tree));
 		}
 	}
 
