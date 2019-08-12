@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -27,8 +28,6 @@ namespace SatisfactorySavegameTool.Panels
 	 * 
 	 * - Add better tree style handling
 	 * 
-	 * - Building trees in background an option? (all besides the initial one)
-	 * 
 	 */
 	
 	public class TreePanel : TabControl
@@ -36,83 +35,71 @@ namespace SatisfactorySavegameTool.Panels
 		public TreePanel()
 			: base()
 		{
-			Func<string,string,BasicTree,TabItem> createTab = (title,icon,tree) => {
-				TabItem tab = new TabItem();
-				StackPanel sp = new StackPanel() {
-					Orientation = Orientation.Horizontal,
-				};
-				sp.Children.Add(new Image() {
-					Source = new BitmapImage(Helpers.GetResourceUri(icon)),
-					Width = 20,
-					Height = 20,
-				});
-				sp.Children.Add(new Label() {
-					Content = Translate._(title),
-				});
-				tab.Header = sp;
-				tab.Content = tree;
-				return tab;
-			};
+			_Tabs = new List<TabItem>();
+			foreach(string tree in Config.Root.trees.order)
+			{
+				Item config_item = Config.Root.trees.Items[tree];
+				if ((bool)config_item.Value)
+				{
+					string name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tree);
+					string icon = "Icon.TreePanel." + name + ".png";
+					string title = "TreePanel.Tab." + name;
 
-			////TODO: Suitable icon for 'simple'
-			//_treeSimple = new SimpleTree();
-			//_tabSimple = new TabItem() { Header = Translate._("TreePanel.Tab.Simple"), };
-			//_tabSimple.Content = _treeSimple;
-			//AddChild(_tabSimple);
+					Type type = Type.GetType("SatisfactorySavegameTool.Panels." + name + "Tree");
+					if (type == null)
+					{
+						Log.Error("Unknown tree '{0}' in config file!", name);
+						continue;
+					}
+					BasicTree instance = Activator.CreateInstance(type) as BasicTree;
+					if (instance == null)
+					{
+						Log.Error("Unable to create instance of tree '{0}'!", name);
+						continue;
+					}
 
-			_treeClasses = new ClassesTree();
-			_tabClasses = createTab("TreePanel.Tab.Classes", "Icon.TreePanel.Classes.png", _treeClasses);
-			AddChild(_tabClasses);
+					StackPanel sp = new StackPanel() {
+						Orientation = Orientation.Horizontal,
+					};
+					sp.Children.Add(new Image() {
+						Source = new BitmapImage(Helpers.GetResourceUri(icon)),
+						Width = 20,
+						Height = 20,
+					});
+					sp.Children.Add(new Label() {
+						Content = Translate._(title),
+					});
 
-			//_treePaths = new PathTree();
-			//_tabPaths = createTab("TreePanel.Tab.Paths", "Icon.TreePanel.Paths.png", _treePaths);
-			//AddChild(_tabPaths);
-
-			_treeLiving = new LivingTree();
-			_tabLiving = createTab("TreePanel.Tab.Living", "Icon.TreePanel.Living.png", _treeLiving);
-			AddChild(_tabLiving);
-
-			_treeBuildings = new BuildingsTree();
-			_tabBuildings = createTab("TreePanel.Tab.Buildings", "Icon.TreePanel.Buildings.png", _treeBuildings);
-			AddChild(_tabBuildings);
+					TabItem tab = new TabItem() {
+						Header = sp,
+						Content = instance,
+					};
+					_Tabs.Add(tab);
+					AddChild(tab);
+				}
+			}
 		}
 
 		public void CreateTrees(ICallback callback)
 		{
-			//if (_treeSimple != null) _treeSimple.CreateTree(callback);
-			if (_treeClasses != null) _treeClasses.CreateTree(callback);
-			//if (_treePaths != null) _treePaths.CreateTree(callback);
-			if (_treeLiving != null) _treeLiving.CreateTree(callback);
-			if (_treeBuildings != null) _treeBuildings.CreateTree(callback);
+			foreach (TabItem tab in _Tabs)
+			{
+				BasicTree tree = Dispatcher.Invoke(() => { return tab.Content as BasicTree; });
+				tree.CreateTree(callback);
+			}
 
-			Dispatcher.Invoke(() => SelectedItem = _tabClasses);
+			if (_Tabs.Count > 0)
+				Dispatcher.Invoke(() => SelectedItem = _Tabs.First().Content);
 		}
 
 		public void ClearTrees()
 		{
-			//if (_treeSimple != null) _treeSimple.ClearTree();
-			if (_treeClasses != null) _treeClasses.ClearTree();
-			//if (_treePaths != null) _treePaths.ClearTree();
-			if (_treeLiving != null) _treeLiving.ClearTree();
-			if (_treeBuildings != null) _treeBuildings.ClearTree();
+			foreach (TabItem tab in _Tabs)
+				(tab.Content as BasicTree).ClearTree();
 		}
 
 
-		//internal TabItem _tabSimple;
-		//internal BasicTree _treeSimple;
-
-		internal TabItem _tabClasses;
-		internal BasicTree _treeClasses;
-
-		//internal TabItem _tabPaths;
-		//internal BasicTree _treePaths;
-
-		internal TabItem _tabLiving;
-		internal BasicTree _treeLiving;
-
-		internal TabItem _tabBuildings;
-		internal BasicTree _treeBuildings;
-
+		private List<TabItem> _Tabs;
 
 		protected override void OnSelectionChanged(SelectionChangedEventArgs e)
 		{
