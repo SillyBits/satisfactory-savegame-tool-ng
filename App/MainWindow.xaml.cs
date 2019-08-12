@@ -128,6 +128,8 @@ namespace SatisfactorySavegameTool
 				Details.ShowProperty(null);
 				TreeView.ClearTrees();
 			}
+
+			TreeView.IsEnabled = has_save;
 		}
 
 		protected override void OnKeyUp(KeyEventArgs e)
@@ -252,18 +254,23 @@ namespace SatisfactorySavegameTool
 			TreeView tv = sender as TreeView;
 			if (tv == null)
 				return;
-			TreeViewItem tvi = tv.SelectedItem as TreeViewItem;
-			if (tvi == null)
+			Panels.TreeNode node = tv.SelectedItem as Panels.TreeNode;
+			if (node == null)
 				return;
-			if (tvi.Tag is Property)
+			if (node.Tag is Property)
 			{
-				Property prop = tvi.Tag as Property;
+				Property prop = node.Tag as Property;
 				Details.ShowProperty(prop);
 			}
-			else if (tvi.Tag is Panels.LivingTree.Living)
+			else if (node.Tag is Panels.LivingTree.Living)
 			{
-				Panels.LivingTree.Living living = tvi.Tag as Panels.LivingTree.Living;
+				Panels.LivingTree.Living living = node.Tag as Panels.LivingTree.Living;
 				Details.ShowLiving(living);
+			}
+			else if (node.Tag is Panels.BuildingsTree.Building)
+			{
+				Panels.BuildingsTree.Building building = node.Tag as Panels.BuildingsTree.Building;
+				Details.ShowBuilding(building);
 			}
 		}
 #endregion
@@ -282,7 +289,6 @@ namespace SatisfactorySavegameTool
 			}
 
 			ProgressDialog progress = new ProgressDialog(this, Translate._("MainWindow.LoadGamefile.Progress.Title"));
-			progress.Interval = 1024 * 128;
 
 			await Task.Run(() => {
 				DateTime start_time = DateTime.Now;
@@ -294,13 +300,14 @@ namespace SatisfactorySavegameTool
 
 				Log.Info("Loading file '{0}'", filename);
 				progress.CounterFormat = Translate._("MainWindow.LoadGamefile.Progress.CounterFormat");
+				progress.Interval = 1024*1024;//1024 * 128;
 				CurrFile.Load(progress.Events);//, self.treeview)
 				Log.Info("Finished loading");
 				Log.Info("... loaded a total of {0} elements", CurrFile.TotalElements);
 
 				Log.Info("Creating tree ...");
 				//progress.CounterFormat = Translate._("MainWindow.LoadGamefile.Progress.CounterFormat.2");
-				progress.Interval = 10000;
+				progress.Interval = 1000;
 				//TreeView.CreateTree(progress.Events);
 				TreeView.CreateTrees(progress.Events);
 				Log.Info("... finished creating tree");
@@ -308,9 +315,11 @@ namespace SatisfactorySavegameTool
 				DateTime end_time = DateTime.Now;
 				TimeSpan ofs = end_time - start_time;
 				Log.Info("Loading took {0}", ofs);
-
-				Dispatcher.Invoke(() => { _UpdateUIState(); });
 			});
+
+			progress = null;
+
+			_UpdateUIState();
 		}
 
 		private async void _SaveGamefile(string filename)

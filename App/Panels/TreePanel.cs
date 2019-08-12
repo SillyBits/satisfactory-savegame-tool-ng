@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
@@ -119,6 +122,83 @@ namespace SatisfactorySavegameTool.Panels
 					TreeView.SelectedItemChangedEvent);
 			tree.RaiseEvent(ev);
 		}
+
+	}
+
+
+	public class TreeModel
+	{
+		public TreeNodes Nodes { get; private set; }
+
+		public TreeModel()
+		{
+			Nodes = new TreeNodes();
+		}
+	}
+
+	public class TreeNodes : ObservableCollection<TreeNode>
+	{
+		public TreeNode Add(string title, object tag)
+		{
+			TreeNode node = new TreeNode(title, tag);
+			Add(node);
+			return node;
+		}
+	}
+
+	public class TreeNode : INotifyPropertyChanged
+	{
+		public string    Title      { get; private set; }
+		public object    Tag        { get; private set; }
+		public TreeNodes Childs     { get; private set; }
+
+		public bool IsEnabled
+		{
+			get { return _enabled; }
+			set	{ _enabled = value; _Notify("IsEnabled"); }
+		}
+
+		public bool IsExpanded
+		{
+			get { return _expanded; }
+			set	{ _expanded = value; _Notify("IsExpanded"); }
+		}
+
+		public bool IsSelected
+		{
+			get { return _selected; }
+			set	{ _selected = value; _Notify("IsSelected"); }
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
+
+
+		public TreeNode(string title, object tag)
+		{
+			Title = title;
+			Tag = tag;
+			Childs = new TreeNodes();
+
+			_enabled = true;
+			_expanded = false;
+			_selected = false;
+		}
+
+		public TreeNode Add(string title, object tag)
+		{
+			TreeNode node = new TreeNode(title, tag);
+			Childs.Add(node);
+			return node;
+		}
+
+		private void _Notify(string prop)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+		}
+
+		private bool _enabled;
+		private bool _expanded;
+		private bool _selected;
 	}
 
 
@@ -129,6 +209,13 @@ namespace SatisfactorySavegameTool.Panels
 		{
 			SetValue(VirtualizingPanel.IsVirtualizingProperty, true);
 			SetValue(VirtualizingPanel.VirtualizationModeProperty, VirtualizationMode.Recycling);
+
+			Model = new TreeModel();
+			DataContext = Model;
+			ItemsSource = Model.Nodes;
+
+			ItemTemplate = FindResource("treeTemplate") as HierarchicalDataTemplate;
+			ItemContainerStyle = FindResource("treeitemStyle") as Style;
 		}
 
 
@@ -142,52 +229,48 @@ namespace SatisfactorySavegameTool.Panels
 				SelectedItemChanged -= (Application.Current.MainWindow as MainWindow).TreeView_SelectedItemChanged;
 				SelectedItemChanged += (Application.Current.MainWindow as MainWindow).TreeView_SelectedItemChanged;
 				_CreateContextMenu();
-				Items.Clear();
-				_callback.Start(MainWindow.CurrFile.TotalElements + extra, Translate._("MainWindow.LoadGamefile.Progress.Title.2"), "");
+				Model.Nodes.Clear();
 			});
 
+			_callback.Start(MainWindow.CurrFile.TotalElements + extra, Translate._("MainWindow.LoadGamefile.Progress.Title.2"), "");
 			_count = 0;
 
-			TreeViewItem root = _AddItem(null, System.IO.Path.GetFileName(MainWindow.CurrFile.Filename), null);
-			Dispatcher.Invoke(() => {
-				root.Tag = MainWindow.CurrFile.Header;
-			});
-
+			TreeNode root = _AddItem(null, Path.GetFileName(MainWindow.CurrFile.Filename), MainWindow.CurrFile.Header);
 			_CreateTree(root);
 
-			Dispatcher.Invoke(() => {
-				root.IsExpanded = true;
-				root.IsSelected = true;
-				_callback.Stop("", "");
-			});
+			root.IsExpanded = true;
+			root.IsSelected = true;
+
+			_callback.Stop("", "");
 		}
 
 		public void ClearTree()
 		{
-			Items.Clear();
+			Model.Nodes.Clear();
 		}
 
 
 		internal abstract int NoOfExtraElements { get; }
-		internal abstract void _CreateTree(TreeViewItem root);
+
+		internal abstract void _CreateTree(TreeNode root);
 
 
+		public TreeModel Model { get; private set; }
 		internal ICallback _callback;
 		internal long _count;
 
-		internal TreeViewItem _AddItem(TreeViewItem parent, string label, object tag = null)
+		internal TreeNode _AddItem(TreeNode parent, string label, object tag = null)
 		{
 			_count ++;
+			_callback.Update(_count, null, label);
+
 			return Dispatcher.Invoke(() => {
-				TreeViewItem item = new TreeViewItem();
-				item.Header = label;
-				item.Tag = tag;
-				if (parent != null)
-					parent.Items.Add(item);
+				TreeNode node;
+				if (parent == null)
+					node = Model.Nodes.Add(label, tag);
 				else
-					Items.Add(item);
-				_callback.Update(_count, null, label);
-				return item;
+					node = parent.Add(label, tag);
+				return node;
 			});
 		}
 
@@ -205,16 +288,21 @@ namespace SatisfactorySavegameTool.Panels
 
 		protected override void OnContextMenuOpening(ContextMenuEventArgs e)
 		{
-			TreeViewItem tvi = e.Source as TreeViewItem;
-			if (tvi == null)
+			if (!(e.OriginalSource is TextBlock))
 			{
 				e.Handled = true;
 				return;
 			}
-			if (!tvi.IsSelected)
-				tvi.IsSelected = true;
+			TreeNode node = (e.OriginalSource as TextBlock).DataContext as TreeNode;
+			if (node == null)
+			{
+				e.Handled = true;
+				return;
+			}
+			if (!node.IsSelected)
+				node.IsSelected = true;
 
-			if (tvi.Tag is P.Property) // || ...)
+			if (node.Tag is P.Property) // || ...)
 			{
 			}
 			else
@@ -228,11 +316,11 @@ namespace SatisfactorySavegameTool.Panels
 
 		private void Contextmenu_Inspect_Click(object sender, RoutedEventArgs e)
 		{
-			TreeViewItem tvi = SelectedItem as TreeViewItem;
-			if (tvi == null)
+			TreeNode node = SelectedItem as TreeNode;
+			if (node == null)
 				return;
 
-			P.Property prop = tvi.Tag as P.Property;
+			P.Property prop = node.Tag as P.Property;
 			if (prop == null)
 				return;
 
@@ -254,15 +342,15 @@ namespace SatisfactorySavegameTool.Panels
 
 		internal override int NoOfExtraElements { get { return 3; } }
 
-		internal override void _CreateTree(TreeViewItem root)
+		internal override void _CreateTree(TreeNode root)
 		{
-			String label = string.Format(Translate._("TreePanel.Tree.Objects"), MainWindow.CurrFile.Objects.Count);
-			TreeViewItem objects = _AddItem(root, label, null);
+			string label = string.Format(Translate._("TreePanel.Tree.Objects"), MainWindow.CurrFile.Objects.Count);
+			TreeNode objects = _AddItem(root, label, null);
 			foreach (P.Property prop in MainWindow.CurrFile.Objects)
 				_AddItem(objects, prop.ToString(), prop);
 
 			label = string.Format(Translate._("TreePanel.Tree.Collected"), MainWindow.CurrFile.Collected.Count);
-			TreeViewItem collected = _AddItem(root, label, null);
+			TreeNode collected = _AddItem(root, label, null);
 			foreach (P.Property prop in MainWindow.CurrFile.Collected)
 				_AddItem(collected, prop.ToString(), prop);
 
@@ -289,9 +377,9 @@ namespace SatisfactorySavegameTool.Panels
 			}
 		}
 
-		internal override void _CreateTree(TreeViewItem root)
+		internal override void _CreateTree(TreeNode root)
 		{
-			_classes = new Dictionary<string,TreeViewItem>();
+			_classes = new Dictionary<string,TreeNode>();
 
 			foreach (P.Property prop in MainWindow.CurrFile.Objects)
 				_AddClassRecurs(root, "/", prop);
@@ -304,10 +392,10 @@ namespace SatisfactorySavegameTool.Panels
 			//	self.__add(self.root, label, self.__savegame.Missing)
 		}
 
-		internal TreeViewItem _AddClassRecurs(TreeViewItem parent, string path, Savegame.Properties.Property prop)
+		internal TreeNode _AddClassRecurs(TreeNode parent, string path, Savegame.Properties.Property prop)
 		{
 			string classname, fullname, label;
-			TreeViewItem class_item;
+			TreeNode class_item;
 
 			string ClassName, PathName;
 			if (prop is P.Actor)//.TypeName == "Actor")
@@ -318,7 +406,7 @@ namespace SatisfactorySavegameTool.Panels
 			}
 			else if (prop is P.Object)//.TypeName == "Object")
 			{
-				Savegame.Properties.Object obj = (Savegame.Properties.Object) prop;
+				P.Object obj = (P.Object) prop;
 				ClassName = obj.ClassName.ToString();
 				PathName = obj.PathName.ToString();
 			}
@@ -413,16 +501,16 @@ namespace SatisfactorySavegameTool.Panels
 			return _AddItem(parent, label, prop);
 		}
 
-		internal TreeViewItem _AddOrGetClass(TreeViewItem parent, string fullname, string classname)
+		internal TreeNode _AddOrGetClass(TreeNode parent, string fullname, string classname)
 		{
 			if (_classes.ContainsKey(fullname))
 				return _classes[fullname];
-			TreeViewItem class_item = _AddItem(parent, classname);
+			TreeNode class_item = _AddItem(parent, classname);
 			_classes.Add(fullname, class_item);
 			return class_item;
 		}
 
-		internal Dictionary<string,TreeViewItem> _classes;
+		internal Dictionary<string, TreeNode> _classes;
 
 	}
 
@@ -435,9 +523,9 @@ namespace SatisfactorySavegameTool.Panels
 
 		internal override int NoOfExtraElements { get { return 150; } }
 
-		internal override void _CreateTree(TreeViewItem root)
+		internal override void _CreateTree(TreeNode root)
 		{
-			_paths = new Dictionary<string,TreeViewItem>();
+			_paths = new Dictionary<string, TreeNode>();
 
 			foreach (P.Property prop in MainWindow.CurrFile.Objects)
 				_AddTreeRecurs(root, "", prop);
@@ -446,10 +534,10 @@ namespace SatisfactorySavegameTool.Panels
 				_AddTreeRecurs(root, "", prop);
 		}
 
-		internal TreeViewItem _AddTreeRecurs(TreeViewItem parent, string path, P.Property prop)
+		internal TreeNode _AddTreeRecurs(TreeNode parent, string path, P.Property prop)
 		{
 			string pathname, fullname, label;
-			TreeViewItem path_item;
+			TreeNode path_item;
 
 			string PathName;
 			if (prop is P.Actor)
@@ -459,7 +547,7 @@ namespace SatisfactorySavegameTool.Panels
 			}
 			else if (prop is P.Object)
 			{
-				Savegame.Properties.Object obj = (P.Object) prop;
+				P.Object obj = (P.Object) prop;
 				PathName = obj.PathName.ToString();
 			}
 			else if (prop is P.Collected)
@@ -522,16 +610,16 @@ namespace SatisfactorySavegameTool.Panels
 			return _AddItem(parent, label, prop);
 		}
 
-		internal TreeViewItem _AddOrGetPath(TreeViewItem parent, string fullname, string pathname)
+		internal TreeNode _AddOrGetPath(TreeNode parent, string fullname, string pathname)
 		{
 			if (_paths.ContainsKey(fullname))
 				return _paths[fullname];
-			TreeViewItem path_item = _AddItem(parent, pathname);
+			TreeNode path_item = _AddItem(parent, pathname);
 			_paths.Add(fullname, path_item);
 			return path_item;
 		}
 
-		internal Dictionary<string,TreeViewItem> _paths;
+		internal Dictionary<string, TreeNode> _paths;
 
 	}
 
@@ -544,9 +632,9 @@ namespace SatisfactorySavegameTool.Panels
 
 		internal override int NoOfExtraElements { get { return 0; } }
 
-		internal override void _CreateTree(TreeViewItem root)
+		internal override void _CreateTree(TreeNode root)
 		{
-			_classes = new Dictionary<string,TreeViewItem>();
+			_classes = new Dictionary<string, TreeNode>();
 
 			var living = MainWindow.CurrFile.Objects
 				.Where(p => p is P.Actor)
@@ -554,29 +642,27 @@ namespace SatisfactorySavegameTool.Panels
 				.Where(a => a.ClassName.ToString().StartsWith("/Game/FactoryGame/Character/"))
 				;
 
-			TreeViewItem players = _AddItem(root, "Players");
+			TreeNode players = _AddItem(root, "Players");
 			var subset = living.Where(a => a.ClassName.ToString().StartsWith("/Game/FactoryGame/Character/Player/BP_PlayerState"));
 			foreach (P.Actor prop in subset)
 				_AddPlayer(players, prop);
 
-			TreeViewItem enemies = _AddItem(root, "Enemies");
+			TreeNode enemies = _AddItem(root, "Enemies");
 			subset = living.Where(a => a.ClassName.ToString().StartsWith("/Game/FactoryGame/Character/Creature/Enemy"));
 			foreach (P.Actor prop in subset)
 				_AddEnemy(enemies, prop);
 
-			TreeViewItem wildlife = _AddItem(root, "Wildlife");
+			TreeNode wildlife = _AddItem(root, "Wildlife");
 			subset = living.Where(a => a.ClassName.ToString().StartsWith("/Game/FactoryGame/Character/Creature/Wildlife"));
 			foreach (P.Actor prop in subset)
 				_AddWildlife(wildlife, prop);
 
-			Dispatcher.Invoke(() => {
-				players.IsExpanded = true;
-				enemies.IsExpanded = true;
-				wildlife.IsExpanded = true;
-			});
+			players.IsExpanded = true;
+			enemies.IsExpanded = true;
+			wildlife.IsExpanded = true;
 		}
 
-		internal void _AddPlayer(TreeViewItem parent, P.Actor blueprint)
+		internal void _AddPlayer(TreeNode parent, P.Actor blueprint)
 		{
 			P.NamedEntity named = blueprint.EntityObj as P.NamedEntity;
 			P.ObjectProperty player_obj = named.Value.Named("mOwnedPawn") as P.ObjectProperty;
@@ -584,8 +670,8 @@ namespace SatisfactorySavegameTool.Panels
 			{
 				string pl = blueprint.PathName.LastName();
 				string short_title = string.Format("Player #{0} [INVALID]", pl.Split('_').Last());
-				TreeViewItem p = _AddItem(parent, short_title, null);
-				Dispatcher.Invoke(() => p.IsEnabled = false);
+				TreeNode p = _AddItem(parent, short_title, null);
+				p.IsEnabled = false;
 			}
 			else
 			{
@@ -599,8 +685,8 @@ namespace SatisfactorySavegameTool.Panels
 				if (player == null)
 				{
 					short_title += " [NO ACTOR]";
-					TreeViewItem p = _AddItem(parent, short_title, null);
-					Dispatcher.Invoke(() => p.IsEnabled = false);
+					TreeNode p = _AddItem(parent, short_title, null);
+					p.IsEnabled = false;
 				}
 				else
 				{
@@ -610,7 +696,7 @@ namespace SatisfactorySavegameTool.Panels
 			}
 		}
 
-		internal void _AddEnemy(TreeViewItem parent, P.Actor entity)
+		internal void _AddEnemy(TreeNode parent, P.Actor entity)
 		{
 			// Add grouping
 			//From: /Game/FactoryGame/Character/Creature/Enemy/Crab/BabyCrab/Char_BabyCrab.Char_BabyCrab_C
@@ -619,7 +705,7 @@ namespace SatisfactorySavegameTool.Panels
 				.ClassName.ToString()
 				.Replace("/Game/FactoryGame/Character/Creature/Enemy/", "")
 				.Split('/');
-			TreeViewItem group = _AddOrGetClass(parent, groups[0]);
+			TreeNode group = _AddOrGetClass(parent, groups[0]);
 			if (groups.Length == 3)
 				group = _AddOrGetClass(group, groups[1]);
 
@@ -634,7 +720,7 @@ namespace SatisfactorySavegameTool.Panels
 			_AddItem(group, short_title, living);
 		}
 
-		internal void _AddWildlife(TreeViewItem parent, P.Actor entity)
+		internal void _AddWildlife(TreeNode parent, P.Actor entity)
 		{
 			// Add grouping
 			//From: /Game/FactoryGame/Character/Creature/Wildlife/SpaceRabbit/Char_SpaceRabbit.Char_SpaceRabbit_C
@@ -643,7 +729,7 @@ namespace SatisfactorySavegameTool.Panels
 				.ClassName.ToString()
 				.Replace("/Game/FactoryGame/Character/Creature/Wildlife/", "")
 				.Split('/').First();
-			TreeViewItem group = _AddOrGetClass(parent, group_name);
+			TreeNode group = _AddOrGetClass(parent, group_name);
 
 			string name = entity.PathName.LastName();
 			string classname = entity.ClassName.LastName();
@@ -656,12 +742,12 @@ namespace SatisfactorySavegameTool.Panels
 			_AddItem(group, short_title, living);
 		}
 
-		internal TreeViewItem _AddOrGetClass(TreeViewItem parent, string name)
+		internal TreeNode _AddOrGetClass(TreeNode parent, string name)
 		{
 			if (!_classes.ContainsKey(name))
 			{
-				TreeViewItem class_item = _AddItem(parent, name);
-				Dispatcher.Invoke(() => class_item.IsExpanded = true);
+				TreeNode class_item = _AddItem(parent, name);
+				//class_item.IsExpanded = true;
 				_classes.Add(name, class_item);
 			}
 			return _classes[name];
@@ -681,7 +767,7 @@ namespace SatisfactorySavegameTool.Panels
 		}
 
 
-		internal Dictionary<string,TreeViewItem> _classes;
+		internal Dictionary<string, TreeNode> _classes;
 
 
 		internal class Living
