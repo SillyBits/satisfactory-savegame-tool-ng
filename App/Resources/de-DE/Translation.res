@@ -63,6 +63,7 @@
 	<TreePanel.Tab.Classes>Klassen</TreePanel.Tab.Classes>
 	<TreePanel.Tab.Paths>Pfade</TreePanel.Tab.Paths>
 	<TreePanel.Tab.Living>Lebewesen</TreePanel.Tab.Living>
+	<TreePanel.Tab.Buildings>Gebäude</TreePanel.Tab.Buildings>
 
 	<TreePanel.Tree.Objects>Objekte ({0:#,#0} Elemente)</TreePanel.Tree.Objects>
 	<TreePanel.Tree.Collected>Sammlung ({0:#,#0} Elemente)</TreePanel.Tree.Collected>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
@@ -58,6 +59,15 @@ namespace SatisfactorySavegameTool.Panels
 
 			Log.Debug("Visualizing living entity '{0}'", living != null ? living.Title : EMPTY);
 			Details.IElement element = new Details.LivingEntity(living);
+			Children.Add(element.Visual);
+		}
+
+		internal void ShowBuilding(BuildingsTree.Building building)
+		{
+			_ClearAll();
+
+			Log.Debug("Visualizing building '{0}'", building != null ? building.Title : EMPTY);
+			Details.IElement element = new Details.Building(building);
 			Children.Add(element.Visual);
 		}
 
@@ -2253,7 +2263,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 				P.ObjectProperty limit = allowed[i] as P.ObjectProperty;
 				if (limit != null)
 				{
-					if (str.IsNullOrEmpty(limit.PathName))
+					if (str.IsNullOrEmpty(limit.PathName) 
+						|| limit.PathName.ToString() == "/Script/FactoryGame.FGItemDescriptor") // Placeholder?
 						item_limit = DetailsPanel.EMPTY;
 					else
 					{
@@ -3182,6 +3193,880 @@ namespace SatisfactorySavegameTool.Panels.Details
 			}
 
 		}
+
+	}
+
+	internal class Building : Expando
+	{
+		public Building(BuildingsTree.Building building)
+			: base(null, building.Title, building)
+		{ }
+
+		internal override void _CreateChilds()
+		{
+			BuildingsTree.Building tag = Tag as BuildingsTree.Building;
+			P.Actor building = tag.Actor;
+			P.NamedEntity ent_named = building.EntityObj as P.NamedEntity;
+
+			// Is this a passive or active actor?
+			// - Passives: E.g. walls, conveyors, merger, ... -> Connectors only (up to 3 inputs, 1 output)
+			// - Active  : E.g. constructors, miner, ...      -> Above (up to 4 inputs) plus invi(s), power, ...
+			bool is_passive = (ent_named.Value.Named("mCurrentRecipe") == null);
+
+			// Is this a simple conveyor?
+			bool is_conveyor = (building.PathName.ToString().Contains("ConveyorBeltMk") 
+				|| building.PathName.ToString().Contains("ConveyorLiftMk"));
+
+			// Is this a simple power pole?
+			bool is_powerpole = (building.PathName.ToString().Contains("PowerPoleMk"));
+
+			// Start generating visuals
+			//
+
+			_childs.Add(MainFactory.Create(this, "Position", building.Translate));
+			_childs.Add(MainFactory.Create(this, "Rotation", building.Rotation));
+			_childs.Add(MainFactory.Create(this, "Scale"   , building.Scale));
+
+			P.Property prop;
+			P.StructProperty stru;
+			P.ObjectProperty objprop;
+			//P.Properties props;
+			P.ArrayProperty arr;
+			P.Object obj;
+			P.Entity entity;
+
+			//|-> [IntProperty] mBuildingID
+			//|  .Name = str:'mBuildingID'
+			//|  .Length = Int32:4
+			//|  .Index = Int32:0
+			//|  .Value = Int32:1
+			prop = ent_named.Value.Named("mBuildingID");
+			if (prop is P.IntProperty)
+				_childs.Add(MainFactory.Create(this, "Building id", (prop as P.IntProperty).Value, true));
+
+			//|-> [FloatProperty] mBuildTimeStamp
+			//|  .Name = str:'mBuildTimeStamp'
+			//|  .Length = Int32:4
+			//|  .Index = Int32:0
+			//|  .Value = Single:-434694
+			//TODO: Find correct unit
+			prop = ent_named.Value.Named("mBuildTimeStamp");
+			if (prop is P.FloatProperty)
+				_childs.Add(MainFactory.Create(this, "Built at", (prop as P.FloatProperty).Value, true));
+
+			//|-> [ObjectProperty] /Game/FactoryGame/Recipes/Buildings/Recipe_ConstructorMk1.Recipe_ConstructorMk1_C
+			//|  .LevelName = str:''
+			//|  .PathName = str:'/Game/FactoryGame/Recipes/Buildings/Recipe_ConstructorMk1.Recipe_ConstructorMk1_C'
+			//|  .Name = str:'mBuiltWithRecipe'
+			//|  .Length = Int32:90
+			//|  .Index = Int32:0
+			//|  .Value = <empty>
+			prop = ent_named.Value.Named("mBuiltWithRecipe");
+			if (prop is P.ObjectProperty)
+			{
+				objprop = prop as P.ObjectProperty;
+				string recipe = objprop.PathName.LastName();
+				if (Translate.Has(recipe))
+					recipe = Translate._(recipe);
+				_childs.Add(MainFactory.Create(this, "Recipe used", recipe, true));
+			}
+
+			//|-> [StructProperty] mPrimaryColor
+			prop = ent_named.Value.Named("mPrimaryColor");
+			if (prop is P.StructProperty)
+			{
+				stru = prop as P.StructProperty;
+				if (stru != null && stru.Value is P.LinearColor)
+					_childs.Add(MainFactory.Create(this, "Primary color", stru.Value));
+			}
+
+			//|-> [StructProperty] mSecondaryColor
+			prop = ent_named.Value.Named("mSecondaryColor");
+			if (prop is P.StructProperty)
+			{
+				stru = prop as P.StructProperty;
+				if (stru != null && stru.Value is P.LinearColor)
+					_childs.Add(MainFactory.Create(this, "Secondary color", stru.Value));
+			}
+
+			//|-> [ArrayProperty] mDismantleRefund
+			prop = ent_named.Value.Named("mDismantleRefund");
+			if (prop is P.ArrayProperty)
+			{
+				arr = prop as P.ArrayProperty;
+				_childs.Add(new DismantleRefund(this, null, arr.Value));
+			}
+
+			if (!is_passive)
+			{
+				// Active buildings might have an active recipe
+				//TODO: "Identify" recipe-able buildings so we can show an 
+				//      empty recipe if "mCurrentRecipe" is missing
+				bool has_recipe = (ent_named.Value.Named("mExtractResourceNode") == null);
+
+				if (has_recipe)
+				{
+					//|-> [ObjectProperty] /Game/FactoryGame/Recipes/Constructor/Recipe_Wire.Recipe_Wire_C
+					//|  .LevelName = str:''
+					//|  .PathName = str:'/Game/FactoryGame/Recipes/Constructor/Recipe_Wire.Recipe_Wire_C'
+					//|  .Name = str:'mCurrentRecipe'
+					//|  .Length = Int32:72
+					//|  .Index = Int32:0
+					//|  .Value = <empty>
+					string recipe = DetailsPanel.EMPTY;
+					prop = ent_named.Value.Named("mCurrentRecipe");
+					if (prop is P.ObjectProperty)
+					{
+						objprop = prop as P.ObjectProperty;
+						recipe = objprop.PathName.LastName();
+						if (Translate.Has(recipe))
+							recipe = Translate._(recipe);
+					}
+					_childs.Add(MainFactory.Create(this, "Current recipe", recipe, true));
+
+					//|-> [FloatProperty] mCurrentManufacturingProgress
+					//|  .Name = str:'mCurrentManufacturingProgress'
+					//|  .Length = Int32:4
+					//|  .Index = Int32:0
+					//|  .Value = Single:0,003470778
+					prop = ent_named.Value.Named("mCurrentManufacturingProgress");
+					if (prop is P.FloatProperty)
+					{
+						float progress = ((float)(prop as P.FloatProperty).Value) * 100.0f;
+						_childs.Add(MainFactory.Create(this, "Current progress [%]", progress, true));
+					}
+				}
+				else
+				{
+					// Instead of a recipe, miners will have extraction info instead
+					//|-> [ObjectProperty] Persistent_Level:PersistentLevel.BP_ResourceNode89
+					//|  .LevelName = str:'Persistent_Level'
+					//|  .PathName = str:'Persistent_Level:PersistentLevel.BP_ResourceNode89'
+					//|  .Name = str:'mExtractResourceNode'
+					//|  .Length = Int32:76
+					//|  .Index = Int32:0
+					//|  .Value = <empty>
+					string node = DetailsPanel.EMPTY;
+					prop = ent_named.Value.Named("mExtractResourceNode");
+					if (prop is P.ObjectProperty)
+					{
+						objprop = prop as P.ObjectProperty;
+						node = objprop.PathName.LastName();
+					}
+					_childs.Add(MainFactory.Create(this, "Resource node", node, true));
+
+					//|-> [FloatProperty] mCurrentExtractProgress
+					//|  .Name = str:'mCurrentExtractProgress'
+					//|  .Length = Int32:4
+					//|  .Index = Int32:0
+					//|  .Value = Single:0,04885578
+					prop = ent_named.Value.Named("mCurrentExtractProgress");
+					if (prop is P.FloatProperty)
+					{
+						float progress = ((float)(prop as P.FloatProperty).Value) * 100.0f;
+						_childs.Add(MainFactory.Create(this, "Current progress [%]", progress, true));
+					}
+				}
+
+				//|-> [FloatProperty] mTimeSinceStartStopProducing
+				//|  .Name = str:'mTimeSinceStartStopProducing'
+				//|  .Length = Int32:4
+				//|  .Index = Int32:0
+				//|  .Value = Single:2918,587
+				//TODO: Find correct unit
+				prop = ent_named.Value.Named("mTimeSinceStartStopProducing");
+				if (prop is P.FloatProperty)
+					_childs.Add(MainFactory.Create(this, "Time since start", (prop as P.FloatProperty).Value, true));
+			}
+
+			// Create list of childs, processed ones are to be removed and 
+			// remain - if any - will be logged as "dangling"
+			var childs = ent_named
+				.Children
+				.ListOf<P.NamedEntity.Name>()
+				.Select(n => n.PathName.ToString())
+				.ToList()
+				;
+			string building_pathname = building.PathName.ToString();
+			Action<string> _eat = (path) => {
+				string p = building_pathname + path;
+				if (childs.Contains(p))
+					childs.Remove(p);
+			};
+			Action<string, string> _try_add_item_conn = (title, path) => {
+				string p = building_pathname + path;
+				prop = MainWindow.CurrFile.Objects.FindByPathName(p, true);
+				if (prop != null)
+				{
+					_eat(path);
+					_childs.Add(new FactoryConnection(this, title, prop));
+				}
+			};
+			Action<string, string> _try_add_inventory = (title, path) => {
+				string p = building_pathname + path;
+				prop = MainWindow.CurrFile.Objects.FindByPathName(p, true);
+				if (prop != null)
+				{
+					_eat(path);
+					FGInventoryComponent invi = new FGInventoryComponent(this, null, prop);
+					invi._label = null;
+					invi._excluded.AddRange(_excluded_props);
+					(invi.Visual as Expando).Header = title;
+					_childs.Add(invi);
+				}
+			};
+			Action<string, string> _try_add_power_conn = (title, path) => {
+				string p = building_pathname + path;
+				prop = MainWindow.CurrFile.Objects.FindByPathName(p, true);
+				if (prop != null)
+				{
+					_eat(path);
+					_childs.Add(new PowerConnection(this, title, prop));
+				}
+			};
+
+			// Distinguish between conveyors, power poles and "more intelligent" 
+			// buildings to ease things a bit in regards to no. of lookups
+			if (is_conveyor)
+			{
+				_try_add_item_conn("Input", ".ConveyorAny0");
+				_try_add_item_conn("Output", ".ConveyorAny1");
+
+				//TODO: Add .Private, if any
+			}
+			else if (is_powerpole)
+			{
+				_try_add_power_conn("Power connection", ".PowerConnection");
+
+				//TODO: Add .Private, if any
+			}
+			else
+			{
+				// Buildings can have up to 6 inputs (e.g. space elevator),
+				// but start index varies between 0 and 1, so we do a 0-6 in total.
+				for (int index = 0; index <= 6; ++index)
+				{
+					string idx = index.ToString();
+					_try_add_item_conn("Input #" + idx, ".Input" + idx);
+				}
+
+				// Building can have either a "normal" or "fuel" input inventory
+				// which is being fed by inputs above
+				_try_add_inventory("Input inventory", ".InputInventory");
+				_try_add_inventory("Input inventory", ".FuelInventory");
+
+				// Buildings can have up to 3 outputs (e.g. splitter),
+				// but start index varies between 0 and 1, so we do a 0-3 in total.
+				for (int index = 0; index <= 3; ++index)
+				{
+					string idx = index.ToString();
+					_try_add_item_conn("Output #" + idx, ".Output" + idx);
+				}
+
+				// Building can have an output inventory
+				// which is being emptied by outputs above
+				_try_add_inventory("Output inventory", ".OutputInventory");
+
+				// Handle special types like storage containers and alike
+				_try_add_inventory("Storage", ".StorageInventory");
+
+				// Some machines do have an inventory potential, the OC slots ^^
+				//TODO: Add those
+				//|-> [FloatProperty] mCurrentPotential
+				//|  .Name = str:'mCurrentPotential'
+				//|  .Length = Int32:4
+				//|  .Index = Int32:0
+				//|  .Value = Single:1,88
+				prop = ent_named.Value.Named("mCurrentPotential");
+				if (prop is P.FloatProperty)
+				{
+					float potential = (((float)(prop as P.FloatProperty).Value) + 1.0f) * 100.0f;;
+					_childs.Add(MainFactory.Create(this, "Current potential [%]", potential, true));
+				}
+
+				//|-> [FloatProperty] mPendingPotential
+				//|  .Name = str:'mPendingPotential'
+				//|  .Length = Int32:4
+				//|  .Index = Int32:0
+				//|  .Value = Single:1,88
+				prop = ent_named.Value.Named("mPendingPotential");
+				if (prop is P.FloatProperty)
+				{
+					float potential = (((float)(prop as P.FloatProperty).Value) + 1.0f) * 100.0f;;
+					_childs.Add(MainFactory.Create(this, "Maximum potential [%]", potential, true));
+				}
+
+				_try_add_inventory("Overclocking slots", ".InventoryPotential");
+
+
+				// All buildings do have a power consumption info
+				// *.powerInfo
+				//
+				//-> [Object] /Script/FactoryGame.FGPowerInfoComponent
+				//  .ClassName = str:'/Script/FactoryGame.FGPowerInfoComponent'
+				//  .LevelName = str:'Persistent_Level'
+				//  .PathName = str:'Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.powerInfo'
+				//  .OuterPathName = str:'Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118'
+				//  .EntityObj =
+				//	-> [Entity] 
+				//	  .LevelName = <empty>
+				//	  .PathName = <empty>
+				//	  .Children = <empty>
+				//	  .Unknown = Int32:0
+				//	  .Missing = <empty>
+				//	  .Private = <empty>
+				//	  .Value =
+				//		/ List with 1 elements:
+				//		|-> [FloatProperty] mTargetConsumption
+				//		|  .Name = str:'mTargetConsumption'
+				//		|  .Length = Int32:4
+				//		|  .Index = Int32:0
+				//		|  .Value = Single:0,1
+				//		\ end of list
+				//TODO: Find correct unit, maybe kW?
+				prop = MainWindow.CurrFile.Objects.FindByPathName(building_pathname + ".powerInfo");
+				if (prop is P.Object)
+				{
+					entity = (prop as P.Object).EntityObj as P.Entity;
+					if (entity != null)
+					{
+						prop = entity.Value.Named("mTargetConsumption");
+						if (prop is P.FloatProperty)
+							_childs.Add(MainFactory.Create(this, "Power consumption [kW?]", (prop as P.FloatProperty).Value));
+					}
+				}
+
+				// Buildings can also have one of those
+				_try_add_power_conn("Power connection", ".PowerInput");
+				_try_add_power_conn("Power connection", ".PowerConnection");
+				_try_add_power_conn("Power connection", ".FGPowerConnection");
+
+				// Buildings with dynamic legs will also carry those offsets
+				//
+				//-> [Object] /Script/FactoryGame.FGFactoryLegsComponent
+				//  .ClassName = str:'/Script/FactoryGame.FGFactoryLegsComponent'
+				//  .LevelName = str:'Persistent_Level'
+				//  .PathName = str:'Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.FGFactoryLegs'
+				//  .OuterPathName = str:'Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118'
+				//  .EntityObj =
+				//	-> [Entity] 
+				//	  .LevelName = <empty>
+				//	  .PathName = <empty>
+				//	  .Children = <empty>
+				//	  .Unknown = Int32:0
+				//	  .Missing = <empty>
+				//	  .Private = <empty>
+				//	  .Value =
+				//		/ List with 1 elements:
+				//		|-> [ArrayProperty] mCachedFeetOffset
+				//		|  .InnerType = str:'StructProperty'
+				//		|  .Name = str:'mCachedFeetOffset'
+				//		|  .Length = Int32:665
+				//		|  .Index = Int32:0
+				//		|  .Value =
+				//		|	-> [StructProperty] mCachedFeetOffset
+				//		|	  .Unknown = list<Byte>(17):[0,]
+				//		|	  .Name = str:'mCachedFeetOffset'
+				//		|	  .Length = Int32:580
+				//		|	  .Index = Int32:0
+				//		|	  .Value =
+				//		|		/ List with 4 elements:
+				//		|		|-> [FeetOffset].Value[3]
+				prop = MainWindow.CurrFile.Objects.FindByPathName(building_pathname + ".FGFactoryLegs");
+				if (prop is P.Object)
+					_childs.Add(new FeetOffsets(this, "Feet offsets", prop));
+
+				//TODO: Add .Private, if any
+			}
+
+
+			// Handle type-specific childs remaining
+			if (is_passive)
+			{
+				// Some passive buildings will also carry snap-only data
+
+				//TODO:
+				//.SnapOnly0
+				//- /Game/FactoryGame/Buildable/Building/Wall/Build_Wall_Conveyor_8x4_01.Build_Wall_Conveyor_8x4_01_C
+				//- /Game/FactoryGame/Buildable/Building/Wall/Build_Wall_Conveyor_8x4_03_Steel.Build_Wall_Conveyor_8x4_03_Steel_C
+				//- /Game/FactoryGame/Buildable/Building/Wall/Build_Wall_Conveyor_8x4_03.Build_Wall_Conveyor_8x4_03_C
+				//- /Game/FactoryGame/Buildable/Building/Wall/Build_Wall_Conveyor_8x4_02_Steel.Build_Wall_Conveyor_8x4_02_Steel_C
+				//- /Game/FactoryGame/Buildable/Factory/ConveyorPoleStackable/Build_ConveyorPoleStackable.Build_ConveyorPoleStackable_C
+				//- /Game/FactoryGame/Buildable/Factory/ConveyorPole/Build_ConveyorPole.Build_ConveyorPole_C
+				//.SnapOnly1
+				//- /Game/FactoryGame/Buildable/Building/Wall/Build_Wall_Conveyor_8x4_01.Build_Wall_Conveyor_8x4_01_C
+				//- /Game/FactoryGame/Buildable/Building/Wall/Build_Wall_Conveyor_8x4_02_Steel.Build_Wall_Conveyor_8x4_02_Steel_C
+				//.SnapOnly2
+				//- /Game/FactoryGame/Buildable/Building/Wall/Build_Wall_Conveyor_8x4_01.Build_Wall_Conveyor_8x4_01_C
+
+
+				// Ignored for now:
+				//
+				//|-> [IntProperty] mCurrentInputIndex
+				//|  .Name = str:'mCurrentInputIndex'
+				//|  .Length = Int32:4
+				//|  .Index = Int32:0
+				//|  .Value = Int32:2
+			}
+			else
+			{
+				// Active "buildings"
+				//
+
+				// What to do with those? Also contained in "Children"
+				//|-> [ObjectProperty] Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.InputInventory
+				//|  .LevelName = str:'Persistent_Level'
+				//|  .PathName = str:'Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.InputInventory'
+				//|  .Name = str:'mInputInventory'
+				//|  .Length = Int32:100
+				//|  .Index = Int32:0
+				//|  .Value = <empty>
+				//|-> [ObjectProperty] Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.OutputInventory
+				//|  .LevelName = str:'Persistent_Level'
+				//|  .PathName = str:'Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.OutputInventory'
+				//|  .Name = str:'mOutputInventory'
+				//|  .Length = Int32:101
+				//|  .Index = Int32:0
+				//|  .Value = <empty>
+				//|-> [ObjectProperty] Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.powerInfo
+				//|  .LevelName = str:'Persistent_Level'
+				//|  .PathName = str:'Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.powerInfo'
+				//|  .Name = str:'mPowerInfo'
+				//|  .Length = Int32:95
+				//|  .Index = Int32:0
+				//|  .Value = <empty>
+				//|-> [ObjectProperty] Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.InventoryPotential
+				//|  .LevelName = str:'Persistent_Level'
+				//|  .PathName = str:'Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.InventoryPotential'
+				//|  .Name = str:'mInventoryPotential'
+				//|  .Length = Int32:104
+				//|  .Index = Int32:0
+				//|  .Value = <empty>
+
+				// Ignored for now:
+				//
+				//|-> [BoolProperty] mDidFirstTimeUse
+				//|  .Name = str:'mDidFirstTimeUse'
+				//|  .Length = Int32:0
+				//|  .Index = Int32:0
+				//|  .Value = Byte:1
+			}
+
+			if (childs.Count > 0)
+			{
+				Log.Warning("Building '{0}' has a {1} dangling children:", building_pathname, childs.Count);
+				foreach (string child in childs)
+					Log.Warning("- {0}", child);
+			}
+
+		}
+
+
+		internal class DismantleRefund : Expando
+		{
+			public DismantleRefund(IElement parent, string label, object obj)
+				: base(parent, label, obj)
+			{ }
+
+			internal override void _CreateChilds()
+			{
+				//|-> [ArrayProperty] mDismantleRefund
+				//|  .InnerType = str:'StructProperty'
+				//|  .Name = str:'mDismantleRefund'
+				//|  .Length = Int32:450
+				//|  .Index = Int32:0
+				//|  .Value =
+				//|	-> [StructProperty] mDismantleRefund
+				P.StructProperty stru = Tag as P.StructProperty;
+
+				_childs = new List<IElement>();
+				List<P.ItemAmount> coll = stru.Value.ListOf<P.ItemAmount>();
+				int index = 0;
+
+				Header = "Dismantle refund";
+				if (coll.Count == 0)
+					IsEnabled = false;
+
+				//|	-> [StructProperty] mDismantleRefund
+				//|	  .Unknown = list<Byte>(17):[0,]
+				//|	  .Name = str:'mDismantleRefund'
+				//|	  .Length = Int32:366
+				//|	  .Index = Int32:0
+				//|	  .Value =
+				//|		/ List with 2 elements:
+				//|		|-> [ItemAmount].Value[2]
+				//|		|  .Value =
+				//|		|	/ List with 2 elements:
+				//|        |   ...
+				//|		|	\ end of list
+				//|		|-> [ItemAmount].Value[2]
+				//|		|	/ List with 2 elements:
+				//|        |   ...
+				//|		|	\ end of list
+				//|		\ end of list
+				VersionTable.Version version = MainWindow.CurrFile.Header.GetVersion();
+				List<object[]> rows = new List<object[]>();
+				foreach (P.ItemAmount amount in coll)
+				{
+					P.Properties props = amount.Value as P.Properties;
+
+					++index;
+					string label = index.ToString();
+
+					//|		|	/ List with 2 elements:
+					//|		|	|-> [ObjectProperty] /Game/FactoryGame/Resource/Parts/IronPlateReinforced/Desc_IronPlateReinforced.Desc_IronPlateReinforced_C
+					//|		|	|  .LevelName = str:''
+					//|		|	|  .PathName = str:'/Game/FactoryGame/Resource/Parts/IronPlateReinforced/Desc_IronPlateReinforced.Desc_IronPlateReinforced_C'
+					//|		|	|  .Name = str:'ItemClass'
+					//|		|	|  .Length = Int32:113
+					//|		|	|  .Index = Int32:0
+					//|		|	|  .Value = <empty>
+					//|        |   ...
+					P.ObjectProperty objprop = props.Named("ItemClass") as P.ObjectProperty;
+					string item_name = objprop.PathName.LastName();
+					if (!string.IsNullOrEmpty(item_name))
+					{
+						if (Translate.Has(item_name))
+							item_name = Translate._(item_name);
+					}
+
+					//|        |   ...
+					//|		|	|-> [IntProperty] amount
+					//|		|	|  .Name = str:'amount'
+					//|		|	|  .Length = Int32:4
+					//|		|	|  .Index = Int32:0
+					//|		|	|  .Value = Int32:3
+					//|		|	\ end of list
+					P.IntProperty count = props.Named("amount") as P.IntProperty;
+					string item_amount = ((int)count.Value).ToString();
+
+					rows.Add(new object[] {
+						label,
+						item_name,
+						item_amount
+					});
+				}
+
+				List<ListViewControl.ColumnDefinition> columns = new List<ListViewControl.ColumnDefinition>();
+				columns.Add(new ListViewControl.ColumnDefinition("#", 25));
+				columns.Add(new ListViewControl.ColumnDefinition("Item", 150));
+				columns.Add(new ListViewControl.ColumnDefinition("Count", 50));
+
+				ListViewControl lvc = new ListViewControl(columns.ToArray());
+				//lvc.Label = "Refunds";
+				lvc.Value = rows;
+
+				_childs.Add(lvc);
+			}
+
+		}
+
+		internal class FactoryConnection : ReadonlySimpleValueControl<string>
+		{
+			public FactoryConnection(IElement parent, string label, object obj)
+				: base(parent, label, null)
+			{
+				_object = obj as P.Object;//-> [Object] /Script/FactoryGame.FGFactoryConnectionComponent
+			}
+
+			//-> [Object] /Script/FactoryGame.FGFactoryConnectionComponent
+			//  .ClassName = str:'/Script/FactoryGame.FGFactoryConnectionComponent'
+			//  .LevelName = str:'Persistent_Level'
+			//  .PathName = str:'Persistent_Level:PersistentLevel.Build_ConveyorAttachmentMerger_C_392.InPut3'
+			//  .OuterPathName = str:'Persistent_Level:PersistentLevel.Build_ConveyorAttachmentMerger_C_392'
+			//  .EntityObj =
+			//	-> [Entity] 
+			//	  .LevelName = <empty>
+			//	  .PathName = <empty>
+			//	  .Children = <empty>
+			//	  .Unknown = Int32:0
+			//	  .Missing = <empty>
+			//	  .Value =
+			//		/ List with 1 elements:
+			//		|-> [ObjectProperty] Persistent_Level:PersistentLevel.Build_ConveyorBeltMk1_C_1329.ConveyorAny1
+			//		|  .LevelName = str:'Persistent_Level'
+			//		|  .PathName = str:'Persistent_Level:PersistentLevel.Build_ConveyorBeltMk1_C_1329.ConveyorAny1'
+			//		|  .Name = str:'mConnectedComponent'
+			//		|  .Length = Int32:100
+			//		|  .Index = Int32:0
+			//		|  .Value = <empty>
+			//		\ end of list
+			internal override void _CreateVisual()
+			{
+				_value = DetailsPanel.EMPTY;
+
+				P.Entity entity = _object.EntityObj as P.Entity;
+				if (entity.Value != null)
+				{
+					P.Property prop = entity.Value.Named("mConnectedComponent");
+					if (prop is P.ObjectProperty)
+					{
+						P.ObjectProperty objprop = prop as P.ObjectProperty;
+						string pathname = objprop.PathName.ToString();
+						if (!string.IsNullOrEmpty(pathname))
+						{
+							//var names = pathname
+							//	.Split('_')
+							//	.Where(s => !_excludes.Contains(s))
+							//	.ToList();
+							//string id = names.Last();
+							//names.Remove(id);
+							//string name = string.Join("_", names);
+							//_value = string.Format("{0} - {1}", string.Join("_", names), id);
+							_value = pathname;
+						}
+					}
+				}
+
+				base._CreateVisual();
+
+				//TODO: Check if connector is listed at all and in a valid "chunk" (see FGFoundationSubsystem)
+			}
+
+			private P.Object _object;
+			private static string[] _excludes = new string[] { "Build", "BP", "C" };
+		}
+
+		internal class PowerConnection : Expando
+		{
+			public PowerConnection(IElement parent, string label, object obj)
+				: base(parent, label, null)
+			{
+				_object = obj as P.Object;//-> [Object] /Script/FactoryGame.FGPowerConnectionComponent
+			}
+
+			//-> [Object] /Script/FactoryGame.FGPowerConnectionComponent
+			//  .ClassName = str:'/Script/FactoryGame.FGPowerConnectionComponent'
+			//  .LevelName = str:'Persistent_Level'
+			//  .PathName = str:'Persistent_Level:PersistentLevel.Build_SmelterMk1_C_24.PowerConnection'
+			//  .OuterPathName = str:'Persistent_Level:PersistentLevel.Build_SmelterMk1_C_24'
+			//  .EntityObj =
+			//	-> [Entity] 
+			//	  .LevelName = <empty>
+			//	  .PathName = <empty>
+			//	  .Children = <empty>
+			//	  .Unknown = Int32:0
+			//	  .Missing = <empty>
+			//	  .Private = <empty>
+			//	  .Value =
+			//		/ List with 2 elements:
+			//		|-> [ArrayProperty] mWires
+			//		|  .InnerType = str:'ObjectProperty'
+			//		|  .Name = str:'mWires'
+			//		|  .Length = Int32:85
+			//		|  .Index = Int32:0
+			//		|  .Value =
+			//		|	/ List with 1 elements:
+			//		|	|-> [ObjectProperty] Persistent_Level:PersistentLevel.Build_PowerLine_C_1395
+			//		|	|  .LevelName = str:'Persistent_Level'
+			//		|	|  .PathName = str:'Persistent_Level:PersistentLevel.Build_PowerLine_C_1395'
+			//		|	|  .Length = Int32:0
+			//		|	|  .Index = Int32:0
+			//		|	\ end of list
+			//		|-> [IntProperty] mCircuitID
+			//		|  .Name = str:'mCircuitID'
+			//		|  .Length = Int32:4
+			//		|  .Index = Int32:0
+			//		|  .Value = Int32:1
+			//		\ end of list
+			internal override void _CreateChilds()
+			{
+				Header = "Power connection(s)";
+
+				P.Entity entity = _object.EntityObj as P.Entity;
+				if (entity.Value != null)
+				{
+					P.Property prop = entity.Value.Named("mCircuitID");
+					if (prop is P.IntProperty)
+						_childs.Add(MainFactory.Create(this, "Circuit ID", (prop as P.IntProperty).Value, true));
+
+					prop = entity.Value.Named("mWires");
+					if (prop is P.ArrayProperty)
+					{
+						P.ArrayProperty arr = prop as P.ArrayProperty;
+						List<P.ObjectProperty> list = (arr.Value as P.Properties).ListOf<P.ObjectProperty>();
+
+						// Machines do have only one wire, but power poles can have multiples
+						// So we do split here into simple and list-based visualisation based on 
+						// parent by investigating objects .OuterPathName
+						bool is_powerpole = _object.OuterPathName.ToString().Contains("PowerPoleMk");
+
+						//		|  .Value =
+						//		|	/ List with 1 elements:
+						//		|	|-> [ObjectProperty] Persistent_Level:PersistentLevel.Build_PowerLine_C_1395
+						//		|	|  .LevelName = str:'Persistent_Level'
+						//		|	|  .PathName = str:'Persistent_Level:PersistentLevel.Build_PowerLine_C_1395'
+						//		|	|  .Length = Int32:0
+						//		|	|  .Index = Int32:0
+						//		|	\ end of list
+						if (!is_powerpole)
+						{
+							// Single
+							string pathname = list[0].PathName.ToString();
+							_childs.Add(MainFactory.Create(this, "Power line", pathname, true));
+						}
+						else
+						{
+							// List
+
+							int index = 0;
+							List<object[]> rows = new List<object[]>();
+							foreach (P.ObjectProperty objprop in list)
+							{
+								++index;
+								string label = index.ToString();
+
+								string name = objprop.PathName.ToString();
+								if (string.IsNullOrEmpty(name))
+									name = DetailsPanel.EMPTY;
+
+								rows.Add(new object[] {
+									label,
+									name,
+								});
+							}
+
+							List<ListViewControl.ColumnDefinition> columns = new List<ListViewControl.ColumnDefinition>();
+							columns.Add(new ListViewControl.ColumnDefinition("#", 25));
+							columns.Add(new ListViewControl.ColumnDefinition("Power line", 300));
+
+							ListViewControl lvc = new ListViewControl(columns.ToArray());
+							//lvc.Label = "Power lines";
+							lvc.Value = rows;
+							if (rows.Count == 0)
+								lvc.IsEnabled = false;
+
+							_childs.Add(lvc);
+						}
+					}
+				}
+
+				//TODO: Check if lines are listed at all and in a valid "circuit group"
+			}
+
+			private P.Object _object;
+		}
+
+		internal class FeetOffsets : Expando
+		{
+			public FeetOffsets(IElement parent, string label, object obj)
+				: base(parent, label, obj)
+			{ }
+
+			internal override void _CreateChilds()
+			{
+				Header = "Feet offsets";
+
+				P.Object obj = Tag as P.Object;
+
+				// Buildings with dynamic legs will also carry those offsets
+				//
+				//-> [Object] /Script/FactoryGame.FGFactoryLegsComponent
+				//  .ClassName = str:'/Script/FactoryGame.FGFactoryLegsComponent'
+				//  .LevelName = str:'Persistent_Level'
+				//  .PathName = str:'Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.FGFactoryLegs'
+				//  .OuterPathName = str:'Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118'
+				//  .EntityObj =
+				//	-> [Entity] 
+				//	  .LevelName = <empty>
+				//	  .PathName = <empty>
+				//	  .Children = <empty>
+				//	  .Unknown = Int32:0
+				//	  .Missing = <empty>
+				//	  .Private = <empty>
+				//	  .Value =
+				//		/ List with 1 elements:
+				//		|-> [ArrayProperty] mCachedFeetOffset
+				//		|  .InnerType = str:'StructProperty'
+				//		|  .Name = str:'mCachedFeetOffset'
+				//		|  .Length = Int32:665
+				//		|  .Index = Int32:0
+				//		|  .Value =
+				//		|	-> [StructProperty] mCachedFeetOffset
+				//		|	  .Unknown = list<Byte>(17):[0,]
+				//		|	  .Name = str:'mCachedFeetOffset'
+				//		|	  .Length = Int32:580
+				//		|	  .Index = Int32:0
+				//		|	  .Value =
+				//		|		/ List with 4 elements:
+				//		|		|-> [FeetOffset].Value[3]
+				P.Entity entity = obj.EntityObj as P.Entity;
+				if (entity == null || entity.Value == null || entity.Value.Count == 0)
+					return;
+				P.ArrayProperty arr = entity.Value[0] as P.ArrayProperty;
+				if (arr == null)
+					return;
+				P.StructProperty stru = arr.Value as P.StructProperty;
+				if (stru == null)
+					return;
+				var feets = (stru.Value as P.Properties).ListOf<P.FeetOffset>();
+
+				if (feets.Count() == 0)
+					IsEnabled = false;
+
+				//		|	  .Value =
+				//		|		/ List with 4 elements:
+				//		|		|-> [FeetOffset].Value[3]
+				//		|		|  .Value =
+				//		|		|	/ List with 3 elements:
+				//		|		|	|-> [NameProperty] FeetName
+				//		|		|	|  .Name = str:'FeetName'
+				//		|		|	|  .Length = Int32:12
+				//		|		|	|  .Index = Int32:0
+				//		|		|	|  .Value = str:'foot_01'
+				//		|		|	|-> [FloatProperty] OffsetZ
+				//		|		|	|  .Name = str:'OffsetZ'
+				//		|		|	|  .Length = Int32:4
+				//		|		|	|  .Index = Int32:0
+				//		|		|	|  .Value = Single:-10,00708
+				//		|		|	|-> [BoolProperty] ShouldShow
+				//		|		|	|  .Name = str:'ShouldShow'
+				//		|		|	|  .Length = Int32:0
+				//		|		|	|  .Index = Int32:0
+				//		|		|	|  .Value = Byte:1
+				//		|		|	\ end of list
+				List<object[]> rows = new List<object[]>();
+				foreach (P.FeetOffset ofs in feets)
+				{
+					string label = "?";
+					P.Property prop = ofs.Value.Named("FeetName");
+					if (prop is P.NameProperty)
+						label = ((prop as P.NameProperty).Value as str).ToString();
+
+					string offset = "?";
+					prop = ofs.Value.Named("OffsetZ");
+					if (prop is P.FloatProperty)
+						offset = ((float)(prop as P.FloatProperty).Value).ToString("F7");
+
+					string show = "?";
+					prop = ofs.Value.Named("ShouldShow");
+					if (prop is P.BoolProperty)
+						show = ((byte)(prop as P.BoolProperty).Value) != 0 ? "Yes" : "No";
+
+					rows.Add(new object[] {
+						label,
+						offset,
+						show,
+					});
+				}
+
+				List<ListViewControl.ColumnDefinition> columns = new List<ListViewControl.ColumnDefinition>();
+				columns.Add(new ListViewControl.ColumnDefinition("Name", 100));
+				columns.Add(new ListViewControl.ColumnDefinition("Offset", 150, HorizontalAlignment.Right));
+				columns.Add(new ListViewControl.ColumnDefinition("Should show?", 100));
+
+				ListViewControl lvc = new ListViewControl(columns.ToArray());
+				//lvc.Label = "Feet offsets";
+				lvc.Value = rows;
+				if (rows.Count == 0)
+					lvc.IsEnabled = false;
+
+				_childs.Add(lvc);
+
+			}
+		}
+
+		private static string[] _excluded_props = new string[] { "ClassName", "LevelName", "PathName", "OuterPathName" };
 
 	}
 

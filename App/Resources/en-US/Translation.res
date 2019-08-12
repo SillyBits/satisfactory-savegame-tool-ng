@@ -63,6 +63,7 @@
 	<TreePanel.Tab.Classes>Classes</TreePanel.Tab.Classes>
 	<TreePanel.Tab.Paths>Paths</TreePanel.Tab.Paths>
 	<TreePanel.Tab.Living>Living</TreePanel.Tab.Living>
+	<TreePanel.Tab.Buildings>Buildings</TreePanel.Tab.Buildings>
 
 	<TreePanel.Tree.Objects>Objects ({0:#,#0} elements)</TreePanel.Tree.Objects>
 	<TreePanel.Tree.Collected>Collected ({0:#,#0} elements)</TreePanel.Tree.Collected>

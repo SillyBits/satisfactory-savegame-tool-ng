@@ -71,6 +71,10 @@ namespace SatisfactorySavegameTool.Panels
 			_treeLiving = new LivingTree();
 			_tabLiving = createTab("TreePanel.Tab.Living", "Icon.TreePanel.Living.png", _treeLiving);
 			AddChild(_tabLiving);
+
+			_treeBuildings = new BuildingsTree();
+			_tabBuildings = createTab("TreePanel.Tab.Buildings", "Icon.TreePanel.Buildings.png", _treeBuildings);
+			AddChild(_tabBuildings);
 		}
 
 		public void CreateTrees(ICallback callback)
@@ -79,6 +83,7 @@ namespace SatisfactorySavegameTool.Panels
 			if (_treeClasses != null) _treeClasses.CreateTree(callback);
 			//if (_treePaths != null) _treePaths.CreateTree(callback);
 			if (_treeLiving != null) _treeLiving.CreateTree(callback);
+			if (_treeBuildings != null) _treeBuildings.CreateTree(callback);
 
 			Dispatcher.Invoke(() => SelectedItem = _tabClasses);
 		}
@@ -89,6 +94,7 @@ namespace SatisfactorySavegameTool.Panels
 			if (_treeClasses != null) _treeClasses.ClearTree();
 			//if (_treePaths != null) _treePaths.ClearTree();
 			if (_treeLiving != null) _treeLiving.ClearTree();
+			if (_treeBuildings != null) _treeBuildings.ClearTree();
 		}
 
 
@@ -103,6 +109,9 @@ namespace SatisfactorySavegameTool.Panels
 
 		internal TabItem _tabLiving;
 		internal BasicTree _treeLiving;
+
+		internal TabItem _tabBuildings;
+		internal BasicTree _treeBuildings;
 
 
 		protected override void OnSelectionChanged(SelectionChangedEventArgs e)
@@ -783,6 +792,142 @@ namespace SatisfactorySavegameTool.Panels
 				Title = title;
 				Entity = entity;
 				Blueprint = blueprint;
+			}
+		}
+
+	}
+
+
+	public class BuildingsTree : BasicTree
+	{
+		public BuildingsTree()
+			: base()
+		{ }
+
+		internal override int NoOfExtraElements { get { return 0; } }
+
+		internal override void _CreateTree(TreeNode root)
+		{
+			_classes = new Dictionary<string, TreeNode>();
+
+			var factory_set = MainWindow.CurrFile.Objects
+				.Where(p => p is P.Actor)
+				.Cast<P.Actor>()
+				.Where(a => a.ClassName.ToString().StartsWith("/Game/FactoryGame/Buildable/Factory/"))
+				;
+			TreeNode factories = _AddItem(root, "Factories");
+			foreach (P.Actor prop in factory_set)
+				_AddFactory(factories, prop);
+
+			var building_set = MainWindow.CurrFile.Objects
+				.Where(p => p is P.Actor)
+				.Cast<P.Actor>()
+				.Where(a => a.ClassName.ToString().StartsWith("/Game/FactoryGame/Buildable/Building/"))
+				;
+			TreeNode buildings = _AddItem(root, "Buildings");
+			foreach (P.Actor prop in building_set)
+				_AddBuilding(buildings, prop);
+
+			factories.IsExpanded = true;
+			buildings.IsExpanded = true;
+		}
+
+		internal void _AddFactory(TreeNode parent, P.Actor actor)
+		{
+			string[] groups = actor
+				.ClassName.ToString()
+				.Replace("/Game/FactoryGame/Buildable/Factory/", "")
+				.Split('/');
+			TreeNode group = _AddOrGetClass(parent, groups[0]);
+			if (groups.Length == 3)
+				group = _AddOrGetClass(group, groups[1]);
+
+			string objname = actor.PathName.LastName();
+			var names = objname
+				.Split('_')
+				.Where(s => !_excludes.Contains(s))
+				.ToList();
+			string id = names.Last();
+			names.Remove(id);
+			string name = string.Join("_", names);
+
+			string short_title = string.Format("{0} #{1}", name, id);
+			string title = short_title + string.Format(" ({0})", objname);
+
+			Building building = new Building(title, actor, true);
+			_AddItem(group, short_title, building);
+		}
+
+		internal void _AddBuilding(TreeNode parent, P.Actor actor)
+		{
+			string[] groups = actor
+				.ClassName.ToString()
+				.Replace("/Game/FactoryGame/Buildable/Building/", "")
+				.Split('/');
+			TreeNode group = _AddOrGetClass(parent, groups[0]);
+			if (groups.Length == 3)
+				group = _AddOrGetClass(group, groups[1]);
+
+			string objname = actor.PathName.LastName();
+			var names = objname
+				.Split('_')
+				.Where(s => !_excludes.Contains(s))
+				.ToList();
+			string id = names.Last();
+			names.Remove(id);
+			string name = string.Join("_", names);
+
+			string short_title = string.Format("{0} #{1}", name, id);
+			string title = short_title + string.Format(" ({0})", objname);
+
+			Building building = new Building(title, actor, false);
+			_AddItem(group, short_title, building);
+		}
+
+		//TODO: Add icon capability?
+		internal TreeNode _AddOrGetClass(TreeNode parent, string name)
+		{
+			if (!_classes.ContainsKey(name))
+			{
+				string title = name;
+				if (Translate.Has(title))
+					title = Translate._(title);
+				TreeNode class_item = _AddItem(parent, title);
+				//class_item.IsExpanded = true;
+				_classes.Add(name, class_item);
+			}
+			return _classes[name];
+		}
+
+		protected override void _CreateContextMenu()
+		{
+			/* NO context menu for now
+			ContextMenu = new ContextMenu();
+
+			MenuItem item = new MenuItem() {
+				Header = Translate._("TreePanel.Context.Inspect"),
+			};
+			item.Click += Contextmenu_Inspect_Click;
+			ContextMenu.Items.Add(item);
+			*/
+		}
+
+
+		private Dictionary<string, TreeNode> _classes;
+		private static string[] _excludes = new string[] { "Build", "BP", "C" };
+
+
+		internal class Building
+		{
+			internal string  Title;
+			internal P.Actor Actor;
+			internal bool    IsFactory;
+
+			internal Building(string title, P.Actor actor, bool is_factory)
+			{
+				Title = title;
+				Actor = actor;
+				IsFactory = is_factory;
 			}
 		}
 
