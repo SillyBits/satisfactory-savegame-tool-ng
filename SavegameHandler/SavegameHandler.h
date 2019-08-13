@@ -34,7 +34,7 @@ namespace Savegame {
 
 		void Load(ICallback^ callback)
 		{
-			_Load(callback);//, treeview)
+			_Load(callback);
 		}
 
 		void Save(ICallback^ callback)
@@ -85,11 +85,7 @@ namespace Savegame {
 			FileReader^ reader = gcnew FileReader(Filename, nullptr);
 			Log::Info("-> {0:#,#0} Bytes", reader->Size);
 
-			//if treeview.IsSideloadingAvail:
-			//	treeview.InitSideloading(self)
 			_cbStart(reader, "Loading file ...", "");
-			//if treeview.IsSideloadingAvail:
-			//	treeview.sideload_start(self.Filename)
 
 			try
 			{
@@ -124,7 +120,6 @@ namespace Savegame {
 				self.__cb_read_update(reader, None, str(obj))
 				//^^^^^ DEBUG */
 			
-				//self.Objects = []
 				int count = reader->ReadInt();
 				Log::Info("-> {0:#,#0} game objects", count);
 				for (int i=0; i<count; ++i)
@@ -145,9 +140,6 @@ namespace Savegame {
 					//_total += _count_recurs(new_child.Childs)
 					//-> Entity not yet read, so down below instead
 					_cbUpdate(reader, nullptr, new_child->ToString());
-					//if treeview.IsSideloadingAvail:
-					//	treeview.sideload_update(obj)
-					//-> Entity not yet read, so down below instead
 				}
 
 				__int64 prev_pos = reader->Pos;
@@ -167,13 +159,9 @@ namespace Savegame {
 					else
 						throw gcnew Exception(
 							String::Format("Can't handle object {0}", prop));
-					//_total += self.__count_recurs(obj.Childs)
-					_cbUpdate(reader, nullptr, prop->ToString());//was: obj->ToString()
-					//if treeview.IsSideloadingAvail:
-					//	treeview.sideload_update(obj)
+					_cbUpdate(reader, nullptr, prop->ToString());
 				}
 
-				//self.Collected = []
 				count = reader->ReadInt();
 				Log::Info("-> {0:#,#0} collected objects", count);
 				for (int i = 0; i < count; ++i)
@@ -181,16 +169,13 @@ namespace Savegame {
 					Properties::Property^ new_child = (gcnew Properties::Collected(nullptr))->Read(reader);
 					TotalElements++;
 					Collected->Add(new_child);
-					//self.__total += self.__count_recurs(new_child.Childs)
 					_cbUpdate(reader, nullptr, new_child->ToString());
-					//if treeview.IsSideloadingAvail:
-					//TODO: treeview.sideload_update(obj)
 				}
 
 				__int64 missing = reader->Size - reader->Pos;
 				if (missing > 0)
 				{
-					Missing = Properties::Property::ReadBytes(reader, (int)missing);
+					Missing = reader->ReadBytes((int)missing);
 					Log::Info("-> Found extra data of size {0:#,#0} at end of file", missing);
 					TotalElements++;
 				}
@@ -219,17 +204,10 @@ namespace Savegame {
 
 			finally
 			{
-				//self.__update_totals() -> Now done while loading
-				//sleep(0.01)
 				_cbStop(reader, nullptr, nullptr);
 				reader->Close();
 				reader = nullptr;
 
-
-				//if treeview.IsSideloadingAvail:
-				//	treeview.sideload_end()
-				//	treeview.UninitSideloading()
-			
 				//vvvvv DEBUG
 				//fn = path.join(wx.App.Get().Path, "reports", 
 				//	"Classes#{}.log".format(self.Header.BuildVersion))
