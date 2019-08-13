@@ -185,21 +185,7 @@ namespace Savegame
 		virtual Property^ Read(IReader^ reader) abstract;
 
 
-		static ByteArray^ ReadBytes(IReader^ reader, int count)
-		{
-			ByteArray^ bytes = gcnew ByteArray(count);
-			pin_ptr<byte> p = &bytes[0];
-			reader->ReadByte(p, count);
-			return bytes;
-		}
 
-		static array<__int32>^ ReadInts(IReader^ reader, int count)
-		{
-			array<__int32>^ ints = gcnew array<__int32>(count);
-			pin_ptr<__int32> p = &ints[0];
-			reader->ReadInt(p, count);
-			return ints;
-		}
 
 		static void CheckNullByte(IReader^ reader)
 		{
@@ -456,7 +442,6 @@ namespace Savegame
 		READ
 			Value = reader->ReadByte();
 			CheckNullByte(reader);
-			return this;
 		READ_END
 	CLS_END
 
@@ -476,7 +461,6 @@ namespace Savegame
 		READ
 			CheckNullByte(reader);
 			Value = reader->ReadInt();
-			return this;
 		READ_END
 	CLS_END
 
@@ -484,7 +468,6 @@ namespace Savegame
 		READ
 			CheckNullByte(reader);
 			Value = reader->ReadFloat();
-			return this;
 		READ_END
 	CLS_END
 	
@@ -492,7 +475,6 @@ namespace Savegame
 		READ
 			CheckNullByte(reader);
 			Value = reader->ReadString();
-			return this;
 		READ_END
 	CLS_END
 
@@ -547,28 +529,30 @@ namespace Savegame
 		bool IsArray;
 		READ
 			IsArray = false;
-			str^ inner = reader->ReadString();
-			Property^ acc = PropertyFactory::Construct(inner, this);
+			_Inner = reader->ReadString();
+			Property^ acc = PropertyFactory::Construct(_Inner, this);
 			if (acc == nullptr)
-				throw gcnew ReadException(reader, String::Format("Unknown inner structure type '{0}'", inner));
-			Unknown = ReadBytes(reader, 17);
+				throw gcnew ReadException(reader, String::Format("Unknown inner structure type '{0}'", _Inner));
+			Unknown = reader->ReadBytes(17);
 			Value = acc->Read(reader);
 		READ_END
 		void ReadAsArray(IReader^ reader, int count)
 		{
 			IsArray = true;
-			str^ inner = reader->ReadString();
-			Unknown = ReadBytes(reader, 17);
+			_Inner = reader->ReadString();
+			Unknown = reader->ReadBytes(17);
 			Properties^ props = gcnew Properties;
 			for (int i = 0; i < count; ++i)
 			{
-				Property^ acc = PropertyFactory::Construct(inner, this);
+				Property^ acc = PropertyFactory::Construct(_Inner, this);
 				if (acc == nullptr)
-					throw gcnew ReadException(reader, String::Format("Unknown inner structure type '{0}'", inner));
+					throw gcnew ReadException(reader, String::Format("Unknown inner structure type '{0}'", _Inner));
 				props->Add(acc->Read(reader));
 			}
 			Value = props;
 		}
+	protected:
+		str^ _Inner;
 	CLS_END
 
 	CLS(Vector)
@@ -821,13 +805,13 @@ namespace Savegame
 			{
 				CheckNullByte(reader);
 				int count = reader->ReadInt();
-				Value = ReadInts(reader, count);
+				Value = reader->ReadInts(count);
 			}
 			else if (InnerType == "ByteProperty")
 			{
 				CheckNullByte(reader);
 				int count = reader->ReadInt();
-				Value = ReadBytes(reader, count);
+				Value = reader->ReadBytes(count);
 			}
 			else
 				throw gcnew ReadException(reader, String::Format("Unknown inner array type '{0}'", InnerType));
@@ -882,7 +866,7 @@ namespace Savegame
 		PUB_ab(Unknown)
 		READ
 			CheckNullByte(reader);
-			Unknown = ReadBytes(reader, 13);
+			Unknown = reader->ReadBytes(13);
 			Value = reader->ReadString();
 		READ_END
 	CLS_END
@@ -924,10 +908,12 @@ namespace Savegame
 			if (bytes_read < 0)
 				throw gcnew ReadException(reader, "Negative offset!");
 			if (bytes_read != length)
-				Missing = ReadBytes(reader, (int)(length - bytes_read));
+				_Missing = Missing = reader->ReadBytes((int)(length - bytes_read));
 			return this;
 		}
 		STR_(PathName)
+	protected:
+		ByteArray^ _Missing; // Shadow copy just for writing back to file
 	};
 
 	public ref class NamedEntity : Entity
@@ -982,14 +968,12 @@ namespace Savegame
 
 
 	CLS(Object)
-		//int Type;
 		PUB_s(ClassName)
 		PUB_s(LevelName)
 		PUB_s(PathName)
 		PUB_s(OuterPathName)
 		PUB(EntityObj,Property^)
 		READ
-			//Type = 0;
 			ClassName = reader->ReadString();
 			LevelName = reader->ReadString();
 			PathName = reader->ReadString();
@@ -997,9 +981,9 @@ namespace Savegame
 		READ_END
 		Property^ ReadEntity(IReader^ reader)
 		{
-			int length = reader->ReadInt();
+			_EntityLength = reader->ReadInt();
 			Entity^ entity = gcnew Entity(this, nullptr, nullptr, nullptr);
-			entity->Read(reader, length);
+			entity->Read(reader, _EntityLength);
 			EntityObj = entity;
 
 			// EXPERIMENTAL
@@ -1022,10 +1006,11 @@ namespace Savegame
 			return this;
 		}
 		STR_(ClassName)
+	protected:
+		int _EntityLength;
 	CLS_END
 
 	CLS(Actor)
-		//int Type;
 		PUB_s(ClassName)
 		PUB_s(LevelName)
 		PUB_s(PathName)
@@ -1036,7 +1021,6 @@ namespace Savegame
 		PUB_i(WasPlacedInLevel)
 		PUB(EntityObj,Property^)
 		READ
-			//Type = 1;
 			ClassName = reader->ReadString();
 			LevelName = reader->ReadString();
 			PathName = reader->ReadString();
@@ -1048,9 +1032,9 @@ namespace Savegame
 		READ_END
 		Property^ ReadEntity(IReader^ reader)
 		{
-			int length = reader->ReadInt();
+			_EntityLength = reader->ReadInt();
 			NamedEntity^ entity = gcnew NamedEntity(this, nullptr, nullptr, nullptr);
-			entity->Read(reader, length);
+			entity->Read(reader, _EntityLength);
 			EntityObj = entity;
 
 			// EXPERIMENTAL
@@ -1073,6 +1057,8 @@ namespace Savegame
 			return this;
 		}
 		STR_(PathName)
+	protected:
+		int _EntityLength;
 	CLS_END
 
 
@@ -1351,7 +1337,7 @@ namespace Savegame
 			// Seems like some animation data?
 			Node = reader->ReadString();
 			//TODO: Crack those 53 bytes
-			Unknown = ReadBytes(reader, 53);
+			Unknown = reader->ReadBytes(53);
 		READ_END
 	CLS_END
 
@@ -1365,7 +1351,7 @@ namespace Savegame
 	CLS_END
 
 
-#endif
+#endif // EXPERIMENTAL
   }
 
 }
