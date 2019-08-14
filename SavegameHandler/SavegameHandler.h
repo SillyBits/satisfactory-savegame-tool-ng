@@ -39,33 +39,31 @@ namespace Savegame {
 
 		void Save(ICallback^ callback)
 		{
-			throw gcnew NotImplementedException("Save functionality not yet available!");
-			//_Save(Filename, callback);
+			_Save(Filename, callback);
 		}
 
 		void SaveAs(ICallback^ callback, String^ new_filename)
 		{
-			throw gcnew NotImplementedException("Save functionality not yet available!");
-			//_Save(new_filename, callback)
+			_Save(new_filename, callback);
 		}
 
 
 	protected:
 		ICallback^ _callback;
 
-		void _cbStart(IReader^ reader, String^ status, String^ info)
+		void _cbStart(__int64 size, String^ status, String^ info)
 		{
 			if (_callback) 
-				_callback->Start(reader->Size, status, info);
+				_callback->Start(size, status, info);
 		}
 
-		void _cbUpdate(IReader^ reader, String^ status, String^ info)
+		void _cbUpdate(__int64 pos, String^ status, String^ info)
 		{
 			if (_callback) 
-				_callback->Update(reader->Pos, status, info);
+				_callback->Update(pos, status, info);
 		}
 
-		void _cbStop(IReader^ reader, String^ status, String^ info)
+		void _cbStop(String^ status, String^ info)
 		{
 			if (_callback) 
 				_callback->Stop(status, info);
@@ -77,6 +75,7 @@ namespace Savegame {
 			Log::_(s, Logger::Level::Info, false, false);
 		}
 
+
 		void _Load(ICallback^ callback)
 		{
 			_callback = callback;
@@ -85,13 +84,13 @@ namespace Savegame {
 			FileReader^ reader = gcnew FileReader(Filename, nullptr);
 			Log::Info("-> {0:#,#0} Bytes", reader->Size);
 
-			_cbStart(reader, "Loading file ...", "");
+			_cbStart(reader->Size, "Loading file ...", "");
 
 			try
 			{
 				Header = (Properties::Header^) (gcnew Properties::Header(nullptr))->Read(reader);
 				TotalElements++;
-				_cbUpdate(reader, nullptr, "Header");
+				_cbUpdate(reader->Pos, nullptr, "Header");
 
 				// Writing header to log
 				//Log::Info("-> {0}", Header);
@@ -139,7 +138,7 @@ namespace Savegame {
 					Objects->Add(new_child);
 					//_total += _count_recurs(new_child.Childs)
 					//-> Entity not yet read, so down below instead
-					_cbUpdate(reader, nullptr, new_child->ToString());
+					_cbUpdate(reader->Pos, nullptr, new_child->ToString());
 				}
 
 				__int64 prev_pos = reader->Pos;
@@ -159,7 +158,7 @@ namespace Savegame {
 					else
 						throw gcnew Exception(
 							String::Format("Can't handle object {0}", prop));
-					_cbUpdate(reader, nullptr, prop->ToString());
+					_cbUpdate(reader->Pos, nullptr, prop->ToString());
 				}
 
 				count = reader->ReadInt();
@@ -169,7 +168,7 @@ namespace Savegame {
 					Properties::Property^ new_child = (gcnew Properties::Collected(nullptr))->Read(reader);
 					TotalElements++;
 					Collected->Add(new_child);
-					_cbUpdate(reader, nullptr, new_child->ToString());
+					_cbUpdate(reader->Pos, nullptr, new_child->ToString());
 				}
 
 				__int64 missing = reader->Size - reader->Pos;
@@ -179,7 +178,7 @@ namespace Savegame {
 					Log::Info("-> Found extra data of size {0:#,#0} at end of file", missing);
 					TotalElements++;
 				}
-				_cbUpdate(reader, nullptr, "Done loading");
+				_cbUpdate(reader->Pos, nullptr, "Done loading");
 			}
 
 			//catch(Accessor::ReadException)
@@ -204,7 +203,7 @@ namespace Savegame {
 
 			finally
 			{
-				_cbStop(reader, nullptr, nullptr);
+				_cbStop(nullptr, nullptr);
 				reader->Close();
 				reader = nullptr;
 
@@ -222,7 +221,80 @@ namespace Savegame {
 		{
 			_callback = callback;
 
-			//...
+			FileWriter^ writer = gcnew FileWriter(filename, nullptr);
+
+			_cbStart(TotalElements, "Saving file ...", "");
+			__int64 saved = 0;
+
+			try
+			{
+				Header->Write(writer);
+				saved++;
+				_cbUpdate(saved, nullptr, "Header");
+
+				writer->Write((int)Objects->Count);
+				Log::Info("-> {0:#,#0} game objects", Objects->Count);
+				for each (Properties::Property^ prop in Objects)
+				{
+					__int64 prev_pos = writer->Pos;
+
+					int type = -1;
+					if (IsInstance<Properties::Actor>(prop))
+						type = 1;
+					else if (IsInstance<Properties::Object>(prop))
+						type = 0;
+					else
+						throw gcnew Exception(
+							String::Format("Savegame at pos {0:#,#0}: Unhandled type {1}", 
+								prev_pos, prop->GetType()->Name));
+
+					writer->Write(type);
+					prop->Write(writer);
+					//saved++;
+					//_cbUpdate(saved, nullptr, prop->ToString());
+				}
+
+				writer->Write((int)Objects->Count);
+				for each (Properties::Property^ prop in Objects)
+				{
+					if (IsInstance<Properties::Actor>(prop))
+						safe_cast<Properties::Actor^>(prop)->WriteEntity(writer);
+					else if (IsInstance<Properties::Object>(prop))
+						safe_cast<Properties::Object^>(prop)->WriteEntity(writer);
+					else
+						throw gcnew Exception(
+							String::Format("Can't handle object {0}", prop));
+
+					saved++;
+					_cbUpdate(saved, nullptr, prop->ToString());
+				}
+
+				writer->Write((int)Collected->Count);
+				Log::Info("-> {0:#,#0} collected objects", Collected->Count);
+				for each (Properties::Property^ prop in Collected)
+				{
+					prop->Write(writer);
+					saved++;
+					_cbUpdate(saved, nullptr, prop->ToString());
+				}
+
+				if (Missing != nullptr)
+				{
+					Log::Info("-> Storing extra data of size {0:#,#0} at end of file", Missing->Length);
+					writer->Write(Missing);
+					saved++;
+				}
+
+				_cbUpdate(saved, nullptr, "Done saving");
+				Log::Info("-> stored a {0:#,#0} Bytes", writer->Pos);
+			}
+
+			finally
+			{
+				_cbStop(nullptr, nullptr);
+				writer->Close();
+				writer = nullptr;
+			}
 		}
 
 	};

@@ -37,6 +37,7 @@ const bool VERBOSITY = false;
 
 #include "Types.h"
 #include "Reader.h"
+#include "Writer.h"
 #include "Properties.h"
 #include "PropertyDumper.h"
 //#include "SavegameHandler.h"

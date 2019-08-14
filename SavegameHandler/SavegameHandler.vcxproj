@@ -85,6 +85,7 @@
     <ClInclude Include="SavegameHandler.h" />
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="Types.h" />
+    <ClInclude Include="Writer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />

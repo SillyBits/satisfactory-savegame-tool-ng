@@ -2,9 +2,25 @@
 #pragma warning(disable : 4091)
 
 using namespace System::Reflection;
+using namespace System::Text;
 
 using namespace CoreLib;
 using namespace Reader;
+using namespace Writer;
+
+
+/*
+ * TODO:
+ *
+ * - Eliminate shadows like _Inner, _Missing and _EntityLength, else will
+ *   need quite some efforts in regards to adding new elements
+ *   - _Inner: "Type" actually stored in .Value, but what if empty? (e.g. lists)
+ *   - _Missing: Just don't "eat" the pointer and indicated with other means 
+ *               (store no. of bytes used for example)
+ *   - _EntityLength: Must calculate real length by traversing hierarchy 2-pass like.
+ *
+ */
+
 
 namespace Savegame
 {
@@ -185,6 +201,7 @@ namespace Savegame
 		virtual Property^ Read(IReader^ reader) abstract;
 
 
+		virtual void Write(IWriter^ writer) abstract;
 
 
 		static void CheckNullByte(IReader^ reader)
@@ -240,6 +257,14 @@ namespace Savegame
 		public:
 			ReadException(IReader^ reader, String^ msg)
 				: Exception(String::Format("Reader({0}|{1}): {2}", reader->Name, reader->PrevPos, msg))
+			{ }
+		};
+
+		ref class WriteException : Exception
+		{
+		public:
+			WriteException(IWriter^ writer, String^ msg)
+				: Exception(String::Format("Writer({0}|{1}): {2}", writer->Name, writer->PrevPos, msg))
 			{ }
 		};
 
@@ -350,6 +375,9 @@ namespace Savegame
 	#define READ				Property^ Read(IReader^ reader) override {
 	#define READ_END			return this; }
 
+	#define WRITE				void Write(IWriter^ writer) override {
+	#define WRITE_END			}
+
 	#define STR(s)				String^ ToString() override { return s; };
 	#define STR_(s)				STR("[" + TypeName + "] " + s)
 
@@ -406,11 +434,41 @@ namespace Savegame
 			return Read(reader, this);
 		READ_END
 
-		//WRITE
-		//	...
-		//WRITE_END
+
+		static void Write(IWriter^ writer, ValueProperty^ prop)
+		{
+			__int64 last = writer->Pos;
+
+			if (prop == nullptr)
+				throw gcnew WriteException(writer, "Empty property");
+			//if (prop == nullptr)
+			//{
+			//	writer->Write(NONE);
+			//	return;
+			//}
+
+			writer->Write(prop->Name);
+
+			// TypeName is always Ascii, so this inline-conversion will do,
+			// no need to bother IWriter in regards to this special case.
+			ByteArray^ chars = Encoding::ASCII->GetBytes(prop->TypeName);
+			writer->Write((int)(chars->Length + 1));
+			writer->Write(chars);
+			writer->Write((byte)0);
+
+			writer->Write(prop->Length);
+			writer->Write(prop->Index);
+
+			prop->Write(writer);
+		}
+
+		WRITE
+			Write(writer, this);
+		WRITE_END
 
 		String^ ToString() override { return "[" + TypeName + "] " + (Name ? Name : str::Statics::empty); };
+
+		static str^ NONE = gcnew str((char*)"None");
 
 	CLS_END
 
@@ -430,6 +488,12 @@ namespace Savegame
 				Value->Add(prop);
 			}
 		READ_END
+		WRITE
+			for each (ValueProperty^ prop in Value)
+				ValueProperty::Write(writer, prop);
+			//ValueProperty::Write(writer, nullptr);
+			writer->Write(ValueProperty::NONE);
+		WRITE_END
 		STR(String::Format("[{0}].Value[{1}]", TypeName, Value->Count))
 	CLS_END
 
@@ -443,6 +507,10 @@ namespace Savegame
 			Value = reader->ReadByte();
 			CheckNullByte(reader);
 		READ_END
+		WRITE
+			writer->Write((byte)Value);
+			writer->Write((byte)0);
+		WRITE_END
 	CLS_END
 
 	CLS_(ByteProperty, ValueProperty)
@@ -455,6 +523,14 @@ namespace Savegame
 			else
 				Value = reader->ReadString();
 		READ_END
+		WRITE
+			writer->Write(Unknown);
+			writer->Write((byte)0);
+			if (*Unknown == "None")
+				writer->Write((byte)Value);
+			else
+				writer->Write((str^)Value);
+		WRITE_END
 	CLS_END
 	
 	CLS_(IntProperty, ValueProperty)
@@ -462,6 +538,10 @@ namespace Savegame
 			CheckNullByte(reader);
 			Value = reader->ReadInt();
 		READ_END
+		WRITE
+			writer->Write((byte)0);
+			writer->Write((__int32)Value);
+		WRITE_END
 	CLS_END
 
 	CLS_(FloatProperty, ValueProperty)
@@ -469,6 +549,10 @@ namespace Savegame
 			CheckNullByte(reader);
 			Value = reader->ReadFloat();
 		READ_END
+		WRITE
+			writer->Write((byte)0);
+			writer->Write((float)Value);
+		WRITE_END
 	CLS_END
 	
 	CLS_(StrProperty, ValueProperty)
@@ -476,6 +560,10 @@ namespace Savegame
 			CheckNullByte(reader);
 			Value = reader->ReadString();
 		READ_END
+		WRITE
+			writer->Write((byte)0);
+			writer->Write((str^)Value);
+		WRITE_END
 	CLS_END
 
 
@@ -511,6 +599,18 @@ namespace Savegame
 			// According to Goz3rr's loader, this byte is avail only with Version>=5?
 			Visibility = reader->ReadByte();
 		READ_END	
+		WRITE
+			writer->Write(Type);
+			writer->Write(SaveVersion);
+			writer->Write(BuildVersion);
+			writer->Write(MapName);
+			writer->Write(MapOptions);
+			writer->Write(SessionName);
+			writer->Write(PlayDuration);// in seconds
+			writer->Write(SaveDateTime);
+			// According to Goz3rr's loader, this byte is avail only with Version>=5?
+			writer->Write(Visibility);
+		WRITE_END	
 	CLS_END
 
 	CLS(Collected) 
@@ -521,6 +621,10 @@ namespace Savegame
 			LevelName = reader->ReadString();
 			PathName = reader->ReadString();
 		READ_END
+		WRITE
+			writer->Write(LevelName);
+			writer->Write(PathName);
+		WRITE_END
 		STR_(PathName)
 	CLS_END
 
@@ -551,6 +655,25 @@ namespace Savegame
 			}
 			Value = props;
 		}
+		WRITE
+			if (IsArray)
+				throw gcnew WriteException(writer, String::Format(
+					"Expected IsArray=false while saving structure type '{0}'", _Inner));
+			writer->Write(_Inner);
+			writer->Write(Unknown);
+			dynamic_cast<Property^>(Value)->Write(writer);
+		WRITE_END
+		void WriteAsArray(IWriter^ writer)
+		{
+			if (!IsArray)
+				throw gcnew WriteException(writer, String::Format(
+					"Expected IsArray=true while saving structure type '{0}'", _Inner));
+			writer->Write(_Inner);
+			writer->Write(Unknown);
+			Properties^ props = (Properties^) Value;
+			for each (Property^ prop in props)
+				prop->Write(writer);
+		}
 	protected:
 		str^ _Inner;
 	CLS_END
@@ -564,6 +687,11 @@ namespace Savegame
 			Y = reader->ReadFloat();
 			Z = reader->ReadFloat();
 		READ_END
+		WRITE
+			writer->Write(X);
+			writer->Write(Y);
+			writer->Write(Z);
+		WRITE_END
 	CLS_END
 
 	CLS_(Rotator,Vector)
@@ -599,6 +727,15 @@ namespace Savegame
 			MaxZ = reader->ReadFloat();
 			IsValid = reader->ReadByte();
 		READ_END
+		WRITE
+			writer->Write(MinX);
+			writer->Write(MinY);
+			writer->Write(MinZ);
+			writer->Write(MaxX);
+			writer->Write(MaxY);
+			writer->Write(MaxZ);
+			writer->Write(IsValid);
+		WRITE_END
 	CLS_END
 
 	CLS(Color)
@@ -612,6 +749,12 @@ namespace Savegame
 			B = reader->ReadByte();
 			A = reader->ReadByte();
 		READ_END
+		WRITE
+			writer->Write(R);
+			writer->Write(G);
+			writer->Write(B);
+			writer->Write(A);
+		WRITE_END
 	CLS_END
 
 	CLS(LinearColor)
@@ -625,6 +768,12 @@ namespace Savegame
 			B = reader->ReadFloat();
 			A = reader->ReadFloat();
 		READ_END
+		WRITE
+			writer->Write(R);
+			writer->Write(G);
+			writer->Write(B);
+			writer->Write(A);
+		WRITE_END
 	CLS_END
 
 	CLS_(Transform,PropertyList)
@@ -654,6 +803,12 @@ namespace Savegame
 			C = reader->ReadFloat();
 			D = reader->ReadFloat();
 		READ_END
+		WRITE
+			writer->Write(A);
+			writer->Write(B);
+			writer->Write(C);
+			writer->Write(D);
+		WRITE_END
 	CLS_END
 
 	CLS_(RemovedInstanceArray,PropertyList)
@@ -679,6 +834,13 @@ namespace Savegame
 			PathName = reader->ReadString();
 			Value = ValueProperty::Read(reader, this);
 		READ_END
+		WRITE
+			writer->Write(Unknown);
+			writer->Write(ItemName);
+			writer->Write(LevelName);
+			writer->Write(PathName);
+			ValueProperty::Write(writer, Value);
+		WRITE_END
 		STR_(ItemName)
 	CLS_END
 
@@ -740,6 +902,16 @@ namespace Savegame
 			LevelName = reader->ReadString();
 			PathName = reader->ReadString();
 			return this;
+		}
+		WRITE
+			Write(writer, true);
+		WRITE_END
+		void Write(IWriter^ writer, bool add_null)
+		{
+			if (add_null)
+				writer->Write((byte)0);
+			writer->Write(LevelName);
+			writer->Write(PathName);
 		}
 		STR_(PathName)
 		Keys^ GetKeys() override
@@ -816,6 +988,45 @@ namespace Savegame
 			else
 				throw gcnew ReadException(reader, String::Format("Unknown inner array type '{0}'", InnerType));
 		READ_END
+		WRITE
+			writer->Write(InnerType);
+			if (InnerType == "StructProperty")
+			{
+				writer->Write((byte)0);
+				StructProperty^ stru = (StructProperty^) Value;
+				Properties^ props = (Properties^) stru->Value;
+				writer->Write((int)props->Count);
+				writer->Write(stru->Name);
+				writer->Write(InnerType);
+				writer->Write(stru->Length);
+				writer->Write(stru->Index);
+				stru->WriteAsArray(writer);
+			}
+			else if (InnerType == "ObjectProperty")
+			{
+				writer->Write((byte)0);
+				Properties^ props = (Properties^) Value;
+				writer->Write((int)props->Count);
+				for each (Property^ prop in props)
+					dynamic_cast<ObjectProperty^>(prop)->Write(writer, false);
+			}
+			else if (InnerType == "IntProperty")
+			{
+				writer->Write((byte)0);
+				array<__int32>^ arr = (array<__int32>^) Value;
+				writer->Write((int)arr->Length);
+				writer->Write(arr);
+			}
+			else if (InnerType == "ByteProperty")
+			{
+				writer->Write((byte)0);
+				ByteArray^ arr = (ByteArray^) Value;
+				writer->Write((int)arr->Length);
+				writer->Write(arr);
+			}
+			else
+				throw gcnew WriteException(writer, String::Format("Unknown inner array type '{0}'", InnerType));
+		WRITE_END
 	CLS_END
 
 	CLS_(EnumProperty,ValueProperty)
@@ -825,6 +1036,11 @@ namespace Savegame
 			CheckNullByte(reader);
 			Value = reader->ReadString();
 		READ_END
+		WRITE
+			writer->Write(EnumName);
+			writer->Write((byte)0);
+			writer->Write((str^)Value);
+		WRITE_END
 		STR_(EnumName)
 	CLS_END
 
@@ -860,6 +1076,19 @@ namespace Savegame
 				Value->Add(key, (Entry^)entry->Read(reader));
 			}
 		READ_END
+		WRITE
+			writer->Write(MapName);
+			writer->Write(ValueType);
+			/*5*/ writer->Write((byte)0); writer->Write((byte)0); writer->Write((byte)0); writer->Write((byte)0); writer->Write((byte)0);
+			Entries^ entries = (Entries^) Value;
+			writer->Write((int)entries->Count);
+			//TODO: This might write in a different order. Investigate!
+			for each (KeyValuePair<int, Entry^>^ pair in entries)
+			{
+				writer->Write(pair->Key);
+				pair->Value->Write(writer);
+			}
+		WRITE_END
 	CLS_END
 
 	CLS_(TextProperty,ValueProperty)
@@ -869,6 +1098,11 @@ namespace Savegame
 			Unknown = reader->ReadBytes(13);
 			Value = reader->ReadString();
 		READ_END
+		WRITE
+			writer->Write((byte)0);
+			writer->Write(Unknown);
+			writer->Write((str^)Value);
+		WRITE_END
 	CLS_END
 
 	public ref class Entity : PropertyList
@@ -911,6 +1145,27 @@ namespace Savegame
 				_Missing = Missing = reader->ReadBytes((int)(length - bytes_read));
 			return this;
 		}
+		void Write(IWriter^ writer, int length)
+		{
+			__int64 last_pos = writer->Pos;
+			PropertyList::Write(writer);
+			//TODO: There is an extra 'int' following, investigate!
+			// Not sure if this is valid for all elements which are of type
+			// PropertyList. For now,  we will handle it only here
+			// Might this be the same "int" discovered with entities below???
+			writer->Write(Unknown);
+
+			// Using shadow here in case reading private data removed .Missing
+			__int64 bytes_written = writer->Pos - last_pos;
+			if (bytes_written < 0)
+				throw gcnew WriteException(writer, "Negative offset!");
+			__int64 delta = length - bytes_written;
+			if (bytes_written != length && 
+				(_Missing == nullptr || (__int64)_Missing->Length != delta))
+				throw gcnew WriteException(writer, "Integrity error, expected .Missing!");
+			if (_Missing != nullptr)
+				writer->Write(_Missing);
+		}
 		STR_(PathName)
 	protected:
 		ByteArray^ _Missing; // Shadow copy just for writing back to file
@@ -932,6 +1187,10 @@ namespace Savegame
 				LevelName = reader->ReadString();
 				PathName = reader->ReadString();
 			READ_END
+			WRITE
+				writer->Write(LevelName);
+				writer->Write(PathName);
+			WRITE_END
 		};
 
 		NamedEntity(Property^ parent, str^ level_name, str^ path_name, Properties^ children)
@@ -957,6 +1216,24 @@ namespace Savegame
 			//	Missing = ReadBytes(reader, length - bytes_read);
 			Entity::Read(reader, (int)(length - bytes_read));
 			return this;
+		}
+		void Write(IWriter^ writer, int length)
+		{
+			__int64 last_pos = writer->Pos;
+			writer->Write(LevelName);
+			writer->Write(PathName);
+			writer->Write((int)Children->Count);
+			for each (Name^ name in Children)
+				name->Write(writer);
+			__int64 bytes_written = writer->Pos - last_pos;
+			//TODO:
+			if (bytes_written < 0)
+				throw gcnew WriteException(writer, "Negative offset!");
+			//if (bytes_read != length)
+			//	Missing = ReadBytes(reader, length - bytes_read);
+			// Even if length isn't needed for writing, 
+			// better do some integrity checking there
+			Entity::Write(writer, (int)(length - bytes_written));
 		}
 	};
 
@@ -1004,6 +1281,23 @@ namespace Savegame
 #endif
 
 			return this;
+		}
+		WRITE
+			writer->Write(ClassName);
+			writer->Write(LevelName);
+			writer->Write(PathName);
+			writer->Write(OuterPathName);
+		WRITE_END
+		void WriteEntity(IWriter^ writer)
+		{
+			writer->Write(_EntityLength);
+			Entity^ entity = (Entity^) EntityObj;
+			// Even if length isn't needed for writing, 
+			// better do some integrity checking there
+			entity->Write(writer, _EntityLength);
+
+			// EXPERIMENTAL
+			//=> No need to save anything, enough to store shadow _Missing
 		}
 		STR_(ClassName)
 	protected:
@@ -1055,6 +1349,27 @@ namespace Savegame
 #endif
 
 			return this;
+		}
+		WRITE
+			writer->Write(ClassName);
+			writer->Write(LevelName);
+			writer->Write(PathName);
+			writer->Write(NeedTransform);
+			Rotation->Write(writer);
+			Translate->Write(writer);
+			Scale->Write(writer);
+			writer->Write(WasPlacedInLevel);
+		WRITE_END
+		void WriteEntity(IWriter^ writer)
+		{
+			writer->Write(_EntityLength);
+			NamedEntity^ entity = (NamedEntity^) EntityObj;
+			// Even if length isn't needed for writing, 
+			// better do some integrity checking there
+			entity->Write(writer, _EntityLength);
+
+			// EXPERIMENTAL
+			//=> No need to save anything, enough to store shadow _Missing
 		}
 		STR_(PathName)
 	protected:
@@ -1204,6 +1519,9 @@ namespace Savegame
 	CLS_(PrivateData,PropertyList)
 		READ
 		READ_END
+		WRITE
+			throw gcnew NotImplementedException();
+		WRITE_END
 	CLS_END
 
 
@@ -1229,6 +1547,9 @@ namespace Savegame
 			//PathName = reader.readInt()
 			return Collected::Read(reader);
 		READ_END
+		WRITE
+			throw gcnew NotImplementedException();
+		WRITE_END
 	CLS_END
 
 	// Contains path to player state which this tied to this game state, e.g.:
@@ -1259,6 +1580,9 @@ namespace Savegame
 			ItemName = reader->ReadString();
 			Translate = (Vector^) (gcnew Vector(this))->Read(reader);
 		READ_END
+		WRITE
+			throw gcnew NotImplementedException();
+		WRITE_END
 	CLS_END
 
 	CLS_(Build_ConveyorBeltMk1_C, Build_ConveyorBelt)
@@ -1296,6 +1620,9 @@ namespace Savegame
 			ItemName = reader->ReadString();
 			Translate = (Vector^) (gcnew Vector(this))->Read(reader);
 		READ_END
+		WRITE
+			throw gcnew NotImplementedException();
+		WRITE_END
 	CLS_END
 
 	CLS_(Build_ConveyorLiftMk1_C, Build_ConveyorLift)
@@ -1339,6 +1666,9 @@ namespace Savegame
 			//TODO: Crack those 53 bytes
 			Unknown = reader->ReadBytes(53);
 		READ_END
+		WRITE
+			throw gcnew NotImplementedException();
+		WRITE_END
 	CLS_END
 
 	CLS_(BP_Tractor_C, BP_Vehicle)
