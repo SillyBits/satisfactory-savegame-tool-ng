@@ -55,6 +55,12 @@
 	<MainWindow.LoadGamefile.Progress.Title.2>Erzeuge Baumstrukturen ...</MainWindow.LoadGamefile.Progress.Title.2>
 	<MainWindow.LoadGamefile.Progress.CounterFormat.2>{0:#,#0} / {1:#,#0} Elemente</MainWindow.LoadGamefile.Progress.CounterFormat.2>
 
+	<MainWindow.SaveGamefile.Title>Ziel auswählen</MainWindow.SaveGamefile.Title>
+	<MainWindow.SaveGamefile.Filter>Spielstände (*.sav)|*.sav|Alle Dateien (*.*)|*.*</MainWindow.SaveGamefile.Filter>
+	<MainWindow.SaveGamefile.DefaultExt>.sav</MainWindow.SaveGamefile.DefaultExt>
+	<MainWindow.SaveGamefile.Progress.Title>Speichere Spielstand ...</MainWindow.SaveGamefile.Progress.Title>
+	<MainWindow.SaveGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} Objekte</MainWindow.SaveGamefile.Progress.CounterFormat>
+
 	<Dialog.About.Title>Über ...</Dialog.About.Title>
 	<Dialog.Changelog.Title>Änderungsprotokoll ...</Dialog.Changelog.Title>
 	<Dialog.PropertyDump.Title>Elementdetails ...</Dialog.PropertyDump.Title>

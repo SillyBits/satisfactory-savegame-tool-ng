@@ -110,7 +110,11 @@ namespace SatisfactorySavegameTool
 		protected void _UpdateUIState()
 		{
 			bool has_save = (CurrFile != null);
+#if DEBUG
+			bool modified = true;
+#else
 			bool modified = false; //TODO: has_save && CurrFile.IsModified;
+#endif
 
 			File_Save.IsEnabled = File_SaveAs.IsEnabled = modified;
 			File_Close.IsEnabled = has_save;
@@ -172,10 +176,20 @@ namespace SatisfactorySavegameTool
 
 		private void File_Save_Click(object sender, RoutedEventArgs e)
 		{
+			_SaveGamefile(CurrFile.Filename + ".test");
 		}
 
 		private void File_SaveAs_Click(object sender, RoutedEventArgs e)
 		{
+			SaveFileDialog dlg = new SaveFileDialog();
+			dlg.Title = Translate._("MainWindow.SaveGamefile.Title");
+			dlg.InitialDirectory = Settings.EXPORTPATH;
+			dlg.DefaultExt = Translate._("MainWindow.SaveGamefile.DefaultExt");
+			dlg.Filter = Translate._("MainWindow.SaveGamefile.Filter");
+			if (dlg.ShowDialog().GetValueOrDefault(false) == true)
+			{
+				_SaveGamefile(dlg.FileName + ".test");
+			}
 		}
 
 		private void File_Close_Click(object sender, RoutedEventArgs e)
@@ -324,6 +338,26 @@ namespace SatisfactorySavegameTool
 
 		private async void _SaveGamefile(string filename)
 		{
+			ProgressDialog progress = new ProgressDialog(this, Translate._("MainWindow.SaveGamefile.Progress.Title"));
+
+			await Task.Run(() => {
+				DateTime start_time = DateTime.Now;
+
+				Log.Info("Saving file '{0}'", filename);
+				progress.CounterFormat = Translate._("MainWindow.SaveGamefile.Progress.CounterFormat");
+				progress.Interval = 1024*1024;//1024 * 128;
+				CurrFile.SaveAs(progress.Events, filename);
+				Log.Info("Finished saving");
+				Log.Info("... saved a total of {0} elements", CurrFile.TotalElements);
+
+				DateTime end_time = DateTime.Now;
+				TimeSpan ofs = end_time - start_time;
+				Log.Info("Saving took {0}", ofs);
+			});
+
+			progress = null;
+
+			_UpdateUIState();
 		}
 
 		private void _CloseGamefile()

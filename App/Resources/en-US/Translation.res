@@ -54,6 +54,12 @@
 	<MainWindow.LoadGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} bytes</MainWindow.LoadGamefile.Progress.CounterFormat>
 	<MainWindow.LoadGamefile.Progress.Title.2>Building trees ...</MainWindow.LoadGamefile.Progress.Title.2>
 	<MainWindow.LoadGamefile.Progress.CounterFormat.2>{0:#,#0} / {1:#,#0} elements</MainWindow.LoadGamefile.Progress.CounterFormat.2>
+
+	<MainWindow.SaveGamefile.Title>Select file to save to</MainWindow.SaveGamefile.Title>
+	<MainWindow.SaveGamefile.Filter>Savegames (*.sav)|*.sav|All files (*.*)|*.*</MainWindow.SaveGamefile.Filter>
+	<MainWindow.SaveGamefile.DefaultExt>.sav</MainWindow.SaveGamefile.DefaultExt>
+	<MainWindow.SaveGamefile.Progress.Title>Saving savegame ...</MainWindow.SaveGamefile.Progress.Title>
+	<MainWindow.SaveGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} objects</MainWindow.SaveGamefile.Progress.CounterFormat>
 	
 	<Dialog.About.Title>About ...</Dialog.About.Title>
 	<Dialog.Changelog.Title>Changelog ...</Dialog.Changelog.Title>
