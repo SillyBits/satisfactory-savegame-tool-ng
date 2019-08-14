@@ -151,7 +151,7 @@ namespace Reader
 			int len = length ? length : ReadInt();
 
 			if (len == 0)
-				return gcnew str("");
+				return gcnew str(true);
 
 			if (len < 0)
 			{

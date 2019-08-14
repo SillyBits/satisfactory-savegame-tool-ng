@@ -53,6 +53,7 @@ public:
 	str()
 		: _ascii(nullptr)
 		, _unicode(nullptr)
+		, _treat_as_empty(false)
 	{ }
 
 	str(const int length, int type)
@@ -69,6 +70,14 @@ public:
 	str(String^ s) : str()
 	{
 		_Set(s);
+	}
+
+	// Special constructor used to indicate an empty string was read 
+	// from stream which MUST report its length as =0
+	str(bool)
+		: str("")
+	{
+		_treat_as_empty = true;
 	}
 
 
@@ -90,6 +99,28 @@ public:
 	wchar_t *Wchar()
 	{
 		return _unicode;
+	}
+
+	const int GetRawLength()
+	{
+		int len = 0;
+		if (!_treat_as_empty)
+		{
+			// Special handling for those "null" strings we've tweaked in
+			// We've to skip any null-term. increment if this flag is set!
+
+			if (_ascii)
+			{
+				len = (int)strlen(_ascii);
+				len ++;
+			}
+			else if (_unicode)
+			{
+				len = (int)wcslen(_unicode);
+				len += 2;
+			}
+		}
+		return len;
 	}
 
 
@@ -134,6 +165,7 @@ public:
 protected:
 	char *_ascii;
 	wchar_t *_unicode;
+	bool _treat_as_empty;
 
 
 	void _Set(char *s)
