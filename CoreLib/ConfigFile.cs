@@ -36,7 +36,7 @@ namespace CoreLib
 	 */
 
 	// Items do store a name and value
-	internal class Item : DynamicObject
+	public class Item : DynamicObject
 	{
 		internal Item()
 		{
@@ -391,7 +391,7 @@ namespace CoreLib
 
 
 	// Sections do store a list of either other sections or items
-	internal class Section : DynamicObject
+	public class Section : DynamicObject
 	{
 		internal Section()
 		{

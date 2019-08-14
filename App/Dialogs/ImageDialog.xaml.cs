@@ -20,6 +20,12 @@ namespace SatisfactorySavegameTool.Dialogs
 	/// </summary>
 	public partial class ImageDialog : Window
 	{
+		public static void Show(string title, BitmapSource image)
+		{
+			new ImageDialog(null, title, image).ShowDialog();
+		}
+
+
 		public ImageDialog(Window parent, string title, BitmapSource image)
 			: base()
 		{

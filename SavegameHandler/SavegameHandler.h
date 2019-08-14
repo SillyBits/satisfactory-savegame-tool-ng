@@ -155,9 +155,10 @@ namespace Savegame {
 						safe_cast<Properties::Actor^>(prop)->ReadEntity(reader);
 					else if (IsInstance<Properties::Object>(prop))
 						safe_cast<Properties::Object^>(prop)->ReadEntity(reader);
-					else
-						throw gcnew Exception(
-							String::Format("Can't handle object {0}", prop));
+					//else
+					//	throw gcnew Exception(
+					//		String::Format("Can't handle object {0}", prop));
+					//=> Type checking done in first loop already
 					_cbUpdate(reader->Pos, nullptr, prop->ToString());
 				}
 

@@ -133,12 +133,27 @@ namespace CoreLib
 		{
 			if (Level.Error > _min_level)
 				return;
+
+			string stack_trace = null;
+			try
+			{
+				var trace = new StackTrace(exc);
+				if (trace != null)
+					stack_trace = trace.ToString();
+			}
+			catch { }
+			if (stack_trace == null)
+				stack_trace = exc.StackTrace;
+
 			string s = msg + ":\n"
-				+ exc.Message.ToString() + "\n"
-				+ exc.Source.ToString() + "\n"
-				+ exc.StackTrace.ToString() + "\n"
+				+ "Message   : " + exc.Message + "\n"
+				+ "TargetSite: " + exc.TargetSite.Name + ", " + exc.TargetSite.Module.FullyQualifiedName + "\n"
+				+ "Source    : " + exc.Source + "\n"
+				+ "StackTrace:\n" 
+				+ stack_trace + "\n"
 				;
-			Log(msg, Level.Error);
+
+			Log(s, Level.Error);
 		}
 
 

@@ -120,12 +120,12 @@ namespace SatisfactorySavegameTool
 			File_Close.IsEnabled = has_save;
 			Actions_Validate.IsEnabled = has_save;
 
-			#if DEBUG
+#if DEBUG
 			File_Export.IsEnabled = has_save;//Only for me :D
 			File_Import.IsEnabled = false;
-			#else
+#else
 			File_Export.IsEnabled = File_Import.IsEnabled = false;//TODO:
-			#endif
+#endif
 
 			if (!has_save)
 			{
@@ -147,11 +147,11 @@ namespace SatisfactorySavegameTool
 				switch (c)
 				{
 					case 'O':
-						#if DEBUG
+#if DEBUG
 						_LoadGamefile(@"C:\Users\SillyBits\AppData\Local\FactoryGame\Saved\SaveGames\NF-Start-100979.sav");
-						#else
+#else
 						File_Open_Click(e.OriginalSource, null);
-						#endif
+#endif
 						break;					
 					case 'S': File_Save_Click(e.OriginalSource, null); break;
 					case 'W': File_Close_Click(e.OriginalSource, null); break;
@@ -315,7 +315,7 @@ namespace SatisfactorySavegameTool
 				Log.Info("Loading file '{0}'", filename);
 				progress.CounterFormat = Translate._("MainWindow.LoadGamefile.Progress.CounterFormat");
 				progress.Interval = 1024*1024;//1024 * 128;
-				CurrFile.Load(progress.Events);//, self.treeview)
+				CurrFile.Load(progress.Events);
 				Log.Info("Finished loading");
 				Log.Info("... loaded a total of {0} elements", CurrFile.TotalElements);
 
