@@ -14,8 +14,25 @@ namespace CoreLib
 	// Similar to System.Configuration, but more light-weighted and 
 	// flexible by utilizing DynamicObject which allows for stuff like:
 	//
-	//     Window.SetPosition(
-	//     Config.Root.mru.files.Add(<newly opened file>)
+	//     Setting a windows position:
+    //         Left   = Config.Root.window.pos_x;
+    //         Top    = Config.Root.window.pos_y;
+    //         Width  = Config.Root.window.size_x;
+    //         Height = Config.Root.window.size_y;
+	//
+	//     Handling MRU lists, like setting up a menu:
+	//         foreach (string file in Config.Root.mru.files) 
+	//         {
+    //             item = new MenuItem();
+	//             ...
+	//         }
+	//     and adding new files:
+	//         Config.Root.mru.files.Add(<newly opened file>)
+	//
+	// Only downside with using DynamicObject: There is no syntax help 
+	// in means of auto-completion and such. But a small price to pay
+	// compared to possibilities avail.
+	//
 	//
 	// 'Sections' can contain other 'Section's or 'Item's.
 	// 'Item' can contain an optional attribute 'type' and defaults to 'String' if omitted.
@@ -416,8 +433,95 @@ namespace CoreLib
 		public bool HasItem(string name) { return Items.ContainsKey(name); }
 		public bool Has(string name) { return HasSection(name) || HasItem(name); }
 
-		//TODO: Creator for sections needed
-		//TODO: Creator for items needed
+		public Section AddSection(string name)
+		{
+			if (HasSection(name))
+				return null;
+
+			XmlElement node = _node.OwnerDocument.CreateElement(name);
+			_node.AppendChild(node);
+
+			Section section = new Section(node);
+			Sections.Add(name, section);
+
+			return section;
+		}
+
+		public bool RemoveSection(string name)
+		{
+			if (!HasSection(name))
+				return false;
+
+			Section section = Sections[name];
+			Sections.Remove(name);
+
+			_node.RemoveChild(section._node);
+
+			return true;
+		}
+
+		public Item AddItem(string name)
+		{
+			return AddItem(name, "");
+		}
+		public Item AddItem<_ValueType>(string name, _ValueType initial)
+		{
+			if (HasItem(name))
+				return null;
+
+			XmlElement node = _node.OwnerDocument.CreateElement(name);
+			node.InnerText = initial.ToString();
+			_node.AppendChild(node);
+
+			XmlAttribute attr = _node.OwnerDocument.CreateAttribute("type");
+			attr.InnerText = typeof(_ValueType).Name;
+			node.Attributes.Append(attr);
+
+			Item item = ItemFactory.Create(node);
+			Items.Add(name, item);
+
+			return item;
+		}
+
+		public Item AddListItem(string name)
+		{
+			return AddListItem(name, "");
+		}
+		public Item AddListItem<_ValueType>(string name, _ValueType initial)
+		{
+			if (HasItem(name))
+				return null;
+
+			XmlElement node = _node.OwnerDocument.CreateElement(name);
+			node.InnerText = initial.ToString();
+			_node.AppendChild(node);
+
+			XmlAttribute attr = _node.OwnerDocument.CreateAttribute("type");
+			attr.InnerText = typeof(_ValueType).Name;
+			node.Attributes.Append(attr);
+
+			attr = _node.OwnerDocument.CreateAttribute("is-list");
+			attr.InnerText = "True";
+			node.Attributes.Append(attr);
+
+			Item item = ItemFactory.Create(node);
+			Items.Add(name, item);
+
+			return item;
+		}
+
+		public bool RemoveItem(string name)
+		{
+			if (!HasItem(name))
+				return false;
+
+			Item item = Items[name];
+			Items.Remove(name);
+
+			_node.RemoveChild(item._node);
+
+			return true;
+		}
 
 		internal XmlNode _node;
 
