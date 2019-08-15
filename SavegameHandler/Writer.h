@@ -151,18 +151,16 @@ namespace Writer
 
 			int len = length ? length : val->GetRawLength();
 			if (val->Wchar() != nullptr)
-				len = -len;
-			Write(len);
-
-			if (len < 0)
 			{
 				// Unicode string
 				// (length returned by GetRawLength already accounts for double-char)
-				Write((byte*)val->Wchar(), -len);
+				Write(-len / 2);
+				Write((byte*)val->Wchar(), len);
 			}
 			else if (len > 0)
 			{
 				// ASCII string
+				Write(len);
 				Write((byte*)val->Ascii(), len);
 			}
 		}

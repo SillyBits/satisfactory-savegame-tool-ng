@@ -116,7 +116,7 @@ public:
 			}
 			else if (_unicode)
 			{
-				len = (int)wcslen(_unicode);
+				len = (int)wcslen(_unicode) * 2;
 				len += 2;
 			}
 		}
