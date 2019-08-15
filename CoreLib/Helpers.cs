@@ -129,9 +129,12 @@ namespace CoreLib
 			RegistryKey key = root;
 			try
 			{
+				RegistryKey new_key;
 				foreach (string sub in path)
 				{
-					key = key.OpenSubKey(sub, writable);
+					new_key = key.OpenSubKey(sub, writable);
+					key.Dispose();
+					key = new_key;
 					if (key == null)
 						break;
 				}
@@ -139,7 +142,11 @@ namespace CoreLib
 			catch
 			{
 				// Access failed, maybe due to missing access restrictions
-				key = null;
+				if (key != null)
+				{
+					key.Dispose();
+					key = null;
+				}
 			}
 
 			return key;
