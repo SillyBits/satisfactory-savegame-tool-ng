@@ -187,18 +187,20 @@ namespace SatisfactorySavegameTool
 			// Setup paths which do rely on our main path
 			RESOURCEPATH = Path.Combine(APPPATH, RESOURCES);
 			LOGPATH      = Path.Combine(APPPATH, LOGS);
-
-
 		}
 
 		// - Second, init remain based on actual config instance
 		internal static void Init()
 		{
+			if (!Config.Root.HasSection("core"))
+				Config.Root.AddSection("core");
+
+
 			// Pick suitable default language if setting is missing
 			Splashscreen.SetMessage("Setting up language");
-			if (!Config.Root.HasSection("core") 
-				|| !Config.Root.core.HasItem("language")
-				|| string.IsNullOrEmpty(Config.Root.core.language))
+			if (!Config.Root.core.HasItem("language"))
+				Config.Root.core.AddItem("language");
+			if (string.IsNullOrEmpty(Config.Root.core.language))
 			{
 #if DEBUG
 				Config.Root.core.language = "en-US";
@@ -215,9 +217,9 @@ namespace SatisfactorySavegameTool
 
 			// Create defaultpath setting if not set up yet
 			Splashscreen.SetMessage("Setting up default savegame path");
-			if (!Config.Root.HasSection("core") 
-				|| !Config.Root.core.HasItem("defaultpath") 
-				|| Config.Root.core.defaultpath == "")
+			if (!Config.Root.core.HasItem("defaultpath"))
+				Config.Root.core.AddItem("defaultpath");
+			if (Config.Root.core.defaultpath == "" || !Directory.Exists(Config.Root.core.defaultpath))
 			{
 				string subpath = Path.Combine("FactoryGame", "Saved", "SaveGames");
 
@@ -255,10 +257,32 @@ namespace SatisfactorySavegameTool
 			}
 
 
-			EXPORTPATH   = Path.Combine(APPPATH, EXPORTS);//TODO: Use config value
+			// Setup export path
+			if (!Config.Root.core.HasItem("exportpath"))
+				Config.Root.core.AddItem("exportpath", Path.Combine(APPPATH, EXPORTS));
+			EXPORTPATH = Config.Root.core.exportpath;
 
 
+			// Create any missing config before continuing
+			if (!Config.Root.HasSection("deep_analysis"))
+				Config.Root.AddSection("deep_analysis");
+			if (!Config.Root.deep_analysis.HasItem("enabled"))
+				Config.Root.deep_analysis.AddItem("enabled", false);
 
+			if (!Config.Root.HasSection("crash_reports"))
+				Config.Root.AddSection("crash_reports");
+			if (!Config.Root.crash_reports.HasItem("enabled"))
+				Config.Root.crash_reports.AddItem("enabled", false);
+
+			if (!Config.Root.HasSection("incident_reports"))
+				Config.Root.AddSection("incident_reports");
+			if (!Config.Root.incident_reports.HasItem("enabled"))
+				Config.Root.incident_reports.AddItem("enabled", false);
+
+			if (!Config.Root.HasSection("online_mapping"))
+				Config.Root.AddSection("online_mapping");
+			if (!Config.Root.online_mapping.HasItem("enabled"))
+				Config.Root.online_mapping.AddItem("enabled", false);
 		}
 
 	}

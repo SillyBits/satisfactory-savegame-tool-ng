@@ -89,9 +89,16 @@ namespace SatisfactorySavegameTool
 		{
 			// Save window state
 
-			//TODO:
-			//if (!Config.Root.HasSection("window"))
-			//	Config.Root.AddSection("window");
+			if (!Config.Root.HasSection("window"))
+			{
+				Section wnd = Config.Root.AddSection("window");
+				wnd.AddItem("state");
+				wnd.AddItem("pos_x", 0);
+				wnd.AddItem("pos_y", 0);
+				wnd.AddItem("size_x", 0);
+				wnd.AddItem("size_y", 0);
+				wnd.AddItem("splitter", 0);
+			}
 
 			Config.Root.window.state = WindowState.ToString();
 
@@ -201,19 +208,9 @@ namespace SatisfactorySavegameTool
 
 		private void File_Export_Click(object sender, RoutedEventArgs e)
 		{
-			string export_file;
-			if (Config.Root.core.HasItem("exportpath"))
-			{
-				string path = Config.Root.core.exportpath;
-				if (path == "")
-					path = Path.Combine(Settings.APPPATH, Settings.EXPORTS);
-				string filename = Path.GetFileName(CurrFile.Filename) + ".export";
-				export_file = Path.Combine(path, filename);
-			}
-			else
-			{
-				export_file = CurrFile.Filename + ".export";
-			}
+			string filename = Path.GetFileName(CurrFile.Filename) + ".export";
+			string export_file = Path.Combine(Config.Root.core.exportpath, filename);
+
 			_ExportGamefile(export_file);
 		}
 
@@ -431,10 +428,10 @@ namespace SatisfactorySavegameTool
 #region Handling for MRU menu
 		protected void _SetupMRU()
 		{
-			if (!Config.HasSection("mru"))
+			if (!Config.Root.HasSection("mru"))
 			{
-				File_MRU.IsEnabled = false;
-				return;
+				Config.Root.AddSection("mru");
+				Config.Root.mru.AddListItem("files");
 			}
 
 			_UpdateMRU();

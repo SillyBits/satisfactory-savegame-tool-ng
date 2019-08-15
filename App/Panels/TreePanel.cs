@@ -35,6 +35,24 @@ namespace SatisfactorySavegameTool.Panels
 		public TreePanel()
 			: base()
 		{
+			// Create initial trees config if missing
+			if (!Config.Root.HasSection("trees"))
+			{
+				Section trees = Config.Root.AddSection("trees");
+				trees.AddItem("simple"   , false);
+				trees.AddItem("classes"  , true);
+				trees.AddItem("paths"    , false);
+				trees.AddItem("living"   , true);
+				trees.AddItem("buildings", true);
+
+				dynamic order = trees.AddListItem("order");
+				order.Add("simple");
+				order.Add("classes");
+				order.Add("paths");
+				order.Add("living");
+				order.Add("buildings");
+			}
+
 			_Tabs = new List<TabItem>();
 			foreach(string tree in Config.Root.trees.order)
 			{
