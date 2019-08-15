@@ -137,6 +137,11 @@ By activating such an option you do agree to those terms.</OptionsDialog.Privacy
 	<ShowRawTextDialog.Save.Filter>Text file (*.txt)|*.txt|All files (*.*)|*.*</ShowRawTextDialog.Save.Filter>
 	<ShowRawTextDialog.Save.DefaultExt>.txt</ShowRawTextDialog.Save.DefaultExt>
 
+	<ErrorReportingDialog.Title>Crash report</ErrorReportingDialog.Title>
+	<ErrorReportingDialog.Hint>Owww, this shouldn't have happened.</ErrorReportingDialog.Hint>
+	<ErrorReportingDialog.Send>Send</ErrorReportingDialog.Send>
+	<ErrorReportingDialog.Exit>Exit</ErrorReportingDialog.Exit>
+
 	<ImageControl.Label>Bitmap of size {0}x{1} with {2} color channels</ImageControl.Label>
 	<ImageControl.Button>Show ...</ImageControl.Button>
 

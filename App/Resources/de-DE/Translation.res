@@ -137,6 +137,11 @@ Mit aktivieren einer Berichtsoption stimmt der Nutzer dieser Verwendung zu.</Opt
 	<ShowRawTextDialog.Save.Title>Speichern unter ...</ShowRawTextDialog.Save.Title>
 	<ShowRawTextDialog.Save.Filter>Textdatei (*.txt)|*.txt|Alle Dateien (*.*)|*.*</ShowRawTextDialog.Save.Filter>
 	<ShowRawTextDialog.Save.DefaultExt>.txt</ShowRawTextDialog.Save.DefaultExt>
+
+	<ErrorReportingDialog.Title>Absturzbericht</ErrorReportingDialog.Title>
+	<ErrorReportingDialog.Hint>Upps, das hätte nicht passieren sollen.</ErrorReportingDialog.Hint>
+	<ErrorReportingDialog.Send>Senden</ErrorReportingDialog.Send>
+	<ErrorReportingDialog.Exit>Beenden</ErrorReportingDialog.Exit>
 	
 	<ImageControl.Label>Bild der Größe {0}x{1} mit {2} Farbkanälen</ImageControl.Label>
 	<ImageControl.Button>Anzeigen ...</ImageControl.Button>

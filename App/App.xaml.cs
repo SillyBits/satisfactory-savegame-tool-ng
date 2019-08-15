@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Win32;
 
@@ -30,6 +31,9 @@ namespace SatisfactorySavegameTool
 			_logger    = new Logger(Settings.LOGPATH, Settings.APPNAME, Logger.Level.Debug);
 			_config    = new ConfigFile(Settings.APPPATH, Settings.APPNAME);
 			_languages = new LanguageHandler(Settings.RESOURCEPATH, null, TRANSLATIONFILES);
+
+			// Setup error reporting
+			_InitErrorReporting();
 
 			Splashscreen.ShowSplash("Starting up...");
 			MainWindow = null;
@@ -56,9 +60,52 @@ namespace SatisfactorySavegameTool
 		}
 
 
-		public void SaveConfig()
+		private void _InitErrorReporting()
+		{
+			// Catching those based on idea in https://stackoverflow.com/a/46804709
+			AppDomain.CurrentDomain.UnhandledException += _AppDomainUnhandledException;
+			DispatcherUnhandledException += _DispatcherUnhandledException;
+			TaskScheduler.UnobservedTaskException += _TaskSchedulerUnobservedTaskException;
+		}
+
+		private void _AppDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
+		{
+			_ReportException(sender, (Exception)e.ExceptionObject);
+		}
+
+		private void _DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+		{
+			_ReportException(sender, e.Exception);
+			e.Handled = true;
+		}
+
+		private void _TaskSchedulerUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+		{
+			_ReportException(sender, e.Exception);
+		}
+
+		private void _ReportException(object sender, Exception exc)
+		{
+			string msg = "Catched an unhandled exception raised from: " + sender.ToString();
+			_logger.Error(msg, exc);
+
+			try
+			{
+				// Not sure which state we're in, so better be careful with creating this dialog
+				Dialogs.ErrorReportingDialog.Show(msg, exc);
+			}
+			catch { }
+		}
+
+
+		internal void SaveConfig()
 		{
 			_config.Flush();
+		}
+
+		internal void SendReport()
+		{
+			//TODO: Flush current log, save to zip and upload to XXX
 		}
 
 

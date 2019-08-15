@@ -81,6 +81,9 @@
     <Compile Include="Dialogs\OptionsDialog.xaml.cs">
       <DependentUpon>OptionsDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\ErrorReportingDialog.xaml.cs">
+      <DependentUpon>ErrorReportingDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Supplements\Callback.cs" />
     <Compile Include="Supplements\Enums.cs" />
     <Compile Include="Supplements\Extensions.cs" />
@@ -93,6 +96,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Dialogs\ShowHtmlResDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\ErrorReportingDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
