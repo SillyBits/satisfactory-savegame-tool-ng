@@ -182,6 +182,12 @@ namespace Savegame {
 				_cbUpdate(reader->Pos, nullptr, "Done loading");
 			}
 
+			catch (Exception^ exc)
+			{
+				Log::Error(String::Format("Error loading '{0}'", Filename), exc);
+				throw;
+			}
+
 			//catch(Accessor::ReadException)
 			//except Property.Property.PropertyReadException as exc:
 			//	print(exc)
@@ -288,6 +294,12 @@ namespace Savegame {
 
 				_cbUpdate(saved, nullptr, "Done saving");
 				Log::Info("-> stored a {0:#,#0} Bytes", writer->Pos);
+			}
+
+			catch (Exception^ exc)
+			{
+				Log::Error(String::Format("Error saving '{0}'", filename), exc);
+				throw;
 			}
 
 			finally
