@@ -2432,9 +2432,10 @@ namespace SatisfactorySavegameTool.Panels.Details
 				new ListViewControl.ColumnDefinition("Building", 300),
 			};
 
-			foreach(KeyValuePair<int, P.MapProperty.Entry> pair in map_prop.Value)
+			foreach(KeyValuePair<object, object> pair in map_prop.Value)
 			{
-				List<P.ArrayProperty> entries = pair.Value.Value.ListOf<P.ArrayProperty>();
+				P.PropertyList props = pair.Value as P.PropertyList;
+				List<P.ArrayProperty> entries = props.Value.ListOf<P.ArrayProperty>();
 				if (entries == null || entries.Count != 1)
 					continue;//TODO:
 				P.ArrayProperty entry = entries[0];
