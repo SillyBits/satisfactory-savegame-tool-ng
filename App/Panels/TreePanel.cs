@@ -162,9 +162,19 @@ namespace SatisfactorySavegameTool.Panels
 
 	public class TreeNode : INotifyPropertyChanged
 	{
-		public string    Title      { get; private set; }
-		public object    Tag        { get; private set; }
-		public TreeNodes Childs     { get; private set; }
+		public string Title
+		{
+			get
+			{
+				string t = _title;
+				if (Childs != null)
+					t += string.Format(" [{0}]", Childs.Count);
+				return t;
+			}
+		}
+
+		public object    Tag    { get; private set; }
+		public TreeNodes Childs { get; private set; }
 
 		public bool IsEnabled
 		{
@@ -189,9 +199,9 @@ namespace SatisfactorySavegameTool.Panels
 
 		public TreeNode(string title, object tag)
 		{
-			Title = title;
+			_title = title;
 			Tag = tag;
-			Childs = new TreeNodes();
+			Childs = null;
 
 			_enabled = true;
 			_expanded = false;
@@ -201,7 +211,16 @@ namespace SatisfactorySavegameTool.Panels
 		public TreeNode Add(string title, object tag)
 		{
 			TreeNode node = new TreeNode(title, tag);
-			Childs.Add(node);
+			if (Childs == null)
+			{
+				Childs = new TreeNodes();
+				Childs.Add(node);
+				_Notify("Childs");
+			}
+			else
+			{
+				Childs.Add(node);
+			}
 			return node;
 		}
 
@@ -210,6 +229,7 @@ namespace SatisfactorySavegameTool.Panels
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
 		}
 
+		private string _title;
 		private bool _enabled;
 		private bool _expanded;
 		private bool _selected;
