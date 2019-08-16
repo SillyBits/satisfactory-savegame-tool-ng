@@ -24,8 +24,6 @@ namespace SatisfactorySavegameTool.Panels
 	/*
 	 * TODO:
 	 * 
-	 * - Add options to select which trees to build, and which one to show initially
-	 * 
 	 * - Add better tree style handling
 	 * 
 	 */
@@ -152,6 +150,14 @@ namespace SatisfactorySavegameTool.Panels
 
 	public class TreeNodes : ObservableCollection<TreeNode>
 	{
+		internal TreeNodes()
+			: base()
+		{ }
+
+		internal TreeNodes(IEnumerable<TreeNode> collection)
+			: base(collection)
+		{ }
+
 		public TreeNode Add(string title, object tag)
 		{
 			TreeNode node = new TreeNode(title, tag);
@@ -224,6 +230,16 @@ namespace SatisfactorySavegameTool.Panels
 			return node;
 		}
 
+		public void Sort()
+		{
+			if (Childs != null)
+			{
+				Childs = new TreeNodes(Childs.OrderBy(n => n.Title));
+				foreach (TreeNode node in Childs)
+					node.Sort();
+			}
+		}
+
 		private void _Notify(string prop)
 		{
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
@@ -257,7 +273,7 @@ namespace SatisfactorySavegameTool.Panels
 		{
 			_callback = callback;
 
-			long extra = NoOfExtraElements;
+			_Setup();
 
 			Dispatcher.Invoke(() => {
 				SelectedItemChanged -= (Application.Current.MainWindow as MainWindow).TreeView_SelectedItemChanged;
@@ -266,11 +282,14 @@ namespace SatisfactorySavegameTool.Panels
 				Model.Nodes.Clear();
 			});
 
-			_callback.Start(MainWindow.CurrFile.TotalElements + extra, Translate._("MainWindow.LoadGamefile.Progress.Title.2"), "");
+			_callback.Start(NoOfElements, Translate._("MainWindow.LoadGamefile.Progress.Title.2"), "");
 			_count = 0;
 
 			TreeNode root = _AddItem(null, Path.GetFileName(MainWindow.CurrFile.Filename), MainWindow.CurrFile.Header);
 			_CreateTree(root);
+
+			//root.Sort();
+			//=> Actual sorting is up to each individual tree
 
 			root.IsExpanded = true;
 			root.IsSelected = true;
@@ -284,7 +303,9 @@ namespace SatisfactorySavegameTool.Panels
 		}
 
 
-		internal abstract int NoOfExtraElements { get; }
+		internal abstract int NoOfElements { get; }
+
+		internal virtual void _Setup() { }
 
 		internal abstract void _CreateTree(TreeNode root);
 
@@ -292,6 +313,7 @@ namespace SatisfactorySavegameTool.Panels
 		public TreeModel Model { get; private set; }
 		internal ICallback _callback;
 		internal long _count;
+
 
 		internal TreeNode _AddItem(TreeNode parent, string label, object tag = null)
 		{
@@ -374,10 +396,22 @@ namespace SatisfactorySavegameTool.Panels
 			: base()
 		{ }
 
-		internal override int NoOfExtraElements { get { return 3; } }
+		internal override int NoOfElements
+		{
+			get
+			{
+				return 1 // Root
+					+ (1 + MainWindow.CurrFile.Objects.Count) 
+					+ (1 + MainWindow.CurrFile.Collected.Count) 
+				//	+ 1 // .Missing
+					;
+			}
+		}
 
 		internal override void _CreateTree(TreeNode root)
 		{
+			// Do not apply sorting here as this tree should reflect save game 1:1
+
 			string label = string.Format(Translate._("TreePanel.Tree.Objects"), MainWindow.CurrFile.Objects.Count);
 			TreeNode objects = _AddItem(root, label, null);
 			foreach (P.Property prop in MainWindow.CurrFile.Objects)
@@ -402,12 +436,19 @@ namespace SatisfactorySavegameTool.Panels
 			: base()
 		{ }
 
-		internal override int NoOfExtraElements
+		internal override int NoOfElements
 		{
 			get
 			{
-				// A 25% as rough estimate should be ok
-				return MainWindow.CurrFile.Objects.Count / 4;
+				// We're doing a rough estimate here instead of calculating
+				// real amount, else would require parsing all .ClassNames
+				// for potential sub-classes to be added to tree
+
+				return 1 // Root
+					+ (int)((1 + MainWindow.CurrFile.Objects.Count) * 1.25)
+				//	+ (int)((1 + MainWindow.CurrFile.Collected.Count) * 1.25)
+				//	+ 1 // .Missing
+					;
 			}
 		}
 
@@ -424,6 +465,8 @@ namespace SatisfactorySavegameTool.Panels
 			//if self.__savegame.Missing:
 			//	label = "Missing"
 			//	self.__add(self.root, label, self.__savegame.Missing)
+
+			root.Sort();
 		}
 
 		internal TreeNode _AddClassRecurs(TreeNode parent, string path, Savegame.Properties.Property prop)
@@ -555,7 +598,21 @@ namespace SatisfactorySavegameTool.Panels
 			: base()
 		{ }
 
-		internal override int NoOfExtraElements { get { return 150; } }
+		internal override int NoOfElements
+		{
+			get
+			{
+				// We're doing a rough estimate here instead of calculating
+				// real amount, else would require parsing all .ClassNames
+				// for potential sub-classes to be added to tree
+
+				return 1 // Root
+					+ (int)((1 + MainWindow.CurrFile.Objects.Count) * 1.1)
+					+ (int)((1 + MainWindow.CurrFile.Collected.Count) * 1.1)
+				//	+ 1 // .Missing
+					;
+			}
+		}
 
 		internal override void _CreateTree(TreeNode root)
 		{
@@ -566,6 +623,8 @@ namespace SatisfactorySavegameTool.Panels
 
 			foreach (P.Property prop in MainWindow.CurrFile.Collected)
 				_AddTreeRecurs(root, "", prop);
+
+			root.Sort();
 		}
 
 		internal TreeNode _AddTreeRecurs(TreeNode parent, string path, P.Property prop)
@@ -664,36 +723,72 @@ namespace SatisfactorySavegameTool.Panels
 			: base()
 		{ }
 
-		internal override int NoOfExtraElements { get { return 0; } }
+		internal override int NoOfElements
+		{
+			get
+			{
+				// We're doing a rough estimate here instead of calculating
+				// real amount, else would require parsing all .ClassNames
+				// for potential sub-classes to be added to tree
+
+				return 1 // Root
+					+ (1 + _players.Count)
+					+ (1 + 10 + _enemies.Count)  // 10 different enemy classes
+					+ (1 + 10 + _wildlife.Count) // 10 different passive mobs
+					;
+			}
+		}
+
+		internal override void _Setup()
+		{
+			const string magic = "/Game/FactoryGame/Character/";
+			var actors = MainWindow.CurrFile.Objects
+				.Where(p => p is P.Actor)
+				.Cast<P.Actor>()
+				;
+			_players = new List<P.Actor>();
+			_enemies = new List<P.Actor>();
+			_wildlife = new List<P.Actor>();
+			foreach (P.Actor actor in actors)
+			{
+				string classname = actor.ClassName.ToString();
+				if (classname.StartsWith(magic))
+				{
+					classname = classname.Substring(magic.Length);
+					if (classname.StartsWith("Player/BP_PlayerState"))
+						_players.Add(actor);
+					else if (classname.StartsWith("Creature/Enemy"))
+						_enemies.Add(actor);
+					else if (classname.StartsWith("Creature/Wildlife"))
+						_wildlife.Add(actor);
+				}
+			}
+		}
 
 		internal override void _CreateTree(TreeNode root)
 		{
 			_classes = new Dictionary<string, TreeNode>();
 
-			var living = MainWindow.CurrFile.Objects
-				.Where(p => p is P.Actor)
-				.Cast<P.Actor>()
-				.Where(a => a.ClassName.ToString().StartsWith("/Game/FactoryGame/Character/"))
-				;
-
 			TreeNode players = _AddItem(root, "Players");
-			var subset = living.Where(a => a.ClassName.ToString().StartsWith("/Game/FactoryGame/Character/Player/BP_PlayerState"));
-			foreach (P.Actor prop in subset)
+			foreach (P.Actor prop in _players)
 				_AddPlayer(players, prop);
+			players.Sort();
 
 			TreeNode enemies = _AddItem(root, "Enemies");
-			subset = living.Where(a => a.ClassName.ToString().StartsWith("/Game/FactoryGame/Character/Creature/Enemy"));
-			foreach (P.Actor prop in subset)
+			foreach (P.Actor prop in _enemies)
 				_AddEnemy(enemies, prop);
+			enemies.Sort();
 
 			TreeNode wildlife = _AddItem(root, "Wildlife");
-			subset = living.Where(a => a.ClassName.ToString().StartsWith("/Game/FactoryGame/Character/Creature/Wildlife"));
-			foreach (P.Actor prop in subset)
+			foreach (P.Actor prop in _wildlife)
 				_AddWildlife(wildlife, prop);
+			wildlife.Sort();
 
 			players.IsExpanded = true;
 			enemies.IsExpanded = true;
 			wildlife.IsExpanded = true;
+
+			_players = _enemies = _wildlife = null;
 		}
 
 		internal void _AddPlayer(TreeNode parent, P.Actor blueprint)
@@ -801,6 +896,9 @@ namespace SatisfactorySavegameTool.Panels
 		}
 
 
+		internal List<P.Actor> _players;
+		internal List<P.Actor> _enemies;
+		internal List<P.Actor> _wildlife;
 		internal Dictionary<string, TreeNode> _classes;
 
 
@@ -823,38 +921,71 @@ namespace SatisfactorySavegameTool.Panels
 	}
 
 
+	//TODO: VehicleTree
+
+
 	public class BuildingsTree : BasicTree
 	{
 		public BuildingsTree()
 			: base()
 		{ }
 
-		internal override int NoOfExtraElements { get { return 0; } }
+		internal override int NoOfElements
+		{
+			get
+			{
+				// We're doing a rough estimate here instead of calculating
+				// real amount, else would require parsing all .ClassNames
+				// for potential sub-classes to be added to tree
+
+				return 1 // Root
+					+ (1 + 50 + _factories.Count) // 50 different factory classes
+					+ (1 + 10 + _buildings.Count) // 10 different building classes
+					;
+			}
+		}
+
+		internal override void _Setup()
+		{
+			const string magic = "/Game/FactoryGame/Buildable/";
+			var actors = MainWindow.CurrFile.Objects
+				.Where(p => p is P.Actor)
+				.Cast<P.Actor>()
+				;
+			_factories = new List<P.Actor>();
+			_buildings = new List<P.Actor>();
+			foreach (P.Actor actor in actors)
+			{
+				string classname = actor.ClassName.ToString();
+				if (classname.StartsWith(magic))
+				{
+					classname = classname.Substring(magic.Length);
+					if (classname.StartsWith("Factory/"))
+						_factories.Add(actor);
+					else if (classname.StartsWith("Building/"))
+						_buildings.Add(actor);
+				}
+			}
+		}
 
 		internal override void _CreateTree(TreeNode root)
 		{
 			_classes = new Dictionary<string, TreeNode>();
 
-			var factory_set = MainWindow.CurrFile.Objects
-				.Where(p => p is P.Actor)
-				.Cast<P.Actor>()
-				.Where(a => a.ClassName.ToString().StartsWith("/Game/FactoryGame/Buildable/Factory/"))
-				;
 			TreeNode factories = _AddItem(root, "Factories");
-			foreach (P.Actor prop in factory_set)
+			foreach (P.Actor prop in _factories)
 				_AddFactory(factories, prop);
+			factories.Sort();
 
-			var building_set = MainWindow.CurrFile.Objects
-				.Where(p => p is P.Actor)
-				.Cast<P.Actor>()
-				.Where(a => a.ClassName.ToString().StartsWith("/Game/FactoryGame/Buildable/Building/"))
-				;
 			TreeNode buildings = _AddItem(root, "Buildings");
-			foreach (P.Actor prop in building_set)
+			foreach (P.Actor prop in _buildings)
 				_AddBuilding(buildings, prop);
+			buildings.Sort();
 
 			factories.IsExpanded = true;
 			buildings.IsExpanded = true;
+
+			_factories = _buildings = null;
 		}
 
 		internal void _AddFactory(TreeNode parent, P.Actor actor)
@@ -885,6 +1016,9 @@ namespace SatisfactorySavegameTool.Panels
 
 		internal void _AddBuilding(TreeNode parent, P.Actor actor)
 		{
+			// TODO: Further refinement of tree, e.g. group conveyors showing 'Mk#' nodes below,
+			//       or split walls and walkways into their explicit types (e.g. door left/right/, ...)
+
 			string[] groups = actor
 				.ClassName.ToString()
 				.Replace("/Game/FactoryGame/Buildable/Building/", "")
@@ -938,6 +1072,8 @@ namespace SatisfactorySavegameTool.Panels
 		}
 
 
+		private List<P.Actor> _factories;
+		private List<P.Actor> _buildings;
 		private Dictionary<string, TreeNode> _classes;
 		private static string[] _excludes = new string[] { "Build", "BP", "C" };
 
