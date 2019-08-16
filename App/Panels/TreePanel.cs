@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -990,22 +991,39 @@ namespace SatisfactorySavegameTool.Panels
 
 		internal void _AddFactory(TreeNode parent, P.Actor actor)
 		{
-			string[] groups = actor
-				.ClassName.ToString()
-				.Replace("/Game/FactoryGame/Buildable/Factory/", "")
-				.Split('/');
-			TreeNode group = _AddOrGetClass(parent, groups[0]);
-			if (groups.Length == 3)
-				group = _AddOrGetClass(group, groups[1]);
-
 			string objname = actor.PathName.LastName();
 			var names = objname
 				.Split('_')
 				.Where(s => !_excludes.Contains(s))
-				.ToList();
+				.ToList()
+				;
 			string id = names.Last();
 			names.Remove(id);
 			string name = string.Join("_", names);
+
+			// Further refinement of tree, grouping conveyors and such, showing 'Mk#' nodes below
+			TreeNode group = parent;
+
+			Match match = _regex_mk.Match(name);
+			if (match.Success)
+			{
+				// For this to work, we've to refactor use of _classes cache, darn :-/
+				string grp = match.Groups["group"].Value;
+				group = _AddOrGetClass(group, grp);
+				grp = match.Groups["tier"].Value;
+				group = _AddOrGetClass(group, grp);
+				name = grp + match.Groups["name"];
+			}
+			else
+			{
+				string[] groups = actor
+					.ClassName.ToString()
+					.Replace("/Game/FactoryGame/Buildable/Factory/", "")
+					.Split('/');
+				group = _AddOrGetClass(group, groups[0]);
+				if (groups.Length == 3)
+					group = _AddOrGetClass(group, groups[1]);
+			}
 
 			string short_title = string.Format("{0} #{1}", name, id);
 			string title = short_title + string.Format(" ({0})", objname);
@@ -1016,24 +1034,34 @@ namespace SatisfactorySavegameTool.Panels
 
 		internal void _AddBuilding(TreeNode parent, P.Actor actor)
 		{
-			// TODO: Further refinement of tree, e.g. group conveyors showing 'Mk#' nodes below,
-			//       or split walls and walkways into their explicit types (e.g. door left/right/, ...)
-
-			string[] groups = actor
-				.ClassName.ToString()
-				.Replace("/Game/FactoryGame/Buildable/Building/", "")
-				.Split('/');
-			TreeNode group = _AddOrGetClass(parent, groups[0]);
-			if (groups.Length == 3)
-				group = _AddOrGetClass(group, groups[1]);
-
 			string objname = actor.PathName.LastName();
 			var names = objname
 				.Split('_')
 				.Where(s => !_excludes.Contains(s))
-				.ToList();
+				.ToList()
+				;
 			string id = names.Last();
 			names.Remove(id);
+			// Further refinement of tree, grouping walls, walkways and such, showing typed nodes below
+			TreeNode group = parent;
+
+			if (names.Count > 2)
+			{
+				group = _AddOrGetClass(group, names[0]);
+				names.RemoveAt(0);
+				group = _AddOrGetClass(group, names[0]);
+			}
+			else
+			{
+				string[] groups = actor
+					.ClassName.ToString()
+					.Replace("/Game/FactoryGame/Buildable/Building/", "")
+					.Split('/');
+				group = _AddOrGetClass(group, groups[0]);
+				if (groups.Length == 3)
+					group = _AddOrGetClass(group, groups[1]);
+			}
+
 			string name = string.Join("_", names);
 
 			string short_title = string.Format("{0} #{1}", name, id);
@@ -1046,16 +1074,18 @@ namespace SatisfactorySavegameTool.Panels
 		//TODO: Add icon capability?
 		internal TreeNode _AddOrGetClass(TreeNode parent, string name)
 		{
-			if (!_classes.ContainsKey(name))
+			string lookup = (parent != null) ? parent.GetHashCode().ToString() : "";
+			lookup += name;
+			if (!_classes.ContainsKey(lookup))
 			{
 				string title = name;
 				if (Translate.Has(title))
 					title = Translate._(title);
 				TreeNode class_item = _AddItem(parent, title);
 				//class_item.IsExpanded = true;
-				_classes.Add(name, class_item);
+				_classes.Add(lookup, class_item);
 			}
-			return _classes[name];
+			return _classes[lookup];
 		}
 
 		protected override void _CreateContextMenu()
@@ -1076,6 +1106,8 @@ namespace SatisfactorySavegameTool.Panels
 		private List<P.Actor> _buildings;
 		private Dictionary<string, TreeNode> _classes;
 		private static string[] _excludes = new string[] { "Build", "BP", "C" };
+		private static RegexOptions _default_options = RegexOptions.Compiled | RegexOptions.CultureInvariant;
+		private static Regex _regex_mk = new Regex(@"^(?<group>.+)(?<tier>Mk\d)(?<name>.*)$", _default_options);
 
 
 		internal class Building
