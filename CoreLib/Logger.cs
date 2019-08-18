@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 
 namespace CoreLib
@@ -15,36 +11,42 @@ namespace CoreLib
     {
 		public static Logger LOG = null;
 
-		public Logger(string filepath, string appname, Level min_level = Level.Info)
+		public Logger(string filepath, string appname, Level min_level = Level.Info, bool as_singleton = true)
         {
 			if (!Directory.Exists(filepath))
 				Directory.CreateDirectory(filepath);
 
-			string filename = Path.Combine(filepath, appname + ".log");
+			_filename = Path.Combine(filepath, appname + ".log");
 
 			// Backup existing log
-			if (File.Exists(filename))
+			if (File.Exists(_filename))
 			{
+				//TODO: Compress instead of simple copy
 				string backupfile = Path.Combine(filepath, appname + "-" + DateTime.Now.ToString("yyyyMMdd-hhmmss") + ".log");
-				try { File.Move(filename, backupfile); }
+				try { File.Move(_filename, backupfile); }
 				catch { /*Just eat this*/ }
 			}
 
-			_file = File.CreateText(filename);
+			_file = new StreamWriter(File.Open(_filename, FileMode.Create, FileAccess.Write, FileShare.ReadWrite));
 
 			_min_level = min_level;
 
 			Info("Starting up log facility ...");
 
 			// Replace original listeners, replacing with writing into our own log
-			Trace.Listeners.RemoveAt(0);
-			_trace = new _Trace(this);
-			Trace.Listeners.Add(_trace);
+			if (as_singleton)
+			{
+				// Only avail with singleton, e.g. the main application log
+				Trace.Listeners.RemoveAt(0);
+				_trace = new _Trace(this);
+				Trace.Listeners.Add(_trace);
+			}
 
 			Info("... log facility up and running");
 			_file.Write("\n");
 
-			SetLog(this);
+			if (as_singleton)
+				SetLog(this);
 		}
 
 		~Logger()
@@ -61,11 +63,15 @@ namespace CoreLib
 			_file.Write("\n");
 			Info("Shutting down log facility ...");
 
-			Trace.Listeners.RemoveAt(0);
+			if (LOG == this)
+			{
+				// Only avail with singleton, e.g. the main application log
+				Trace.Listeners.RemoveAt(0);
 
-			if (_trace != null)
-				_trace.Close();
-			_trace = null;
+				if (_trace != null)
+					_trace.Close();
+				_trace = null;
+			}
 
 			Info("... log facility is down now!");
 
@@ -157,7 +163,23 @@ namespace CoreLib
 		}
 
 
+		public byte[] GetSnapshot(bool compressed = true)
+		{
+			lock(_file)
+			{
+				_file.Flush();
+
+				byte[] snapshot = Helpers.GetFileContents(_filename);
+				if (compressed)
+					snapshot = Compressor.CompressToArray(snapshot, Path.GetFileName(_filename));
+
+				return snapshot;
+			}
+		}
+
+
 		protected Level _min_level;
+		protected string _filename;
 		protected TextWriter _file;
 		protected _Trace _trace;
 

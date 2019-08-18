@@ -25,7 +25,7 @@ namespace CoreLib
 		{
 			try
 			{
-				using (FileStream in_stream = File.OpenRead(filename))
+				using (FileStream in_stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 				{
 					using (MemoryStream mem = new MemoryStream())
 					{
