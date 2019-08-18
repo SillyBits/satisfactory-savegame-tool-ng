@@ -636,6 +636,7 @@ namespace CoreLib
 			Shutdown();
 		}
 
+
 		public void Shutdown()
 		{
 			CONFIG = null;
@@ -645,10 +646,12 @@ namespace CoreLib
 			_root = null;
 			_config = null;
 		}
+
 		public void Flush()
 		{
 			_Save();
 		}
+
 
 		// Override this if you subclass from ConfigFile, or call it at least once
 		virtual public void SetConfig(ConfigFile cfg)
@@ -656,41 +659,21 @@ namespace CoreLib
 			CONFIG = cfg;
 		}
 
+
+		public string Filename { get { return _filename; } }
+
 		public dynamic Root { get { return _root; } }
 
 		public bool HasSection(string name) { return _root.HasSection(name); }
 		public bool HasItem(string name) { return _root.HasItem(name); }
 		public bool Has(string name) { return _root.Has(name); }
-		
-		/*
-		public void AddSection(string name)//, ...)
-		{
-		}
-		public void RemoveSection(string name)
-		{
-		}
-		public void RemoveSection(Section section)
-		{
-		}
 
-		public void AddValue(string section, string name, object value)
-		{
-		}
-		public void RemoveValue(string section, string name)
-		{
-		}
-		public void RemoveValue(Section section, string name)
-		{
-		}
-		public void RemoveValue(Item item)
-		{
-		}
-		*/
 
 		internal string _filename;
 		internal XmlDocument _config;
 		internal string _version;
 		internal Section _root;
+
 
 		internal void _Load(string filename)
 		{
@@ -720,6 +703,7 @@ namespace CoreLib
 			_version = node.Attributes[0].Value;
 			_root = new Section(node);
 		}
+
 		internal void _Save()
 		{
 			if (_root != null)
@@ -730,6 +714,7 @@ namespace CoreLib
 			}
 		}
 
+
 		// DynamicObject
 		public override bool TryGetMember(GetMemberBinder binder, out object result)
 		{
@@ -738,6 +723,7 @@ namespace CoreLib
 			result = null;
 			return false;
 		}
+
 		public override bool TrySetMember(SetMemberBinder binder, object value)
 		{
 			if (_root != null)
