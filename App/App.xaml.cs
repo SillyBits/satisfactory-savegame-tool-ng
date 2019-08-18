@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Globalization;
@@ -21,19 +22,20 @@ namespace SatisfactorySavegameTool
     /// </summary>
     public partial class App : Application
     {
+		protected Uploader _uploader = null;
 		protected Logger _logger = null;
 		protected ConfigFile _config = null;
 		protected LanguageHandler _languages = null;
 		protected VersionTable _versions = null;
 
+
 		protected override void OnStartup(StartupEventArgs e)
 		{
+			_InitErrorReporting();
+
 			_logger    = new Logger(Settings.LOGPATH, Settings.APPNAME, Logger.Level.Debug);
 			_config    = new ConfigFile(Settings.APPPATH, Settings.APPNAME);
 			_languages = new LanguageHandler(Settings.RESOURCEPATH, null, TRANSLATIONFILES);
-
-			// Setup error reporting
-			_InitErrorReporting();
 
 			Splashscreen.ShowSplash("Starting up...");
 			MainWindow = null;
@@ -52,20 +54,61 @@ namespace SatisfactorySavegameTool
 
 			_languages = null;
 
-			_config.Shutdown();
+			if (_config != null)
+				_config.Shutdown();
 			_config = null;
 
-			_logger.Shutdown();
+			if (_logger != null)
+				_logger.Shutdown();
 			_logger = null;
+
+			_ShutdownErrorReporting();
 		}
 
 
 		private void _InitErrorReporting()
 		{
+			// Setup error reporting
+			_uploader = new Uploader( Helpers.Unpack("yygpKSi20tc3STNKsUw008vPy8nMS9UtTi0qSy3SS87JL03Rz3NxNSs18ckqLs+rMnMJrzIyzUoCAA==")
+									, Helpers.Unpack("CwxNNgmpysgJzsrISTTIiAgxcjNKzA4K9jOwMEsJ9TQID3GLDMn1y04xzvAJd0vJSAkvMQ0NT7cFAA==")
+									, new string[] { Settings.APPNAME, Settings.APPVERSION }
+									, Path.Combine(Settings.LOGPATH, "Uploader"));
+
 			// Catching those based on idea in https://stackoverflow.com/a/46804709
 			AppDomain.CurrentDomain.UnhandledException += _AppDomainUnhandledException;
 			DispatcherUnhandledException += _DispatcherUnhandledException;
 			TaskScheduler.UnobservedTaskException += _TaskSchedulerUnobservedTaskException;
+
+			_uploader.Start();
+		}
+
+		private void _ShutdownErrorReporting()
+		{
+			// Remove event handlers first!
+			AppDomain.CurrentDomain.UnhandledException -= _AppDomainUnhandledException;
+			DispatcherUnhandledException -= _DispatcherUnhandledException;
+			TaskScheduler.UnobservedTaskException -= _TaskSchedulerUnobservedTaskException;
+
+			if (_uploader != null)
+			{
+				if (_uploader.HasPendingWork)
+				{
+					Splashscreen.ShowSplash("Waiting for uploader to finish ...");
+
+					string msg = "";
+					while (_uploader.HasPendingWork)
+					{
+						msg += ".";
+						Splashscreen.SetMessage(msg);
+						Thread.Sleep(250);
+					}
+
+					Splashscreen.HideSplash();
+				}
+
+				_uploader.Close();
+			}
+			_uploader = null;
 		}
 
 		private void _AppDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -103,15 +146,27 @@ namespace SatisfactorySavegameTool
 			_config.Flush();
 		}
 
-		internal void SendReport()
+		internal void SendReport(string type, string report)
 		{
-			//TODO: Flush current log, save to zip and upload to XXX
+#if DEVENV
+			// Do nothing while in a development environment
+#else
+			// Gather relevant data
+			Dictionary<string,byte[]> content = new Dictionary<string, byte[]>();
+			content.Add(type + ".txt", Encoding.ASCII.GetBytes(report));
+			if (type == "Crash")
+			{
+				content.Add("Latest.log", _logger.GetSnapshot(false));
+				content.Add("Latest.cfg", Helpers.GetFileContents(_config.Filename));
+			}
+			_uploader.Send(Compressor.CompressToArray(content));
+#endif
 		}
 
 
 		private const  string   TRANSLATIONFILE_MAIN = "Translation.res";
 		private const  string   TRANSLATIONFILE_FG   = "FactoryGame.res";
-		private static string[] TRANSLATIONFILES     = new string[] { TRANSLATIONFILE_MAIN, TRANSLATIONFILE_FG };
+		private static string[] TRANSLATIONFILES     = { TRANSLATIONFILE_MAIN, TRANSLATIONFILE_FG };
 
 	}
 
@@ -167,26 +222,42 @@ namespace SatisfactorySavegameTool
 			else
 				APPVERSION = FileVersionInfo.GetVersionInfo(ass.Location).ProductVersion;
 
-			string path;
-#if DEBUG
-			path = @"E:\GitHub\satisfactory-savegame-tool-ng\App";
+#if DEVENV
+			APPPATH = @"E:\GitHub\satisfactory-savegame-tool-ng\App";
 #else
-			//TODO:
-			path = Process.GetCurrentProcess().StartInfo.WorkingDirectory;
-			if (path == "" || !Directory.Exists(path))
-			{
-				path = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
-			}
-			if (path == "" || !Directory.Exists(path))
-			{
-				path = @"E:\GitHub\satisfactory-savegame-tool-ng";
-			}
+			APPPATH = Path.GetDirectoryName(ass.Location);
 #endif
-			APPPATH = path;
 
 			// Setup paths which do rely on our main path
 			RESOURCEPATH = Path.Combine(APPPATH, RESOURCES);
 			LOGPATH      = Path.Combine(APPPATH, LOGS);
+
+			// Ensure log path exists
+			// If this fails, user might have insufficient rights, or even worse happened
+			try
+			{
+				if (!Directory.Exists(LOGPATH))
+					Directory.CreateDirectory(LOGPATH);
+			}
+			catch (Exception exc)
+			{
+				string msg = string.Format("A fatal error has occurred while initializing!\n"
+										 + "\n"
+										 + "Catched an exception\n"
+										 + "\n"
+										 + "{0}\n"
+										 + "\n"
+										 + "while trying to create log files folder\n"
+										 + "\n"
+										 + "{1}\n"
+										 + "\n"
+										 + "\n"
+										 + "Consult the FaQ for further assistance."
+										 , exc.Message
+										 , LOGPATH);
+				MessageBox.Show(msg, "Fatal error", MessageBoxButton.OK, MessageBoxImage.Stop);
+				Process.GetCurrentProcess().Kill();
+			}
 		}
 
 		// - Second, init remain based on actual config instance

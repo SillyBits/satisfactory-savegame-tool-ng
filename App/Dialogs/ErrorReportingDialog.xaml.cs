@@ -58,19 +58,14 @@ namespace SatisfactorySavegameTool.Dialogs
 				;
 			TextCtrl.Text = text;
 
-			//try
-			//{
-			//	// Not sure which state we're in, so better be careful with accessing config
-			//	SendBtn.IsEnabled = Config.Root.crash_reports.enabled;
-			//}
-			//catch { }
-			//=> Deactivated until proxy avail for receiving those crashes
-			SendBtn.Visibility = Visibility.Collapsed;
+			// Not sure which state we're in, so better be careful with accessing config
+			try { SendBtn.IsEnabled = Config.Root.crash_reports.enabled; }
+			catch { }
 		}
 
 		private void Send_Click(object sender, RoutedEventArgs e)
 		{
-			(Application.Current as App).SendReport();
+			(Application.Current as App).SendReport("Crash", TextCtrl.Text);
 			Application.Current.Shutdown();
 		}
 
