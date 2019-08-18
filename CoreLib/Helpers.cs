@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -13,6 +14,33 @@ namespace CoreLib
 	// Random helpers
 	public static class Helpers
 	{
+
+		/// <summary>
+		/// Reads a file, returning it's content as byte array.
+		/// Note that file will be read in binary mode, so there won't be any CRLF-conversion or such.
+		/// </summary>
+		/// <param name="filename">File to read</param>
+		/// <returns>File contents</returns>
+		public static byte[] GetFileContents(string filename)
+		{
+			try
+			{
+				using (FileStream in_stream = File.OpenRead(filename))
+				{
+					using (MemoryStream mem = new MemoryStream())
+					{
+						in_stream.CopyTo(mem);
+						mem.Flush();
+						return mem.ToArray();
+					}
+				}
+			}
+			catch
+			{
+				return null;
+			}
+		}
+
 
 		/// <summary>
 		/// Create a hexdump for data given.

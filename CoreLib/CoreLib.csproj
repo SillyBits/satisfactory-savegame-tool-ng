@@ -35,6 +35,7 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -49,6 +50,7 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Callback.cs" />
+    <Compile Include="Compressor.cs" />
     <Compile Include="ConfigFile.cs" />
     <Compile Include="CoreLib.cs" />
     <Compile Include="FactoryHelpers.cs" />
