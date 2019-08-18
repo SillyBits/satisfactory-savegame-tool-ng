@@ -204,6 +204,30 @@ namespace CoreLib
 			return new Uri(path);
 		}
 
+
+		/// <summary>
+		/// Pack given string, used to hide data from simple crawlers.
+		/// </summary>
+		/// <param name="unpacked">String to be cloaked</param>
+		/// <returns>Cloaked version of string</returns>
+		public static string Pack(string unpacked)
+		{
+			byte[] bytes = Encoding.ASCII.GetBytes(unpacked);
+			byte[] compressed = Compressor.Inflate(bytes);
+			return Convert.ToBase64String(compressed);
+		}
+
+		/// <summary>
+		/// Unpacks string created by <see cref="Pack"/> earlier.
+		/// </summary>
+		/// <param name="packed">Cloaked string to unpack</param>
+		/// <returns>Unpacked string</returns>
+		public static string Unpack(string packed)
+		{
+			byte[] bytes = Convert.FromBase64String(packed);
+			byte[] uncompressed = Compressor.Deflate(bytes);
+			return Encoding.ASCII.GetString(uncompressed);
+		}
 	}
 
 }

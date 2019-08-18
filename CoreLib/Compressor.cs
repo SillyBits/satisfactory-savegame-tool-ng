@@ -137,6 +137,49 @@ namespace CoreLib
 			}
 		}
 
+
+		/// <summary>
+		/// Compresses data array, returning inflated byte array.
+		/// </summary>
+		/// <param name="data">Data to compress</param>
+		/// <returns>Compressed data array</returns>
+		public static byte[] Inflate(byte[] data)
+		{
+			using (MemoryStream mem = new MemoryStream())
+			{
+				using (DeflateStream inflater = new DeflateStream(mem, CompressionMode.Compress))
+				{
+					inflater.Write(data, 0, data.Length);
+					inflater.Flush();
+				}
+
+				mem.Flush();
+				return mem.ToArray();
+			}
+		}
+
+		/// <summary>
+		/// Decompresses data array, returning original data as array.
+		/// </summary>
+		/// <param name="data">Data to decompress</param>
+		/// <returns>Decompressed data array</returns>
+		public static byte[] Deflate(byte[] data)
+		{
+			using (MemoryStream out_stream = new MemoryStream())
+			{
+				using (MemoryStream in_stream = new MemoryStream(data))
+				{
+					using (DeflateStream deflater = new DeflateStream(in_stream, CompressionMode.Decompress))
+					{
+						deflater.CopyTo(out_stream);
+					}
+				}
+
+				out_stream.Flush();
+				return out_stream.ToArray();
+			}
+		}
+
 	}
 
 }
