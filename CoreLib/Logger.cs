@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 
 namespace CoreLib
@@ -21,10 +23,21 @@ namespace CoreLib
 			// Backup existing log
 			if (File.Exists(_filename))
 			{
-				//TODO: Compress instead of simple copy
-				string backupfile = Path.Combine(filepath, appname + "-" + DateTime.Now.ToString("yyyyMMdd-hhmmss") + ".log");
-				try { File.Move(_filename, backupfile); }
-				catch { /*Just eat this*/ }
+				// Move to zip, ...
+				string backupfile = Path.Combine(filepath, appname + "-" + DateTime.Now.ToString("yyyyMMdd-hhmmss") + ".zip");
+				Compressor.CompressToFile(backupfile, new Dictionary<string,byte[]> {
+					{ Path.GetFileName(_filename), Helpers.GetFileContents(_filename) } });
+				File.Delete(_filename);
+				// ..., and reduce to at most 5 latest logs
+				var logs = Directory.EnumerateFiles(filepath, appname + "*.zip")
+					.OrderByDescending(f => File.GetLastAccessTime(f))
+					.ToList()
+					;
+				if (logs.Count > 5)
+				{
+					logs.RemoveRange(0, 5);
+					logs.ForEach(f => File.Delete(f));
+				}
 			}
 
 			_file = new StreamWriter(File.Open(_filename, FileMode.Create, FileAccess.Write, FileShare.ReadWrite));
