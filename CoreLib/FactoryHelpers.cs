@@ -170,12 +170,14 @@ namespace CoreLib
 
 		public bool IsKnown(string typename)
 		{
+			if (typename == null)
+				return false;
 			return _lookup.ContainsKey(typename);
 		}
 
 		public _LookupType this[string typename]
 		{
-			get { return _lookup.ContainsKey(typename) ? _lookup[typename] : null; }
+			get	{ return IsKnown(typename) ? _lookup[typename] : null; }
 		}
 
 		public delegate _LookupType SelectorFunc(TypeInfo typeinfo);
