@@ -191,7 +191,7 @@ namespace SatisfactorySavegameTool
 
 		private void File_Save_Click(object sender, RoutedEventArgs e)
 		{
-			_SaveGamefile(CurrFile.Filename + ".test");
+			_SaveGamefile(CurrFile.Filename);
 		}
 
 		private void File_SaveAs_Click(object sender, RoutedEventArgs e)
@@ -203,7 +203,7 @@ namespace SatisfactorySavegameTool
 			dlg.Filter = Translate._("MainWindow.SaveGamefile.Filter");
 			if (dlg.ShowDialog().GetValueOrDefault(false) == true)
 			{
-				_SaveGamefile(dlg.FileName + ".test");
+				_SaveGamefile(dlg.FileName);
 			}
 		}
 
@@ -370,6 +370,16 @@ namespace SatisfactorySavegameTool
 
 		private async void _SaveGamefile(string filename)
 		{
+			if (File.Exists(filename))
+			{
+				// Move to zip, ...
+				string path = Path.GetDirectoryName(filename);
+				string backupfile = Path.Combine(path, 
+					Path.GetFileNameWithoutExtension(filename) + "-" + DateTime.Now.ToString("yyyyMMdd-hhmmss") + ".zip");
+				_SetStatusbar(string.Format(Translate._("MainWindow.SaveGamefile.Backup.Statusbar"), filename, Path.GetFileName(backupfile)));
+				await Task.Run(() => Compressor.CompressToFile(backupfile, filename, path));
+			}
+
 			_SetStatusbar(string.Format(Translate._("MainWindow.SaveGamefile.Progress.Statusbar"), filename));
 			ProgressDialog progress = new ProgressDialog(this, Translate._("MainWindow.SaveGamefile.Progress.Title"));
 
