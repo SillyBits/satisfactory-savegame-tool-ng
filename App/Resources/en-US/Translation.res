@@ -13,7 +13,7 @@
 	<Down>Down</Down>
 
 	<MainWindow.Title>Satisfactory Savegame Tool</MainWindow.Title>
-	
+
 	<MainWindow.Menu.File>_File</MainWindow.Menu.File>
 	<MainWindow.Menu.File.Open>O_pen</MainWindow.Menu.File.Open>
 	<MainWindow.Menu.File.Open.IG>Ctrl+O</MainWindow.Menu.File.Open.IG>
@@ -50,6 +50,24 @@
 	
 	<MainWindow.LoadGamefile.Title>Select savegame to load</MainWindow.LoadGamefile.Title>
 	<MainWindow.LoadGamefile.Filter>Savegames (*.sav)|*.sav|All files (*.*)|*.*</MainWindow.LoadGamefile.Filter>
+	<MainWindow.LoadGamefile.PeekHeader.Failed>Failed inspecting header of savegame
+
+{0}
+
+This tool can't operate on this savegame, sorry.</MainWindow.LoadGamefile.PeekHeader.Failed>
+	<MainWindow.LoadGamefile.PeekHeader.Warn>This tool only supports savegame to up
+
+{0},
+
+but the savegame you're trying to load uses a more recent version
+
+{1}.
+
+
+The tool might still be able to load this savegame, but expect
+failures or even crash/incident reports popping up.
+You're NOT advised to save any changes as this might cause
+unrecoverable damage to your save!</MainWindow.LoadGamefile.PeekHeader.Warn>
 	<MainWindow.LoadGamefile.Progress.Title>Loading savegame ...</MainWindow.LoadGamefile.Progress.Title>
 	<MainWindow.LoadGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} bytes</MainWindow.LoadGamefile.Progress.CounterFormat>
 	<MainWindow.LoadGamefile.Progress.Title.2>Building trees ...</MainWindow.LoadGamefile.Progress.Title.2>

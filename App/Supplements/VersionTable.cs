@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml;
 
 
@@ -23,6 +24,12 @@ namespace SatisfactorySavegameTool.Supplements
 		public VersionEntry Find(int buildno)
 		{
 			return _versions.Find(v => v._cl == buildno);
+		}
+
+
+		public VersionEntry GetMax()
+		{
+			return _versions.Last();
 		}
 
 

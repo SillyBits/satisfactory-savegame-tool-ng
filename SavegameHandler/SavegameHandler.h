@@ -32,6 +32,11 @@ namespace Savegame {
 		}
 
 
+		Properties::Header^ PeekHeader()
+		{
+			return _PeekHeader();
+		}
+
 		void Load(ICallback^ callback)
 		{
 			_Load(callback);
@@ -75,6 +80,30 @@ namespace Savegame {
 			Log::_(s, Logger::Level::Info, false, false);
 		}
 
+
+		Properties::Header^ _PeekHeader()
+		{
+			Properties::Header^ header = nullptr;
+			FileReader^ reader = nullptr;
+			try
+			{
+				reader = gcnew FileReader(Filename, nullptr);
+				header = (Properties::Header^) (gcnew Properties::Header(nullptr))->Read(reader);
+			}
+			catch (Exception^ exc)
+			{
+				Log::Error(String::Format("Error loading header from '{0}'", Filename), exc);
+				header = nullptr;
+			}
+			finally
+			{
+				if (reader != nullptr)
+					reader->Close();
+				reader = nullptr;
+			}
+
+			return header;
+		}
 
 		void _Load(ICallback^ callback)
 		{

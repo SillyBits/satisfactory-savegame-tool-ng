@@ -299,15 +299,38 @@ namespace SatisfactorySavegameTool
 				return;
 			}
 
+			// Setup savegame
+			CurrFile = new Savegame.Savegame(filename);
+
+			// Activate features as configured by user
+			CurrFile.EnableDeepAnalysis(Config.Root.deep_analysis.enabled);
+
+			// Peek header first, to ensure the savegame version is fully supported
+			Header header = CurrFile.PeekHeader();
+			if (header == null)
+			{
+				Log.Error("Failed to peek header");
+				MessageBox.Show(string.Format(Translate._("MainWindow.LoadGamefile.PeekHeader.Failed"), filename), Settings.APPTITLE, 
+					MessageBoxButton.OK, MessageBoxImage.Stop);
+				return;
+			}
+			if (header.GetVersionEntry() == null)
+			{
+				// Log this version info in case tool crashes
+				Log.Warning("Save is newer than this tool supports: Build={0}, SaveVersion={1}, SaveType={2}", 
+					header.GetBuildVersion(), header.SaveVersion, header.Type);
+				VersionTable.VersionEntry max_version = VersionTable.INSTANCE.GetMax();
+				string save_version = string.Format("Build {0}", header.GetBuildVersion());
+				var ret = MessageBox.Show(string.Format(Translate._("MainWindow.LoadGamefile.PeekHeader.Warn"), max_version, save_version), 
+					Settings.APPTITLE, MessageBoxButton.YesNo, MessageBoxImage.Question);
+				if (ret == MessageBoxResult.No)
+					return;
+			}
+
 			ProgressDialog progress = new ProgressDialog(this, Translate._("MainWindow.LoadGamefile.Progress.Title"));
 
 			await Task.Run(() => {
 				DateTime start_time = DateTime.Now;
-
-				CurrFile = new Savegame.Savegame(filename);
-
-				// Activate features as configured by user
-				CurrFile.EnableDeepAnalysis(Config.Root.deep_analysis.enabled);
 
 				Log.Info("Loading file '{0}'", filename);
 				progress.CounterFormat = Translate._("MainWindow.LoadGamefile.Progress.CounterFormat");

@@ -50,6 +50,24 @@
 
 	<MainWindow.LoadGamefile.Title>Spielstand auswählen</MainWindow.LoadGamefile.Title>
 	<MainWindow.LoadGamefile.Filter>Spielstände (*.sav)|*.sav|Alle Dateien (*.*)|*.*</MainWindow.LoadGamefile.Filter>
+	<MainWindow.LoadGamefile.PeekHeader.Failed>Fehler beim inspizieren des Dateikopfes von
+
+{0}
+
+Dieses Tool kann diesen Spielstand leider nicht laden.</MainWindow.LoadGamefile.PeekHeader.Failed>
+	<MainWindow.LoadGamefile.PeekHeader.Warn>Dieses Tool unterstützt nur Spielstände bis
+
+{0},
+
+aber der zu ladende Spielstand benutzt eine neuere Version
+
+{1}.
+
+
+Möglich das dieser Spielstand geladen werden kann, es kann aber
+zu ungewolltem Verhalten oder gar zu einem Absturzbericht führen.
+Auf jeden Fall sollten KEINE Änderungen gespeichert werden, dies
+kann diesen Spielstand unter Umständen komplett unbrauchbar machen!</MainWindow.LoadGamefile.PeekHeader.Warn>
 	<MainWindow.LoadGamefile.Progress.Title>Lade Spielstand ...</MainWindow.LoadGamefile.Progress.Title>
 	<MainWindow.LoadGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} Bytes</MainWindow.LoadGamefile.Progress.CounterFormat>
 	<MainWindow.LoadGamefile.Progress.Title.2>Erzeuge Baumstrukturen ...</MainWindow.LoadGamefile.Progress.Title.2>
