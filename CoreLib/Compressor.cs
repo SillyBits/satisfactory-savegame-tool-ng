@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 
 
 namespace CoreLib
@@ -14,36 +15,68 @@ namespace CoreLib
 
 		/// <summary>
 		/// Compresses given file into an archive, writing archive to disk.
-		/// Note that input path is preserved, incl. any drive letter!
 		/// </summary>
 		/// <param name="archive">Name of archive to create (with optional path)</param>
 		/// <param name="filename">File to compress (with optional path)</param>
+		/// <param name="path">Path to remove from filename, null to preserve full path</param>
 		/// <returns>Outcome</returns>
-		public static bool CompressToFile(string archive, string filename)
+		public static bool CompressToFile(string archive, string filename, string path = null)
 		{
-			return CompressToFile(archive, new List<string> { filename });
+			return CompressToFile(archive, new List<string> { filename }, path);
 		}
 
 		/// <summary>
 		/// Compresses given files into an archive, writing archive to disk.
-		/// Note that input paths are preserved, incl. any drive letter!
 		/// </summary>
 		/// <param name="archive">Name of archive to create (with optional path)</param>
-		/// <param name="filename">Files to compress as list</param>
+		/// <param name="files">Files to compress as list</param>
+		/// <param name="path">Path to remove from filenames, null to preserve full paths</param>
 		/// <returns>Outcome</returns>
-		public static bool CompressToFile(string archive, List<string> files)
+		public static bool CompressToFile(string archive, List<string> files, string path = null)
 		{
+			Dictionary<string,Stream> buffers = null;
 			try
 			{
-				Dictionary<string,byte[]> buffers = new Dictionary<string,byte[]>();
-				foreach (var file in files)
-					buffers.Add(file, Helpers.GetFileContents(file));
-
+				if (path != null && !path.EndsWith("\\"))
+					path += "\\";
+				buffers = files.ToDictionary(file => (path == null) ? file : file.Substring(path.Length), 
+											 file => (Stream)File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read));
 				return CompressToFile(archive, buffers);
 			}
 			catch
 			{
 				return false;
+			}
+			finally
+			{
+				if (buffers != null)
+					buffers.ToList().ForEach(pair => pair.Value.Dispose());
+			}
+		}
+
+		/// <summary>
+		/// Compresses given data into an archive, writing archive to disk.
+		/// </summary>
+		/// <param name="archive">Name of archive to create (with optional path)</param>
+		/// <param name="data">Data to compress as dictionary</param>
+		/// <returns>Outcome</returns>
+		public static bool CompressToFile(string archive, Dictionary<string,byte[]> data)
+		{
+			Dictionary<string,Stream> buffers = null;
+			try
+			{
+				buffers = data.ToDictionary(pair => pair.Key,
+											pair => (Stream)new MemoryStream(pair.Value));
+				return CompressToFile(archive, buffers);
+			}
+			catch
+			{
+				return false;
+			}
+			finally
+			{
+				if (buffers != null)
+					buffers.ToList().ForEach(pair => pair.Value.Dispose());
 			}
 		}
 
@@ -54,21 +87,12 @@ namespace CoreLib
 		/// <param name="data">Data to compress as dictionary</param>
 		/// <param name="filename">Filename to assign (with optional path)</param>
 		/// <returns>Outcome</returns>
-		public static bool CompressToFile(string archive, Dictionary<string,byte[]> data)
+		public static bool CompressToFile(string archive, Dictionary<string,Stream> data)
 		{
 			try
 			{
-				byte[] content = CompressToArray(data);
-				if (content == null)
-					return false;
-
 				using (FileStream out_stream = File.Create(archive))
-				{
-					out_stream.Write(content, 0, content.Length);
-					out_stream.Flush();
-				}
-
-				return true;
+					return CompressToStream(out_stream, data);
 			}
 			catch
 			{
@@ -79,14 +103,24 @@ namespace CoreLib
 
 		/// <summary>
 		/// Compresses given file into an archive, returning archive as byte array.
-		/// Note that, in contrast to <see cref="CompressToFile"/>, this does NOT prevent full path.
 		/// </summary>
 		/// <param name="data">Data to compress</param>
 		/// <param name="filename">Filename to assign (with optional path)</param>
+		/// <param name="path">Path to remove from filename, null to preserve full path</param>
 		/// <returns>Archive as byte array</returns>
-		public static byte[] CompressToArray(string filename)
+		public static byte[] CompressToArray(string filename, string path = null)
 		{
-			return CompressToArray(Helpers.GetFileContents(filename), Path.GetFileName(filename));
+			try
+			{
+				if (path != null && !path.EndsWith("\\"))
+					path += "\\";
+				using (FileStream in_stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
+					return CompressToArray(in_stream, (path == null) ? filename : filename.Substring(path.Length));
+			}
+			catch
+			{
+				return null;
+			}
 		}
 
 		/// <summary>
@@ -97,7 +131,26 @@ namespace CoreLib
 		/// <returns>Archive as byte array</returns>
 		public static byte[] CompressToArray(byte[] data, string filename)
 		{
-			return CompressToArray(new Dictionary<string,byte[]> { { filename, data } });
+			try
+			{
+				using (MemoryStream mem = new MemoryStream(data))
+					return CompressToArray(new Dictionary<string,Stream> { { filename, mem } });
+			}
+			catch
+			{
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// Compresses given data into an archive, returning archive as byte array.
+		/// </summary>
+		/// <param name="data">Data to compress</param>
+		/// <param name="filename">Filename to assign (with optional path)</param>
+		/// <returns>Archive as byte array</returns>
+		public static byte[] CompressToArray(Stream stream, string filename)
+		{
+			return CompressToArray(new Dictionary<string,Stream> { { filename, stream } });
 		}
 
 		/// <summary>
@@ -107,6 +160,31 @@ namespace CoreLib
 		/// <returns>Archive as byte array</returns>
 		public static byte[] CompressToArray(Dictionary<string,byte[]> data)
 		{
+			Dictionary<string,Stream> buffers = null;
+			try
+			{
+				buffers = data.ToDictionary(pair => pair.Key,
+											pair => (Stream)new MemoryStream(pair.Value));
+				return CompressToArray(buffers);
+			}
+			catch
+			{
+				return null;
+			}
+			finally
+			{
+				if (buffers != null)
+					buffers.ToList().ForEach(pair => pair.Value.Dispose());
+			}
+		}
+
+		/// <summary>
+		/// Compresses given data into an archive, returning archive as byte array.
+		/// </summary>
+		/// <param name="data">Data to compress as dictionary</param>
+		/// <returns>Archive as byte array</returns>
+		public static byte[] CompressToArray(Dictionary<string,Stream> data)
+		{
 			if (data == null || data.Count == 0)
 				return null;
 
@@ -114,26 +192,50 @@ namespace CoreLib
 			{
 				using (MemoryStream mem = new MemoryStream())
 				{
-					using (ZipArchive zip = new ZipArchive(mem, ZipArchiveMode.Create))
+					if (CompressToStream(mem, data))
 					{
-						foreach (var pair in data)
+						mem.Flush();
+						return mem.ToArray();
+					}
+				}
+			}
+			catch { }
+			return null;
+		}
+
+
+		/// <summary>
+		/// Compresses given data into stream given.
+		/// </summary>
+		/// <param name="stream">Stream to write compressed data to</param>
+		/// <param name="data">Data to compress as dictionary</param>
+		/// <returns>True on success, else False</returns>
+		public static bool CompressToStream(Stream stream, Dictionary<string,Stream> data)
+		{
+			if (data == null || data.Count == 0)
+				return false;
+
+			try
+			{
+				using (ZipArchive zip = new ZipArchive(stream, ZipArchiveMode.Create))
+				{
+					foreach (var pair in data)
+					{
+						ZipArchiveEntry entry = zip.CreateEntry(pair.Key, CompressionLevel.Optimal);
+						using (Stream strm = entry.Open())
 						{
-							ZipArchiveEntry entry = zip.CreateEntry(pair.Key, CompressionLevel.Optimal);
-							using (Stream strm = entry.Open())
-							{
-								strm.Write(pair.Value, 0, pair.Value.Length);
-								strm.Flush();
-							}
+							pair.Value.CopyTo(strm);
+							strm.Flush();
 						}
 					}
-
-					mem.Flush();
-					return mem.ToArray();
 				}
+
+				stream.Flush();
+				return true;
 			}
 			catch
 			{
-				return null;
+				return false;
 			}
 		}
 
