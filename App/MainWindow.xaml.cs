@@ -78,6 +78,8 @@ namespace SatisfactorySavegameTool
 
 			_SetupMRU();
 
+			_SetStatusbar();
+
 			// Finally, update menu states
 			_UpdateUIState();
 
@@ -141,6 +143,12 @@ namespace SatisfactorySavegameTool
 			}
 
 			TreeView.IsEnabled = has_save;
+		}
+
+		protected void _SetStatusbar(string text = null)
+		{
+			StatBarText.Text = (text != null) ? text : Translate._("MainWindow.Menu.Statusbar.Ready");
+			StatBarText.Refresh();
 		}
 
 		protected override void OnKeyUp(KeyEventArgs e)
@@ -240,7 +248,9 @@ namespace SatisfactorySavegameTool
 
 		private void Actions_Validate_Click(object sender, RoutedEventArgs e)
 		{
+			_SetStatusbar(string.Format(Translate._("Action.Validate.Progress.Statusbar"), CurrFile.Filename));
 			ValidateSavegame.Run(CurrFile);
+			_SetStatusbar();
 		}
 
 
@@ -327,6 +337,7 @@ namespace SatisfactorySavegameTool
 					return;
 			}
 
+			_SetStatusbar(string.Format(Translate._("MainWindow.LoadGamefile.Progress.Statusbar"), filename));
 			ProgressDialog progress = new ProgressDialog(this, Translate._("MainWindow.LoadGamefile.Progress.Title"));
 
 			await Task.Run(() => {
@@ -339,12 +350,12 @@ namespace SatisfactorySavegameTool
 				Log.Info("Finished loading");
 				Log.Info("... loaded a total of {0} elements", CurrFile.TotalElements);
 
-				Log.Info("Creating tree ...");
+				Log.Info("Creating trees ...");
 				//progress.CounterFormat = Translate._("MainWindow.LoadGamefile.Progress.CounterFormat.2");
 				progress.Interval = 1000;
 				//TreeView.CreateTree(progress.Events);
 				TreeView.CreateTrees(progress.Events);
-				Log.Info("... finished creating tree");
+				Log.Info("... finished creating trees");
 
 				DateTime end_time = DateTime.Now;
 				TimeSpan ofs = end_time - start_time;
@@ -352,12 +363,14 @@ namespace SatisfactorySavegameTool
 			});
 
 			progress = null;
+			_SetStatusbar();
 
 			_UpdateUIState();
 		}
 
 		private async void _SaveGamefile(string filename)
 		{
+			_SetStatusbar(string.Format(Translate._("MainWindow.SaveGamefile.Progress.Statusbar"), filename));
 			ProgressDialog progress = new ProgressDialog(this, Translate._("MainWindow.SaveGamefile.Progress.Title"));
 
 			await Task.Run(() => {
@@ -365,7 +378,7 @@ namespace SatisfactorySavegameTool
 
 				Log.Info("Saving file '{0}'", filename);
 				progress.CounterFormat = Translate._("MainWindow.SaveGamefile.Progress.CounterFormat");
-				progress.Interval = 1024*1024;//1024 * 128;
+				progress.Interval = 1000;
 				CurrFile.SaveAs(progress.Events, filename);
 				Log.Info("Finished saving");
 				Log.Info("... saved a total of {0} elements", CurrFile.TotalElements);
@@ -376,6 +389,7 @@ namespace SatisfactorySavegameTool
 			});
 
 			progress = null;
+			_SetStatusbar();
 
 			_UpdateUIState();
 		}
@@ -389,6 +403,7 @@ namespace SatisfactorySavegameTool
 
 		private async void _ExportGamefile(string export_file)
 		{
+			_SetStatusbar("Exporting save to " + export_file + " ...");
 			ProgressDialog progress = new ProgressDialog(this, "Exporting save ..."/*Translate._("MainWindow.LoadGamefile.Progress.Title")*/);
 			progress.CounterFormat = "{0} / {1} elements";//Translate._("MainWindow.LoadGamefile.Progress.CounterFormat.2");
 			progress.Interval = 1000;
@@ -443,6 +458,8 @@ namespace SatisfactorySavegameTool
 
 				progress.Events.Stop("Done", "");
 			});
+
+			_SetStatusbar();
 
 			MessageBox.Show("Done");
 		}

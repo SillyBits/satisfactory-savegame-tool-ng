@@ -68,6 +68,7 @@ Möglich das dieser Spielstand geladen werden kann, es kann aber
 zu ungewolltem Verhalten oder gar zu einem Absturzbericht führen.
 Auf jeden Fall sollten KEINE Änderungen gespeichert werden, dies
 kann diesen Spielstand unter Umständen komplett unbrauchbar machen!</MainWindow.LoadGamefile.PeekHeader.Warn>
+	<MainWindow.LoadGamefile.Progress.Statusbar>Lade {0} ...</MainWindow.LoadGamefile.Progress.Statusbar>
 	<MainWindow.LoadGamefile.Progress.Title>Lade Spielstand ...</MainWindow.LoadGamefile.Progress.Title>
 	<MainWindow.LoadGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} Bytes</MainWindow.LoadGamefile.Progress.CounterFormat>
 	<MainWindow.LoadGamefile.Progress.Title.2>Erzeuge Baumstrukturen ...</MainWindow.LoadGamefile.Progress.Title.2>
@@ -76,6 +77,8 @@ kann diesen Spielstand unter Umständen komplett unbrauchbar machen!</MainWindow
 	<MainWindow.SaveGamefile.Title>Ziel auswählen</MainWindow.SaveGamefile.Title>
 	<MainWindow.SaveGamefile.Filter>Spielstände (*.sav)|*.sav|Alle Dateien (*.*)|*.*</MainWindow.SaveGamefile.Filter>
 	<MainWindow.SaveGamefile.DefaultExt>.sav</MainWindow.SaveGamefile.DefaultExt>
+	<MainWindow.SaveGamefile.Backup.Statusbar>Backup von {0} nach {1} ...</MainWindow.SaveGamefile.Backup.Statusbar>
+	<MainWindow.SaveGamefile.Progress.Statusbar>Speichere {0} ...</MainWindow.SaveGamefile.Progress.Statusbar>
 	<MainWindow.SaveGamefile.Progress.Title>Speichere Spielstand ...</MainWindow.SaveGamefile.Progress.Title>
 	<MainWindow.SaveGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} Objekte</MainWindow.SaveGamefile.Progress.CounterFormat>
 
@@ -168,6 +171,7 @@ Mit aktivieren einer Berichtsoption stimmt der Nutzer dieser Verwendung zu.</Opt
 	<Action.Done>Abgeschlossen</Action.Done>
 
 	<Action.Validate.Title>Validierung</Action.Validate.Title>
+	<Action.Validate.Progress.Statusbar>Validiere {0} ...</Action.Validate.Progress.Statusbar>
 	<Action.Validate.Progress.Title>Validiere ...</Action.Validate.Progress.Title>
 	<Action.Validate.Progress.Validate>Validiere Elemente ...</Action.Validate.Progress.Validate>
 	<Action.Validate.Progress.CounterFormat>{0:#,#0} / {1:#,#0} Elemente</Action.Validate.Progress.CounterFormat>

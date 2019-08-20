@@ -68,6 +68,7 @@ The tool might still be able to load this savegame, but expect
 failures or even crash/incident reports popping up.
 You're NOT advised to save any changes as this might cause
 unrecoverable damage to your save!</MainWindow.LoadGamefile.PeekHeader.Warn>
+	<MainWindow.LoadGamefile.Progress.Statusbar>Loading {0} ...</MainWindow.LoadGamefile.Progress.Statusbar>
 	<MainWindow.LoadGamefile.Progress.Title>Loading savegame ...</MainWindow.LoadGamefile.Progress.Title>
 	<MainWindow.LoadGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} bytes</MainWindow.LoadGamefile.Progress.CounterFormat>
 	<MainWindow.LoadGamefile.Progress.Title.2>Building trees ...</MainWindow.LoadGamefile.Progress.Title.2>
@@ -76,6 +77,8 @@ unrecoverable damage to your save!</MainWindow.LoadGamefile.PeekHeader.Warn>
 	<MainWindow.SaveGamefile.Title>Select file to save to</MainWindow.SaveGamefile.Title>
 	<MainWindow.SaveGamefile.Filter>Savegames (*.sav)|*.sav|All files (*.*)|*.*</MainWindow.SaveGamefile.Filter>
 	<MainWindow.SaveGamefile.DefaultExt>.sav</MainWindow.SaveGamefile.DefaultExt>
+	<MainWindow.SaveGamefile.Backup.Statusbar>Backing up {0} to {1} ...</MainWindow.SaveGamefile.Backup.Statusbar>
+	<MainWindow.SaveGamefile.Progress.Statusbar>Saving {0} ...</MainWindow.SaveGamefile.Progress.Statusbar>
 	<MainWindow.SaveGamefile.Progress.Title>Saving savegame ...</MainWindow.SaveGamefile.Progress.Title>
 	<MainWindow.SaveGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} objects</MainWindow.SaveGamefile.Progress.CounterFormat>
 	
@@ -167,6 +170,7 @@ By activating such an option you do agree to those terms.</OptionsDialog.Privacy
 	<Action.Done>Done</Action.Done>
 	
 	<Action.Validate.Title>Validation</Action.Validate.Title>
+	<Action.Validate.Progress.Statusbar>Validating {0} ...</Action.Validate.Progress.Statusbar>
 	<Action.Validate.Progress.Title>Validating ...</Action.Validate.Progress.Title>
 	<Action.Validate.Progress.Validate>Validating elements ...</Action.Validate.Progress.Validate>
 	<Action.Validate.Progress.CounterFormat>{0:#,#0} / {1:#,#0} elements</Action.Validate.Progress.CounterFormat>
