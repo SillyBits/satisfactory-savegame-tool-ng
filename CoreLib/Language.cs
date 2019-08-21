@@ -67,7 +67,7 @@ namespace CoreLib
 
 		public bool HasTranslation(string id)
 		{
-			if (_translations == null)
+			if (_translations == null || string.IsNullOrEmpty(id))
 				return false;
 			return _translations.ContainsKey(id);
 		}
