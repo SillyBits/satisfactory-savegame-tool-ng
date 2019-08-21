@@ -15,7 +15,7 @@ using namespace Writer;
  * - Eliminate shadows like _Inner, _Missing and _EntityLength, else will
  *   need quite some efforts in regards to adding new elements
  *   - _Inner: "Type" actually stored in .Value, but what if empty? (e.g. lists)
- *   - _Missing: Just don't "eat" the pointer and indicated with other means 
+ *   - _Missing: Just don't "eat" the pointer and indicate using other means 
  *               (store no. of bytes used for example)
  *   - _EntityLength: Must calculate real length by traversing hierarchy 2-pass like.
  *
@@ -1162,7 +1162,6 @@ namespace Savegame
 		PUB_ab(Missing)
 #ifdef EXPERIMENTAL
 		PUB(Private, Property^)
-		//Property^ Private;
 #endif
 
 		Property^ Read(IReader^ reader, int length)
