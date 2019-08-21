@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -36,6 +37,20 @@ namespace SatisfactorySavegameTool.Dialogs
 				parent = Application.Current.MainWindow;
 			Owner = parent;
 
+			if (Config.Root.HasSection("dialogs") && Config.Root.dialogs.HasSection("error_report"))
+			{
+				dynamic section = Config.Root.dialogs.error_report;
+				Left   = section.pos_x;
+				Top    = section.pos_y;
+				Width  = section.size_x;
+				Height = section.size_y;
+			}
+			else
+			{
+				Width  = 750;
+				Height = 500;
+				WindowStartupLocation = WindowStartupLocation.CenterOwner;
+			}
 
 			string stack_trace = null;
 			try
@@ -72,6 +87,32 @@ namespace SatisfactorySavegameTool.Dialogs
 		private void Exit_Click(object sender, RoutedEventArgs e)
 		{
 			Application.Current.Shutdown();
+		}
+
+		protected override void OnClosing(CancelEventArgs e)
+		{
+			if (!Config.Root.HasSection("dialogs"))
+				Config.Root.AddSection("dialogs");
+
+			dynamic section;
+			if (!Config.Root.dialogs.HasSection("error_report"))
+			{
+				section = Config.Root.dialogs.AddSection("error_report");
+				section.AddItem("pos_x" , (int)Left);
+				section.AddItem("pos_y" , (int)Top);
+				section.AddItem("size_x", (int)Width);
+				section.AddItem("size_y", (int)Height);
+			}
+			else
+			{
+				section = Config.Root.dialogs.error_report;
+				section.pos_x  = (int)Left;
+				section.pos_y  = (int)Top;
+				section.size_x = (int)Width;
+				section.size_y = (int)Height;
+			}
+
+			base.OnClosing(e);
 		}
 
 	}

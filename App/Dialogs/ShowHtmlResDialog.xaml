@@ -6,8 +6,8 @@
         xmlns:local="clr-namespace:SatisfactorySavegameTool.Dialogs"
 		xmlns:lang="clr-namespace:CoreLib.Language.XAML;assembly=CoreLib"
         mc:Ignorable="d"
-        Title="" Width="750" Height="500"
-		WindowStartupLocation="CenterOwner" ResizeMode="CanResizeWithGrip" ShowInTaskbar="False">
+        Title=""
+		ResizeMode="CanResizeWithGrip" ShowInTaskbar="False">
 	<Grid Margin="5,5">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="*" />

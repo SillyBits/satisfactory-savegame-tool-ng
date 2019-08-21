@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -7,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
 using CoreLib;
+
 
 namespace SatisfactorySavegameTool.Dialogs
 {
@@ -36,6 +38,21 @@ namespace SatisfactorySavegameTool.Dialogs
 			if (parent == null)
 				parent = Application.Current.MainWindow;
 			Owner = parent;
+
+			if (Config.Root.HasSection("dialogs") && Config.Root.dialogs.HasSection("html_res"))
+			{
+				dynamic section = Config.Root.dialogs.html_res;
+				Left   = section.pos_x;
+				Top    = section.pos_y;
+				Width  = section.size_x;
+				Height = section.size_y;
+			}
+			else
+			{
+				Width  = 750;
+				Height = 500;
+				WindowStartupLocation = WindowStartupLocation.CenterOwner;
+			}
 
 			if (!string.IsNullOrEmpty(title))
 				Title = title;
@@ -74,6 +91,32 @@ namespace SatisfactorySavegameTool.Dialogs
 		private void Close_Click(object sender, RoutedEventArgs e)
 		{
 			Close();
+		}
+
+		protected override void OnClosing(CancelEventArgs e)
+		{
+			if (!Config.Root.HasSection("dialogs"))
+				Config.Root.AddSection("dialogs");
+
+			dynamic section;
+			if (!Config.Root.dialogs.HasSection("html_res"))
+			{
+				section = Config.Root.dialogs.AddSection("html_res");
+				section.AddItem("pos_x" , (int)Left);
+				section.AddItem("pos_y" , (int)Top);
+				section.AddItem("size_x", (int)Width);
+				section.AddItem("size_y", (int)Height);
+			}
+			else
+			{
+				section = Config.Root.dialogs.html_res;
+				section.pos_x  = (int)Left;
+				section.pos_y  = (int)Top;
+				section.size_x = (int)Width;
+				section.size_y = (int)Height;
+			}
+
+			base.OnClosing(e);
 		}
 
 		protected override void OnKeyUp(KeyEventArgs e)
