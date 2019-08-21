@@ -127,14 +127,11 @@ namespace SatisfactorySavegameTool
 
 			File_Save.IsEnabled = File_SaveAs.IsEnabled = modified;
 			File_Close.IsEnabled = has_save;
+			File_Export.IsEnabled = has_save;
+			File_Import.IsEnabled = false;//TODO:
+
 			Actions_Validate.IsEnabled = has_save;
 
-#if DEBUG
-			File_Export.IsEnabled = has_save;//Only for me :D
-			File_Import.IsEnabled = false;
-#else
-			File_Export.IsEnabled = File_Import.IsEnabled = false;//TODO:
-#endif
 
 			if (!has_save)
 			{
