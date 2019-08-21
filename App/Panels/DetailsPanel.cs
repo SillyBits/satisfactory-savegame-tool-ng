@@ -912,9 +912,10 @@ namespace SatisfactorySavegameTool.Panels.Details
 				Text = Helpers.Hexdump(_value, indent:0),
 				FontFamily = new FontFamily("Consolas, FixedSys, Terminal"),
 				FontSize = 12,
+				MaxLines = 10,
+				VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
 			};
 		}
-
 	}
 
 
