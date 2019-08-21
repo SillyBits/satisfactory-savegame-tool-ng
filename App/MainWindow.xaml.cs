@@ -90,26 +90,27 @@ namespace SatisfactorySavegameTool
 		protected override void OnClosing(CancelEventArgs e)
 		{
 			// Save window state
-
+			dynamic wnd;
 			if (!Config.Root.HasSection("window"))
 			{
-				Section wnd = Config.Root.AddSection("window");
-				wnd.AddItem("state");
-				wnd.AddItem("pos_x", 0);
-				wnd.AddItem("pos_y", 0);
-				wnd.AddItem("size_x", 0);
-				wnd.AddItem("size_y", 0);
-				wnd.AddItem("splitter", 0);
+				wnd = Config.Root.AddSection("window");
+				wnd.AddItem("state"   , WindowState.ToString());
+				wnd.AddItem("pos_x"   , (int)Left);
+				wnd.AddItem("pos_y"   , (int)Top);
+				wnd.AddItem("size_x"  , (int)Width);
+				wnd.AddItem("size_y"  , (int)Height);
+				wnd.AddItem("splitter", (int)MainGrid.ColumnDefinitions[0].ActualWidth);
 			}
-
-			Config.Root.window.state = WindowState.ToString();
-
-			Config.Root.window.pos_x  = (int) Left  ;
-			Config.Root.window.pos_y  = (int) Top   ;
-			Config.Root.window.size_x = (int) Width ;
-			Config.Root.window.size_y = (int) Height;
-
-			Config.Root.window.splitter = (int) MainGrid.ColumnDefinitions[0].ActualWidth;
+			else
+			{
+				wnd = Config.Root.window;
+				wnd.state    = WindowState.ToString();
+				wnd.pos_x    = (int)Left;
+				wnd.pos_y    = (int)Top;
+				wnd.size_x   = (int)Width;
+				wnd.size_y   = (int)Height;
+				wnd.splitter = (int)MainGrid.ColumnDefinitions[0].ActualWidth;
+			}
 
 			base.OnClosing(e);
 		}
