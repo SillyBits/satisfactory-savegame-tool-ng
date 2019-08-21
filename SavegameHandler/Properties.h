@@ -1153,6 +1153,7 @@ namespace Savegame
 			, Missing(nullptr)
 #ifdef EXPERIMENTAL
 			, Private(nullptr)
+			, MissingUsed(0)
 #endif
 		{ }
 		PUB_s(LevelName)
@@ -1162,6 +1163,7 @@ namespace Savegame
 		PUB_ab(Missing)
 #ifdef EXPERIMENTAL
 		PUB(Private, Property^)
+		int MissingUsed;
 #endif
 
 		Property^ Read(IReader^ reader, int length)
@@ -1177,7 +1179,7 @@ namespace Savegame
 			if (bytes_read < 0)
 				throw gcnew ReadException(reader, "Negative offset!");
 			if (bytes_read != length)
-				_Missing = Missing = reader->ReadBytes((int)(length - bytes_read));
+				Missing = reader->ReadBytes((int)(length - bytes_read));
 			return this;
 		}
 		void Write(IWriter^ writer, int length)
@@ -1196,14 +1198,12 @@ namespace Savegame
 				throw gcnew WriteException(writer, "Negative offset!");
 			__int64 delta = length - bytes_written;
 			if (bytes_written != length && 
-				(_Missing == nullptr || (__int64)_Missing->Length != delta))
+				(Missing == nullptr || (__int64)Missing->Length != delta))
 				throw gcnew WriteException(writer, "Integrity error, expected .Missing!");
-			if (_Missing != nullptr)
-				writer->Write(_Missing);
+			if (Missing != nullptr)
+				writer->Write(Missing);
 		}
 		STR_(PathName)
-	protected:
-		ByteArray^ _Missing; // Shadow copy just for writing back to file
 	};
 
 	public ref class NamedEntity : Entity
@@ -1275,7 +1275,7 @@ namespace Savegame
 
 #ifdef EXPERIMENTAL
 	template<typename _Parent>
-	static Property^ ReadPrivateData(_Parent^ parent);
+	static Property^ ReadPrivateData(_Parent^ parent, [out] int UsedUp);
 #endif
 
 
@@ -1304,11 +1304,12 @@ namespace Savegame
 			{
 				try 
 				{
-					entity->Private = ReadPrivateData(this);
+					entity->Private = ReadPrivateData(this, entity->MissingUsed);
 				}
 				catch (Exception^ exc)
 				{
 					entity->Private = nullptr;
+					entity->MissingUsed = 0;
 					if (VERBOSITY)
 						Log::Debug(String::Format("Error loading private data for '{0}'", PathName), exc);
 				}
@@ -1332,7 +1333,7 @@ namespace Savegame
 			entity->Write(writer, _EntityLength);
 
 			// EXPERIMENTAL
-			//=> No need to save anything, enough to store shadow _Missing
+			//=> No need to save anything, enough to store Missing
 		}
 		STR_(ClassName)
 	protected:
@@ -1372,11 +1373,12 @@ namespace Savegame
 			{
 				try 
 				{
-					entity->Private = ReadPrivateData(this);
+					entity->Private = ReadPrivateData(this, entity->MissingUsed);
 				}
 				catch (Exception^ exc)
 				{
 					entity->Private = nullptr;
+					entity->MissingUsed = 0;
 					if (VERBOSITY)
 						Log::Debug(String::Format("Error loading private data for '{0}'", PathName), exc);
 				}
@@ -1450,7 +1452,7 @@ namespace Savegame
 
 
 	template<typename _Parent>
-	static Property^ ReadPrivateData(_Parent^ parent)
+	static Property^ ReadPrivateData(_Parent^ parent, [out] int UsedUp)
 	{
 		/*
 			* List of "something" ... no clues on what as seen only empty lists by now:
@@ -1479,6 +1481,8 @@ namespace Savegame
 			* Name guesses:
 				./.
 		*/
+
+		UsedUp = 0;
 
 		String^ classname = parent->ClassName->ToString();
 		if (classname->StartsWith("/Game/FactoryGame/"))
@@ -1527,9 +1531,8 @@ namespace Savegame
 				instance->Value->Add(prop->Read(reader));
 			}
 
-			if (reader->Pos == reader->Size)
-				entity->Missing = nullptr;
-			else if (VERBOSITY)
+			UsedUp = (int) reader->Pos;
+			if (reader->Pos != reader->Size)
 				Log::Debug("Still some dangling bytes, .Missing kept");
 
 			reader = nullptr;
