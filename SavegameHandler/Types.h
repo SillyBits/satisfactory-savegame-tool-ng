@@ -67,6 +67,14 @@ public:
 		_Set(s);
 	}
 
+	str(ByteArray^ arr) : str()
+	{
+		pin_ptr<byte> pin = &(arr[0]);
+		const int len = arr->Length + 1;
+		_Reserve(len, ASCII);
+		memcpy(_ascii, pin, len);
+	}
+
 	str(String^ s) : str()
 	{
 		_Set(s);
@@ -136,6 +144,16 @@ public:
 		if (!_unicode)
 			throw "Empty string";
 		return (wcscmp(_unicode, s) == 0);
+	}
+
+	bool IsAscii()
+	{
+		return (_ascii != nullptr);
+	}
+
+	bool IsWide()
+	{
+		return (_unicode != nullptr);
 	}
 
 	bool IsEmpty()
