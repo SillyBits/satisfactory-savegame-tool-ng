@@ -336,11 +336,12 @@ namespace SatisfactorySavegameTool.Panels
 		{
 			ContextMenu = new ContextMenu();
 
-			MenuItem item = new MenuItem() {
-				Header = Translate._("TreePanel.Context.Inspect"),
-			};
-			item.Click += Contextmenu_Inspect_Click;
-			ContextMenu.Items.Add(item);
+			ContextMenu_Add("TreePanel.Context.ExpandAll", Contextmenu_ExpandAll_Click);
+			ContextMenu_Add("TreePanel.Context.CollapseAll", Contextmenu_CollapseAll_Click);
+
+			ContextMenu_AddSeparator();
+
+			_inspect = ContextMenu_Add("TreePanel.Context.Inspect", Contextmenu_Inspect_Click);
 		}
 
 		protected override void OnContextMenuOpening(ContextMenuEventArgs e)
@@ -359,16 +360,30 @@ namespace SatisfactorySavegameTool.Panels
 			if (!node.IsSelected)
 				node.IsSelected = true;
 
+			// Adjust enable states and such before actually opening menu
 			if (node.Tag is P.Property) // || ...)
 			{
+				_inspect.IsEnabled = true;
+				//...
 			}
 			else
 			{
-				e.Handled = true;
-				return;
+				_inspect.IsEnabled = false;
+				//...
 			}
 
 			base.OnContextMenuOpening(e);
+		}
+
+		private void Contextmenu_ExpandAll_Click(object sender, RoutedEventArgs e)
+		{
+			RecursExecuter(Model.Nodes[0], (node) => node.IsExpanded = true);
+		}
+
+		private void Contextmenu_CollapseAll_Click(object sender, RoutedEventArgs e)
+		{
+			Model.Nodes[0].IsSelected = true;
+			RecursExecuter(Model.Nodes[0], (node) => node.IsExpanded = false);
 		}
 
 		private void Contextmenu_Inspect_Click(object sender, RoutedEventArgs e)
@@ -387,6 +402,42 @@ namespace SatisfactorySavegameTool.Panels
 
 			ShowRawTextDialog.Show(Translate._("Dialog.PropertyDump.Title"), sb.ToString());
 		}
+
+
+		protected void ContextMenu_AddSeparator()
+		{
+			ContextMenu.Items.Add(new Separator());
+		}
+
+		protected MenuItem ContextMenu_Add(string lang_id, RoutedEventHandler handler)
+		{
+			MenuItem item = new MenuItem() {
+				Header = Translate._(lang_id),
+			};
+
+			lang_id += ".Tooltip";
+			if (Translate.Has(lang_id))
+				item.ToolTip = Translate._(lang_id);
+
+			item.Click += handler;
+
+			ContextMenu.Items.Add(item);
+
+			return item;
+		}
+
+
+		protected void RecursExecuter(TreeNode node, Action<TreeNode> action)
+		{
+			if (node.Childs == null)
+				return;
+			action(node);
+			foreach(TreeNode child in node.Childs)
+				RecursExecuter(child, action);
+		}
+
+
+		private MenuItem _inspect;
 
 	}
 
@@ -588,6 +639,7 @@ namespace SatisfactorySavegameTool.Panels
 			return class_item;
 		}
 
+
 		internal Dictionary<string, TreeNode> _classes;
 
 	}
@@ -712,6 +764,7 @@ namespace SatisfactorySavegameTool.Panels
 			_paths.Add(fullname, path_item);
 			return path_item;
 		}
+
 
 		internal Dictionary<string, TreeNode> _paths;
 
@@ -883,18 +936,14 @@ namespace SatisfactorySavegameTool.Panels
 			return _classes[name];
 		}
 
-		protected override void _CreateContextMenu()
-		{
-			/* NO context menu for now
-			ContextMenu = new ContextMenu();
 
-			MenuItem item = new MenuItem() {
-				Header = Translate._("TreePanel.Context.Inspect"),
-			};
-			item.Click += Contextmenu_Inspect_Click;
-			ContextMenu.Items.Add(item);
-			*/
-		}
+		// No additional context menu items for now
+		//protected override void _CreateContextMenu()
+		//{
+		//	base._CreateContextMenu();
+		//
+		//	...
+		//}
 
 
 		internal List<P.Actor> _players;
@@ -1088,18 +1137,14 @@ namespace SatisfactorySavegameTool.Panels
 			return _classes[lookup];
 		}
 
-		protected override void _CreateContextMenu()
-		{
-			/* NO context menu for now
-			ContextMenu = new ContextMenu();
 
-			MenuItem item = new MenuItem() {
-				Header = Translate._("TreePanel.Context.Inspect"),
-			};
-			item.Click += Contextmenu_Inspect_Click;
-			ContextMenu.Items.Add(item);
-			*/
-		}
+		// No additional context menu items for now
+		//protected override void _CreateContextMenu()
+		//{
+		//	base._CreateContextMenu();
+		//
+		//	...
+		//}
 
 
 		private List<P.Actor> _factories;

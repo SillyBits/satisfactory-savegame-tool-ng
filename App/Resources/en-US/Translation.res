@@ -86,7 +86,12 @@ unrecoverable damage to your save!</MainWindow.LoadGamefile.PeekHeader.Warn>
 	<Dialog.Changelog.Title>Changelog ...</Dialog.Changelog.Title>
 	<Dialog.PropertyDump.Title>Property details ...</Dialog.PropertyDump.Title>
 
+	<TreePanel.Context.ExpandAll>Expand all</TreePanel.Context.ExpandAll>
+	<TreePanel.Context.ExpandAll.Tooltip>Expands all nodes</TreePanel.Context.ExpandAll.Tooltip>
+	<TreePanel.Context.CollapseAll>Collapse all</TreePanel.Context.CollapseAll>
+	<TreePanel.Context.CollapseAll.Tooltip>Collapses all nodes</TreePanel.Context.CollapseAll.Tooltip>
 	<TreePanel.Context.Inspect>Inspect ...</TreePanel.Context.Inspect>
+	<TreePanel.Context.Inspect.Tooltip>Opens inspection dialog on selected node</TreePanel.Context.Inspect.Tooltip>
 	
 	<TreePanel.Tab.Simple>Simple</TreePanel.Tab.Simple>
 	<TreePanel.Tab.Classes>Classes</TreePanel.Tab.Classes>

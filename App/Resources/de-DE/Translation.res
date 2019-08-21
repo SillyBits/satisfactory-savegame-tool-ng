@@ -86,7 +86,12 @@ kann diesen Spielstand unter Umständen komplett unbrauchbar machen!</MainWindow
 	<Dialog.Changelog.Title>Änderungsprotokoll ...</Dialog.Changelog.Title>
 	<Dialog.PropertyDump.Title>Elementdetails ...</Dialog.PropertyDump.Title>
 
-	<TreePanel.Context.Inspect>Details ...</TreePanel.Context.Inspect>
+	<TreePanel.Context.ExpandAll>Alles aufklappen</TreePanel.Context.ExpandAll>
+	<TreePanel.Context.ExpandAll.Tooltip>Klappt alle Knoten auf</TreePanel.Context.ExpandAll.Tooltip>
+	<TreePanel.Context.CollapseAll>Alles zuklappen</TreePanel.Context.CollapseAll>
+	<TreePanel.Context.CollapseAll.Tooltip>Klappt alle Knoten zu</TreePanel.Context.CollapseAll.Tooltip>
+	<TreePanel.Context.Inspect>Rohansicht ...</TreePanel.Context.Inspect>
+	<TreePanel.Context.Inspect.Tooltip>Öffnet eine Rohansicht des ausgewählten Knotens</TreePanel.Context.Inspect.Tooltip>
 
 	<TreePanel.Tab.Simple>Einfach</TreePanel.Tab.Simple>
 	<TreePanel.Tab.Classes>Klassen</TreePanel.Tab.Classes>
