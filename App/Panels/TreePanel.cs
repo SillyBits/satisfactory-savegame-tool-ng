@@ -377,13 +377,13 @@ namespace SatisfactorySavegameTool.Panels
 
 		private void Contextmenu_ExpandAll_Click(object sender, RoutedEventArgs e)
 		{
-			RecursExecuter(Model.Nodes[0], (node) => node.IsExpanded = true);
+			RecursExecuter(Model.Nodes.First(), (node) => node.IsExpanded = true);
 		}
 
 		private void Contextmenu_CollapseAll_Click(object sender, RoutedEventArgs e)
 		{
 			Model.Nodes[0].IsSelected = true;
-			RecursExecuter(Model.Nodes[0], (node) => node.IsExpanded = false);
+			RecursExecuter(Model.Nodes.First(), (node) => node.IsExpanded = false);
 		}
 
 		private void Contextmenu_Inspect_Click(object sender, RoutedEventArgs e)
@@ -429,11 +429,10 @@ namespace SatisfactorySavegameTool.Panels
 
 		protected void RecursExecuter(TreeNode node, Action<TreeNode> action)
 		{
-			if (node.Childs == null)
-				return;
+			if (node.Childs != null)
+				foreach(TreeNode child in node.Childs)
+					RecursExecuter(child, action);
 			action(node);
-			foreach(TreeNode child in node.Childs)
-				RecursExecuter(child, action);
 		}
 
 
