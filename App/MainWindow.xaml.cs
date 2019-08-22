@@ -143,6 +143,11 @@ namespace SatisfactorySavegameTool
 			TreeView.IsEnabled = has_save;
 		}
 
+		protected void _BlockUI(bool state)
+		{
+			MainMenuBar.IsEnabled = !state;
+		}
+
 		protected void _SetStatusbar(string text = null)
 		{
 			StatBarText.Text = (text != null) ? text : Translate._("MainWindow.Menu.Statusbar.Ready");
@@ -246,9 +251,11 @@ namespace SatisfactorySavegameTool
 
 		private void Actions_Validate_Click(object sender, RoutedEventArgs e)
 		{
+			_BlockUI(true);
 			_SetStatusbar(string.Format(Translate._("Action.Validate.Progress.Statusbar"), CurrFile.Filename));
 			ValidateSavegame.Run(CurrFile);
 			_SetStatusbar();
+			_BlockUI(false);
 		}
 
 
@@ -335,6 +342,7 @@ namespace SatisfactorySavegameTool
 					return;
 			}
 
+			_BlockUI(true);
 			_SetStatusbar(string.Format(Translate._("MainWindow.LoadGamefile.Progress.Statusbar"), filename));
 			ProgressDialog progress = new ProgressDialog(this, Translate._("MainWindow.LoadGamefile.Progress.Title"));
 
@@ -362,12 +370,15 @@ namespace SatisfactorySavegameTool
 
 			progress = null;
 			_SetStatusbar();
+			_BlockUI(false);
 
 			_UpdateUIState();
 		}
 
 		private async void _SaveGamefile(string filename)
 		{
+			_BlockUI(true);
+
 			if (File.Exists(filename))
 			{
 				// Move to zip, ...
@@ -398,6 +409,7 @@ namespace SatisfactorySavegameTool
 
 			progress = null;
 			_SetStatusbar();
+			_BlockUI(false);
 
 			_UpdateUIState();
 		}
@@ -411,6 +423,7 @@ namespace SatisfactorySavegameTool
 
 		private async void _ExportGamefile(string export_file)
 		{
+			_BlockUI(true);
 			_SetStatusbar("Exporting save to " + export_file + " ...");
 			ProgressDialog progress = new ProgressDialog(this, "Exporting save ..."/*Translate._("MainWindow.LoadGamefile.Progress.Title")*/);
 			progress.CounterFormat = "{0} / {1} elements";//Translate._("MainWindow.LoadGamefile.Progress.CounterFormat.2");
@@ -468,6 +481,7 @@ namespace SatisfactorySavegameTool
 			});
 
 			_SetStatusbar();
+			_BlockUI(false);
 
 			MessageBox.Show("Done");
 		}

@@ -11,7 +11,7 @@
 
 	<DockPanel>
 
-		<Menu DockPanel.Dock="Top" HorizontalAlignment="Left" Background="White" BorderBrush="Black" >
+		<Menu x:Name="MainMenuBar" DockPanel.Dock="Top" HorizontalAlignment="Left" Background="White" BorderBrush="Black" >
 
 			<MenuItem Header="{lang:Translate Key=MainWindow.Menu.File}">
 				<MenuItem Header="{lang:Translate Key=MainWindow.Menu.File.Open}" 
