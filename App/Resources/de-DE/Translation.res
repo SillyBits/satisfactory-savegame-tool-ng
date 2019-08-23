@@ -11,9 +11,14 @@
 	<Browse>Durchsuchen ...</Browse>
 	<Up>Hoch</Up>
 	<Down>Runter</Down>
-	
+	<Done>Fertig</Done>
+	<SendReport>Bericht senden</SendReport>
+	<DontSendReport>Schliessen ohne senden</DontSendReport>
+	<Exit>Beenden</Exit>
+	<ExitApp>Programm beenden</ExitApp>
+
 	<MainWindow.Title>Satisfactory Spielstand Helfer</MainWindow.Title>
-	
+
 	<MainWindow.Menu.File>_Datei</MainWindow.Menu.File>
 	<MainWindow.Menu.File.Open>Ö_ffnen</MainWindow.Menu.File.Open>
 	<MainWindow.Menu.File.Open.IG>Strg+O</MainWindow.Menu.File.Open.IG>
@@ -81,6 +86,11 @@ kann diesen Spielstand unter Umständen komplett unbrauchbar machen!</MainWindow
 	<MainWindow.SaveGamefile.Progress.Statusbar>Speichere {0} ...</MainWindow.SaveGamefile.Progress.Statusbar>
 	<MainWindow.SaveGamefile.Progress.Title>Speichere Spielstand ...</MainWindow.SaveGamefile.Progress.Title>
 	<MainWindow.SaveGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} Objekte</MainWindow.SaveGamefile.Progress.CounterFormat>
+
+	<MainWindow.ExportGamefile.Progress.Title>Exportiere Spielstand ...</MainWindow.ExportGamefile.Progress.Title>
+	<MainWindow.ExportGamefile.Progress.Statusbar>Exportiere Spielstand {0} nach {1} ...</MainWindow.ExportGamefile.Progress.Statusbar>
+	<MainWindow.ExportGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} objects</MainWindow.ExportGamefile.Progress.CounterFormat>
+	<MainWindow.ExportGamefile.Done>Spielstand erfolgreich exportiert.</MainWindow.ExportGamefile.Done>
 
 	<Dialog.About.Title>Über ...</Dialog.About.Title>
 	<Dialog.Changelog.Title>Änderungsprotokoll ...</Dialog.Changelog.Title>
@@ -166,12 +176,10 @@ Mit aktivieren einer Berichtsoption stimmt der Nutzer dieser Verwendung zu.</Opt
 
 	<ErrorReportingDialog.Title>Absturzbericht</ErrorReportingDialog.Title>
 	<ErrorReportingDialog.Hint>Upps, das hätte nicht passieren sollen.</ErrorReportingDialog.Hint>
-	<ErrorReportingDialog.Send>Senden</ErrorReportingDialog.Send>
-	<ErrorReportingDialog.Exit>Beenden</ErrorReportingDialog.Exit>
-	
+
 	<ImageControl.Label>Bild der Größe {0}x{1} mit {2} Farbkanälen</ImageControl.Label>
 	<ImageControl.Button>Anzeigen ...</ImageControl.Button>
-	
+
 	<Action.Prepare>Vorbereitung ...</Action.Prepare>
 	<Action.Done>Abgeschlossen</Action.Done>
 
@@ -183,5 +191,5 @@ Mit aktivieren einer Berichtsoption stimmt der Nutzer dieser Verwendung zu.</Opt
 	<Action.Validate.NoErrors>Keine Fehler gefunden.</Action.Validate.NoErrors>
 	<Action.Validate.HasErrors>Es wurden {0:#,#0} fehlerhafte Elemente gefunden!\n\nMöchtest Du den Bericht jetzt einsehen?</Action.Validate.HasErrors>
 	<Action.Validate.Report>Erzeuge Bericht ...</Action.Validate.Report>
-	
+
 </translation>

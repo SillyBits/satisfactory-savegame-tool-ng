@@ -325,8 +325,8 @@ namespace SatisfactorySavegameTool
 			if (header == null)
 			{
 				Log.Error("Failed to peek header");
-				MessageBox.Show(string.Format(Translate._("MainWindow.LoadGamefile.PeekHeader.Failed"), filename), Settings.APPTITLE, 
-					MessageBoxButton.OK, MessageBoxImage.Stop);
+				MessageBox.Show(string.Format(Translate._("MainWindow.LoadGamefile.PeekHeader.Failed"), filename), 
+					Translate._("MainWindow.Title"), MessageBoxButton.OK, MessageBoxImage.Stop);
 				return;
 			}
 			if (header.GetVersionEntry() == null)
@@ -337,7 +337,7 @@ namespace SatisfactorySavegameTool
 				VersionTable.VersionEntry max_version = VersionTable.INSTANCE.GetMax();
 				string save_version = string.Format("Build {0}", header.GetBuildVersion());
 				var ret = MessageBox.Show(string.Format(Translate._("MainWindow.LoadGamefile.PeekHeader.Warn"), max_version, save_version), 
-					Settings.APPTITLE, MessageBoxButton.YesNo, MessageBoxImage.Question);
+					Translate._("MainWindow.Title"), MessageBoxButton.YesNo, MessageBoxImage.Question);
 				if (ret == MessageBoxResult.No)
 					return;
 			}
@@ -424,9 +424,10 @@ namespace SatisfactorySavegameTool
 		private async void _ExportGamefile(string export_file)
 		{
 			_BlockUI(true);
-			_SetStatusbar("Exporting save to " + export_file + " ...");
-			ProgressDialog progress = new ProgressDialog(this, "Exporting save ..."/*Translate._("MainWindow.LoadGamefile.Progress.Title")*/);
-			progress.CounterFormat = "{0} / {1} elements";//Translate._("MainWindow.LoadGamefile.Progress.CounterFormat.2");
+			_SetStatusbar(string.Format(Translate._("MainWindow.ExportGamefile.Progress.Statusbar"), 
+				Path.GetFileName(CurrFile.Filename), export_file));
+			ProgressDialog progress = new ProgressDialog(this, Translate._("MainWindow.ExportGamefile.Progress.Title"));
+			progress.CounterFormat = Translate._("MainWindow.ExportGamefile.Progress.CounterFormat");
 			progress.Interval = 1000;
 
 			int count = 0;
@@ -435,7 +436,7 @@ namespace SatisfactorySavegameTool
 				Log.Info("Exporting file '{0}'\n"
 					   + "-> to          '{1}'", 
 					   CurrFile.Filename, export_file);
-				progress.Events.Start(CurrFile.TotalElements, "Exporting ...", "");
+				progress.Events.Start(CurrFile.TotalElements, Translate._("MainWindow.ExportGamefile.Progress.Title"), "");
 
 				DateTime start_time = DateTime.Now;
 
@@ -477,13 +478,13 @@ namespace SatisfactorySavegameTool
 				TimeSpan ofs = end_time - start_time;
 				Log.Info("Finished exporting, took {0}", ofs);
 
-				progress.Events.Stop("Done", "");
+				progress.Events.Stop(Translate._("MainWindow.ExportGamefile.Done"), "");
 			});
 
 			_SetStatusbar();
 			_BlockUI(false);
 
-			MessageBox.Show("Done");
+			MessageBox.Show(Translate._("MainWindow.ExportGamefile.Done"), Translate._("MainWindow.Title"));
 		}
 #endregion
 

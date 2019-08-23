@@ -19,8 +19,8 @@
 			<ColumnDefinition Width="*" />
 		</Grid.ColumnDefinitions>
 
-		<Label Grid.Row="0" Content="{lang:Translate Key=ErrorReportingDialog.Hint}" HorizontalContentAlignment="Stretch" 
-			   Margin="0,0,0,10" />
+		<TextBlock Grid.Row="0" HorizontalAlignment="Stretch" Margin="0,0,0,5" 
+				   Text="{lang:Translate Key=ErrorReportingDialog.Hint}" TextWrapping="WrapWithOverflow" />
 		
 		<TextBox x:Name="TextCtrl" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
 				 Width="auto" Height="auto" 
@@ -28,11 +28,11 @@
 
 		<StackPanel Grid.Row="3" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" >
 			<Button x:Name="SendBtn" HorizontalAlignment="Center" VerticalAlignment="Center"
-					Width="75" Height="21" Content="{lang:Translate Key=ErrorReportingDialog.Send}" Click="Send_Click"
+					Width="150" Height="21" Content="{lang:Translate Key=SendReport}" Click="Send_Click"
 					Margin="0,0,10,0" />
 
 			<Button x:Name="ExitBtn" HorizontalAlignment="Center" VerticalAlignment="Center"
-					Width="75" Height="21" Content="{lang:Translate Key=ErrorReportingDialog.Exit}" Click="Exit_Click" />
+					Width="150" Height="21" Content="{lang:Translate Key=ExitApp}" Click="Exit_Click" />
 		</StackPanel>
 		
 	</Grid>

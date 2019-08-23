@@ -75,7 +75,8 @@ namespace SatisfactorySavegameTool.Dialogs
 
 				if (enc == null)
 				{
-					MessageBox.Show(Translate._("ImageDialog.Save.UnknownFormat"), null, MessageBoxButton.OK, MessageBoxImage.Error);
+					MessageBox.Show(Translate._("ImageDialog.Save.UnknownFormat"), 
+						Translate._("MainWindow.Title"), MessageBoxButton.OK, MessageBoxImage.Error);
 					return;
 				}
 
@@ -87,7 +88,8 @@ namespace SatisfactorySavegameTool.Dialogs
 				}
 				catch (Exception exc)
 				{
-					MessageBox.Show(string.Format(Translate._("ImageDialog.Save.Failed"), exc.ToString()), null, MessageBoxButton.OK, MessageBoxImage.Error);
+					MessageBox.Show(string.Format(Translate._("ImageDialog.Save.Failed"), exc.ToString()), 
+						Translate._("MainWindow.Title"), MessageBoxButton.OK, MessageBoxImage.Error);
 				}
 				finally
 				{

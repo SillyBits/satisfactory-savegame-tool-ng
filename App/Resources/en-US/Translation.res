@@ -11,6 +11,11 @@
 	<Browse>Browse ...</Browse>
 	<Up>Up</Up>
 	<Down>Down</Down>
+	<Done>Done</Done>
+	<SendReport>Send report</SendReport>
+	<DontSendReport>Close without sending</DontSendReport>
+	<Exit>Exit</Exit>
+	<ExitApp>Exit application</ExitApp>
 
 	<MainWindow.Title>Satisfactory Savegame Tool</MainWindow.Title>
 
@@ -47,7 +52,7 @@
 	<MainWindow.Menu.Help.About>About ...</MainWindow.Menu.Help.About>
 	<MainWindow.Menu.Help.About.TT>Shows info on this tool</MainWindow.Menu.Help.About.TT>
 	<MainWindow.Menu.Statusbar.Ready>Ready.</MainWindow.Menu.Statusbar.Ready>
-	
+
 	<MainWindow.LoadGamefile.Title>Select savegame to load</MainWindow.LoadGamefile.Title>
 	<MainWindow.LoadGamefile.Filter>Savegames (*.sav)|*.sav|All files (*.*)|*.*</MainWindow.LoadGamefile.Filter>
 	<MainWindow.LoadGamefile.PeekHeader.Failed>Failed inspecting header of savegame
@@ -81,7 +86,12 @@ unrecoverable damage to your save!</MainWindow.LoadGamefile.PeekHeader.Warn>
 	<MainWindow.SaveGamefile.Progress.Statusbar>Saving {0} ...</MainWindow.SaveGamefile.Progress.Statusbar>
 	<MainWindow.SaveGamefile.Progress.Title>Saving savegame ...</MainWindow.SaveGamefile.Progress.Title>
 	<MainWindow.SaveGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} objects</MainWindow.SaveGamefile.Progress.CounterFormat>
-	
+
+	<MainWindow.ExportGamefile.Progress.Title>Exporting save ...</MainWindow.ExportGamefile.Progress.Title>
+	<MainWindow.ExportGamefile.Progress.Statusbar>Exporting save {0} to {1} ...</MainWindow.ExportGamefile.Progress.Statusbar>
+	<MainWindow.ExportGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} objects</MainWindow.ExportGamefile.Progress.CounterFormat>
+	<MainWindow.ExportGamefile.Done>Savegame exported.</MainWindow.ExportGamefile.Done>
+
 	<Dialog.About.Title>About ...</Dialog.About.Title>
 	<Dialog.Changelog.Title>Changelog ...</Dialog.Changelog.Title>
 	<Dialog.PropertyDump.Title>Property details ...</Dialog.PropertyDump.Title>
@@ -92,7 +102,7 @@ unrecoverable damage to your save!</MainWindow.LoadGamefile.PeekHeader.Warn>
 	<TreePanel.Context.CollapseAll.Tooltip>Collapses all nodes</TreePanel.Context.CollapseAll.Tooltip>
 	<TreePanel.Context.Inspect>Inspect ...</TreePanel.Context.Inspect>
 	<TreePanel.Context.Inspect.Tooltip>Opens inspection dialog on selected node</TreePanel.Context.Inspect.Tooltip>
-	
+
 	<TreePanel.Tab.Simple>Simple</TreePanel.Tab.Simple>
 	<TreePanel.Tab.Classes>Classes</TreePanel.Tab.Classes>
 	<TreePanel.Tab.Paths>Paths</TreePanel.Tab.Paths>
@@ -150,7 +160,7 @@ Satisfactory-Community.de to help with advancing our online map.</OptionsDialog.
 and it's data will only be used for the purposes stated.
 By activating such an option you do agree to those terms.</OptionsDialog.Privacy.Hint>
 	<OptionsDialog.Saved>Changes saved.\n\nThose changes will take effect with next program start.</OptionsDialog.Saved>
-	
+
 	<ImageDialog.Title>Image</ImageDialog.Title>
 	<ImageDialog.Save.Title>Save as ...</ImageDialog.Save.Title>
 	<ImageDialog.Save.Filter>PNG file (*.png)|*.png|All files (*.*)|*.*</ImageDialog.Save.Filter>
@@ -165,15 +175,13 @@ By activating such an option you do agree to those terms.</OptionsDialog.Privacy
 
 	<ErrorReportingDialog.Title>Crash report</ErrorReportingDialog.Title>
 	<ErrorReportingDialog.Hint>Owww, this shouldn't have happened.</ErrorReportingDialog.Hint>
-	<ErrorReportingDialog.Send>Send</ErrorReportingDialog.Send>
-	<ErrorReportingDialog.Exit>Exit</ErrorReportingDialog.Exit>
 
 	<ImageControl.Label>Bitmap of size {0}x{1} with {2} color channels</ImageControl.Label>
 	<ImageControl.Button>Show ...</ImageControl.Button>
 
 	<Action.Prepare>Preparing ...</Action.Prepare>
 	<Action.Done>Done</Action.Done>
-	
+
 	<Action.Validate.Title>Validation</Action.Validate.Title>
 	<Action.Validate.Progress.Statusbar>Validating {0} ...</Action.Validate.Progress.Statusbar>
 	<Action.Validate.Progress.Title>Validating ...</Action.Validate.Progress.Title>
@@ -182,5 +190,5 @@ By activating such an option you do agree to those terms.</OptionsDialog.Privacy
 	<Action.Validate.NoErrors>No errors found.</Action.Validate.NoErrors>
 	<Action.Validate.HasErrors>Found a {0:#,#0} elements with errors!\n\nWould you like to see the report?</Action.Validate.HasErrors>
 	<Action.Validate.Report>Generating report ...</Action.Validate.Report>
-	
+
 </translation>

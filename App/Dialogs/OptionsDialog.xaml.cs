@@ -124,7 +124,7 @@ namespace SatisfactorySavegameTool.Dialogs
 
 			(Application.Current as App).SaveConfig();
 
-			MessageBox.Show(Translate._("OptionsDialog.Saved"));
+			MessageBox.Show(Translate._("OptionsDialog.Saved"), Translate._("MainWindow.Title"));
 
 			Close();
 		}
