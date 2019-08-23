@@ -331,7 +331,7 @@ namespace Savegame
 
 					_AddLine("  .Missing");
 					_Push(1, '\t');
-					String^ dump = Helpers::Hexdump(safe_cast<array<byte>^>(val), 16, true, true, 0);
+					String^ dump = Helpers::Hexdump(safe_cast<array<byte>^>(val), 16, true, true, 0, 0);
 					array<String^>^ lines = dump->Split('\n');
 					Collections::IEnumerator^ e = lines->GetEnumerator();
 					while(e->MoveNext())

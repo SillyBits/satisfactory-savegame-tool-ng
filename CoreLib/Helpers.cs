@@ -20,8 +20,10 @@ namespace CoreLib
 		/// Note that file will be read in binary mode, so there won't be any CRLF-conversion or such.
 		/// </summary>
 		/// <param name="filename">File to read</param>
+		/// <param name="offset">Offset to where to start reading (defaults to start of file)</param>
+		/// <param name="length">Length of data to read (defaults to all)</param>
 		/// <returns>File contents</returns>
-		public static byte[] GetFileContents(string filename)
+		public static byte[] GetFileContents(string filename, long offset = 0, long length = 0)
 		{
 			try
 			{
@@ -29,7 +31,26 @@ namespace CoreLib
 				{
 					using (MemoryStream mem = new MemoryStream())
 					{
-						in_stream.CopyTo(mem);
+						if (length <= 0)
+						{
+							in_stream.CopyTo(mem);
+						}
+						else
+						{
+							if (offset < 0)
+							{
+								length += offset;
+								offset = 0;
+							}
+							if (offset + length > in_stream.Length)
+								length = in_stream.Length - offset;
+
+							byte[] data = new byte[length];
+							in_stream.Seek(offset, SeekOrigin.Begin);
+							in_stream.Read(data, 0, (int)length);
+							mem.Write(data, 0, data.Length);
+						}
+
 						mem.Flush();
 						return mem.ToArray();
 					}
@@ -50,19 +71,35 @@ namespace CoreLib
 		/// <param name="offsets">Whether or not to include offset in string returned</param>
 		/// <param name="ascii">Whether or not to include ASCII chars in string returned</param>
 		/// <param name="indent">No. of tab chars to add in front of each row</param>
+		/// <param name="rel_offset">Relative offset to use for printing (optional)</param>
 		/// <returns>String containing dump</returns>
-		public static string Hexdump(byte[] data, int width = 16, bool offsets = true, bool ascii = true, int indent = 1)
+		public static string Hexdump(byte[] data, int width = 16, bool offsets = true, bool ascii = true, int indent = 1,
+			long rel_offset = -1)
 		{
 			if (data == null)
 				return "<empty>";
 
 			StringBuilder sb = new StringBuilder();
 
-			int ofs = 0;
+			long ofs = 0;
+			string ofs_fmt = null;
+			if (offsets)
+			{
+				if (rel_offset > 0)
+					ofs = rel_offset;
+				long max = ofs + data.Length;
+				if (max <= 0xFFFF)
+					ofs_fmt = "{0:X4}";
+				else if (max <= 0xFFFFFFFFL)
+					ofs_fmt = "{0:X8}";
+				else
+					ofs_fmt = "{0:X12}";
+			}
+
 			int col = 0;
 			int w = (width * 3) + (width >> 2);
 			StringBuilder hex = new StringBuilder(w*2);
-			StringBuilder asc = ascii ? new StringBuilder(width*2): null;
+			StringBuilder asc = ascii ? new StringBuilder(width*2) : null;
 
 			hex.Append(' ');
 			if (ascii)
@@ -81,17 +118,14 @@ namespace CoreLib
 				{
 					if (sb.Length != 0)
 						sb.Append('\n');
-					//if (indent > 0)
-					//	sb.Append('\t', indent);
 					sb.Append('\t', indent);
 					if (offsets)
-						sb.AppendFormat("{0:X4}", ofs);
+						sb.AppendFormat(ofs_fmt, ofs);
 					sb.Append(hex);
 					if (hex.Length < w)
 						sb.Append(' ', w - hex.Length);
 					if (ascii)
 						sb.Append(asc);
-					//sb.Append('\n');
 
 					ofs += width;
 					hex.Clear();
@@ -109,17 +143,14 @@ namespace CoreLib
 			{
 				if (sb.Length != 0)
 					sb.Append('\n');
-				//if (indent > 0)
-				//	sb.Append('\t', indent);
 				sb.Append('\t', indent);
 				if (offsets)
-					sb.AppendFormat("{0:X4}", ofs);
+					sb.AppendFormat(ofs_fmt, ofs);
 				sb.Append(hex);
 				if (hex.Length < w)
 					sb.Append(' ', 1 + w - hex.Length);
 				if (ascii)
 					sb.Append(asc);
-				//sb.Append('\n');
 			}
 
 			return sb.ToString();
