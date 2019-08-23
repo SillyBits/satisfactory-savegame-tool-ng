@@ -206,7 +206,7 @@
 				</Grid>
 			</TabItem>
 
-			<TabItem Header="{lang:Translate Key=OptionsDialog.Reporting.Title}" IsEnabled="False">
+			<TabItem Header="{lang:Translate Key=OptionsDialog.Reporting.Title}">
 				<Grid Margin="5,5">
 					<Grid.RowDefinitions>
 						<RowDefinition Height="auto" />

@@ -78,6 +78,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Dialogs\IncidentReportDialog.xaml.cs">
+      <DependentUpon>IncidentReportDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\OptionsDialog.xaml.cs">
       <DependentUpon>OptionsDialog.xaml</DependentUpon>
     </Compile>
@@ -91,6 +94,10 @@
       <DependentUpon>Splashscreen.xaml</DependentUpon>
     </Compile>
     <Compile Include="Supplements\VersionTable.cs" />
+    <Page Include="Dialogs\IncidentReportDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Dialogs\OptionsDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

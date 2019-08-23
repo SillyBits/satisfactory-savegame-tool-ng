@@ -176,6 +176,13 @@ By activating such an option you do agree to those terms.</OptionsDialog.Privacy
 	<ErrorReportingDialog.Title>Crash report</ErrorReportingDialog.Title>
 	<ErrorReportingDialog.Hint>Owww, this shouldn't have happened.</ErrorReportingDialog.Hint>
 
+	<IncidentReportDialog.Title>Incident Report</IncidentReportDialog.Title>
+	<IncidentReportDialog.Message>While loading your savegame {0},
+the tool detected a yet unknown property '{1}' at position {2:#,#0}.
+This property needs to be dealt with to allow this tool to load this savegame.</IncidentReportDialog.Message>
+	<IncidentReportDialog.Hint>You can enable reporting such incidents within the options dialog.</IncidentReportDialog.Hint>
+	<IncidentReportDialog.Snapshot>Following a small snapshot from your savegame which will be added to the report to assist in implementing this property:</IncidentReportDialog.Snapshot>
+
 	<ImageControl.Label>Bitmap of size {0}x{1} with {2} color channels</ImageControl.Label>
 	<ImageControl.Button>Show ...</ImageControl.Button>
 

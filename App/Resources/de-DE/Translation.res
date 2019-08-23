@@ -177,6 +177,13 @@ Mit aktivieren einer Berichtsoption stimmt der Nutzer dieser Verwendung zu.</Opt
 	<ErrorReportingDialog.Title>Absturzbericht</ErrorReportingDialog.Title>
 	<ErrorReportingDialog.Hint>Upps, das hätte nicht passieren sollen.</ErrorReportingDialog.Hint>
 
+	<IncidentReportDialog.Title>Vorkommniss</IncidentReportDialog.Title>
+	<IncidentReportDialog.Message>Während versucht wurde den Spielstand {0}
+zu laden stolperte der Helfer über eine unbekannte Struktur '{1}' an Position {2:#,#0}.
+Um diesen Spielstand laden zu können muss der Helfer erst entsprechend erweitert werden.</IncidentReportDialog.Message>
+	<IncidentReportDialog.Hint>In den Optionen kannst Du einstellen ob solche Vorkommnisse als Bericht versendet werden sollen.</IncidentReportDialog.Hint>
+	<IncidentReportDialog.Snapshot>Nachfolgend ein kleiner Ausschnitt Deiner Spieldatei, dieser wird dem Bericht angehängt um bei der Analyse dieser unbekannten Struktur zu helfen:</IncidentReportDialog.Snapshot>
+
 	<ImageControl.Label>Bild der Größe {0}x{1} mit {2} Farbkanälen</ImageControl.Label>
 	<ImageControl.Button>Anzeigen ...</ImageControl.Button>
 

@@ -346,33 +346,45 @@ namespace SatisfactorySavegameTool
 			_SetStatusbar(string.Format(Translate._("MainWindow.LoadGamefile.Progress.Statusbar"), filename));
 			ProgressDialog progress = new ProgressDialog(this, Translate._("MainWindow.LoadGamefile.Progress.Title"));
 
-			await Task.Run(() => {
-				DateTime start_time = DateTime.Now;
+			try
+			{
+				await Task.Run(() => {
+					DateTime start_time = DateTime.Now;
 
-				Log.Info("Loading file '{0}'", filename);
-				progress.CounterFormat = Translate._("MainWindow.LoadGamefile.Progress.CounterFormat");
-				progress.Interval = 1024*1024;//1024 * 128;
-				CurrFile.Load(progress.Events);
-				Log.Info("Finished loading");
-				Log.Info("... loaded a total of {0} elements", CurrFile.TotalElements);
+					Log.Info("Loading file '{0}'", filename);
+					progress.CounterFormat = Translate._("MainWindow.LoadGamefile.Progress.CounterFormat");
+					progress.Interval = 1024*1024;//1024 * 128;
+					CurrFile.Load(progress.Events);
+					//throw new UnknownPropertyException("Hard failure :D", "WTFProperty", 0x10001L);
+					Log.Info("Finished loading");
+					Log.Info("... loaded a total of {0} elements", CurrFile.TotalElements);
 
-				Log.Info("Creating trees ...");
-				//progress.CounterFormat = Translate._("MainWindow.LoadGamefile.Progress.CounterFormat.2");
-				progress.Interval = 1000;
-				//TreeView.CreateTree(progress.Events);
-				TreeView.CreateTrees(progress.Events);
-				Log.Info("... finished creating trees");
+					Log.Info("Creating trees ...");
+					//progress.CounterFormat = Translate._("MainWindow.LoadGamefile.Progress.CounterFormat.2");
+					progress.Interval = 1000;
+					//TreeView.CreateTree(progress.Events);
+					TreeView.CreateTrees(progress.Events);
+					Log.Info("... finished creating trees");
 
-				DateTime end_time = DateTime.Now;
-				TimeSpan ofs = end_time - start_time;
-				Log.Info("Loading took {0}", ofs);
-			});
+					DateTime end_time = DateTime.Now;
+					TimeSpan ofs = end_time - start_time;
+					Log.Info("Loading took {0}", ofs);
+				});
+			}
+			catch (UnknownPropertyException exc)
+			{
+				CurrFile = null;
 
-			progress = null;
-			_SetStatusbar();
-			_BlockUI(false);
+				IncidentReportDialog.Show(filename, exc);
+			}
+			finally
+			{
+				progress = null;
+				_SetStatusbar();
+				_BlockUI(false);
 
-			_UpdateUIState();
+				_UpdateUIState();
+			}
 		}
 
 		private async void _SaveGamefile(string filename)

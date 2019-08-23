@@ -146,7 +146,7 @@ namespace SatisfactorySavegameTool
 			_config.Flush();
 		}
 
-		internal void SendReport(string type, string report)
+		internal void SendReport(string type, string report, byte[] data = null)
 		{
 #if DEVENV
 			// Do nothing while in a development environment
@@ -154,11 +154,12 @@ namespace SatisfactorySavegameTool
 			// Gather relevant data
 			Dictionary<string,byte[]> content = new Dictionary<string, byte[]>();
 			content.Add(type + ".txt", Encoding.ASCII.GetBytes(report));
-			if (type == "Crash")
-			{
+			if (type == "Crash" || type == "Incident")
 				content.Add("Latest.log", _logger.GetSnapshot(false));
+			if (type == "Crash")
 				content.Add("Latest.cfg", Helpers.GetFileContents(_config.Filename));
-			}
+			if (data != null)
+				content.Add("Data.bin", data);
 			_uploader.Send(Compressor.CompressToArray(content));
 #endif
 		}
@@ -194,6 +195,11 @@ namespace SatisfactorySavegameTool
 
 		// Localisation related - configured by user
 		public static string LANGUAGE             = null;
+
+
+		// Incident related - size of snapshot to take
+		public const int INCIDENT_OFFSET          = 512;
+		public const int INCIDENT_LENGTH          = INCIDENT_OFFSET + 256;
 
 
 		// Creating actual settings is a 2-step approach:
