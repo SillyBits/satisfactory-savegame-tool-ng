@@ -210,6 +210,11 @@ namespace Savegame {
 				}
 				_cbUpdate(reader->Pos, nullptr, "Done loading");
 			}
+			catch (Properties::UnknownPropertyException^ exc)
+			{
+				Log::Error(String::Format("Error loading '{0}', unknown property detected", Filename), exc);
+				throw;
+			}
 			catch (Exception^ exc)
 			{
 				Log::Error(String::Format("Error loading '{0}'", Filename), exc);

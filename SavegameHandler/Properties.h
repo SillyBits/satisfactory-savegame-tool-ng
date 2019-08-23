@@ -168,6 +168,20 @@ namespace Savegame
 	};
 
 
+	public ref class UnknownPropertyException : Exception
+	{
+	public:
+		String^ PropertyType;
+		__int64 ErrorPos;
+
+		UnknownPropertyException(String^ msg, String^ type_name, __int64 error_pos)
+			: Exception(msg)
+			, PropertyType(type_name)
+			, ErrorPos(error_pos)
+		{ }
+	};
+
+
 	// The base accessor, all properties must be subclasses!
 	public ref class Property abstract
 	{
@@ -419,7 +433,13 @@ namespace Savegame
 			//Accessor^ prop = AccessorFactory::ConstructProperty(type, parent, name, length, index, nullptr);
 			Property^ acc = PropertyFactory::Construct(type, parent);
 			if (acc == nullptr)
-				throw gcnew ReadException(reader, String::Format("Unknown type '{0}'", type));
+			{
+				String^ msg = String::Format("Unknown type '{0}' at pos {1}", type, last);
+				if (!str::IsNullOrEmpty(type))
+					throw gcnew UnknownPropertyException(msg, type->ToString(), last);
+				else
+					throw gcnew ReadException(reader, msg);
+			}
 
 			ValueProperty^ prop = (ValueProperty^)acc;
 
@@ -632,11 +652,18 @@ namespace Savegame
 		PUB_ab(Unknown)
 		bool IsArray;
 		READ
+			__int64 last = reader->Pos;
 			IsArray = false;
 			_Inner = reader->ReadString();
 			Property^ acc = PropertyFactory::Construct(_Inner, this);
 			if (acc == nullptr)
-				throw gcnew ReadException(reader, String::Format("Unknown inner structure type '{0}'", _Inner));
+			{
+				String^ msg = String::Format("Unknown inner structure type '{0}' at pos {1}", _Inner, last);
+				if (!str::IsNullOrEmpty(_Inner))
+					throw gcnew UnknownPropertyException(msg, _Inner->ToString(), last);
+				else
+					throw gcnew ReadException(reader, msg);
+			}
 			Unknown = reader->ReadBytes(17);
 			Value = acc->Read(reader);
 		READ_END
@@ -648,9 +675,16 @@ namespace Savegame
 			Properties^ props = gcnew Properties;
 			for (int i = 0; i < count; ++i)
 			{
+				__int64 last = reader->Pos;
 				Property^ acc = PropertyFactory::Construct(_Inner, this);
 				if (acc == nullptr)
-					throw gcnew ReadException(reader, String::Format("Unknown inner structure type '{0}'", _Inner));
+				{
+					String^ msg = String::Format("Unknown inner structure type '{0}' at pos {1}", _Inner, last);
+					if (!str::IsNullOrEmpty(_Inner))
+						throw gcnew UnknownPropertyException(msg, _Inner->ToString(), last);
+					else
+						throw gcnew ReadException(reader, msg);
+				}
 				props->Add(acc->Read(reader));
 			}
 			Value = props;
