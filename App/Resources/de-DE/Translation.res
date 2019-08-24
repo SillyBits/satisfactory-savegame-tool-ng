@@ -109,8 +109,40 @@ kann diesen Spielstand unter Umständen komplett unbrauchbar machen!</MainWindow
 	<TreePanel.Tab.Living>Lebewesen</TreePanel.Tab.Living>
 	<TreePanel.Tab.Buildings>Gebäude</TreePanel.Tab.Buildings>
 
-	<TreePanel.Tree.Objects>Objekte ({0:#,#0} Elemente)</TreePanel.Tree.Objects>
-	<TreePanel.Tree.Collected>Sammlung ({0:#,#0} Elemente)</TreePanel.Tree.Collected>
+	<TreePanel.Tree.Objects>Objekte</TreePanel.Tree.Objects>
+	<TreePanel.Tree.Collected>Sammlung</TreePanel.Tree.Collected>
+	<TreePanel.Tree.Missing>Unbehandelt</TreePanel.Tree.Missing>
+	<TreePanel.Tree.Players>Spieler</TreePanel.Tree.Players>
+	<TreePanel.Tree.Player>Spieler #{0}</TreePanel.Tree.Player>
+	<TreePanel.Tree.Player.Invalid>[Ungültig]</TreePanel.Tree.Player.Invalid>
+	<TreePanel.Tree.Player.NoActor>[Keine Klasse]</TreePanel.Tree.Player.NoActor>
+	<TreePanel.Tree.Enemies>Feinde</TreePanel.Tree.Enemies>
+	<TreePanel.Tree.Wildlife>Tierwelt</TreePanel.Tree.Wildlife>
+	<TreePanel.Tree.Factories>Fabriken</TreePanel.Tree.Factories>
+	<TreePanel.Tree.Buildings>Gebäude</TreePanel.Tree.Buildings>
+	<TreePanel.Tree.Walkway>Gehweg</TreePanel.Tree.Walkway>
+	<TreePanel.Tree.Walkway.Cross>Kreuzung</TreePanel.Tree.Walkway.Cross>
+	<TreePanel.Tree.Walkway.Ramp>Rampe</TreePanel.Tree.Walkway.Ramp>
+	<TreePanel.Tree.Walkway.Straight>Brücke</TreePanel.Tree.Walkway.Straight>
+	<TreePanel.Tree.Walkway.T>T-Form</TreePanel.Tree.Walkway.T>
+	<TreePanel.Tree.Walkway.Trun>Kurve</TreePanel.Tree.Walkway.Trun>
+	<TreePanel.Tree.Wall>Wand</TreePanel.Tree.Wall>
+	<TreePanel.Tree.Steel>(Stahl)</TreePanel.Tree.Steel>
+	<TreePanel.Tree.Conveyor>Band</TreePanel.Tree.Conveyor>
+	<TreePanel.Tree.Conveyor.x3>x3</TreePanel.Tree.Conveyor.x3>
+	<TreePanel.Tree.Conveyor.x2>x2</TreePanel.Tree.Conveyor.x2>
+	<TreePanel.Tree.Conveyor.x1>x1</TreePanel.Tree.Conveyor.x1>
+	<TreePanel.Tree.Conveyor.x1.WallMounted>x1 (Wand-montiert)</TreePanel.Tree.Conveyor.x1.WallMounted>
+	<TreePanel.Tree.Door>Tür</TreePanel.Tree.Door>
+	<TreePanel.Tree.Door.Center>Mittig</TreePanel.Tree.Door.Center>
+	<TreePanel.Tree.Door.Left>Links</TreePanel.Tree.Door.Left>
+	<TreePanel.Tree.Door.Right>Rechts</TreePanel.Tree.Door.Right>
+	<TreePanel.Tree.Gate>Tor</TreePanel.Tree.Gate>
+	<TreePanel.Tree.Stairs>Stufen</TreePanel.Tree.Stairs>
+	<TreePanel.Tree.Stairs.Left>Links</TreePanel.Tree.Stairs.Left>
+	<TreePanel.Tree.Stairs.Right>Rechts</TreePanel.Tree.Stairs.Right>
+	<TreePanel.Tree.Foundation>Fundament</TreePanel.Tree.Foundation>
+	<TreePanel.Tree.Ramp>Rampe</TreePanel.Tree.Ramp>
 
 	<DetailsPanel.Empty>&lt;leer&gt;</DetailsPanel.Empty>
 

@@ -454,7 +454,7 @@ namespace SatisfactorySavegameTool.Panels
 				return 1 // Root
 					+ (1 + MainWindow.CurrFile.Objects.Count) 
 					+ (1 + MainWindow.CurrFile.Collected.Count) 
-				//	+ 1 // .Missing
+					+ 1 // .Missing
 					;
 			}
 		}
@@ -463,19 +463,16 @@ namespace SatisfactorySavegameTool.Panels
 		{
 			// Do not apply sorting here as this tree should reflect save game 1:1
 
-			string label = string.Format(Translate._("TreePanel.Tree.Objects"), MainWindow.CurrFile.Objects.Count);
-			TreeNode objects = _AddItem(root, label, null);
+			TreeNode objects = _AddItem(root, Translate._("TreePanel.Tree.Objects"), null);
 			foreach (P.Property prop in MainWindow.CurrFile.Objects)
 				_AddItem(objects, prop.ToString(), prop);
 
-			label = string.Format(Translate._("TreePanel.Tree.Collected"), MainWindow.CurrFile.Collected.Count);
-			TreeNode collected = _AddItem(root, label, null);
+			TreeNode collected = _AddItem(root, Translate._("TreePanel.Tree.Collected"), null);
 			foreach (P.Property prop in MainWindow.CurrFile.Collected)
 				_AddItem(collected, prop.ToString(), prop);
 
-			//if self.__savegame.Missing:
-			//	label = "Missing"
-			//	self.__add(self.root, label, self.__savegame.Missing)
+			if (!MainWindow.CurrFile.Missing.IsNullOrEmpty())
+				_AddItem(root, Translate._("TreePanel.Tree.Missing"), MainWindow.CurrFile.Missing);
 		}
 
 	}
@@ -513,9 +510,8 @@ namespace SatisfactorySavegameTool.Panels
 			//foreach (Property prop in MainWindow.GetSavegame().Collected)
 			//	AddClassRecurs(root, "/", (Savegame.Properties.Object) prop);
 
-			//if self.__savegame.Missing:
-			//	label = "Missing"
-			//	self.__add(self.root, label, self.__savegame.Missing)
+			//if (!MainWindow.CurrFile.Missing.IsNullOrEmpty())
+			//	_AddItem(root, Translate._("TreePanel.Tree.Missing"), MainWindow.CurrFile.Missing);
 
 			root.Sort();
 		}
@@ -526,13 +522,13 @@ namespace SatisfactorySavegameTool.Panels
 			TreeNode class_item;
 
 			string ClassName, PathName;
-			if (prop is P.Actor)//.TypeName == "Actor")
+			if (prop is P.Actor)
 			{
 				P.Actor actor = (P.Actor) prop;
 				ClassName = actor.ClassName.ToString();
 				PathName = actor.PathName.ToString();
 			}
-			else if (prop is P.Object)//.TypeName == "Object")
+			else if (prop is P.Object)
 			{
 				P.Object obj = (P.Object) prop;
 				ClassName = obj.ClassName.ToString();
@@ -546,11 +542,6 @@ namespace SatisfactorySavegameTool.Panels
 			{
 				classname = remain.Split('/')[0];
 				fullname = path + classname + "/";
-				//if not fullname in self.__classes:
-				//	class_item = self.__add(parent_item, classname)
-				//	self.__classes[fullname] = class_item
-				//else:
-				//	class_item = self.__classes[fullname]
 				class_item = _AddOrGetClass(parent, fullname, classname);
 				return _AddClassRecurs(class_item, fullname, prop);
 			}
@@ -599,31 +590,9 @@ namespace SatisfactorySavegameTool.Panels
 					return _AddItem(class_item, label, prop);
 				}
 				Log.Warning("AddClassRecurs: What to do with '{0}'?", ClassName);
-			/*
-				fullname = parent_class + classname + "."
-				if not fullname in self.__classes:
-					class_item = self.__add(parent_item, classname)
-					self.__classes[fullname] = class_item
-				else:
-					class_item = self.__classes[fullname]
-				return self.__add_class_recurs(class_item, fullname, prop)
-			*/
 			}
 
-			/*
-			if prop.ClassName.startswith("/Script/") and remain:
-				fullname = prop.ClassName
-				if not fullname in self.__classes:
-					class_item = self.__add(parent_item, remain)
-					self.__classes[fullname] = class_item
-				else:
-					class_item = self.__classes[fullname]
-				parent_item = class_item
-			*/
-	
-			// At the end of our path, now add property
-			//return self.__add(parent_item, remain, prop)
-			//label = prop.PathName.split(".")[1:]
+			// At the end of our path, add property
 			label = PathName;
 			label = label.Substring(label.IndexOf('.') + 1);
 			return _AddItem(parent, label, prop);
@@ -675,6 +644,9 @@ namespace SatisfactorySavegameTool.Panels
 
 			foreach (P.Property prop in MainWindow.CurrFile.Collected)
 				_AddTreeRecurs(root, "", prop);
+
+			//if (!MainWindow.CurrFile.Missing.IsNullOrEmpty())
+			//	_AddItem(root, Translate._("TreePanel.Tree.Missing"), MainWindow.CurrFile.Missing);
 
 			root.Sort();
 		}
@@ -747,9 +719,8 @@ namespace SatisfactorySavegameTool.Panels
 				}
 				Log.Warning("AddClassRecurs: What to do with '{0}'?", PathName);
 			}
-
 	
-			// At the end of our path, now add property
+			// At the end of our path, add property
 			label = PathName;
 			label = label.Substring(label.IndexOf('.') + 1);
 			return _AddItem(parent, label, prop);
@@ -822,17 +793,17 @@ namespace SatisfactorySavegameTool.Panels
 		{
 			_classes = new Dictionary<string, TreeNode>();
 
-			TreeNode players = _AddItem(root, "Players");
+			TreeNode players = _AddItem(root, Translate._("TreePanel.Tree.Players"));
 			foreach (P.Actor prop in _players)
 				_AddPlayer(players, prop);
 			players.Sort();
 
-			TreeNode enemies = _AddItem(root, "Enemies");
+			TreeNode enemies = _AddItem(root, Translate._("TreePanel.Tree.Enemies"));
 			foreach (P.Actor prop in _enemies)
 				_AddEnemy(enemies, prop);
 			enemies.Sort();
 
-			TreeNode wildlife = _AddItem(root, "Wildlife");
+			TreeNode wildlife = _AddItem(root, Translate._("TreePanel.Tree.Wildlife"));
 			foreach (P.Actor prop in _wildlife)
 				_AddWildlife(wildlife, prop);
 			wildlife.Sort();
@@ -851,7 +822,8 @@ namespace SatisfactorySavegameTool.Panels
 			if (player_obj == null)
 			{
 				string pl = blueprint.PathName.LastName();
-				string short_title = string.Format("Player #{0} [INVALID]", pl.Split('_').Last());
+				string short_title = string.Format(Translate._("TreePanel.Tree.Player"), pl.Split('_').Last())
+								   + " " + Translate._("TreePanel.Tree.Player.Invalid");
 				TreeNode p = _AddItem(parent, short_title, null);
 				p.IsEnabled = false;
 			}
@@ -860,13 +832,13 @@ namespace SatisfactorySavegameTool.Panels
 				string pathname = player_obj.PathName.ToString();
 				string name = pathname.LastName();
 
-				string short_title = string.Format("Player #{0}", name.Split('_').Last());
+				string short_title = string.Format(Translate._("TreePanel.Tree.Player"), name.Split('_').Last());
 				string title = short_title + string.Format(" ({0})", name);
 				P.Actor player = MainWindow.CurrFile.Objects.FindByPathName(pathname) as P.Actor;
 
 				if (player == null)
 				{
-					short_title += " [NO ACTOR]";
+					short_title += " " + Translate._("TreePanel.Player.NoActor");
 					TreeNode p = _AddItem(parent, short_title, null);
 					p.IsEnabled = false;
 				}
@@ -887,9 +859,15 @@ namespace SatisfactorySavegameTool.Panels
 				.ClassName.ToString()
 				.Replace("/Game/FactoryGame/Character/Creature/Enemy/", "")
 				.Split('/');
+			if (Translate.Has(groups[0]))
+				groups[0] = Translate._(groups[0]);
 			TreeNode group = _AddOrGetClass(parent, groups[0]);
 			if (groups.Length == 3)
+			{
+				if (Translate.Has(groups[1]))
+					groups[1] = Translate._(groups[1]);
 				group = _AddOrGetClass(group, groups[1]);
+			}
 
 			string name = entity.PathName.LastName();
 			string classname = entity.ClassName.LastName();
@@ -911,6 +889,8 @@ namespace SatisfactorySavegameTool.Panels
 				.ClassName.ToString()
 				.Replace("/Game/FactoryGame/Character/Creature/Wildlife/", "")
 				.Split('/').First();
+			if (Translate.Has(group_name))
+				group_name = Translate._(group_name);
 			TreeNode group = _AddOrGetClass(parent, group_name);
 
 			string name = entity.PathName.LastName();
@@ -929,7 +909,6 @@ namespace SatisfactorySavegameTool.Panels
 			if (!_classes.ContainsKey(name))
 			{
 				TreeNode class_item = _AddItem(parent, name);
-				//class_item.IsExpanded = true;
 				_classes.Add(name, class_item);
 			}
 			return _classes[name];
@@ -1021,12 +1000,12 @@ namespace SatisfactorySavegameTool.Panels
 		{
 			_classes = new Dictionary<string, TreeNode>();
 
-			TreeNode factories = _AddItem(root, "Factories");
+			TreeNode factories = _AddItem(root, Translate._("TreePanel.Tree.Factories"));
 			foreach (P.Actor prop in _factories)
 				_AddFactory(factories, prop);
 			factories.Sort();
 
-			TreeNode buildings = _AddItem(root, "Buildings");
+			TreeNode buildings = _AddItem(root, Translate._("TreePanel.Tree.Buildings"));
 			foreach (P.Actor prop in _buildings)
 				_AddBuilding(buildings, prop);
 			buildings.Sort();
@@ -1057,8 +1036,12 @@ namespace SatisfactorySavegameTool.Panels
 			{
 				// For this to work, we've to refactor use of _classes cache, darn :-/
 				string grp = match.Groups["group"].Value;
+				if (Translate.Has(grp))
+					grp = Translate._(grp);
 				group = _AddOrGetClass(group, grp);
 				grp = match.Groups["tier"].Value;
+				if (Translate.Has(grp))
+					grp = Translate._(grp);
 				group = _AddOrGetClass(group, grp);
 				name = grp + match.Groups["name"];
 			}
@@ -1068,9 +1051,15 @@ namespace SatisfactorySavegameTool.Panels
 					.ClassName.ToString()
 					.Replace("/Game/FactoryGame/Buildable/Factory/", "")
 					.Split('/');
+				if (Translate.Has(groups[0]))
+					groups[0] = Translate._(groups[0]);
 				group = _AddOrGetClass(group, groups[0]);
 				if (groups.Length == 3)
+				{
+					if (Translate.Has(groups[1]))
+						groups[1] = Translate._(groups[1]);
 					group = _AddOrGetClass(group, groups[1]);
+				}
 			}
 
 			string short_title = string.Format("{0} #{1}", name, id);
@@ -1090,12 +1079,101 @@ namespace SatisfactorySavegameTool.Panels
 				;
 			string id = names.Last();
 			names.Remove(id);
+
 			// Further refinement of tree, grouping walls, walkways and such, showing typed nodes below
 			TreeNode group = parent;
 
-			if (names.Count > 2)
+			bool is_steel = false;
+			if (names.Last() == "Steel")
 			{
+				is_steel = true;
+				names.Remove(names.Last());
+			}
+
+			if (names[0].StartsWith("Walkway"))
+			{
+				// Walkway[Cross|Ramp|Straight|T|Trun]
+				group = _AddOrGetClass(group, Translate._("TreePanel.Tree.Walkway"));
+				names[0] = Translate._("TreePanel.Tree.Walkway." + names[0].Substring(7));
 				group = _AddOrGetClass(group, names[0]);
+			}
+			else if (names[0] == "Wall")
+			{
+				group = _AddOrGetClass(group, Translate._("TreePanel.Tree.Wall"));
+				names.RemoveAt(0);
+
+				if (names[0] == "8x4")
+				{
+					// Wall : 8x4 : [01|02] -> 01=Normal, 02=Steel
+					string s = names[0] + "_" + names[1];
+					if (names.Last() == "02")
+					{
+						is_steel = true;
+						s += " " + Translate._("TreePanel.Tree.Steel");
+					}
+					group = _AddOrGetClass(group, s);
+				}
+				else if (names[0] == "Conveyor")
+				{
+					// Wall : Conveyor : 8x4 : [01|02|03|04] {: Steel}
+					// -> 01:x3, 02:x2, 03:x1, 04:x1 perpendicular
+					string s = "TreePanel.Tree.Conveyor";
+
+					group = _AddOrGetClass(group, Translate._(s));
+					names.RemoveAt(0);
+
+					switch (names.Last())
+					{
+						case "01": s += ".x3"; break;
+						case "02": s += ".x2"; break;
+						case "03": s += ".x1"; break;
+						case "04": s += ".x1.WallMounted"; break;
+					}
+					s = Translate._(s);
+					if (is_steel)
+						s += " " + Translate._("TreePanel.Tree.Steel");
+					group = _AddOrGetClass(group, s);
+				}
+				else if (names[0] == "Door")
+				{
+					// Wall : Door : 8x4 : [01|02|03] {: Steel} 
+					// -> 01=Center, 02=Left, 03=Right
+					string s = "TreePanel.Tree.Door";
+
+					group = _AddOrGetClass(group, Translate._(s));
+					names.RemoveAt(0);
+
+					switch (names.Last())
+					{
+						case "01": s += ".Center"; break;
+						case "02": s += ".Left"; break;
+						case "03": s += ".Right"; break;
+					}
+					s = Translate._(s);
+					if (is_steel)
+						s += " " + Translate._("TreePanel.Tree.Steel");
+					group = _AddOrGetClass(group, s);
+				}
+				else if (names[0] == "Gate")
+				{
+					// Wall : Gate : 8x4 : 01
+					group = _AddOrGetClass(group, Translate._("TreePanel.Tree.Gate"));
+					names.RemoveAt(0);
+				}
+			}
+			else if (names[0] == "Stairs")
+			{
+				// Stairs : [Left|Right] : 01
+				group = _AddOrGetClass(group, Translate._("TreePanel.Tree.Stairs"));
+				names.RemoveAt(0);
+				names[0] = Translate._("TreePanel.Tree.Stairs." + names[0]);
+				group = _AddOrGetClass(group, names[0]);
+			}
+			else if (names.Count > 2)
+			{
+				// Foundation : 8x[1|2|4] : 01
+				// Ramp : 8x[1|2|4] : 01
+				group = _AddOrGetClass(group, Translate._("TreePanel.Tree." + names[0]));
 				names.RemoveAt(0);
 				group = _AddOrGetClass(group, names[0]);
 			}
@@ -1105,12 +1183,20 @@ namespace SatisfactorySavegameTool.Panels
 					.ClassName.ToString()
 					.Replace("/Game/FactoryGame/Buildable/Building/", "")
 					.Split('/');
+				if (Translate.Has(groups[0]))
+					groups[0] = Translate._(groups[0]);
 				group = _AddOrGetClass(group, groups[0]);
 				if (groups.Length == 3)
+				{
+					if (Translate.Has(groups[1]))
+						groups[1] = Translate._(groups[1]);
 					group = _AddOrGetClass(group, groups[1]);
+				}
 			}
 
 			string name = string.Join("_", names);
+			if (is_steel)
+				name += " " + Translate._("TreePanel.Tree.Steel");
 
 			string short_title = string.Format("{0} #{1}", name, id);
 			string title = short_title + string.Format(" ({0})", objname);

@@ -109,8 +109,40 @@ unrecoverable damage to your save!</MainWindow.LoadGamefile.PeekHeader.Warn>
 	<TreePanel.Tab.Living>Living</TreePanel.Tab.Living>
 	<TreePanel.Tab.Buildings>Buildings</TreePanel.Tab.Buildings>
 
-	<TreePanel.Tree.Objects>Objects ({0:#,#0} elements)</TreePanel.Tree.Objects>
-	<TreePanel.Tree.Collected>Collected ({0:#,#0} elements)</TreePanel.Tree.Collected>
+	<TreePanel.Tree.Objects>Objects</TreePanel.Tree.Objects>
+	<TreePanel.Tree.Collected>Collected</TreePanel.Tree.Collected>
+	<TreePanel.Tree.Missing>Unhandled</TreePanel.Tree.Missing>
+	<TreePanel.Tree.Players>Players</TreePanel.Tree.Players>
+	<TreePanel.Tree.Player>Player #{0}</TreePanel.Tree.Player>
+	<TreePanel.Tree.Player.Invalid>[Invalid]</TreePanel.Tree.Player.Invalid>
+	<TreePanel.Tree.Player.NoActor>[No class]</TreePanel.Tree.Player.NoActor>
+	<TreePanel.Tree.Enemies>Enemies</TreePanel.Tree.Enemies>
+	<TreePanel.Tree.Wildlife>Wildlife</TreePanel.Tree.Wildlife>
+	<TreePanel.Tree.Factories>Factories</TreePanel.Tree.Factories>
+	<TreePanel.Tree.Buildings>Buildings</TreePanel.Tree.Buildings>
+	<TreePanel.Tree.Walkway>Walkway</TreePanel.Tree.Walkway>
+	<TreePanel.Tree.Walkway.Cross>Cross</TreePanel.Tree.Walkway.Cross>
+	<TreePanel.Tree.Walkway.Ramp>Ramp</TreePanel.Tree.Walkway.Ramp>
+	<TreePanel.Tree.Walkway.Straight>Straight</TreePanel.Tree.Walkway.Straight>
+	<TreePanel.Tree.Walkway.T>T-shape</TreePanel.Tree.Walkway.T>
+	<TreePanel.Tree.Walkway.Trun>Turn</TreePanel.Tree.Walkway.Trun>
+	<TreePanel.Tree.Wall>Wall</TreePanel.Tree.Wall>
+	<TreePanel.Tree.Steel>(Steel)</TreePanel.Tree.Steel>
+	<TreePanel.Tree.Conveyor>Conveyor</TreePanel.Tree.Conveyor>
+	<TreePanel.Tree.Conveyor.x3>x3</TreePanel.Tree.Conveyor.x3>
+	<TreePanel.Tree.Conveyor.x2>x2</TreePanel.Tree.Conveyor.x2>
+	<TreePanel.Tree.Conveyor.x1>x1</TreePanel.Tree.Conveyor.x1>
+	<TreePanel.Tree.Conveyor.x1.WallMounted>x1 (Wall-mounted)</TreePanel.Tree.Conveyor.x1.WallMounted>
+	<TreePanel.Tree.Door>Door</TreePanel.Tree.Door>
+	<TreePanel.Tree.Door.Center>Center</TreePanel.Tree.Door.Center>
+	<TreePanel.Tree.Door.Left>Left</TreePanel.Tree.Door.Left>
+	<TreePanel.Tree.Door.Right>Right</TreePanel.Tree.Door.Right>
+	<TreePanel.Tree.Gate>Gate</TreePanel.Tree.Gate>
+	<TreePanel.Tree.Stairs>Stairs</TreePanel.Tree.Stairs>
+	<TreePanel.Tree.Stairs.Left>Left</TreePanel.Tree.Stairs.Left>
+	<TreePanel.Tree.Stairs.Right>Right</TreePanel.Tree.Stairs.Right>
+	<TreePanel.Tree.Foundation>Foundation</TreePanel.Tree.Foundation>
+	<TreePanel.Tree.Ramp>Ramp</TreePanel.Tree.Ramp>
 
 	<DetailsPanel.Empty>&lt;empty&gt;</DetailsPanel.Empty>
 
