@@ -53,6 +53,12 @@
 	<MainWindow.Menu.Help.About.TT>Shows info on this tool</MainWindow.Menu.Help.About.TT>
 	<MainWindow.Menu.Statusbar.Ready>Ready.</MainWindow.Menu.Statusbar.Ready>
 
+	<MainWindow.Gamefile.Modified>Modified</MainWindow.Gamefile.Modified>
+	<MainWindow.Gamefile.modified>modified</MainWindow.Gamefile.modified>
+	<MainWindow.Gamefile.UnsavedChanges>Your savegame has unsaved changes!
+
+Do you really want to close it?</MainWindow.Gamefile.UnsavedChanges>
+
 	<MainWindow.LoadGamefile.Title>Select savegame to load</MainWindow.LoadGamefile.Title>
 	<MainWindow.LoadGamefile.Filter>Savegames (*.sav)|*.sav|All files (*.*)|*.*</MainWindow.LoadGamefile.Filter>
 	<MainWindow.LoadGamefile.PeekHeader.Failed>Failed inspecting header of savegame

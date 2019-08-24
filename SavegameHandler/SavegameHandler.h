@@ -7,6 +7,7 @@ namespace Savegame {
 	{
 	public:
 		String^ Filename;
+		bool Modified;
 
 		int TotalElements;
 		Properties::Header^ Header;
@@ -16,6 +17,7 @@ namespace Savegame {
 
 		Savegame(String^ filename) 
 			: Filename(filename)
+			, Modified(false)
 			, TotalElements(0)
 			, Header(nullptr)
 			, Objects(nullptr)
@@ -208,6 +210,9 @@ namespace Savegame {
 					Log::Info("-> Found extra data of size {0:#,#0} at end of file", missing);
 					TotalElements++;
 				}
+
+				Modified = false;
+
 				_cbUpdate(reader->Pos, nullptr, "Done loading");
 			}
 			catch (Properties::UnknownPropertyException^ exc)
@@ -303,6 +308,8 @@ namespace Savegame {
 					writer->Write(Missing);
 					saved++;
 				}
+
+				Modified = false;
 
 				_cbUpdate(saved, nullptr, "Done saving");
 				Log::Info("-> stored a {0:#,#0} Bytes", writer->Pos);

@@ -80,6 +80,8 @@ namespace SatisfactorySavegameTool
 
 			_SetStatusbar();
 
+			Details.Modified += Details_Modified;
+
 			// Finally, update menu states
 			_UpdateUIState();
 
@@ -120,11 +122,16 @@ namespace SatisfactorySavegameTool
 		protected void _UpdateUIState()
 		{
 			bool has_save = (CurrFile != null);
-#if DEBUG
-			bool modified = true;
-#else
-			bool modified = false; //TODO: has_save && CurrFile.IsModified;
-#endif
+			bool modified = has_save && CurrFile.Modified;
+
+			string title = Translate._("MainWindow.Title");
+			if (has_save)
+			{
+				title += " - " + Path.GetFileName(CurrFile.Filename);
+				if (modified)
+					title += string.Format(" ({0})", Translate._("MainWindow.Gamefile.modified"));
+			}
+			Title = title;
 
 			File_Save.IsEnabled = File_SaveAs.IsEnabled = modified;
 			File_Close.IsEnabled = has_save;
@@ -299,6 +306,12 @@ namespace SatisfactorySavegameTool
 				Details.ShowBuilding(building);
 			}
 		}
+
+		private void Details_Modified()
+		{
+			CurrFile.Modified = true;
+			_UpdateUIState();
+		}
 #endregion
 
 #region Handling for savegame
@@ -306,7 +319,8 @@ namespace SatisfactorySavegameTool
 
 		private async void _LoadGamefile(string filename)
 		{
-			_CloseGamefile();
+			if (!_CloseGamefile())
+				return;
 
 			if (!File.Exists(filename))
 			{
@@ -426,11 +440,19 @@ namespace SatisfactorySavegameTool
 			_UpdateUIState();
 		}
 
-		private void _CloseGamefile()
+		private bool _CloseGamefile()
 		{
-			//TODO: Add modification check
+			if (CurrFile != null && CurrFile.Modified)
+			{
+				var ret = MessageBox.Show(Translate._("MainWindow.Gamefile.UnsavedChanges"), 
+					Translate._("MainWindow.Title"), MessageBoxButton.YesNo, MessageBoxImage.Question);
+				if (ret == MessageBoxResult.No)
+					return false;
+			}
 
 			CurrFile = null;
+
+			return true;
 		}
 
 		private async void _ExportGamefile(string export_file)

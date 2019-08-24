@@ -53,6 +53,12 @@
 	<MainWindow.Menu.Help.About.TT>Zeigt Informationen über dieses Programm</MainWindow.Menu.Help.About.TT>
 	<MainWindow.Menu.Statusbar.Ready>Bereit.</MainWindow.Menu.Statusbar.Ready>
 
+	<MainWindow.Gamefile.Modified>Geändert</MainWindow.Gamefile.Modified>
+	<MainWindow.Gamefile.modified>geändert</MainWindow.Gamefile.modified>
+	<MainWindow.Gamefile.UnsavedChanges>Dein Spielstand hat ungespeicherte Änderungen!
+
+Willst Du ihn wirklich schliessen?</MainWindow.Gamefile.UnsavedChanges>
+
 	<MainWindow.LoadGamefile.Title>Spielstand auswählen</MainWindow.LoadGamefile.Title>
 	<MainWindow.LoadGamefile.Filter>Spielstände (*.sav)|*.sav|Alle Dateien (*.*)|*.*</MainWindow.LoadGamefile.Filter>
 	<MainWindow.LoadGamefile.PeekHeader.Failed>Fehler beim inspizieren des Dateikopfes von

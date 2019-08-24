@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -38,6 +40,10 @@ namespace SatisfactorySavegameTool.Panels
 		{ }
 
 
+		public delegate void ModifiedHandler();
+		public event ModifiedHandler Modified;
+
+
 		internal void ShowProperty(Property prop)
 		{
 			_ClearAll();
@@ -50,6 +56,7 @@ namespace SatisfactorySavegameTool.Panels
 				expando.IsEnabled = false;
 				element = expando;
 			}
+			(element as INotifyPropertyChanged).PropertyChanged += Panel_PropertyChanged;
 			Children.Add(element.Visual);
 		}
 
@@ -59,6 +66,7 @@ namespace SatisfactorySavegameTool.Panels
 
 			Log.Debug("Visualizing living entity '{0}'", living != null ? living.Title : EMPTY);
 			Details.IElement element = new Details.LivingEntity(living);
+			(element as INotifyPropertyChanged).PropertyChanged += Panel_PropertyChanged;
 			Children.Add(element.Visual);
 		}
 
@@ -68,13 +76,22 @@ namespace SatisfactorySavegameTool.Panels
 
 			Log.Debug("Visualizing building '{0}'", building != null ? building.Title : EMPTY);
 			Details.IElement element = new Details.Building(building);
+			(element as INotifyPropertyChanged).PropertyChanged += Panel_PropertyChanged;
 			Children.Add(element.Visual);
 		}
 
 
 		internal void _ClearAll()
 		{
+			foreach (var child in Children)
+				(child as INotifyPropertyChanged).PropertyChanged -= Panel_PropertyChanged;
 			Children.Clear();
+		}
+
+
+		private void Panel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			Modified?.Invoke();
 		}
 
 	}
@@ -129,7 +146,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 	// Basic visual element (with or without a label)
 	//
-	internal interface IElement
+
+	internal interface IElement : INotifyPropertyChanged
 	{
 		// Constructor required: IElement parent, string label, object obj
 
@@ -141,6 +159,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 		bool HasValue { get; }
 		//object Value { get; set; }
+		//public event PropertyChangedEventHandler PropertyChanged;
 	}
 
 	// More specific, typed element
@@ -148,12 +167,16 @@ namespace SatisfactorySavegameTool.Panels.Details
 	internal interface IElement<_ValueType> : IElement
 	{
 		// Constructor required: IElement parent, string label, object obj
+
 		//FrameworkElement Visual { get; }
+
 		//bool HasLabel { get; }
 		//string Label { get; set; }
-		//bool HasValue { get; }
+		//VerticalAlignment LabelVerticalAlign { get; }
 
+		//bool HasValue { get; }
 		_ValueType Value { get; set; }
+		//public event PropertyChangedEventHandler PropertyChanged;
 	}
 
 
@@ -165,9 +188,14 @@ namespace SatisfactorySavegameTool.Panels.Details
 		// Constructor required: IElement parent, string label, object obj
 
 		//FrameworkElement Visual { get; }
+
 		//bool HasLabel { get; }
 		//string Label { get; set; }
+		//VerticalAlignment LabelVerticalAlign { get; }
+
 		//bool HasValue { get; }
+		//_ValueType Value { get; set; }
+		//public event PropertyChangedEventHandler PropertyChanged;
 
 		// Needed for traversing later with saving?
 		int Count { get; }
@@ -247,6 +275,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 		public bool HasValue { get { return false; } }
 		public object Value { get { return null; } set { } }
+		public event PropertyChangedEventHandler PropertyChanged;
 
 		// IElementContainer
 		public int Count { get { return _grid.RowDefinitions.Count; } }
@@ -256,6 +285,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 		{
 			if (element == null)
 				throw new ArgumentNullException();
+
+			(element as INotifyPropertyChanged).PropertyChanged += _PropertyChanged;
 
 			RowDefinition rowdef = new RowDefinition() {
 				Height = new GridLength(0, GridUnitType.Auto),
@@ -411,6 +442,11 @@ namespace SatisfactorySavegameTool.Panels.Details
 			}
 		}
 
+		protected virtual void _PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Value"));
+		}
+
 		internal IElement _parent;
 		internal string _label;
 		internal VerticalAlignment _label_valign = VerticalAlignment.Center;
@@ -434,7 +470,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 		{
 			// The 'bool' was just to get the right thing here, but it must be at least a byte,
 			// and fields like 'int32:WasPlacedInLevel' use this control too.
-			if (val is bool)	return new BoolControl  ((bool)  val ? 1 : 0);
+			if (val is bool)	return new BoolControl  ((bool)  val);
 			if (val is byte)	return new ByteControl  ((byte)  val);
 			if (val is int)		return new IntControl   ((int)   val);
 			if (val is long)	return new LongControl  ((long)  val);
@@ -446,14 +482,19 @@ namespace SatisfactorySavegameTool.Panels.Details
 	}
 
 	// Every control must implement this getter/setter pattern
-	internal interface IValueContainer<_ValueType>
+	internal interface IValueContainer : INotifyPropertyChanged
+	{
+		//_ValueType Value { get; set; }
+	}
+
+	internal interface IValueContainer<_ValueType> : IValueContainer
 	{
 		_ValueType Value { get; set; }
 	}
 
-	internal class BoolControl : CheckBox, IValueContainer<int>
+	internal class BoolControl : CheckBox, IValueContainer<bool>
 	{
-		internal BoolControl(int val)
+		internal BoolControl(bool val)
 			: base()
 		{
 			HorizontalAlignment = HorizontalAlignment.Left;
@@ -462,16 +503,24 @@ namespace SatisfactorySavegameTool.Panels.Details
 			Value = val;
 		}
 
-		public int Value
+		public bool Value
 		{
-			get { return (IsChecked.GetValueOrDefault() ? 1 : 0); }
-			set { IsChecked = (value != 0); }
+			get { return IsChecked.GetValueOrDefault(); }
+			set { if (IsChecked != value) IsChecked = value; }
+		}
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+		{
+			base.OnPropertyChanged(e);
+			if (IsInitialized && e.Property == IsCheckedProperty)
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Value"));
 		}
 	}
 
 	internal class FloatControl : TextBox, IValueContainer<float>
 	{
-		internal readonly string _format = "{0:F7}"; //TODO: Translate._("");
+		internal readonly string _format = "{0:F5}"; //TODO: Translate._("");
 
 		internal FloatControl(float val)
 			: base()
@@ -484,14 +533,28 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 		public float Value
 		{
-			get
+			get { return _Parse(Text).Value; }
+			set	{ Text = string.Format(CultureInfo.CurrentUICulture, _format, value); }
+		}
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+		{
+			base.OnPropertyChanged(e);
+			if (IsInitialized && e.Property == TextProperty)
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Value"));
+		}
+
+		private static float? _Parse(string text, bool test_only = false)
+		{
+			float value;
+			if (!float.TryParse(text, NumberStyles.Float|NumberStyles.AllowThousands, CultureInfo.CurrentUICulture, out value))
 			{
-				float f;
-				if (!float.TryParse(Text, out f))
+				if (!test_only)
 					throw new FormatException("Input for float value is invalid"); //TODO: Translate._("");
-				return f;
+				return null;
 			}
-			set { Text = string.Format(_format, value); }
+			return value;
 		}
 	}
 
@@ -510,14 +573,28 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 		public byte Value
 		{
-			get
+			get { return _Parse(Text).Value; }
+			set { Text = string.Format(_format, value); }
+		}
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+		{
+			base.OnPropertyChanged(e);
+			if (IsInitialized && e.Property == TextProperty)
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Value"));
+		}
+
+		private static byte? _Parse(string text, bool test_only = false)
+		{
+			byte value;
+			if (!byte.TryParse(text, NumberStyles.Integer|NumberStyles.AllowThousands, CultureInfo.CurrentUICulture, out value))
 			{
-				byte b;
-				if (!byte.TryParse(Text, out b))
+				if (!test_only)
 					throw new FormatException("Input for byte value is invalid"); //TODO: Translate._("");
-				return b;
+				return null;
 			}
-			set	{ Text = string.Format(_format, value); }
+			return value;
 		}
 	}
 
@@ -536,14 +613,28 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 		public int Value
 		{
-			get
+			get { return _Parse(Text).Value; }
+			set { Text = string.Format(_format, value); }
+		}
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+		{
+			base.OnPropertyChanged(e);
+			if (IsInitialized && e.Property == TextProperty)
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Value"));
+		}
+
+		private static int? _Parse(string text, bool test_only = false)
+		{
+			int value;
+			if (!int.TryParse(text, NumberStyles.Integer|NumberStyles.AllowThousands, CultureInfo.CurrentUICulture, out value))
 			{
-				int i;
-				if (!int.TryParse(Text, out i))
-					throw new FormatException("Input for integer value is invalid"); //TODO: Translate._("");
-				return i;
+				if (!test_only)
+					throw new FormatException("Input for int value is invalid"); //TODO: Translate._("");
+				return null;
 			}
-			set	{ Text = string.Format(_format, value); }
+			return value;
 		}
 	}
 
@@ -562,14 +653,28 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 		public long Value
 		{
-			get
-			{
-				long l;
-				if (!long.TryParse(Text, out l))
-					throw new FormatException("Input for long integer value is invalid"); //TODO: Translate._("");
-				return l;
-			}
+			get	{ return _Parse(Text).Value; }
 			set	{ Text = string.Format(_format, value); }
+		}
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+		{
+			base.OnPropertyChanged(e);
+			if (IsInitialized && e.Property == TextProperty)
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Value"));
+		}
+
+		private static long? _Parse(string text, bool test_only = false)
+		{
+			long value;
+			if (!long.TryParse(text, NumberStyles.Integer|NumberStyles.AllowThousands, CultureInfo.CurrentUICulture, out value))
+			{
+				if (!test_only)
+					throw new FormatException("Input for long value is invalid"); //TODO: Translate._("");
+				return null;
+			}
+			return value;
 		}
 	}
 
@@ -581,13 +686,32 @@ namespace SatisfactorySavegameTool.Panels.Details
 			HorizontalAlignment = HorizontalAlignment.Stretch;
 			VerticalAlignment = VerticalAlignment.Stretch;
 			Value = val;
+			_ascii = val.IsAscii();
 		}
 
 		public str Value
 		{
-			get { return (Text != DetailsPanel.EMPTY) ? new str(Text) : null; }
-			set	{ Text = (value != null) ? value.ToString() : DetailsPanel.EMPTY; }
+			get
+			{
+				//return (Text != DetailsPanel.EMPTY) ? new str(Text) : null;
+				if (Text == DetailsPanel.EMPTY)
+					return null;
+				if (_ascii && Text.Any(c => (c <= 127)))
+					return new str(Encoding.ASCII.GetBytes(Text));
+				return new str(Text);
+			}
+			set { Text = (value != null) ? value.ToString() : DetailsPanel.EMPTY; }
 		}
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+		{
+			base.OnPropertyChanged(e);
+			if (IsInitialized && e.Property == TextProperty)
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Value"));
+		}
+
+		internal bool _ascii;
 	}
 
 	internal class StringControl : TextBox, IValueContainer<string>
@@ -603,11 +727,20 @@ namespace SatisfactorySavegameTool.Panels.Details
 		public string Value
 		{
 			get { return (Text != DetailsPanel.EMPTY) ? Text : null; }
-			set	{ Text = (value != null) ? value : DetailsPanel.EMPTY; }
+			set { Text = (value != null) ? value : DetailsPanel.EMPTY; }
+		}
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+		{
+			base.OnPropertyChanged(e);
+			if (IsInitialized && e.Property == TextProperty)
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Value"));
 		}
 	}
 
-	// Needed later to allow for modification, for now just a dumb display
+	// Needed later to allow for modification by opening a color picker control, 
+	// for now just a dumb display
 	internal class ColorControl : Label, IValueContainer<P.Color>
 	{
 		internal ColorControl(P.Color color)
@@ -622,18 +755,21 @@ namespace SatisfactorySavegameTool.Panels.Details
 		public P.Color Value
 		{
 			get { return _value; }
-			set {
+			set
+			{
 				_value = value;
 				System.Windows.Media.Color c = 
 					System.Windows.Media.Color.FromArgb(value.A, value.R, value.G, value.B);
 				Background = new SolidColorBrush(c);
 			}
 		}
+		public event PropertyChangedEventHandler PropertyChanged;
 
 		internal P.Color _value;
 	}
 
-	// Needed later to allow for modification, for now just a dumb display
+	// Needed later to allow for modification by opening a color picker control, 
+	// for now just a dumb display
 	internal class LinearColorControl : Label, IValueContainer<P.LinearColor>
 	{
 		internal LinearColorControl(P.LinearColor color)
@@ -648,13 +784,15 @@ namespace SatisfactorySavegameTool.Panels.Details
 		public P.LinearColor Value
 		{
 			get { return _value; }
-			set {
+			set
+			{
 				_value = value;
 				System.Windows.Media.Color c = 
 					System.Windows.Media.Color.FromScRgb(value.A, value.R, value.G, value.B);
 				Background = new SolidColorBrush(c);
 			}
 		}
+		public event PropertyChangedEventHandler PropertyChanged;
 
 		internal P.LinearColor _value;
 	}
@@ -666,6 +804,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 		//      on how to display value, e.g. coloring
 		//TODO: Also allow for adding framework elements like buttons,
 		//      checkboxes, dropdowns and alike
+		//TODO: Allow for changing elements
 		internal ListViewControl(ColumnDefinition[] columns = null)
 		{
 			_columns = columns != null ? columns.ToList() : null;
@@ -695,6 +834,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 			View = _gridview;
 		}
 
+		public FrameworkElement Visual { get { return this; } }
+
 		public bool HasLabel { get { return (_label != null); } }
 		public string Label { get { return _label; } set { _label = value; } }
 		public VerticalAlignment LabelVerticalAlign { get { return VerticalAlignment.Top; } }
@@ -705,12 +846,12 @@ namespace SatisfactorySavegameTool.Panels.Details
 			get { return ItemsSource as List<object[]>; }
 			set	{ ItemsSource = value; }
 		}
-
-		public FrameworkElement Visual { get { return this; } }
+		public event PropertyChangedEventHandler PropertyChanged;
 
 		internal string _label;
 		internal List<ColumnDefinition> _columns;
 		internal GridView _gridview;
+
 
 		internal class ColumnDefinition
 		{
@@ -788,7 +929,11 @@ namespace SatisfactorySavegameTool.Panels.Details
 			get
 			{
 				if (_visual == null)
+				{
 					_CreateVisual();
+					if (_visual is INotifyPropertyChanged)
+						(_visual as INotifyPropertyChanged).PropertyChanged += _PropertyChanged;
+				}
 				return _visual;
 			}
 		}
@@ -803,8 +948,14 @@ namespace SatisfactorySavegameTool.Panels.Details
 			get { return (_visual as IValueContainer<_ValueType>).Value; }
 			set { (_visual as IValueContainer<_ValueType>).Value = _value; }
 		}
+		public event PropertyChangedEventHandler PropertyChanged;
 
 		internal abstract void _CreateVisual();
+
+		protected virtual void _PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Value"));
+		}
 
 		internal IElement _parent;
 		internal FrameworkElement _visual;
@@ -854,7 +1005,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 				int index = 0;
 				foreach (FrameworkElement child in _childs)
 				{
-					_values[index] = (child as IValueContainer<_ValueType>).Value;
+					if (child is IValueContainer<_ValueType>)//Temp workaround until real color control avail
+						_values[index] = (child as IValueContainer<_ValueType>).Value;
 					++index;
 				}
 				return _values;
@@ -864,7 +1016,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 				int index = 0;
 				foreach (_ValueType val in value)
 				{
-					(_childs[index] as IValueContainer<_ValueType>).Value = val;
+					if (_childs[index] is IValueContainer<_ValueType>)//Temp workaround until real color control avail
+						(_childs[index] as IValueContainer<_ValueType>).Value = val;
 					++index;
 				}
 			}
@@ -891,6 +1044,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			foreach (_ValueType val in _value)
 			{
 				FrameworkElement child = ControlFactory.Create(val);
+				(child as INotifyPropertyChanged).PropertyChanged += _PropertyChanged;
 				_childs.Add(child);
 			}
 		}
@@ -914,6 +1068,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 				FontSize = 12,
 				MaxLines = 10,
 				VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+				IsReadOnly = true,
+				IsReadOnlyCaretVisible = true,
 			};
 		}
 	}
@@ -1036,7 +1192,11 @@ namespace SatisfactorySavegameTool.Panels.Details
 			get
 			{
 				if (_visual == null)
+				{
 					_CreateVisual();
+					if (_visual is INotifyPropertyChanged)
+						(_visual as INotifyPropertyChanged).PropertyChanged += _PropertyChanged;
+				}
 				return _visual;
 			}
 		}
@@ -1046,6 +1206,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 		public VerticalAlignment LabelVerticalAlign { get { return VerticalAlignment.Center; } }
 
 		public virtual bool HasValue { get { return true; } }
+		//Value
+		public event PropertyChangedEventHandler PropertyChanged;
 
 		public virtual int Count { get { throw new NotImplementedException(); } }
 		public virtual List<IElement> Childs { get { throw new NotImplementedException(); } }
@@ -1068,6 +1230,11 @@ namespace SatisfactorySavegameTool.Panels.Details
 		internal virtual void _CreateChilds()
 		{
 			throw new NotImplementedException();
+		}
+
+		protected virtual void _PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Value"));
 		}
 
 		internal IElement _parent;
@@ -1197,11 +1364,11 @@ namespace SatisfactorySavegameTool.Panels.Details
 			string build_v = v != null ? v.ToString() : string.Format("#{0}", build_version);
 			_childs.Add(ValueControlFactory.Create(this, "BuildVersion", build_v, true));
 
-			_childs.Add(ValueControlFactory.Create(this, "MapName"     , _header.MapName, true));
+			_childs.Add(_map_name = new SimpleValueControl<str>(this, "MapName", _header.MapName));
 
-			_childs.Add(ValueControlFactory.Create(this, "MapOptions"  , _header.MapOptions, true));
+			_childs.Add(_map_options = new SimpleValueControl<str>(this, "MapOptions", _header.MapOptions));
 
-			_childs.Add(ValueControlFactory.Create(this, "SessionName" , _header.SessionName, true));
+			_childs.Add(_session_name = new SimpleValueControl<str>(this, "SessionName", _header.SessionName));
 
 			DateTime dur = new DateTime();
 			dur = dur.AddSeconds(_header.PlayDuration);
@@ -1215,7 +1382,19 @@ namespace SatisfactorySavegameTool.Panels.Details
 			_childs.Add(ValueControlFactory.Create(this, "Visibility"  , ((Visibilities)_header.Visibility).ToString(), true));
 		}
 
+		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			_header.MapName     = _map_name.Value;
+			_header.MapOptions  = _map_options.Value;
+			_header.SessionName = _session_name.Value;
+
+			base._PropertyChanged(sender, e);
+		}
+
 		internal P.Header _header;
+		internal SimpleValueControl<str> _map_name;
+		internal SimpleValueControl<str> _map_options;
+		internal SimpleValueControl<str> _session_name;
 
 		internal enum Visibilities { Private=0, FriendsOnly=1 };
 	}
@@ -1299,6 +1478,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 						return parent_pane, parent_sizer
 					*/
 					_impl = MainFactory.Create(_parent, _prop.Name.ToString(), _prop.Value as Property);
+					_impl.PropertyChanged += _PropertyChanged;
 				}
 			}
 
@@ -1309,146 +1489,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 		//{
 		//}
 	}
-#if false
-	internal class StructProperty : IElementContainer
-		//: If IsArray -> IElementContainer, else IElement, but how to tell this C-dumb :D
-	{
-	//CLS_(StructProperty,ValueProperty)
-	//	PUB_ab(Unknown)
-	//	bool IsArray;
-	//	READ
-	//		IsArray = false;
-	//		str^ inner = reader->ReadString();
-	//		Property^ acc = PropertyFactory::Construct(inner, this);
-	//		if (acc == nullptr)
-	//			throw gcnew ReadException(reader, String::Format("Unknown inner structure type '{0}'", inner));
-	//		Unknown = ReadBytes(reader, 17);
-	//		Value = acc->Read(reader);
-	//	READ_END
-	//	void ReadAsArray(IReader^ reader, int count)
-	//	{
-	//		IsArray = true;
-	//		str^ inner = reader->ReadString();
-	//		Unknown = ReadBytes(reader, 17);
-	//		Properties^ props = gcnew Properties;
-	//		for (int i = 0; i < count; ++i)
-	//		{
-	//			Property^ acc = PropertyFactory::Construct(inner, this);
-	//			if (acc == nullptr)
-	//				throw gcnew ReadException(reader, String::Format("Unknown inner structure type '{0}'", inner));
-	//			props->Add(acc->Read(reader));
-	//		}
-	//		Value = props;
-	//	}
-	//CLS_END
-		public StructProperty(IElement parent, string label, object obj)
-		//	: base(parent, label, obj)
-		{
-			_parent = parent;
-			_label = label;
-			_prop = obj as P.StructProperty;
-
-			//_CreateChilds();
-		}
-
-		public FrameworkElement Visual
-		{
-			get
-			{
-				if (_visual == null)
-					_CreateVisual();
-				return _visual;
-			}
-		}
-
-		public bool HasLabel { get { return true; } }
-		public string Label { get { return _label; } }
-
-		public bool HasValue { get { return true; } }
-
-		public int Count { get { throw new NotImplementedException(); } }
-		public List<IElement> Childs { get { throw new NotImplementedException(); } }
-
-		public void Add(IElement element)
-		{
-			throw new NotImplementedException();
-		}
-
-		internal void _CreateVisual()
-		{
-			if (_prop.Value != null && _prop.Index == 0 && !_prop.IsArray)
-			{
-				bool process = (_prop.Unknown == null) || (_prop.Unknown.Length == 0);
-				if (!process)
-				{
-					long sum = 0;
-					foreach (byte b in _prop.Unknown)
-						sum += b;
-					process = (sum == 0);
-				}
-				if (process)
-				{
-					// Replace it with type of actual value
-					/*TODO:
-					t = prop.Value.TypeName
-					if t in globals():
-						cls = globals()[t]
-						cls(parent_pane, parent_sizer, prop.Name, prop.Value)
-						return parent_pane, parent_sizer
-					*/
-					_impl = MainFactory.Create(_parent, _prop.Name.ToString(), _prop.Value as Property);
-				}
-			}
-
-			// Last report: Expando
-			if (_impl == null)
-				_impl = new Expando(_parent, _label, _prop);
-
-			_label = _impl.Label;
-			_visual = _impl.Visual;
-		}
-
-		internal void _CreateChilds()
-		{
-		}
-
-		internal IElement _parent;
-		internal string _label;
-		internal P.StructProperty _prop;
-		internal FrameworkElement _visual;
-		internal IElement _impl;
-
-	//{ "StructProperty", (l,p) => {
-	//	StructProperty struct_p = p as StructProperty;
-	//	if (struct_p.Value != null && struct_p.Index == 0 && !struct_p.IsArray)
-	//	{
-	//		bool process = (struct_p.Unknown == null) || (struct_p.Unknown.Length == 0);
-	//		if (!process)
-	//		{
-	//			long sum = 0;
-	//			foreach(byte b in struct_p.Unknown)
-	//				sum += b;
-	//			process = (sum == 0);
-	//		}
-	//		if (process)
-	//		{
-	//			// Replace it with type of actual value
-	//			/*TODO:
-	//			t = prop.Value.TypeName
-	//			if t in globals():
-	//				cls = globals()[t]
-	//				cls(parent_pane, parent_sizer, prop.Name, prop.Value)
-	//				return parent_pane, parent_sizer
-	//			* /
-	//			ValueControl ctrl = Create(struct_p.Name.ToString(), struct_p.Value as Property);
-	//			if (ctrl != null)
-	//				return ctrl;
-	//		}
-	//	}
-	//	return null;
-	//	} },
-	}
-#endif
 
 	internal class Vector : MultiValueControl<float> //ValueControl<P.Vector>
 	{
@@ -1457,6 +1497,16 @@ namespace SatisfactorySavegameTool.Panels.Details
 		{
 			_prop = obj as P.Vector;
 			_value = new float[] { _prop.X, _prop.Y, _prop.Z };
+		}
+
+		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			float[] vals = Value;
+			_prop.X = vals[0];
+			_prop.Y = vals[1];
+			_prop.Z = vals[2];
+
+			base._PropertyChanged(sender, e);
 		}
 
 		internal P.Vector _prop;
@@ -1494,6 +1544,23 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 			_childs.Add(ValueControlFactory.Create(this, "IsValid", box.IsValid));
 		}
+
+		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			P.Box box = Tag as P.Box;
+
+			float[] min = (_childs[0] as MultiValueControl<float>).Value;
+			box.MinX = min[0];
+			box.MinY = min[1];
+			box.MinZ = min[2];
+
+			float[] max = (_childs[1] as MultiValueControl<float>).Value;
+			box.MaxX = max[0];
+			box.MaxY = max[1];
+			box.MaxZ = max[2];
+
+			base._PropertyChanged(sender, e);
+		}
 	}
 
 	internal class Color : MultiValueControl<byte> //ValueControl<P.Color>
@@ -1523,6 +1590,18 @@ namespace SatisfactorySavegameTool.Panels.Details
 		{
 			base._CreateChilds();
 			_childs.Add(new ColorControl(_prop));
+		}
+
+		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			byte[] vals = Value;
+			_prop.R = vals[0];
+			_prop.G = vals[1];
+			_prop.B = vals[2];
+			_prop.A = vals[3];
+
+			base._PropertyChanged(sender, e);
+			//IsModified = true;
 		}
 
 		internal P.Color _prop;
@@ -1555,6 +1634,17 @@ namespace SatisfactorySavegameTool.Panels.Details
 		{
 			base._CreateChilds();
 			_childs.Add(new LinearColorControl(_prop));
+		}
+
+		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			float[] vals = Value;
+			_prop.R = vals[0];
+			_prop.G = vals[1];
+			_prop.B = vals[2];
+			_prop.A = vals[3];
+
+			base._PropertyChanged(sender, e);
 		}
 
 		internal P.LinearColor _prop;
@@ -1604,6 +1694,18 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 			_visual = panel;
 		}*/
+
+		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			float[] vals = Value;
+			_prop.A = vals[0];
+			_prop.B = vals[1];
+			_prop.C = vals[2];
+			_prop.D = vals[3];
+
+			base._PropertyChanged(sender, e);
+			//IsModified = true;
+		}
 
 		internal P.Quat _prop;
 	}
@@ -1779,6 +1881,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 					// PathName + Name, so Name is our label
 					_impl = MainFactory.Create(_parent, _prop.Name.ToString(), _prop.PathName);
 				}
+				_impl.PropertyChanged += _PropertyChanged;
 			}
 
 			base._CreateVisual();
@@ -1863,6 +1966,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 				// List<ObjectProperty>
 				_impl = new ListControl(_parent, _prop.Name.ToString(), _prop.Value);
 			}
+			_impl.PropertyChanged += _PropertyChanged;
 
 			base._CreateVisual();
 		}
