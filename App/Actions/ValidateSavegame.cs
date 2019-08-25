@@ -113,7 +113,7 @@ namespace SatisfactorySavegameTool.Actions
 		internal static void _ClearAllErrorStates()
 		{
 			int total = 1 + _savegame.TotalElements * 10;
-			Log.Info("Cleaning a {0} elements ...", total);
+			Log.Debug("Cleaning a {0} elements ...", total);
 			_cbStart(total, Translate._("Action.Prepare"), " ");
 
 			_CleanErrorsRecurs(_savegame.Header);
@@ -133,7 +133,7 @@ namespace SatisfactorySavegameTool.Actions
 			//_CleanErrorsRecurs(_savegame.Missing);
 
 			//_cbStop("Cleaned", "");
-			Log.Info("... done cleaning");
+			Log.Debug("... done cleaning");
 		}
 
 		internal static void _CleanErrorsRecurs(Property prop)
@@ -514,7 +514,7 @@ namespace SatisfactorySavegameTool.Actions
 			string s = string.Format("Invalid value for [{0}]", prop.TypeName);//_("Invalid value(s) for [{}]").format(obj.TypeName)
 			if (!string.IsNullOrEmpty(info))
 				s += ": " + info;
-			Log.Info("[V] " + s);
+			Log.Debug("[Validate] " + s);
 			prop.AddError(s);
 		}
 

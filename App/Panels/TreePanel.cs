@@ -283,6 +283,8 @@ namespace SatisfactorySavegameTool.Panels
 				Model.Nodes.Clear();
 			});
 
+			Log.Debug("- " + GetType().Name);
+
 			_callback.Start(NoOfElements, Translate._("MainWindow.LoadGamefile.Progress.Title.2"), "");
 			_count = 0;
 

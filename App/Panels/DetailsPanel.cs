@@ -3757,7 +3757,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 				//|  .Value = Byte:1
 			}
 
-			if (childs.Count > 0)
+			if (childs.Count > 0 && Settings.VERBOSE)
 			{
 				Log.Warning("Building '{0}' has a {1} dangling children:", building_pathname, childs.Count);
 				foreach (string child in childs)
