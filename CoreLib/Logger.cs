@@ -71,6 +71,13 @@ namespace CoreLib
 		}
 
 
+		public void SetLogLevel(Level min_level)
+		{
+			Info("Switching logging level to '{0}'", min_level);
+			_min_level = min_level;
+		}
+
+
 		public void Shutdown()
 		{
 			_file.Write("\n");
