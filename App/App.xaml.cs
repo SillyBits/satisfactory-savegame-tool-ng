@@ -33,9 +33,22 @@ namespace SatisfactorySavegameTool
 		{
 			_InitErrorReporting();
 
+#if DEBUG
 			_logger    = new Logger(Settings.LOGPATH, Settings.APPNAME, Logger.Level.Debug);
+#else
+			_logger    = new Logger(Settings.LOGPATH, Settings.APPNAME);
+#endif
 			_config    = new ConfigFile(Settings.APPPATH, Settings.APPNAME);
 			_languages = new LanguageHandler(Settings.RESOURCEPATH, null, TRANSLATIONFILES);
+
+
+			// Before continuing, check and adjust log level
+			if (Config.Root.HasSection("logging") && Config.Root.logging.HasItem("verbose"))
+			{
+				Settings.VERBOSE = Config.Root.logging.verbose;
+				if (Settings.VERBOSE)
+					_logger.SetLogLevel(Logger.Level.Debug);
+			}
 
 			Splashscreen.ShowSplash("Starting up...");
 			MainWindow = null;
@@ -187,6 +200,7 @@ namespace SatisfactorySavegameTool
 		// Path to where logs are to be stored
 		public const  string LOGS                 = "logs";
 		public static string LOGPATH              = null;
+		public static bool   VERBOSE              = false;
 
 		// Path to where exports are to be stored - configured by user
 		public const  string EXPORTS              = "exports";
