@@ -224,6 +224,9 @@ This property needs to be dealt with to allow this tool to load this savegame.</
 	<ImageControl.Label>Bitmap of size {0}x{1} with {2} color channels</ImageControl.Label>
 	<ImageControl.Button>Show ...</ImageControl.Button>
 
+	<HierarchyRunner.Progress.Title>Traversing savegame ...</HierarchyRunner.Progress.Title>
+	<HierarchyRunner.Progress.CounterFormat>{0:#,#0} objects visited</HierarchyRunner.Progress.CounterFormat>
+
 	<Action.Prepare>Preparing ...</Action.Prepare>
 	<Action.Done>Done</Action.Done>
 

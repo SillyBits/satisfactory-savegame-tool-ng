@@ -225,6 +225,9 @@ Um diesen Spielstand laden zu können muss der Helfer erst entsprechend erweiter
 	<ImageControl.Label>Bild der Größe {0}x{1} mit {2} Farbkanälen</ImageControl.Label>
 	<ImageControl.Button>Anzeigen ...</ImageControl.Button>
 
+	<HierarchyRunner.Progress.Title>Durchquere Spielstand ...</HierarchyRunner.Progress.Title>
+	<HierarchyRunner.Progress.CounterFormat>{0:#,#0} Objekte besucht</HierarchyRunner.Progress.CounterFormat>
+
 	<Action.Prepare>Vorbereitung ...</Action.Prepare>
 	<Action.Done>Abgeschlossen</Action.Done>
 
