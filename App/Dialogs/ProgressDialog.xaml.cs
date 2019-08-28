@@ -83,7 +83,16 @@ namespace SatisfactorySavegameTool.Dialogs
 		{
 			Dispatcher.Invoke/*Async*/(() => {
 				_last_val = 0;
-				_max_val = data.MaxVal;
+				if (data.MaxVal == -1)
+				{
+					Progress.IsIndeterminate = true;
+					_max_val = 0;
+				}
+				else
+				{
+					Progress.IsIndeterminate = false;
+					_max_val = data.MaxVal;
+				}
 				Progress.Value = 0;
 				Progress.Maximum = _max_val;
 				Update(0, data.Status, data.Info);
