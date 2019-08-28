@@ -2107,6 +2107,24 @@ namespace SatisfactorySavegameTool.Panels.Details
 		{ }
 	}
 
+	internal class Name : SimpleValueControl<str>
+	{
+		public Name(IElement parent, string label, object obj)
+			: base(parent, label, null)
+		{
+			_name = obj as P.NamedEntity.Name;
+			_value = _name.PathName;
+		}
+
+		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			_name.PathName = Value;
+			base._PropertyChanged(sender, e);
+		}
+
+		private P.NamedEntity.Name _name;
+	}
+
 	internal class Object : Expando
 	{
 	//CLS(Object)
@@ -4109,56 +4127,106 @@ namespace SatisfactorySavegameTool.Panels.Details
 				if (feets.Count() == 0)
 					IsEnabled = false;
 
-				//		|	  .Value =
-				//		|		/ List with 4 elements:
-				//		|		|-> [FeetOffset].Value[3]
-				//		|		|  .Value =
-				//		|		|	/ List with 3 elements:
-				//		|		|	|-> [NameProperty] FeetName
-				//		|		|	|  .Name = str:'FeetName'
-				//		|		|	|  .Length = Int32:12
-				//		|		|	|  .Index = Int32:0
-				//		|		|	|  .Value = str:'foot_01'
-				//		|		|	|-> [FloatProperty] OffsetZ
-				//		|		|	|  .Name = str:'OffsetZ'
-				//		|		|	|  .Length = Int32:4
-				//		|		|	|  .Index = Int32:0
-				//		|		|	|  .Value = Single:-10,00708
-				//		|		|	|-> [BoolProperty] ShouldShow
-				//		|		|	|  .Name = str:'ShouldShow'
-				//		|		|	|  .Length = Int32:0
-				//		|		|	|  .Index = Int32:0
-				//		|		|	|  .Value = Byte:1
-				//		|		|	\ end of list
-				List<object[]> rows = new List<object[]>();
-				foreach (P.FeetOffset ofs in feets)
-				{
-					string label = "?";
-					P.Property prop = ofs.Value.Named("FeetName");
-					if (prop is P.NameProperty)
-						label = ((prop as P.NameProperty).Value as str).ToString();
-
-					string offset = "?";
-					prop = ofs.Value.Named("OffsetZ");
-					if (prop is P.FloatProperty)
-						offset = ((float)(prop as P.FloatProperty).Value).ToString("F7");
-
-					string show = "?";
-					prop = ofs.Value.Named("ShouldShow");
-					if (prop is P.BoolProperty)
-						show = ((byte)(prop as P.BoolProperty).Value) != 0 ? "Yes" : "No";
-
-					rows.Add(new object[] {
-						label,
-						offset,
-						show,
-					});
-				}
-
+				// SaveVersion 20+ changed properties contained:
+				// - 'FeetName' was replaced with 'FeetIndex'
+				// - 'ShouldShow' was removed
+				//
+				//|	  .Value =
+				//|		/ List with 4 elements:
+				//|		...
+				//|		\ end of list
+				//
 				List<ListViewControl.ColumnDefinition> columns = new List<ListViewControl.ColumnDefinition>();
-				columns.Add(new ListViewControl.ColumnDefinition("Name", 100));
-				columns.Add(new ListViewControl.ColumnDefinition("Offset", 150, HorizontalAlignment.Right));
-				columns.Add(new ListViewControl.ColumnDefinition("Should show?", 100));
+				List<object[]> rows = new List<object[]>();
+				P.Property prop;
+
+				if (MainWindow.CurrFile.Header.SaveVersion < 20)
+				{
+					//|		|-> [FeetOffset].Value[3]
+					//|		|  .Value =
+					//|		|	/ List with 3 elements:
+					//|		|	|-> [NameProperty] FeetName
+					//|		|	|  .Name = str:'FeetName'
+					//|		|	|  .Length = Int32:12
+					//|		|	|  .Index = Int32:0
+					//|		|	|  .Value = str:'foot_01'
+					//|		|	|-> [FloatProperty] OffsetZ
+					//|		|	|  .Name = str:'OffsetZ'
+					//|		|	|  .Length = Int32:4
+					//|		|	|  .Index = Int32:0
+					//|		|	|  .Value = Single:-10,00708
+					//|		|	|-> [BoolProperty] ShouldShow
+					//|		|	|  .Name = str:'ShouldShow'
+					//|		|	|  .Length = Int32:0
+					//|		|	|  .Index = Int32:0
+					//|		|	|  .Value = Byte:1
+					//|		|	\ end of list
+					foreach (P.FeetOffset ofs in feets)
+					{
+						string label = "?";
+						prop = ofs.Value.Named("FeetName");
+						if (prop is P.NameProperty)
+							label = ((prop as P.NameProperty).Value as str).ToString();
+
+						string offset = "?";
+						prop = ofs.Value.Named("OffsetZ");
+						if (prop is P.FloatProperty)
+							offset = ((float)(prop as P.FloatProperty).Value).ToString("F7");
+
+						string show = "?";
+						prop = ofs.Value.Named("ShouldShow");
+						if (prop is P.BoolProperty)
+							show = ((byte)(prop as P.BoolProperty).Value) != 0 ? "Yes" : "No";
+
+						rows.Add(new object[] {
+							label,
+							offset,
+							show,
+						});
+					}
+
+					columns.Add(new ListViewControl.ColumnDefinition("Name", 100));
+					columns.Add(new ListViewControl.ColumnDefinition("Offset", 150, HorizontalAlignment.Right));
+					columns.Add(new ListViewControl.ColumnDefinition("Should show?", 100));
+				}
+				else
+				{
+					//|		|-> [FeetOffset].Value[2]
+					//|		|  .Value =
+					//|		|	/ List with 2 elements:
+					//|		|	|-> [ByteProperty] FeetIndex
+					//|		|	|  .Unknown = str:'None'
+					//|		|	|  .Name = str:'FeetIndex'
+					//|		|	|  .Length = Int32:1
+					//|		|	|  .Index = Int32:0
+					//|		|	|  .Value = Byte:1
+					//|		|	|-> [FloatProperty] OffsetZ
+					//|		|	|  .Name = str:'OffsetZ'
+					//|		|	|  .Length = Int32:4
+					//|		|	|  .Index = Int32:0
+					//|		|	|  .Value = Single:0
+					//|		|	\ end of list
+					foreach (P.FeetOffset ofs in feets)
+					{
+						string label = "?";
+						prop = ofs.Value.Named("FeetIndex");
+						if (prop is P.ByteProperty)
+							label = ((byte)(prop as P.ByteProperty).Value).ToString();
+
+						string offset = "?";
+						prop = ofs.Value.Named("OffsetZ");
+						if (prop is P.FloatProperty)
+							offset = ((float)(prop as P.FloatProperty).Value).ToString("F7");
+
+						rows.Add(new object[] {
+							label,
+							offset,
+						});
+					}
+
+					columns.Add(new ListViewControl.ColumnDefinition("Index", 50));
+					columns.Add(new ListViewControl.ColumnDefinition("Offset", 150, HorizontalAlignment.Right));
+				}
 
 				ListViewControl lvc = new ListViewControl(columns.ToArray());
 				//lvc.Label = "Feet offsets";
