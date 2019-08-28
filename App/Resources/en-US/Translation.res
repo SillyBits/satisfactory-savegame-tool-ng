@@ -230,6 +230,51 @@ This property needs to be dealt with to allow this tool to load this savegame.</
 	<Action.Prepare>Preparing ...</Action.Prepare>
 	<Action.Done>Done</Action.Done>
 
+	<Action.Export.Dialog.Title>Export to file</Action.Export.Dialog.Title>
+	<Action.Export.Dialog.Destination>Destination</Action.Export.Dialog.Destination>
+	<Action.Export.Dialog.Destination.Hint>Choose your destination file:</Action.Export.Dialog.Destination.Hint>
+	<Action.Export.Dialog.Destination.Title>Select file to export to</Action.Export.Dialog.Destination.Title>
+	<Action.Export.Dialog.Destination.Filter>Raw text (*.export)|*.export|CSV (*.csv)|*.csv</Action.Export.Dialog.Destination.Filter>
+	<!--<Action.Export.Dialog.Destination.Filter>Raw text (*.export)|*.export|CSV (*.csv)|*.csv|XML (*.xml)|*.xml|All files (*.*)|*.*</Action.Export.Dialog.Destination.Filter>-->
+	<Action.Export.Dialog.Destination.DefaultExt>.export</Action.Export.Dialog.Destination.DefaultExt>
+	<Action.Export.Dialog.Filters>Filters</Action.Export.Dialog.Filters>
+	<Action.Export.Dialog.Filters.Hint>Specify your filter criterias below.
+Note that 'Or' filters are combined up until next 'And' encountered.</Action.Export.Dialog.Filters.Hint>
+	<Action.Export.Dialog.Filters.Add>Add</Action.Export.Dialog.Filters.Add>
+	<Action.Export.Dialog.Filters.Delete>Del</Action.Export.Dialog.Filters.Delete>
+	<Action.Export.Dialog.Operation.None>&lt;Select&gt;</Action.Export.Dialog.Operation.None>
+	<Action.Export.Dialog.Operation.And>And</Action.Export.Dialog.Operation.And>
+	<Action.Export.Dialog.Operation.Or>Or</Action.Export.Dialog.Operation.Or>
+	<Action.Export.Dialog.Source.None>&lt;Select&gt;</Action.Export.Dialog.Source.None>
+	<Action.Export.Dialog.Source.ClassName>ClassName</Action.Export.Dialog.Source.ClassName>
+	<Action.Export.Dialog.Source.PathName>PathName</Action.Export.Dialog.Source.PathName>
+	<Action.Export.Dialog.Source.LevelName>LevelName</Action.Export.Dialog.Source.LevelName>
+	<Action.Export.Dialog.Source.FieldName>Field name</Action.Export.Dialog.Source.FieldName>
+	<Action.Export.Dialog.Source.FieldValue>Field value</Action.Export.Dialog.Source.FieldValue>
+	<Action.Export.Dialog.Condition.None>&lt;Select&gt;</Action.Export.Dialog.Condition.None>
+	<Action.Export.Dialog.Condition.Equal>is</Action.Export.Dialog.Condition.Equal>
+	<Action.Export.Dialog.Condition.NotEqual>is not</Action.Export.Dialog.Condition.NotEqual>
+	<Action.Export.Dialog.Condition.Less>less than</Action.Export.Dialog.Condition.Less>
+	<Action.Export.Dialog.Condition.LessEqual>less or equal</Action.Export.Dialog.Condition.LessEqual>
+	<Action.Export.Dialog.Condition.Greater>greater than</Action.Export.Dialog.Condition.Greater>
+	<Action.Export.Dialog.Condition.GreaterEqual>greater or equal</Action.Export.Dialog.Condition.GreaterEqual>
+	<Action.Export.Dialog.Condition.Contains>contains</Action.Export.Dialog.Condition.Contains>
+	<Action.Export.Dialog.Condition.StartsWith>starts with</Action.Export.Dialog.Condition.StartsWith>
+	<Action.Export.Dialog.Condition.EndsWith>ends with</Action.Export.Dialog.Condition.EndsWith>
+	<Action.Export.Dialog.Condition.Regex>Regex</Action.Export.Dialog.Condition.Regex>
+	<Action.Export.Dialog.Value>&lt;Enter value&gt;</Action.Export.Dialog.Value>
+	<Action.Export.Dialog.Scope>Scope</Action.Export.Dialog.Scope>
+	<Action.Export.Dialog.Scope.Hint>By default, only direct childs are traversed while filtering, but you can enable deep traversal here.
+Note that this will take quite a while with big savegames.</Action.Export.Dialog.Scope.Hint>
+	<Action.Export.Dialog.Scope.Deep>Enable deep traversal</Action.Export.Dialog.Scope.Deep>	
+	<Action.Export.Dialog.Start>Start</Action.Export.Dialog.Start>
+	<Action.Export.Failed>Unable to create writer for file
+
+{0}</Action.Export.Failed>
+	<Action.Export.Done>Savegame exported to
+
+{0}</Action.Export.Done>
+
 	<Action.Validate.Title>Validation</Action.Validate.Title>
 	<Action.Validate.Progress.Statusbar>Validating {0} ...</Action.Validate.Progress.Statusbar>
 	<Action.Validate.Progress.Title>Validating ...</Action.Validate.Progress.Title>

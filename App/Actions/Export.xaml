@@ -1,0 +1,196 @@
+﻿<Window x:Class="SatisfactorySavegameTool.Actions.ExportAction.Dialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SatisfactorySavegameTool.Actions"
+        xmlns:action="clr-namespace:SatisfactorySavegameTool.Actions.ExportAction"
+		xmlns:lang="clr-namespace:CoreLib.Language.XAML;assembly=CoreLib"
+        mc:Ignorable="d"
+        Title="{lang:Translate Key=Action.Export.Dialog.Title}"
+		ResizeMode="CanResizeWithGrip" SizeToContent="WidthAndHeight" ShowInTaskbar="False">
+
+	<Window.Resources>
+		<Style TargetType="{x:Type GroupBox}" BasedOn="{StaticResource {x:Type GroupBox}}">
+			<Setter Property="Padding" Value="4,0,4,2" />
+			<Setter Property="Margin" Value="0,2" />
+			<Setter Property="Width" Value="auto" />
+			<Setter Property="Height" Value="auto" />
+		</Style>
+		<Style TargetType="{x:Type Label}" BasedOn="{StaticResource {x:Type Label}}">
+			<Setter Property="Margin" Value="0" />
+			<Setter Property="VerticalContentAlignment" Value="Center" />
+		</Style>
+		<Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+			<Setter Property="Margin" Value="0" />
+			<Setter Property="VerticalAlignment" Value="Center" />
+		</Style>
+		<Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+			<Setter Property="Margin" Value="0" />
+			<Setter Property="Height" Value="25" />
+			<Setter Property="VerticalContentAlignment" Value="Center" />
+		</Style>
+		<Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
+			<Setter Property="Height" Value="25" />
+			<Setter Property="VerticalContentAlignment" Value="Center" />
+		</Style>
+		<Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource {x:Type CheckBox}}">
+			<Setter Property="Margin" Value="5,2,5,0" />
+			<Setter Property="VerticalAlignment" Value="Stretch" />
+			<Setter Property="VerticalContentAlignment" Value="Stretch" />
+		</Style>
+		<Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+			<Setter Property="Width" Value="75" />
+		</Style>
+		<!--<action:Languages x:Key="langData" />-->
+		<!--<action:LanguageConverter x:Key="langConvert" />-->
+		<action:Filters x:Key="filtersData" />
+		<action:FilterOperations x:Key="filteroperationsData" />
+		<action:FilterOperationConverter x:Key="filteroperationConvert" />
+		<action:FilterSources x:Key="filtersourcesData" />
+		<action:FilterSourceConverter x:Key="filtersourceConvert" />
+		<action:FilterConditions x:Key="filterconditionsData" />
+		<action:FilterConditionConverter x:Key="filterconditionConvert" />
+	</Window.Resources>
+
+	<Grid Margin="5,5">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="10" />
+			<RowDefinition Height="auto" />
+		</Grid.RowDefinitions>
+
+		<GroupBox Grid.Row="0" x:Name="destination_group">
+			<GroupBox.Header>
+				<Label Content="{lang:Translate Key=Action.Export.Dialog.Destination}" />
+			</GroupBox.Header>
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="80" />
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="auto" />
+					<RowDefinition Height="auto" />
+				</Grid.RowDefinitions>
+				
+				<Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="{lang:Translate Key=Action.Export.Dialog.Destination.Hint}" />
+				
+				<TextBox x:Name="filename" Grid.Row="1" Grid.Column="0" />
+				
+				<Button Grid.Row="1" Grid.Column="1" Content="{lang:Translate Key=Browse}" HorizontalAlignment="Right"
+						Click="Browse_Destination_Click" />
+				
+			</Grid>
+		</GroupBox>
+
+		<GroupBox Grid.Row="1" x:Name="filters_group">
+			<GroupBox.Header>
+				<Label Content="{lang:Translate Key=Action.Export.Dialog.Filters}" />
+			</GroupBox.Header>
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="auto" />
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="auto" />
+					<RowDefinition Height="auto" />
+				</Grid.RowDefinitions>
+				
+				<Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="{lang:Translate Key=Action.Export.Dialog.Filters.Hint}" />
+
+				<ListBox x:Name="filters" Grid.Row="1" Grid.Column="0" SelectionMode="Single" SelectionChanged="filters_SelectionChanged"
+						 HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalAlignment="Stretch"
+						 ItemsSource="{StaticResource filtersData}" Margin="0,0,10,0" Grid.IsSharedSizeScope="True" >
+					<ListBox.ItemTemplate>
+						<DataTemplate>
+							<Grid Margin="3" HorizontalAlignment="Stretch">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="auto" SharedSizeGroup="operation_colGroup" />
+									<ColumnDefinition Width="auto" SharedSizeGroup="source_colGroup" />
+									<ColumnDefinition Width="auto" SharedSizeGroup="condition_colGroup" />
+									<ColumnDefinition Width="auto" SharedSizeGroup="value_colGroup" />
+								</Grid.ColumnDefinitions>
+								<ComboBox Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Stretch" MinWidth="20"
+										  ItemsSource="{StaticResource filteroperationsData}" Text="{Binding Operation, Mode=TwoWay}" 
+										  SelectedItem="{Binding Operation}" >
+									<ComboBox.ItemTemplate>
+										<DataTemplate>
+											<TextBlock Padding="1" Height="auto" Text="{Binding Converter={StaticResource filteroperationConvert}}" />
+										</DataTemplate>
+									</ComboBox.ItemTemplate>
+								</ComboBox>
+								<ComboBox Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" MinWidth="25"
+										  ItemsSource="{StaticResource filtersourcesData}" Text="{Binding Source, Mode=TwoWay}" 
+										  SelectedItem="{Binding Source}" >
+									<ComboBox.ItemTemplate>
+										<DataTemplate>
+											<TextBlock Padding="1" Height="auto" Text="{Binding Converter={StaticResource filtersourceConvert}}" />
+										</DataTemplate>
+									</ComboBox.ItemTemplate>
+								</ComboBox>
+								<ComboBox Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Stretch" MinWidth="25"
+										  ItemsSource="{StaticResource filterconditionsData}" Text="{Binding Condition, Mode=TwoWay}" 
+										  SelectedItem="{Binding Condition}" >
+									<ComboBox.ItemTemplate>
+										<DataTemplate>
+											<TextBlock Padding="1" Height="auto" Text="{Binding Converter={StaticResource filterconditionConvert}}" />
+										</DataTemplate>
+									</ComboBox.ItemTemplate>
+								</ComboBox>
+								<TextBox Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Stretch" MinWidth="50"
+										 Text="{Binding Value, Mode=TwoWay}" />
+							</Grid>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+
+				<StackPanel Grid.Row="1" Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center">
+					<Button x:Name="addButton" Content="{lang:Translate Key=Action.Export.Dialog.Filters.Add}" Click="addButton_Click" 
+									Width="50" Margin="0,0,0,5" />
+					<Button x:Name="delButton" Content="{lang:Translate Key=Action.Export.Dialog.Filters.Delete}" Click="delButton_Click"
+									Width="50" Margin="0,0,0,5" />
+					<Button x:Name="upButton" Content="{lang:Translate Key=Up}" Click="upButton_Click" 
+									Width="50" Margin="0,0,0,5" />
+					<Button x:Name="downButton" Content="{lang:Translate Key=Down}" Click="downButton_Click"
+									Width="50" />
+				</StackPanel>
+				
+			</Grid>
+		</GroupBox>
+
+		<GroupBox Grid.Row="2" x:Name="scope_group">
+			<GroupBox.Header>
+				<Label Content="{lang:Translate Key=Action.Export.Dialog.Scope}" />
+			</GroupBox.Header>
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="80" />
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="auto" />
+					<RowDefinition Height="auto" />
+				</Grid.RowDefinitions>
+				
+				<Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="{lang:Translate Key=Action.Export.Dialog.Scope.Hint}" />
+
+				<CheckBox x:Name="deep_traversal" Grid.Row="1" Content="{lang:Translate Key=Action.Export.Dialog.Scope.Deep}" />
+
+			</Grid>
+		</GroupBox>
+
+		<StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center" >
+			<Button HorizontalAlignment="Center" VerticalAlignment="Center"
+					Height="21" Content="{lang:Translate Key=Action.Export.Dialog.Start}" Click="Start_Click"
+					Margin="0,0,10,0" />
+			<Button HorizontalAlignment="Center" VerticalAlignment="Center"
+					Height="21" Content="{lang:Translate Key=Close}" Click="Close_Click" />
+		</StackPanel>
+
+	</Grid>
+
+</Window>

@@ -231,6 +231,51 @@ Um diesen Spielstand laden zu können muss der Helfer erst entsprechend erweiter
 	<Action.Prepare>Vorbereitung ...</Action.Prepare>
 	<Action.Done>Abgeschlossen</Action.Done>
 
+	<Action.Export.Dialog.Title>In Datei exportieren</Action.Export.Dialog.Title>
+	<Action.Export.Dialog.Destination>Zieldatei</Action.Export.Dialog.Destination>
+	<Action.Export.Dialog.Destination.Hint>Geben hier die Zieldatei an:</Action.Export.Dialog.Destination.Hint>
+	<Action.Export.Dialog.Destination.Title>Zieldatei auswählen</Action.Export.Dialog.Destination.Title>
+	<Action.Export.Dialog.Destination.Filter>Rohtext (*.export)|*.export|CSV (*.csv)|*.csv</Action.Export.Dialog.Destination.Filter>
+	<!--<Action.Export.Dialog.Destination.Filter>Raw text (*.export)|*.export|CSV (*.csv)|*.csv|XML (*.xml)|*.xml|All files (*.*)|*.*</Action.Export.Dialog.Destination.Filter>-->
+	<Action.Export.Dialog.Destination.DefaultExt>.export</Action.Export.Dialog.Destination.DefaultExt>
+	<Action.Export.Dialog.Filters>Filter</Action.Export.Dialog.Filters>
+	<Action.Export.Dialog.Filters.Hint>Definiere hier Deine Filterkriterien.
+Bitte beachte das 'Oder' Filter bis zum nächsten 'Und' Filter kombiniert werden.</Action.Export.Dialog.Filters.Hint>
+	<Action.Export.Dialog.Filters.Add>Neu</Action.Export.Dialog.Filters.Add>
+	<Action.Export.Dialog.Filters.Delete>Löschen</Action.Export.Dialog.Filters.Delete>
+	<Action.Export.Dialog.Operation.None>&lt;Auswahl&gt;</Action.Export.Dialog.Operation.None>
+	<Action.Export.Dialog.Operation.And>Und</Action.Export.Dialog.Operation.And>
+	<Action.Export.Dialog.Operation.Or>Oder</Action.Export.Dialog.Operation.Or>
+	<Action.Export.Dialog.Source.None>&lt;Auswahl&gt;</Action.Export.Dialog.Source.None>
+	<Action.Export.Dialog.Source.ClassName>ClassName</Action.Export.Dialog.Source.ClassName>
+	<Action.Export.Dialog.Source.PathName>PathName</Action.Export.Dialog.Source.PathName>
+	<Action.Export.Dialog.Source.LevelName>LevelName</Action.Export.Dialog.Source.LevelName>
+	<Action.Export.Dialog.Source.FieldName>Feld-Name</Action.Export.Dialog.Source.FieldName>
+	<Action.Export.Dialog.Source.FieldValue>Feld-Wert</Action.Export.Dialog.Source.FieldValue>
+	<Action.Export.Dialog.Condition.None>&lt;Auswahl&gt;</Action.Export.Dialog.Condition.None>
+	<Action.Export.Dialog.Condition.Equal>ist</Action.Export.Dialog.Condition.Equal>
+	<Action.Export.Dialog.Condition.NotEqual>ist nicht</Action.Export.Dialog.Condition.NotEqual>
+	<Action.Export.Dialog.Condition.Less>kleiner als</Action.Export.Dialog.Condition.Less>
+	<Action.Export.Dialog.Condition.LessEqual>kleiner oder gleich</Action.Export.Dialog.Condition.LessEqual>
+	<Action.Export.Dialog.Condition.Greater>größer als</Action.Export.Dialog.Condition.Greater>
+	<Action.Export.Dialog.Condition.GreaterEqual>größer oder gleich</Action.Export.Dialog.Condition.GreaterEqual>
+	<Action.Export.Dialog.Condition.Contains>enthält</Action.Export.Dialog.Condition.Contains>
+	<Action.Export.Dialog.Condition.StartsWith>startet mit</Action.Export.Dialog.Condition.StartsWith>
+	<Action.Export.Dialog.Condition.EndsWith>endet mit</Action.Export.Dialog.Condition.EndsWith>
+	<Action.Export.Dialog.Condition.Regex>Regulär</Action.Export.Dialog.Condition.Regex>
+	<Action.Export.Dialog.Value>&lt;Wert eintragen&gt;</Action.Export.Dialog.Value>
+	<Action.Export.Dialog.Scope>Umfang</Action.Export.Dialog.Scope>
+	<Action.Export.Dialog.Scope.Hint>Standardmäßig werden nur direkte Kinder untersucht, aber Du kannst auch eine Tiefensuche aktivieren.
+Beachte aber das dies, gerade bei großen Spielständen, etwas länger dauern wird.</Action.Export.Dialog.Scope.Hint>
+	<Action.Export.Dialog.Scope.Deep>Tiefensuche aktivieren</Action.Export.Dialog.Scope.Deep>	
+	<Action.Export.Dialog.Start>Starten</Action.Export.Dialog.Start>
+	<Action.Export.Failed>Fehler beim Erzeugen der Exportdatei
+
+{0}</Action.Export.Failed>
+	<Action.Export.Done>Spielstand erfolgreich exportiert nach
+
+{0}</Action.Export.Done>
+
 	<Action.Validate.Title>Validierung</Action.Validate.Title>
 	<Action.Validate.Progress.Statusbar>Validiere {0} ...</Action.Validate.Progress.Statusbar>
 	<Action.Validate.Progress.Title>Validiere ...</Action.Validate.Progress.Title>
