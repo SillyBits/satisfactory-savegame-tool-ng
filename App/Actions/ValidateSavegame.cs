@@ -106,7 +106,7 @@ namespace SatisfactorySavegameTool.Actions
 				}
 			}
 
-			_progress.Events.Stop();
+			_progress.Events.Stop("", "");
 			_progress = null;
 		}
 
