@@ -32,9 +32,7 @@ namespace SatisfactorySavegameTool.Actions
 		//public BitmapSource Icon        { get; }
 
 		// This represents a "match all" filter
-		public static readonly List<ExportAction.FilterDefinition> EMPTY_FILTER = new List<ExportAction.FilterDefinition> {
-			new ExportAction.FilterDefinition(F.Operations.None, ExportAction.Sources.None, F.Conditions.None, null)
-		};
+		public static readonly List<ExportAction.FilterDefinition> EMPTY_FILTER = new List<ExportAction.FilterDefinition>();
 
 		public static void Run(Savegame.Savegame savegame)
 		{
@@ -252,18 +250,25 @@ namespace SatisfactorySavegameTool.Actions
 
 				FilterImpl.Filters source_filters = new FilterImpl.Filters(filters.Select(def => FilterImpl.CreateFilter(def)));
 
-				HierarchyRunner.Runner action = (prop) => {
-					// Test property against filter(s) given
-					FilterImpl.Result result = source_filters.Test(prop, chain);
-					// If successful, pass to writer
-					if (result != null)
-					{
-						if (result.Single != null)
-							writer.Write(result.Single);
-						else if (result.Multi != null)
-							result.Multi.ForEach(res => writer.Write(res));
-					}
-				};
+				HierarchyRunner.Runner action;
+				if (chain.Count == 0)
+					action = (prop) => {
+						// Empty "Export all" filter was passed
+						writer.Write(prop);
+					};
+				else
+					action = (prop) => {
+						// Test property against filter(s) given
+						FilterImpl.Result result = source_filters.Test(prop, chain);
+						// If successful, pass to writer
+						if (result != null)
+						{
+							if (result.Single != null)
+								writer.Write(result.Single);
+							else if (result.Multi != null)
+								result.Multi.ForEach(res => writer.Write(res));
+						}
+					};
 
 				try
 				{
@@ -547,7 +552,16 @@ namespace SatisfactorySavegameTool.Actions
 					//return prop.GetChilds().Any(pair => pair.Value != null ? chain.Test(pair.Value) : false);
 					var result = prop
 						.GetChilds()
-						.Where(pair => pair.Value != null ? chain.Test(pair.Value) : false)
+						.Where(pair => {
+							if (pair.Value != null)
+							{
+								if (pair.Value is string)
+									return chain.Test(pair.Value);
+								else
+									return chain.Test(pair.Value.ToString());
+							}
+							return false;
+						})
 						;
 					int count = result.Count();
 					if (count > 1)
