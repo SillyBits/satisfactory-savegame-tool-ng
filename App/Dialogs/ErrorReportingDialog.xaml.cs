@@ -6,7 +6,8 @@ using System.Windows;
 using System.Windows.Input;
 using Microsoft.Win32;
 
-using Savegame.Properties;
+using SatisfactorySavegameTool.Supplements;
+
 
 namespace SatisfactorySavegameTool.Dialogs
 {
@@ -52,26 +53,7 @@ namespace SatisfactorySavegameTool.Dialogs
 				WindowStartupLocation = WindowStartupLocation.CenterOwner;
 			}
 
-			string stack_trace = null;
-			try
-			{
-				var trace = new StackTrace(exc);
-				if (trace != null)
-					stack_trace = trace.ToString();
-			}
-			catch { }
-			if (stack_trace == null)
-				stack_trace = exc.StackTrace;
-
-			string text = msg 
-				+ "\n\n" 
-				+ "Message: " + exc.Message + "\n"
-				+ "TargetSite: " + exc.TargetSite.Name + ", " + exc.TargetSite.Module.FullyQualifiedName + "\n"
-				+ "Source: " + exc.Source + "\n"
-				+ "StackTrace:\n" 
-				+ stack_trace + "\n"
-				;
-			TextCtrl.Text = text;
+			TextCtrl.Text = exc.ToLongString();
 
 			// Not sure which state we're in, so better be careful with accessing config
 			try { SendBtn.IsEnabled = Config.Root.crash_reports.enabled; }
