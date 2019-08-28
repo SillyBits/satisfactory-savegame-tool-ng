@@ -79,7 +79,7 @@ namespace CoreLib
 					for (int index = 1; index < defs.Count; ++index)
 					{
 						curr = defs[index];
-						if (curr.Operation == Operations.Or)
+						if (curr.Operation == Operations.Or && prev.Operation == Operations.Or)
 						{
 							// Add another "or"
 							or.Add(prev);
