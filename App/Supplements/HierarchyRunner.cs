@@ -56,7 +56,7 @@ namespace SatisfactorySavegameTool.Supplements
 		{
 			_progress = new ProgressDialog(Application.Current.MainWindow, title);
 			_progress.CounterFormat = Translate._("HierarchyRunner.Progress.CounterFormat");
-			_progress.Interval = 1000;
+			_progress.Interval = !_deep_run ? 1000 : 10000;
 
 			Task task = Task.Run(async() => await RunAsync(action, _progress.Events));
 			while (!task.IsCompleted)
