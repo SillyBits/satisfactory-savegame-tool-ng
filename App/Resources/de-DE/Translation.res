@@ -93,11 +93,6 @@ kann diesen Spielstand unter Umständen komplett unbrauchbar machen!</MainWindow
 	<MainWindow.SaveGamefile.Progress.Title>Speichere Spielstand ...</MainWindow.SaveGamefile.Progress.Title>
 	<MainWindow.SaveGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} Objekte</MainWindow.SaveGamefile.Progress.CounterFormat>
 
-	<MainWindow.ExportGamefile.Progress.Title>Exportiere Spielstand ...</MainWindow.ExportGamefile.Progress.Title>
-	<MainWindow.ExportGamefile.Progress.Statusbar>Exportiere Spielstand {0} nach {1} ...</MainWindow.ExportGamefile.Progress.Statusbar>
-	<MainWindow.ExportGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} objects</MainWindow.ExportGamefile.Progress.CounterFormat>
-	<MainWindow.ExportGamefile.Done>Spielstand erfolgreich exportiert.</MainWindow.ExportGamefile.Done>
-
 	<Dialog.About.Title>Über ...</Dialog.About.Title>
 	<Dialog.Changelog.Title>Änderungsprotokoll ...</Dialog.Changelog.Title>
 	<Dialog.PropertyDump.Title>Elementdetails ...</Dialog.PropertyDump.Title>

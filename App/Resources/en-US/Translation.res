@@ -93,11 +93,6 @@ unrecoverable damage to your save!</MainWindow.LoadGamefile.PeekHeader.Warn>
 	<MainWindow.SaveGamefile.Progress.Title>Saving savegame ...</MainWindow.SaveGamefile.Progress.Title>
 	<MainWindow.SaveGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} objects</MainWindow.SaveGamefile.Progress.CounterFormat>
 
-	<MainWindow.ExportGamefile.Progress.Title>Exporting save ...</MainWindow.ExportGamefile.Progress.Title>
-	<MainWindow.ExportGamefile.Progress.Statusbar>Exporting save {0} to {1} ...</MainWindow.ExportGamefile.Progress.Statusbar>
-	<MainWindow.ExportGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} objects</MainWindow.ExportGamefile.Progress.CounterFormat>
-	<MainWindow.ExportGamefile.Done>Savegame exported.</MainWindow.ExportGamefile.Done>
-
 	<Dialog.About.Title>About ...</Dialog.About.Title>
 	<Dialog.Changelog.Title>Changelog ...</Dialog.Changelog.Title>
 	<Dialog.PropertyDump.Title>Property details ...</Dialog.PropertyDump.Title>

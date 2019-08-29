@@ -226,10 +226,7 @@ namespace SatisfactorySavegameTool
 
 		private void File_Export_Click(object sender, RoutedEventArgs e)
 		{
-			string filename = Path.GetFileName(CurrFile.Filename) + ".export";
-			string export_file = Path.Combine(Config.Root.core.exportpath, filename);
-
-			_ExportGamefile(export_file);
+			Export.Run(CurrFile);
 		}
 
 		private void File_Import_Click(object sender, RoutedEventArgs e)
@@ -453,72 +450,6 @@ namespace SatisfactorySavegameTool
 			CurrFile = null;
 
 			return true;
-		}
-
-		private async void _ExportGamefile(string export_file)
-		{
-			_BlockUI(true);
-			_SetStatusbar(string.Format(Translate._("MainWindow.ExportGamefile.Progress.Statusbar"), 
-				Path.GetFileName(CurrFile.Filename), export_file));
-			ProgressDialog progress = new ProgressDialog(this, Translate._("MainWindow.ExportGamefile.Progress.Title"));
-			progress.CounterFormat = Translate._("MainWindow.ExportGamefile.Progress.CounterFormat");
-			progress.Interval = 1000;
-
-			int count = 0;
-
-			await Task.Run(() => {
-				Log.Info("Exporting file '{0}'\n"
-					   + "-> to          '{1}'", 
-					   CurrFile.Filename, export_file);
-				progress.Events.Start(CurrFile.TotalElements, Translate._("MainWindow.ExportGamefile.Progress.Title"), "");
-
-				DateTime start_time = DateTime.Now;
-
-				StreamWriter sw = File.CreateText(export_file);
-
-				sw.Write("/ Header\n");
-				//Dumper.Indent(1, 9);
-				++count;
-				progress.Events.Update(count, null, CurrFile.Header.ToString());
-				Savegame.Properties.Dumper.Dump(CurrFile.Header, sw.Write);
-				//Dumper.Unindent(1);
-				sw.Write("\\ Header\n");
-
-				sw.Write("/ Objects\n");
-				//Dumper.Indent(1, 9);
-				foreach (Property prop in CurrFile.Objects)
-				{
-					++count;
-					progress.Events.Update(count, null, prop.ToString());
-					Savegame.Properties.Dumper.Dump(prop, sw.Write);
-				}
-				//Dumper.Unindent(1);
-				sw.Write("\\ Objects\n");
-
-				sw.Write("/ Collected\n");
-				//Dumper.Indent(1, 9);
-				foreach (Property prop in CurrFile.Collected)
-				{
-					++count;
-					progress.Events.Update(count, null, prop.ToString());
-					Savegame.Properties.Dumper.Dump(prop, sw.Write);
-				}
-				//Dumper.Unindent(1);
-				sw.Write("\\ Collected\n");
-
-				sw.Close();
-
-				DateTime end_time = DateTime.Now;
-				TimeSpan ofs = end_time - start_time;
-				Log.Info("Finished exporting, took {0}", ofs);
-
-				progress.Events.Stop(Translate._("MainWindow.ExportGamefile.Done"), "");
-			});
-
-			_SetStatusbar();
-			_BlockUI(false);
-
-			MessageBox.Show(Translate._("MainWindow.ExportGamefile.Done"), Translate._("MainWindow.Title"));
 		}
 #endregion
 
