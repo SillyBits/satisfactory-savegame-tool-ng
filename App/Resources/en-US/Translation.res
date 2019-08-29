@@ -232,6 +232,12 @@ This property needs to be dealt with to allow this tool to load this savegame.</
 	<Action.Export.Dialog.Destination.Filter>Raw text (*.export)|*.export|CSV (*.csv)|*.csv</Action.Export.Dialog.Destination.Filter>
 	<!--<Action.Export.Dialog.Destination.Filter>Raw text (*.export)|*.export|CSV (*.csv)|*.csv|Json (*.json)|*.json|XML (*.xml)|*.xml</Action.Export.Dialog.Destination.Filter>-->
 	<Action.Export.Dialog.Destination.DefaultExt>.export</Action.Export.Dialog.Destination.DefaultExt>
+	<Action.Export.Dialog.Destination.Type>Type of export:</Action.Export.Dialog.Destination.Type>
+	<Action.Export.Dialog.Destination.Auto>Auto-detect</Action.Export.Dialog.Destination.Auto>
+	<Action.Export.Dialog.Destination.RawText>Raw text (*.export)</Action.Export.Dialog.Destination.RawText>
+	<Action.Export.Dialog.Destination.CSV>CSV (*.csv)</Action.Export.Dialog.Destination.CSV>
+	<!--<Action.Export.Dialog.Destination.Json>Json (*.json)</Action.Export.Dialog.Destination.Json>-->
+	<!--<Action.Export.Dialog.Destination.XML>XML (*.xml)</Action.Export.Dialog.Destination.XML>-->
 	<Action.Export.Dialog.Filters>Filters</Action.Export.Dialog.Filters>
 	<Action.Export.Dialog.Filters.Hint>Specify your optional filter criterias below.
 Note that 'Or' filters are combined up until next 'And' encountered.</Action.Export.Dialog.Filters.Hint>

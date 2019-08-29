@@ -39,13 +39,13 @@ namespace SatisfactorySavegameTool.Actions
 			// Show dialog, gather data, then run method below
 			ExportAction.Dialog dlg = new ExportAction.Dialog();
 			if (dlg.ShowDialog() == true)
-				Run(savegame, dlg.Filename, dlg.Filters, dlg.DeepTraversal, dlg.RecursExport);
+				Run(savegame, dlg.Filename, dlg.DestinationType, dlg.Filters, dlg.DeepTraversal, dlg.RecursExport);
 		}
 
-		public static void Run(Savegame.Savegame savegame, string filename, List<ExportAction.FilterDefinition> filters, 
-			bool deep_traversal, bool recursive_export)
+		public static void Run(Savegame.Savegame savegame, string filename, ExportAction.Writer.Destinations destination_type,
+			List<ExportAction.FilterDefinition> filters, bool deep_traversal, bool recursive_export)
 		{
-			ExportAction.Impl.Run(savegame, filename, filters, deep_traversal, recursive_export);
+			ExportAction.Impl.Run(savegame, filename, destination_type, filters, deep_traversal, recursive_export);
 		}
 
 	}
@@ -56,10 +56,11 @@ namespace SatisfactorySavegameTool.Actions
 
 		public partial class Dialog : Window
 		{
-			public string                 Filename      { get; private set; }
-			public List<FilterDefinition> Filters       { get; private set; }
-			public bool                   DeepTraversal { get; private set; }
-			public bool                   RecursExport  { get; private set; }
+			public string                 Filename        { get; private set; }
+			public Writer.Destinations    DestinationType { get; set; }
+			public List<FilterDefinition> Filters         { get; private set; }
+			public bool                   DeepTraversal   { get; private set; }
+			public bool                   RecursExport    { get; private set; }
 
 			public Dialog(Window parent = null, string title = null)
 			{
@@ -90,6 +91,8 @@ namespace SatisfactorySavegameTool.Actions
 					WindowStartupLocation = WindowStartupLocation.CenterOwner;
 				}
 
+				// Setup defaults, if any
+				destinationtype.SelectedIndex = 0;
 #if DEBUG
 				filename.Text = @"E:\GitHub\satisfactory-savegame-tool-ng\App\exports\test.export";
 				//(filters.ItemsSource as Filters).Add(
@@ -104,7 +107,16 @@ namespace SatisfactorySavegameTool.Actions
 				deep_traversal.IsChecked = true;
 #endif
 
+				filename_TextChanged(null, null);
 				filters_SelectionChanged(null, null);
+			}
+
+			private void filename_TextChanged(object sender, TextChangedEventArgs e)
+			{
+				if (destinationtype.SelectedIndex == 0)
+				{
+					startBtn.IsEnabled = (Writer.GetDestByExt(filename.Text) != Writer.Destinations.Auto);
+				}
 			}
 
 			private void Browse_Destination_Click(object sender, RoutedEventArgs e)
@@ -119,10 +131,12 @@ namespace SatisfactorySavegameTool.Actions
 					filename.Text = dlg.FileName;
 			}
 
-			private void fieldButton_Click(object sender, RoutedEventArgs e)
+			private void destinationtype_SelectionChanged(object sender, SelectionChangedEventArgs e)
 			{
-				//TODO: Browse thru known fields
-				//Field textbox might be changed to combo box instead
+				if (destinationtype.SelectedIndex == 0)
+					filename_TextChanged(null, null);
+				else
+					startBtn.IsEnabled = true;
 			}
 
 			private void filters_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -173,10 +187,11 @@ namespace SatisfactorySavegameTool.Actions
 
 			private void Start_Click(object sender, RoutedEventArgs e)
 			{
-				Filename      = filename.Text;
-				Filters       = (filters.ItemsSource as Filters).ToList();
-				DeepTraversal = (deep_traversal.IsChecked == true);
-				RecursExport  = true;//TODO: (recurs_export.IsChecked == true);
+				Filename        = filename.Text;
+				DestinationType = (Writer.Destinations)destinationtype.SelectedItem;
+				Filters         = (filters.ItemsSource as Filters).ToList();
+				DeepTraversal   = (deep_traversal.IsChecked == true);
+				RecursExport    = true;//TODO: (recurs_export.IsChecked == true);
 
 				DialogResult = true;
 				Close();
@@ -218,10 +233,10 @@ namespace SatisfactorySavegameTool.Actions
 
 		public static class Impl
 		{
-			public static void Run(Savegame.Savegame savegame, string filename, List<FilterDefinition> filters, 
-				bool deep_traversal, bool recursive_export)
+			public static void Run(Savegame.Savegame savegame, string filename, ExportAction.Writer.Destinations destination_type,
+				List<FilterDefinition> filters, bool deep_traversal, bool recursive_export)
 			{
-				Writer.IWriter writer = Writer.CreateWriter(Writer.Destinations.None, filename, recursive_export);
+				Writer.IWriter writer = Writer.CreateWriter(destination_type, filename, recursive_export);
 				if (writer == null)
 				{
 					string msg = string.Format(Translate._("Unable to create writer for file\n\n{0}"), filename);
@@ -296,7 +311,7 @@ namespace SatisfactorySavegameTool.Actions
 		{
 			public enum Destinations
 			{
-				None = 0, // -> Select by file extension
+				Auto = 0, // -> Select by file extension
 				RawText,
 				CSV,
 			//TODO:
@@ -312,20 +327,25 @@ namespace SatisfactorySavegameTool.Actions
 				void Close();
 			}
 
+			public static Destinations GetDestByExt(string filename)
+			{
+				string ext = Path.GetExtension(filename).ToLower();
+				switch (ext)
+				{
+					case ".export": return Destinations.RawText;
+					case ".csv"   : return Destinations.CSV;
+				//TODO:
+				//	case ".json"  : return Destinations.Json;
+				//	case ".xml"   : return Destinations.XML;
+				}
+
+				return Destinations.Auto;
+			}
+
 			public static IWriter CreateWriter(Destinations destination, string filename, bool recursive_export)
 			{
-				if (destination == Destinations.None)
-				{
-					string ext = Path.GetExtension(filename).ToLower();
-					switch (ext)
-					{
-						case ".export": destination = Destinations.RawText; break;
-						case ".csv"   : destination = Destinations.CSV; break;
-					//TODO:
-					//	case ".json"  : destination = Destinations.Json; break;
-					//	case ".xml"   : destination = Destinations.XML; break;
-					}
-				}
+				if (destination == Destinations.Auto)
+					destination = GetDestByExt(filename);
 
 				switch (destination)
 				{
@@ -640,6 +660,36 @@ namespace SatisfactorySavegameTool.Actions
 			{
 				F.Operations op = (F.Operations)value;
 				return Translate._("Action.Export.Dialog.Operation." + op.ToString());
+			}
+
+			public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+			{
+				throw new NotImplementedException();
+			}
+		}
+		#endregion
+
+
+		#region Destination types
+		public class DestinationTypes : ObservableCollection<Writer.Destinations>
+		{
+			public DestinationTypes()
+			{
+				foreach (Writer.Destinations dest in Enum.GetValues(typeof(Writer.Destinations)))
+					Add(dest);
+			}
+		}
+
+		[ValueConversion(typeof(Writer.Destinations), typeof(string))]
+		public class DestinationTypeConverter : IValueConverter
+		{
+			public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+			{
+				if (value is string)
+					return Writer.Destinations.Auto;
+					//return Translate._("Action.Export.Dialog.Destination.Auto"); 
+				Writer.Destinations dest = (Writer.Destinations)value;
+				return Translate._("Action.Export.Dialog.Destination." + dest.ToString());
 			}
 
 			public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

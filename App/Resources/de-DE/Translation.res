@@ -233,6 +233,12 @@ Um diesen Spielstand laden zu können muss der Helfer erst entsprechend erweiter
 	<Action.Export.Dialog.Destination.Filter>Rohtext (*.export)|*.export|CSV (*.csv)|*.csv</Action.Export.Dialog.Destination.Filter>
 	<!--<Action.Export.Dialog.Destination.Filter>Rohtext (*.export)|*.export|CSV (*.csv)|*.csv|Json (*.json)|*.json|XML (*.xml)|*.xml</Action.Export.Dialog.Destination.Filter>-->
 	<Action.Export.Dialog.Destination.DefaultExt>.export</Action.Export.Dialog.Destination.DefaultExt>
+	<Action.Export.Dialog.Destination.Type>Export-Typ:</Action.Export.Dialog.Destination.Type>
+	<Action.Export.Dialog.Destination.Auto>Autom. Erkennung</Action.Export.Dialog.Destination.Auto>
+	<Action.Export.Dialog.Destination.RawText>Rohtext (*.export)</Action.Export.Dialog.Destination.RawText>
+	<Action.Export.Dialog.Destination.CSV>CSV (*.csv)</Action.Export.Dialog.Destination.CSV>
+	<!--<Action.Export.Dialog.Destination.Json>Json (*.json)</Action.Export.Dialog.Destination.Json>-->
+	<!--<Action.Export.Dialog.Destination.XML>XML (*.xml)</Action.Export.Dialog.Destination.XML>-->
 	<Action.Export.Dialog.Filters>Filter</Action.Export.Dialog.Filters>
 	<Action.Export.Dialog.Filters.Hint>Definiere hier Deine optionalen Filterkriterien.
 Bitte beachte das 'Oder' Filter bis zum nächsten 'Und' Filter kombiniert werden.</Action.Export.Dialog.Filters.Hint>
