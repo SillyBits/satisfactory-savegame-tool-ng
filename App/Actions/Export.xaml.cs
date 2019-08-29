@@ -341,9 +341,10 @@ namespace SatisfactorySavegameTool.Actions
 
 			private abstract class BaseWriter : IWriter
 			{
-				public BaseWriter(string filename)
+				public BaseWriter(string filename, bool recursive_export)
 				{
-					_filename = filename;
+					_filename  = filename;
+					_recursive = recursive_export;
 				}
 
 				~BaseWriter()
@@ -371,17 +372,20 @@ namespace SatisfactorySavegameTool.Actions
 				}
 
 				protected string       _filename;
+				protected bool         _recursive;
 				protected StreamWriter _stream;
 			}
 
 			private class TextDumper : BaseWriter
 			{
 				public TextDumper(string filename, bool recursive_export)
-					: base(filename)
+					: base(filename, recursive_export)
 				{ }
 
 				public override void Write(object value)
 				{
+					// For now, Properties.Dumper is recursive all the times,
+					// might be changed in future
 					if (value is P.Property)
 						P.Dumper.Dump(value as P.Property, base.Write);
 				}
@@ -390,13 +394,55 @@ namespace SatisfactorySavegameTool.Actions
 			private class CSVExporter : BaseWriter
 			{
 				public CSVExporter(string filename, bool recursive_export)
-					: base(filename)
-				{ }
+					: base(filename, recursive_export)
+				{
+					_first_line = true;
+					_stringbuilder = new StringBuilder();
+				}
 
 				public override void Write(object value)
 				{
-					//TODO:
+					// For now, CSV export won't use recursive flag,
+					// but recursion might be added in future
+					if (value is P.Property)
+					{
+						var childs = (value as P.Property).GetChilds();
+
+						if (_first_line)
+						{
+							_first_line = false;
+							foreach (var pair in childs)
+							{
+								_stringbuilder.Append(pair.Key);
+								_stringbuilder.Append(',');
+							}
+							if (_stringbuilder.Length > 0)
+								_stringbuilder.Remove(_stringbuilder.Length - 1, 1);
+							_stringbuilder.Append('\n');
+							base.Write(_stringbuilder.ToString());
+							_stringbuilder.Clear();
+						}
+
+						foreach (var pair in childs)
+						{
+							if (pair.Value != null)
+								_stringbuilder.Append(pair.Value);
+							_stringbuilder.Append(',');
+						}
+						if (_stringbuilder.Length > 0)
+							_stringbuilder.Remove(_stringbuilder.Length - 1, 1);
+						_stringbuilder.Append('\n');
+						base.Write(_stringbuilder.ToString());
+						_stringbuilder.Clear();
+					}
+					else
+					{
+						base.Write(value + "\n");
+					}
 				}
+
+				private bool _first_line;
+				private StringBuilder _stringbuilder;
 			}
 
 			//private JsonExporter...
