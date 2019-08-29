@@ -85,7 +85,7 @@ kann diesen Spielstand unter Umständen komplett unbrauchbar machen!</MainWindow
 	<MainWindow.LoadGamefile.Progress.Title.2>Erzeuge Baumstrukturen ...</MainWindow.LoadGamefile.Progress.Title.2>
 	<MainWindow.LoadGamefile.Progress.CounterFormat.2>{0:#,#0} / {1:#,#0} Elemente</MainWindow.LoadGamefile.Progress.CounterFormat.2>
 
-	<MainWindow.SaveGamefile.Title>Ziel auswählen</MainWindow.SaveGamefile.Title>
+	<MainWindow.SaveGamefile.Title>Zieldatei auswählen</MainWindow.SaveGamefile.Title>
 	<MainWindow.SaveGamefile.Filter>Spielstände (*.sav)|*.sav|Alle Dateien (*.*)|*.*</MainWindow.SaveGamefile.Filter>
 	<MainWindow.SaveGamefile.DefaultExt>.sav</MainWindow.SaveGamefile.DefaultExt>
 	<MainWindow.SaveGamefile.Backup.Statusbar>Backup von {0} nach {1} ...</MainWindow.SaveGamefile.Backup.Statusbar>
@@ -231,10 +231,10 @@ Um diesen Spielstand laden zu können muss der Helfer erst entsprechend erweiter
 	<Action.Export.Dialog.Destination.Hint>Geben hier die Zieldatei an:</Action.Export.Dialog.Destination.Hint>
 	<Action.Export.Dialog.Destination.Title>Zieldatei auswählen</Action.Export.Dialog.Destination.Title>
 	<Action.Export.Dialog.Destination.Filter>Rohtext (*.export)|*.export|CSV (*.csv)|*.csv</Action.Export.Dialog.Destination.Filter>
-	<!--<Action.Export.Dialog.Destination.Filter>Raw text (*.export)|*.export|CSV (*.csv)|*.csv|XML (*.xml)|*.xml|All files (*.*)|*.*</Action.Export.Dialog.Destination.Filter>-->
+	<!--<Action.Export.Dialog.Destination.Filter>Rohtext (*.export)|*.export|CSV (*.csv)|*.csv|Json (*.json)|*.json|XML (*.xml)|*.xml</Action.Export.Dialog.Destination.Filter>-->
 	<Action.Export.Dialog.Destination.DefaultExt>.export</Action.Export.Dialog.Destination.DefaultExt>
 	<Action.Export.Dialog.Filters>Filter</Action.Export.Dialog.Filters>
-	<Action.Export.Dialog.Filters.Hint>Definiere hier Deine Filterkriterien.
+	<Action.Export.Dialog.Filters.Hint>Definiere hier Deine optionalen Filterkriterien.
 Bitte beachte das 'Oder' Filter bis zum nächsten 'Und' Filter kombiniert werden.</Action.Export.Dialog.Filters.Hint>
 	<Action.Export.Dialog.Filters.Add>Neu</Action.Export.Dialog.Filters.Add>
 	<Action.Export.Dialog.Filters.Delete>Löschen</Action.Export.Dialog.Filters.Delete>
@@ -255,12 +255,12 @@ Bitte beachte das 'Oder' Filter bis zum nächsten 'Und' Filter kombiniert werden
 	<Action.Export.Dialog.Condition.Greater>größer als</Action.Export.Dialog.Condition.Greater>
 	<Action.Export.Dialog.Condition.GreaterEqual>größer oder gleich</Action.Export.Dialog.Condition.GreaterEqual>
 	<Action.Export.Dialog.Condition.Contains>enthält</Action.Export.Dialog.Condition.Contains>
-	<Action.Export.Dialog.Condition.StartsWith>startet mit</Action.Export.Dialog.Condition.StartsWith>
+	<Action.Export.Dialog.Condition.StartsWith>beginnt mit</Action.Export.Dialog.Condition.StartsWith>
 	<Action.Export.Dialog.Condition.EndsWith>endet mit</Action.Export.Dialog.Condition.EndsWith>
 	<Action.Export.Dialog.Condition.Regex>Regulär</Action.Export.Dialog.Condition.Regex>
 	<Action.Export.Dialog.Value>&lt;Wert eintragen&gt;</Action.Export.Dialog.Value>
 	<Action.Export.Dialog.Scope>Umfang</Action.Export.Dialog.Scope>
-	<Action.Export.Dialog.Scope.Hint>Standardmäßig werden nur direkte Kinder untersucht, aber Du kannst auch eine Tiefensuche aktivieren.
+	<Action.Export.Dialog.Scope.Hint>Standardmäßig werden nur direkte Kinder besucht, aber Du kannst auch eine Tiefensuche aktivieren.
 Beachte aber das dies, gerade bei großen Spielständen, etwas länger dauern wird.</Action.Export.Dialog.Scope.Hint>
 	<Action.Export.Dialog.Scope.Deep>Tiefensuche aktivieren</Action.Export.Dialog.Scope.Deep>	
 	<Action.Export.Dialog.Start>Starten</Action.Export.Dialog.Start>

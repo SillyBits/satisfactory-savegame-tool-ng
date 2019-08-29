@@ -230,10 +230,10 @@ This property needs to be dealt with to allow this tool to load this savegame.</
 	<Action.Export.Dialog.Destination.Hint>Choose your destination file:</Action.Export.Dialog.Destination.Hint>
 	<Action.Export.Dialog.Destination.Title>Select file to export to</Action.Export.Dialog.Destination.Title>
 	<Action.Export.Dialog.Destination.Filter>Raw text (*.export)|*.export|CSV (*.csv)|*.csv</Action.Export.Dialog.Destination.Filter>
-	<!--<Action.Export.Dialog.Destination.Filter>Raw text (*.export)|*.export|CSV (*.csv)|*.csv|XML (*.xml)|*.xml|All files (*.*)|*.*</Action.Export.Dialog.Destination.Filter>-->
+	<!--<Action.Export.Dialog.Destination.Filter>Raw text (*.export)|*.export|CSV (*.csv)|*.csv|Json (*.json)|*.json|XML (*.xml)|*.xml</Action.Export.Dialog.Destination.Filter>-->
 	<Action.Export.Dialog.Destination.DefaultExt>.export</Action.Export.Dialog.Destination.DefaultExt>
 	<Action.Export.Dialog.Filters>Filters</Action.Export.Dialog.Filters>
-	<Action.Export.Dialog.Filters.Hint>Specify your filter criterias below.
+	<Action.Export.Dialog.Filters.Hint>Specify your optional filter criterias below.
 Note that 'Or' filters are combined up until next 'And' encountered.</Action.Export.Dialog.Filters.Hint>
 	<Action.Export.Dialog.Filters.Add>Add</Action.Export.Dialog.Filters.Add>
 	<Action.Export.Dialog.Filters.Delete>Del</Action.Export.Dialog.Filters.Delete>
