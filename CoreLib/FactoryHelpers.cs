@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -35,6 +36,11 @@ namespace CoreLib
 		public bool IsKnown(string typename)
 		{
 			return _lookup.IsKnown(typename);
+		}
+
+		public Dictionary<string, ConstructorInfo> GetKnown()
+		{
+			return _lookup.GetKnown();
 		}
 
 		public _InstanceType this[string typename, params object[] parms]
@@ -99,6 +105,25 @@ namespace CoreLib
 				Log.Debug("... discovered a total of {0} constructors", _lookup.Count);
 		}
 
+		protected void _AddToLookup(Assembly assembly, bool long_naming)
+		{
+			Type basetype = typeof(_InstanceType);
+
+			if (_verbose)
+				Log.Debug("Discovering additional constructors:\n"
+					+ "\t-> assembly : {0}\n"
+					+ "\t-> base type: {1}, {2}", 
+					assembly.FullName, 
+					basetype.Name, basetype.FullName
+				);
+
+			int count = _lookup.Count;
+			_lookup._Add(assembly, long_naming);
+
+			if (_verbose)
+				Log.Debug("... discovered a total of {0} additional constructors", _lookup.Count - count);
+		}
+
 		protected bool _verbose;
 		protected Lookup _lookup;
 
@@ -111,27 +136,39 @@ namespace CoreLib
 			internal Lookup(Assembly assembly, Type[] cons, bool verbose)
 				: base(verbose)
 			{
-				SelectorFunc sel;
+				_constructor_params = cons;
+				_selector           = _GetSelector();
+
+				_Create(assembly, _selector);
+			}
+
+			internal void _Add(Assembly assembly, bool long_naming)
+			{
+				_Add(assembly, _selector, long_naming);
+			}
+
+			internal SelectorFunc _GetSelector()
+			{
 				if (typeof(_InstanceType).IsInterface)
 				{
 					// When dealing with interfaces, we've to check the other way around -.-
-					sel = (typeinfo) => {
+					return (typeinfo) => {
 						if (typeof(_InstanceType).IsAssignableFrom(typeinfo))
-							return typeinfo.GetConstructor(cons);
-						return null;
-					};
-				}
-				else
-				{
-					sel = (typeinfo) => {
-						if (typeinfo.IsSubclassOf(typeof(_InstanceType)))
-							return typeinfo.GetConstructor(cons);
+							return typeinfo.GetConstructor(_constructor_params);
 						return null;
 					};
 				}
 
-				_Create(assembly, sel);
+				return (typeinfo) => {
+					if (typeinfo.IsSubclassOf(typeof(_InstanceType)))
+						return typeinfo.GetConstructor(_constructor_params);
+					return null;
+				};
 			}
+
+			protected Type[]       _constructor_params;
+			protected SelectorFunc _selector;
+
 		}
 
 	}
@@ -175,6 +212,11 @@ namespace CoreLib
 			return _lookup.ContainsKey(typename);
 		}
 
+		public Dictionary<string, _LookupType> GetKnown()
+		{
+			return _lookup;
+		}
+
 		public _LookupType this[string typename]
 		{
 			get	{ return IsKnown(typename) ? _lookup[typename] : null; }
@@ -182,9 +224,18 @@ namespace CoreLib
 
 		public delegate _LookupType SelectorFunc(TypeInfo typeinfo);
 
-		public void _Create(Assembly assembly, SelectorFunc selector)
+		protected void _Create(Assembly assembly, SelectorFunc selector)
+		{
+			_lookup = new Dictionary<string, _LookupType>();
+
+			_Add(assembly, selector, false);
+		}
+
+		protected void _Add(Assembly assembly, SelectorFunc selector, bool long_naming)
 		{
 			Type basetype = typeof(_LookupType);
+
+			string ass_name = assembly.GetName().Name;
 
 			if (_verbose)
 				Log.Debug("Discovering types:\n"
@@ -194,21 +245,25 @@ namespace CoreLib
 					basetype.Name, basetype.FullName
 				);
 
-			_lookup = new Dictionary<string, _LookupType>();
-
 			//TODO: Could use Linq here to reduce set?
 			_LookupType result;
 			IEnumerable<TypeInfo> types = assembly.DefinedTypes;
-			foreach(TypeInfo ti in types)
+			foreach (TypeInfo ti in types)
 			{
 				//if (ti.IsSubclassOf(basetype))
 				{
 					result = selector(ti);
 					if (result != null)
 					{
-						_lookup.Add(ti.Name, result);
+						string name;
+						if (long_naming)
+							name = "[" + ass_name + "]" + ti.Name;
+						else
+							name = ti.Name;
+
+						_lookup.Add(name, result);
 						if (_verbose)
-							Log.Debug("- {0} ({1}) => {2}", ti.Name, ti.FullName, result);
+							Log.Debug("- {0} ({1}) => {2}", name, ti.FullName, result);
 					}
 				}
 			}
