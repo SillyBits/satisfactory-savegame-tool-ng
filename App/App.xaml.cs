@@ -199,6 +199,10 @@ namespace SatisfactorySavegameTool
 		public static string LOGPATH              = null;
 		public static bool   VERBOSE              = false;
 
+		// Path to where plugins are to be stored
+		public const  string PLUGINS              = "plugins";
+		public static string PLUGINPATH           = null;
+
 		// Path to where exports are to be stored - configured by user
 		public const  string EXPORTS              = "exports";
 		public static string EXPORTPATH           = null;
@@ -248,6 +252,7 @@ namespace SatisfactorySavegameTool
 			// Setup paths which do rely on our main path
 			RESOURCEPATH = Path.Combine(APPPATH, RESOURCES);
 			LOGPATH      = Path.Combine(APPPATH, LOGS);
+			PLUGINPATH   = Path.Combine(APPPATH, PLUGINS);
 
 			// Ensure log path exists
 			// If this fails, user might have insufficient rights, or even worse happened

@@ -25,12 +25,9 @@ using SatisfactorySavegameTool.Supplements;
 namespace SatisfactorySavegameTool.Actions
 {
 
-	public static class Export //: IAction <- Non-static only!
+	// Export action is an exception with not being derived from IAction
+	public static class Export
 	{
-		//public string       Name        { get; }
-		//public string       Description { get; }
-		//public BitmapSource Icon        { get; }
-
 		// This represents a "match all" filter
 		public static readonly List<ExportAction.FilterDefinition> EMPTY_FILTER = new List<ExportAction.FilterDefinition>();
 

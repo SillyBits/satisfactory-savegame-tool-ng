@@ -78,6 +78,8 @@ namespace SatisfactorySavegameTool
 
 			_SetupMRU();
 
+			ActionFactory.AddToMenu(actions_menu, Actions_Click);
+
 			_SetStatusbar();
 
 			Details.Modified += Details_Modified;
@@ -138,7 +140,7 @@ namespace SatisfactorySavegameTool
 			File_Export.IsEnabled = has_save;
 			File_Import.IsEnabled = false;//TODO:
 
-			Actions_Validate.IsEnabled = has_save;
+			actions_menu.IsEnabled = has_save;
 
 
 			if (!has_save)
@@ -253,13 +255,29 @@ namespace SatisfactorySavegameTool
 		}
 
 
-		private void Actions_Validate_Click(object sender, RoutedEventArgs e)
+		private void Actions_Click(object sender, RoutedEventArgs e)
 		{
-			_BlockUI(true);
-			_SetStatusbar(string.Format(Translate._("Action.Validate.Progress.Statusbar"), CurrFile.Filename));
-			ValidateSavegame.Run(CurrFile);
-			_SetStatusbar();
-			_BlockUI(false);
+			if (sender is MenuItem)
+			{
+				MenuItem item = sender as MenuItem;
+				string name = item.Tag as string;
+				IAction action = ActionFactory.Create(name, CurrFile);
+				if (action != null)
+				{
+					_BlockUI(true);
+					//_SetStatusbar(string.Format(Translate._("Action.Validate.Progress.Statusbar"), CurrFile.Filename));
+
+					try
+					{
+						action.Run();
+					}
+					finally
+					{
+						//_SetStatusbar();
+						_BlockUI(false);
+					}
+				}
+			}
 		}
 
 

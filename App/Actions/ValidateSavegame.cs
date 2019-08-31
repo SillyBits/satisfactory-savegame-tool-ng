@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 using CoreLib;
 
@@ -12,44 +13,77 @@ using Savegame;
 using Savegame.Properties;
 
 using SatisfactorySavegameTool.Dialogs;
+using A = SatisfactorySavegameTool.Actions.Attributes;
 
-
-/*
- * TODO:
- * 
- * - Create base class for actions.
- *   Besides some "Run", will also need stuff like menu item name, translation keys, ...
- *   
- * - Use iterator to find actions avail (even across assemblies) 
- *   and add them to actions menu.
- * 
- */
 
 namespace SatisfactorySavegameTool.Actions
 {
 
 	// Stuff used to validate those stored objects
 	//
-
-	public class ValidateSavegame
+	[A.Name("[MainWindow.Menu.Actions.Validate]"), A.Description("[MainWindow.Menu.Actions.Validate.TT]")/*, A.Icon("?")*/]
+	public class ValidateSavegame : IAction
 	{
-		public static void Run(Savegame.Savegame savegame)
+		public ValidateSavegame(Savegame.Savegame savegame)
 		{
 			_savegame = savegame;
 
+			_InitValidators();
+		}
+
+		public void Run()
+		{
 			_progress = new ProgressDialog(null, Translate._("Action.Validate.Progress.Title"));
 			_callback = _progress.Events;
 			_progress.CounterFormat = Translate._("Action.Validate.Progress.CounterFormat");
 			_progress.Interval = 100;
 
-			_Run();
+			//_Run();
+			var task = Task.Run(async() => await RunAsync());
+			while (!task.IsCompleted)
+			{
+				Application.Current.Dispatcher.Invoke(() => { }, DispatcherPriority.Render);
+				System.Threading.Thread.Yield();
+				Application.Current.Dispatcher.Invoke(() => { }, DispatcherPriority.ContextIdle);
+			}
+			bool outcome = task.Result;
 
-			//_progress.Close();
-			//_progress = null;
+			_progress.Events.Stop("", "");
+			_progress = null;
+
+			if (outcome)
+			{
+				MessageBox.Show(Application.Current.MainWindow, 
+					Translate._("Action.Validate.NoErrors"), 
+					Translate._("Action.Validate.Title"));
+			}
+			else
+			{
+				MessageBoxResult res = MessageBox.Show(Application.Current.MainWindow, 
+					string.Format(Translate._("Action.Validate.HasErrors"), _errors), 
+					Translate._("Action.Validate.Title"), 
+					MessageBoxButton.YesNo, MessageBoxImage.Error);
+				if (res == MessageBoxResult.Yes)
+				{
+					_report_sb = new StringBuilder();
+					_report_depth = 0;
+
+					//await Task.Run(() => {
+					var c_task = Task.Run(async() => await _CreateReportAsync());
+					while (!c_task.IsCompleted)
+					{
+						Application.Current.Dispatcher.Invoke(() => { }, DispatcherPriority.Render);
+						System.Threading.Thread.Yield();
+						Application.Current.Dispatcher.Invoke(() => { }, DispatcherPriority.ContextIdle);
+					}
+
+					ShowRawTextDialog.Show("", _report_sb.ToString());
+					_report_sb = null;
+				}
+			}
 		}
 
-
-		internal async static void _Run()
+		public async Task<bool> RunAsync()
 		{
 			bool outcome = false;
 
@@ -69,48 +103,24 @@ namespace SatisfactorySavegameTool.Actions
 				Log.Info("Validation took {0}", ofs);
 			});
 
-			//_progress.Events.Destroy();
-			//_progress = null;
-
-			if (outcome)
-			{
-				MessageBox.Show(Application.Current.MainWindow, 
-					Translate._("Action.Validate.NoErrors"), 
-					Translate._("Action.Validate.Title"));
-			}
-			else
-			{
-				MessageBoxResult res = MessageBox.Show(Application.Current.MainWindow, 
-					string.Format(Translate._("Action.Validate.HasErrors"), _errors), 
-					Translate._("Action.Validate.Title"), 
-					MessageBoxButton.YesNo, MessageBoxImage.Error);
-				if (res == MessageBoxResult.Yes)
-				{
-					//=> TODO
-					_report_sb = new StringBuilder();
-					_report_depth = 0;
-
-					await Task.Run(() => {
-						Log.Info("Creating report ...");
-						DateTime start_time = DateTime.Now;
-
-						_CreateReport();
-
-						DateTime end_time = DateTime.Now;
-						TimeSpan ofs = end_time - start_time;
-						Log.Info("Reporting took {0}", ofs);
-					});
-
-					ShowRawTextDialog.Show("", _report_sb.ToString());
-					_report_sb = null;
-				}
-			}
-
-			_progress.Events.Stop("", "");
-			_progress = null;
+			return outcome;
 		}
 
-		internal static void _ClearAllErrorStates()
+		private async Task _CreateReportAsync()
+		{
+			await Task.Run(() => {
+				Log.Info("Creating report ...");
+				DateTime start_time = DateTime.Now;
+
+				_CreateReport();
+
+				DateTime end_time = DateTime.Now;
+				TimeSpan ofs = end_time - start_time;
+				Log.Info("Reporting took {0}", ofs);
+			});
+		}
+
+		internal void _ClearAllErrorStates()
 		{
 			int total = 1 + _savegame.TotalElements * 10;
 			Log.Debug("Cleaning a {0} elements ...", total);
@@ -136,7 +146,7 @@ namespace SatisfactorySavegameTool.Actions
 			Log.Debug("... done cleaning");
 		}
 
-		internal static void _CleanErrorsRecurs(Property prop)
+		internal void _CleanErrorsRecurs(Property prop)
 		{
 			if (prop == null)
 				return;
@@ -173,7 +183,7 @@ namespace SatisfactorySavegameTool.Actions
 		}
 		
 
-		internal static bool _ValidateAll()
+		internal bool _ValidateAll()
 		{
 			int total = 1 + _savegame.TotalElements * 10;
 			Log.Info("Validating a {0} elements ...", total);
@@ -195,7 +205,7 @@ namespace SatisfactorySavegameTool.Actions
 			return outcome;
 		}
 
-		internal static bool _Validate(Property prop)
+		internal bool _Validate(Property prop)
 		{
 			if (prop == null)
 				return true;
@@ -255,7 +265,7 @@ namespace SatisfactorySavegameTool.Actions
 		}
 
 
-		internal static void _CreateReport()
+		internal void _CreateReport()
 		{
 			int total = 1 + _savegame.TotalElements * 10;
 			//Log.Info("Creating report ...", total);
@@ -282,7 +292,7 @@ namespace SatisfactorySavegameTool.Actions
 			//Log.Info("... done reporting");
 		}
 
-		internal static bool _CreateReportRecurs(Property prop)
+		internal bool _CreateReportRecurs(Property prop)
 		{
 			if (prop == null)
 				return false;
@@ -348,7 +358,7 @@ namespace SatisfactorySavegameTool.Actions
 		*/
 
 
-		internal static void _cbStart(long total, string status, string info)
+		internal void _cbStart(long total, string status, string info)
 		{
 			_count = 0;
 			_errors = 0;
@@ -356,32 +366,32 @@ namespace SatisfactorySavegameTool.Actions
 				_callback.Start(total, status, info);
 		}
 
-		internal static void _cbUpdate(string status, string info)
+		internal void _cbUpdate(string status, string info)
 		{
 			_count++;
 			if (_callback != null) 
 				_callback.Update(_count, status, info);
 		}
 
-		internal static void _cbStop(string status, string info)
+		internal void _cbStop(string status, string info)
 		{
 			if (_callback != null) 
 				_callback.Stop(status, info);//reader->Pos == reader->Size);
 		}
 
-		internal static Savegame.Savegame _savegame;
-		internal static ProgressDialog _progress;
-		internal static ICallback _callback;
-		internal static long _count;
-		internal static int _errors;
-		internal static StringBuilder _report_sb;
-		internal static int _report_depth;
+		internal Savegame.Savegame _savegame;
+		internal ProgressDialog _progress;
+		internal ICallback _callback;
+		internal long _count;
+		internal int _errors;
+		internal StringBuilder _report_sb;
+		internal int _report_depth;
 
 
 		// Reporting helper
 		//
 
-		internal static void _AddToReport(string s)
+		internal void _AddToReport(string s)
 		{
 			_report_sb.Append('\t', _report_depth);
 			_report_sb.AppendLine(s);
@@ -396,14 +406,14 @@ namespace SatisfactorySavegameTool.Actions
 		// 'Scale' instead of 'Vector' and class 'Scale' being a sub-class of 'Vector'.
 		//
 
-		internal static bool _ValidateProperty(Property prop)
+		internal bool _ValidateProperty(Property prop)
 		{
 			if (!_validators.ContainsKey(prop.TypeName))
 				return true;
 			return _validators[prop.TypeName](prop);
 		}
 
-		internal static bool _ValidateObject(object obj)
+		internal bool _ValidateObject(object obj)
 		{
 			//if (!_validators.ContainsKey(prop.TypeName))
 			//	return true;
@@ -448,68 +458,71 @@ namespace SatisfactorySavegameTool.Actions
 			return true;
 		}
 
-		internal static float LOWER_SCALE = +1.0e-10f;
-		internal static float LOWER_BOUND = -1.0e+10f;
-		internal static float UPPER_BOUND = +1.0e+10f;
+		internal const float LOWER_SCALE = +1.0e-10f;
+		internal const float LOWER_BOUND = -1.0e+10f;
+		internal const float UPPER_BOUND = +1.0e+10f;
 
 		internal delegate bool ValidatorFunc(Property prop);
-		internal static Dictionary<string, ValidatorFunc> _validators = new Dictionary<string, ValidatorFunc>
+		internal static Dictionary<string, ValidatorFunc> _validators;
+		internal void _InitValidators()
 		{
-		//vvvvv Must be handled different
-		//	{ "str",					_v_str },
-		//	{ "byte",					_v_byte },
-		//	{ "bool",					_v_bool },
-		//	{ "float",					_v_float },
-		//^^^^^ Must be handled different
+			_validators = new Dictionary<string, ValidatorFunc> {
+			//vvvvv Must be handled different
+			//	{ "str",					_v_str },
+			//	{ "byte",					_v_byte },
+			//	{ "bool",					_v_bool },
+			//	{ "float",					_v_float },
+			//^^^^^ Must be handled different
 
-		//	{ "Property", 				_v_Property },
-			{ "PropertyList", 			_v_PropertyList }, 
-			{ "BoolProperty", 			_v_BoolProperty },
-		//	{ "ByteProperty", 			_v_ByteProperty },
-		//	{ "IntProperty", 			_v_IntProperty },
-		//	{ "FloatProperty", 			_v_FloatProperty },
-		//	{ "StrProperty", 			_v_StrProperty },
-		//	{ "Header", 				_v_Header },
-		//	{ "Collected", 				_v_Collected },
-		//	{ "StructProperty", 		_v_StructProperty },
-			{ "Vector",					_v_Vector },
-			{ "Rotator", 				_v_Rotator },
-			{ "Scale",					_v_Scale },
-			{ "Box", 					_v_Box },
-		//	{ "Color", 					_v_Color },
-			{ "LinearColor", 			_v_LinearColor },
-		//	{ "Transform", 				_v_Transform },
-			{ "Quat", 					_v_Quat },
-		//	{ "RemovedInstanceArray",	_v_RemovedInstanceArray },
-		//	{ "RemovedInstance", 		_v_RemovedInstance },
-		//	{ "InventoryStack", 		_v_InventoryStack },
-		//	{ "InventoryItem", 			_v_InventoryItem },
-		//	{ "PhaseCost", 				_v_PhaseCost },
-		//	{ "ItemAmount",				_v_ItemAmount },
-		//	{ "ResearchCost", 			_v_ResearchCost },
-		//	{ "CompletedResearch", 		_v_CompletedResearch },
-		//	{ "ResearchRecipeReward",	_v_ResearchRecipeReward },
-		//	{ "ItemFoundData", 			_v_ItemFoundData },
-		//	{ "RecipeAmountStruct", 	_v_RecipeAmountStruct },
-		//	{ "MessageData", 			_v_MessageData },
-		//	{ "SplinePointData", 		_v_SplinePointData },
-		//	{ "SpawnData", 				_v_SpawnData },
-		//	{ "FeetOffset",				_v_FeetOffset },
-		//	{ "SplitterSortRule", 		_v_SplitterSortRule },
-		//	{ "ArrayProperty", 			_v_ArrayProperty },
-		//	{ "ObjectProperty", 		_v_ObjectProperty },
-		//	{ "EnumProperty", 			_v_EnumProperty },
-		//	{ "NameProperty", 			_v_NameProperty },
-		//	{ "MapProperty", 			_v_MapProperty },
-		//	{ "TextProperty", 			_v_TextProperty },
-		//	{ "Entity", 				_v_Entity },
-		//	{ "NamedEntity", 			_v_NamedEntity },
-		//	{ "Object", 				_v_Object },
-		//	{ "Actor", 					_v_Actor },
-		};
+			//	{ "Property", 				_v_Property },
+				{ "PropertyList", 			_v_PropertyList }, 
+				{ "BoolProperty", 			_v_BoolProperty },
+			//	{ "ByteProperty", 			_v_ByteProperty },
+			//	{ "IntProperty", 			_v_IntProperty },
+			//	{ "FloatProperty", 			_v_FloatProperty },
+			//	{ "StrProperty", 			_v_StrProperty },
+			//	{ "Header", 				_v_Header },
+			//	{ "Collected", 				_v_Collected },
+			//	{ "StructProperty", 		_v_StructProperty },
+				{ "Vector",					_v_Vector },
+				{ "Rotator", 				_v_Rotator },
+				{ "Scale",					_v_Scale },
+				{ "Box", 					_v_Box },
+			//	{ "Color", 					_v_Color },
+				{ "LinearColor", 			_v_LinearColor },
+			//	{ "Transform", 				_v_Transform },
+				{ "Quat", 					_v_Quat },
+			//	{ "RemovedInstanceArray",	_v_RemovedInstanceArray },
+			//	{ "RemovedInstance", 		_v_RemovedInstance },
+			//	{ "InventoryStack", 		_v_InventoryStack },
+			//	{ "InventoryItem", 			_v_InventoryItem },
+			//	{ "PhaseCost", 				_v_PhaseCost },
+			//	{ "ItemAmount",				_v_ItemAmount },
+			//	{ "ResearchCost", 			_v_ResearchCost },
+			//	{ "CompletedResearch", 		_v_CompletedResearch },
+			//	{ "ResearchRecipeReward",	_v_ResearchRecipeReward },
+			//	{ "ItemFoundData", 			_v_ItemFoundData },
+			//	{ "RecipeAmountStruct", 	_v_RecipeAmountStruct },
+			//	{ "MessageData", 			_v_MessageData },
+			//	{ "SplinePointData", 		_v_SplinePointData },
+			//	{ "SpawnData", 				_v_SpawnData },
+			//	{ "FeetOffset",				_v_FeetOffset },
+			//	{ "SplitterSortRule", 		_v_SplitterSortRule },
+			//	{ "ArrayProperty", 			_v_ArrayProperty },
+			//	{ "ObjectProperty", 		_v_ObjectProperty },
+			//	{ "EnumProperty", 			_v_EnumProperty },
+			//	{ "NameProperty", 			_v_NameProperty },
+			//	{ "MapProperty", 			_v_MapProperty },
+			//	{ "TextProperty", 			_v_TextProperty },
+			//	{ "Entity", 				_v_Entity },
+			//	{ "NamedEntity", 			_v_NamedEntity },
+			//	{ "Object", 				_v_Object },
+			//	{ "Actor", 					_v_Actor },
+			};
+		}
 
 
-		internal static void _AddError(Property prop, string info = null)
+		internal void _AddError(Property prop, string info = null)
 		{
 			string s = string.Format("Invalid value for [{0}]", prop.TypeName);//_("Invalid value(s) for [{}]").format(obj.TypeName)
 			if (!string.IsNullOrEmpty(info))
@@ -518,7 +531,7 @@ namespace SatisfactorySavegameTool.Actions
 			prop.AddError(s);
 		}
 
-		internal static bool _IsValid(float val, float lowerbounds = float.NaN, float upperbounds = float.NaN)
+		internal bool _IsValid(float val, float lowerbounds = float.NaN, float upperbounds = float.NaN)
 		{
 			//global LOWER_BOUND, UPPER_BOUND
 			if (float.IsInfinity(val) || float.IsNaN(val))
@@ -532,7 +545,7 @@ namespace SatisfactorySavegameTool.Actions
 			return true;
 		}
 
-		internal static bool _v_3(Property prop, float a, float b, float c, 
+		internal bool _v_3(Property prop, float a, float b, float c, 
 								  float lowerbounds = float.NaN, float upperbounds = float.NaN)
 		{
 			if (!( _IsValid(a, lowerbounds, upperbounds)
@@ -545,7 +558,7 @@ namespace SatisfactorySavegameTool.Actions
 			return true;
 		}
 
-		internal static bool _v_4(Property prop, float a, float b, float c, float d,
+		internal bool _v_4(Property prop, float a, float b, float c, float d,
 								  float lowerbounds = float.NaN, float upperbounds = float.NaN)
 		{
 			if (!( _IsValid(a, lowerbounds, upperbounds)
@@ -569,7 +582,7 @@ namespace SatisfactorySavegameTool.Actions
 		// Actual validators
 		//
 
-		internal static bool _v_PropertyList(Property obj)
+		internal bool _v_PropertyList(Property obj)
 		{
 			PropertyList proplist = obj as PropertyList;
 			bool outcome = true;
@@ -589,7 +602,7 @@ namespace SatisfactorySavegameTool.Actions
 			return outcome;
 		}
 
-		internal static bool _v_BoolProperty(Property obj)
+		internal bool _v_BoolProperty(Property obj)
 		{
 			BoolProperty bool_prop = obj as BoolProperty;
 			if (!_IsValid((byte)bool_prop.Value, 0, 1))
@@ -600,28 +613,28 @@ namespace SatisfactorySavegameTool.Actions
 			return true;
 		}
 
-		internal static bool _v_Vector(Property obj)
+		internal bool _v_Vector(Property obj)
 		{
 			return _v_VectorP2(obj, float.NaN);
 		}
-		internal static bool _v_VectorP2(Property obj, float lowerbounds = float.NaN)
+		internal bool _v_VectorP2(Property obj, float lowerbounds = float.NaN)
 		{
 			Savegame.Properties.Vector v = obj as Savegame.Properties.Vector;
 			return _v_3(obj, v.X, v.Y, v.Z, lowerbounds);
 		}
 
-		internal static bool _v_Rotator(Property obj)
+		internal bool _v_Rotator(Property obj)
 		{
 			Rotator rot = obj as Rotator;
 			return _v_3(obj, rot.X, rot.Y, rot.Z);
 		}
 
-		internal static bool _v_Scale(Property obj)
+		internal bool _v_Scale(Property obj)
 		{
 			return _v_VectorP2(obj, LOWER_SCALE);
 		}
 
-		internal static bool _v_Box(Property obj)
+		internal bool _v_Box(Property obj)
 		{
 			Box b = obj as Box;
 			bool outcome = true;
@@ -642,7 +655,7 @@ namespace SatisfactorySavegameTool.Actions
 			return outcome;
 		}
 
-		internal static bool _v_LinearColor(Property obj)
+		internal bool _v_LinearColor(Property obj)
 		{
 			LinearColor col = obj as LinearColor;
 			if (!( _IsValid(col.R, 0.0f, 1.0f) 
@@ -656,7 +669,7 @@ namespace SatisfactorySavegameTool.Actions
 			return true;
 		}
 
-		internal static bool _v_Quat(Property obj)
+		internal bool _v_Quat(Property obj)
 		{
 			Quat quat = obj as Quat;
 			if (float.IsInfinity(quat.D) || float.IsNaN(quat.D))
