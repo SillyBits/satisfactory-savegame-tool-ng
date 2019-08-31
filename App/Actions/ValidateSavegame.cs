@@ -68,7 +68,6 @@ namespace SatisfactorySavegameTool.Actions
 					_report_sb = new StringBuilder();
 					_report_depth = 0;
 
-					//await Task.Run(() => {
 					var c_task = Task.Run(async() => await _CreateReportAsync());
 					while (!c_task.IsCompleted)
 					{
@@ -87,7 +86,7 @@ namespace SatisfactorySavegameTool.Actions
 		{
 			bool outcome = false;
 
-			await Task.Run(() => {
+			return await Task.Run(() => {
 				Log.Info("Starting up validation ...");
 				DateTime start_time = DateTime.Now;
 
@@ -101,9 +100,9 @@ namespace SatisfactorySavegameTool.Actions
 				DateTime end_time = DateTime.Now;
 				TimeSpan ofs = end_time - start_time;
 				Log.Info("Validation took {0}", ofs);
-			});
 
-			return outcome;
+				return outcome;
+			});
 		}
 
 		private async Task _CreateReportAsync()
