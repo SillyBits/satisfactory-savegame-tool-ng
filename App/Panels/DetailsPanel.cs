@@ -518,24 +518,18 @@ namespace SatisfactorySavegameTool.Panels.Details
 		}
 	}
 
-	internal class FloatControl : TextBox, IValueContainer<float>
+	internal class FloatControl : MaskedTextBox<float>, IValueContainer<float>
 	{
-		internal readonly string _format = "{0:F5}"; //TODO: Translate._("");
-
 		internal FloatControl(float val)
 			: base()
 		{
 			Width = new GridLength((Math.Abs(val) > 1e7f) ? 200 : 100).Value;
 			HorizontalAlignment = HorizontalAlignment.Left;
 			TextAlignment = TextAlignment.Right;
+			Mask = @"^[<S>]?([0-9]{1,3}(<T>[0-9]{3})|[0-9])*(<D>[0-9]{0,5})?$";
 			Value = val;
 		}
 
-		public float Value
-		{
-			get { return _Parse(Text).Value; }
-			set	{ Text = string.Format(CultureInfo.CurrentUICulture, _format, value); }
-		}
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -544,38 +538,20 @@ namespace SatisfactorySavegameTool.Panels.Details
 			if (IsInitialized && e.Property == TextProperty)
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Value"));
 		}
-
-		private static float? _Parse(string text, bool test_only = false)
-		{
-			float value;
-			if (!float.TryParse(text, NumberStyles.Float|NumberStyles.AllowThousands, CultureInfo.CurrentUICulture, out value))
-			{
-				if (!test_only)
-					throw new FormatException("Input for float value is invalid"); //TODO: Translate._("");
-				return null;
-			}
-			return value;
-		}
 	}
 
-	internal class ByteControl : TextBox, IValueContainer<byte> // Might change to wx.SpinCtrl later
+	internal class ByteControl : MaskedTextBox<byte>, IValueContainer<byte> // Might change to wx.SpinCtrl later
 	{
-		internal readonly string _format = "{0}"; //TODO: Translate._("");
-
 		internal ByteControl(byte val)
 			: base()
 		{
 			Width = new GridLength(50).Value;
 			HorizontalAlignment = HorizontalAlignment.Left;
 			TextAlignment = TextAlignment.Right;
+			Mask = @"^[0-9]{1,3}$";
 			Value = val;
 		}
 
-		public byte Value
-		{
-			get { return _Parse(Text).Value; }
-			set { Text = string.Format(_format, value); }
-		}
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -584,38 +560,20 @@ namespace SatisfactorySavegameTool.Panels.Details
 			if (IsInitialized && e.Property == TextProperty)
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Value"));
 		}
-
-		private static byte? _Parse(string text, bool test_only = false)
-		{
-			byte value;
-			if (!byte.TryParse(text, NumberStyles.Integer|NumberStyles.AllowThousands, CultureInfo.CurrentUICulture, out value))
-			{
-				if (!test_only)
-					throw new FormatException("Input for byte value is invalid"); //TODO: Translate._("");
-				return null;
-			}
-			return value;
-		}
 	}
 
-	internal class IntControl : TextBox, IValueContainer<int> // Might change to wx.SpinCtrl later
+	internal class IntControl : MaskedTextBox<int>, IValueContainer<int> // Might change to wx.SpinCtrl later
 	{
-		internal readonly string _format = "{0:#,#0}"; //TODO: Translate._("");
-
 		internal IntControl(int val)
 			: base()
 		{
 			Width = new GridLength((Math.Abs(val) > 1e10) ? 200 : 100).Value;
 			HorizontalAlignment = HorizontalAlignment.Left;
 			TextAlignment = TextAlignment.Right;
+			Mask = @"^[<S>]?([0-9]{1,3}(<T>[0-9]{3})|[0-9])*$";
 			Value = val;
 		}
 
-		public int Value
-		{
-			get { return _Parse(Text).Value; }
-			set { Text = string.Format(_format, value); }
-		}
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -624,38 +582,20 @@ namespace SatisfactorySavegameTool.Panels.Details
 			if (IsInitialized && e.Property == TextProperty)
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Value"));
 		}
-
-		private static int? _Parse(string text, bool test_only = false)
-		{
-			int value;
-			if (!int.TryParse(text, NumberStyles.Integer|NumberStyles.AllowThousands, CultureInfo.CurrentUICulture, out value))
-			{
-				if (!test_only)
-					throw new FormatException("Input for int value is invalid"); //TODO: Translate._("");
-				return null;
-			}
-			return value;
-		}
 	}
 
-	internal class LongControl : TextBox, IValueContainer<long> // Might change to wx.SpinCtrl later
+	internal class LongControl : MaskedTextBox<long>, IValueContainer<long> // Might change to wx.SpinCtrl later
 	{
-		internal readonly string _format = "{0:#,#0}"; //TODO: Translate._("");
-
 		internal LongControl(long val)
 			: base()
 		{
 			Width = new GridLength(200).Value;
 			HorizontalAlignment = HorizontalAlignment.Left;
 			TextAlignment = TextAlignment.Right;
+			Mask = @"^[<S>]?([0-9]{1,3}(<T>[0-9]{3})|[0-9])*$";
 			Value = val;
 		}
 
-		public long Value
-		{
-			get	{ return _Parse(Text).Value; }
-			set	{ Text = string.Format(_format, value); }
-		}
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -663,18 +603,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 			base.OnPropertyChanged(e);
 			if (IsInitialized && e.Property == TextProperty)
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Value"));
-		}
-
-		private static long? _Parse(string text, bool test_only = false)
-		{
-			long value;
-			if (!long.TryParse(text, NumberStyles.Integer|NumberStyles.AllowThousands, CultureInfo.CurrentUICulture, out value))
-			{
-				if (!test_only)
-					throw new FormatException("Input for long value is invalid"); //TODO: Translate._("");
-				return null;
-			}
-			return value;
 		}
 	}
 
