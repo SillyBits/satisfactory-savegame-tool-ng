@@ -93,27 +93,35 @@ namespace SatisfactorySavegameTool
 
 		protected override void OnClosing(CancelEventArgs e)
 		{
-			// Save window state
-			dynamic wnd;
-			if (!Config.Root.HasSection("window"))
+			if (!_CloseGamefile())
 			{
-				wnd = Config.Root.AddSection("window");
-				wnd.AddItem("state"   , WindowState.ToString());
-				wnd.AddItem("pos_x"   , (int)Left);
-				wnd.AddItem("pos_y"   , (int)Top);
-				wnd.AddItem("size_x"  , (int)Width);
-				wnd.AddItem("size_y"  , (int)Height);
-				wnd.AddItem("splitter", (int)MainGrid.ColumnDefinitions[0].ActualWidth);
+				// User decided to save before closing, so cancel closing
+				e.Cancel = true;
 			}
 			else
 			{
-				wnd = Config.Root.window;
-				wnd.state    = WindowState.ToString();
-				wnd.pos_x    = (int)Left;
-				wnd.pos_y    = (int)Top;
-				wnd.size_x   = (int)Width;
-				wnd.size_y   = (int)Height;
-				wnd.splitter = (int)MainGrid.ColumnDefinitions[0].ActualWidth;
+				// Save window state
+				dynamic wnd;
+				if (!Config.Root.HasSection("window"))
+				{
+					wnd = Config.Root.AddSection("window");
+					wnd.AddItem("state"   , WindowState.ToString());
+					wnd.AddItem("pos_x"   , (int)Left);
+					wnd.AddItem("pos_y"   , (int)Top);
+					wnd.AddItem("size_x"  , (int)Width);
+					wnd.AddItem("size_y"  , (int)Height);
+					wnd.AddItem("splitter", (int)MainGrid.ColumnDefinitions[0].ActualWidth);
+				}
+				else
+				{
+					wnd = Config.Root.window;
+					wnd.state    = WindowState.ToString();
+					wnd.pos_x    = (int)Left;
+					wnd.pos_y    = (int)Top;
+					wnd.size_x   = (int)Width;
+					wnd.size_y   = (int)Height;
+					wnd.splitter = (int)MainGrid.ColumnDefinitions[0].ActualWidth;
+				}
 			}
 
 			base.OnClosing(e);
