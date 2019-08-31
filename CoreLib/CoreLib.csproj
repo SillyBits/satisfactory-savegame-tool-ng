@@ -49,6 +49,7 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="AttributeHelpers.cs" />
     <Compile Include="Callback.cs" />
     <Compile Include="Compressor.cs" />
     <Compile Include="ConfigFile.cs" />
