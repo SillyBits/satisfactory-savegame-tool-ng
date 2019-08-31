@@ -12,13 +12,14 @@ using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-using SatisfactorySavegameTool.Dialogs;
-using SatisfactorySavegameTool.Supplements;
-
 using CoreLib;
 
 using Savegame.Properties;
 using P = Savegame.Properties;
+
+using SatisfactorySavegameTool.Dialogs;
+using SatisfactorySavegameTool.Supplements;
+
 
 /*
  * TODO:

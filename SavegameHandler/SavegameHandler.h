@@ -230,14 +230,6 @@ namespace Savegame {
 				_cbStop(nullptr, nullptr);
 				reader->Close();
 				reader = nullptr;
-
-				//vvvvv DEBUG
-				//fn = path.join(wx.App.Get().Path, "reports", 
-				//	"Classes#{}.log".format(self.Header.BuildVersion))
-				//with open(fn, "wt") as fd:
-				//	for n in Property.class_names:
-				//		fd.write(n+"\n")
-				//^^^^^ DEBUG
 			}
 		}
 

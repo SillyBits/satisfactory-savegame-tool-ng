@@ -98,8 +98,8 @@ namespace CoreLib
 
 			int col = 0;
 			int w = (width * 3) + (width >> 2);
-			StringBuilder hex = new StringBuilder(w*2);
-			StringBuilder asc = ascii ? new StringBuilder(width*2) : null;
+			StringBuilder hex = new StringBuilder(w * 2);
+			StringBuilder asc = ascii ? new StringBuilder(width * 2) : null;
 
 			hex.Append(' ');
 			if (ascii)

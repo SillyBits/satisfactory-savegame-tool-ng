@@ -27,6 +27,9 @@ namespace SatisfactorySavegameTool.Panels
 	 * 
 	 * - Add better tree style handling
 	 * 
+	 * - When a tree gets modified in one tab later on, e.g. by adding/removing an object, how
+	 *   to populate those changes in a cheap way w/o the need for re-building tree?
+	 * 
 	 */
 	
 	public class TreePanel : TabControl
