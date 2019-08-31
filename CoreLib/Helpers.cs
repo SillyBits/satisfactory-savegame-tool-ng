@@ -259,6 +259,79 @@ namespace CoreLib
 			byte[] uncompressed = Compressor.Deflate(bytes);
 			return Encoding.ASCII.GetString(uncompressed);
 		}
+
+
+		/// <summary>
+		/// Used to pick a public method from within a "container" class.
+		/// Note that this approach does NOT distinguish between different return parameter types.
+		/// Also note, when dealing with 'out' or 'ref', make sure to pass a 'ByRef' type (by calling Type.MakeByRefType).
+		/// </summary>
+		/// <param name="container">Container class to search</param>
+		/// <param name="name">Method name</param>
+		/// <param name="args">Method's parameters</param>
+		/// <returns>Method info, or null if not found</returns>
+		public static MethodInfo PickMethod(Type container, string name, params Type[] args)
+		{
+			return PickMethod(container, BindingFlags.Instance | BindingFlags.Public, name, args);
+		}
+
+		/// <summary>
+		/// Used to pick a static method from within a "container" class.
+		/// Note that this approach does NOT distinguish between different return parameter types.
+		/// Also note, when dealing with 'out' or 'ref', make sure to pass a 'ByRef' type (by calling Type.MakeByRefType).
+		/// </summary>
+		/// <param name="container">Container class to search</param>
+		/// <param name="name">Method name</param>
+		/// <param name="args">Method's parameters</param>
+		/// <returns>Method info, or null if not found</returns>
+		public static MethodInfo PickStaticMethod(Type container, string name, params Type[] args)
+		{
+			return PickMethod(container, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, name, args);
+		}
+
+		/// <summary>
+		/// Used to pick a method from within a "container" class.
+		/// Note that this approach does NOT distinguish between different return parameter types.
+		/// Also note, when dealing with 'out' or 'ref', make sure to pass a 'ByRef' type (by calling Type.MakeByRefType).
+		/// </summary>
+		/// <param name="container">Container class to search</param>
+		/// <param name="bind_flags">Binding flags to use</param>
+		/// <param name="name">Method name</param>
+		/// <param name="args">Method's parameters</param>
+		/// <returns>Method info, or null if not found</returns>
+		public static MethodInfo PickMethod(Type container, BindingFlags bind_flags, string name, params Type[] args)
+		{
+			try
+			{
+				MethodInfo method = container.GetMethod(name, bind_flags, null, args, null);
+				if (method != null)
+					return method;
+			}
+			catch (AmbiguousMatchException)
+			{ }
+
+			// No exact match avail or ambiguous, traverse methods avail and try to pick one.
+			// For this to work as expected, any generic method must be located after any if 
+			// it's non-generic overloads.
+			var methods = container
+				.GetMethods(bind_flags)
+				.Where(mi => mi.Name == name)
+				;
+			foreach (MethodInfo mi in methods)
+			{
+				var parms = mi.GetParameters();
+				if (parms.Length == args.Length)
+				{
+					bool matches = true;
+					for (int i = 0; i < args.Length; ++i)
+						matches &= (parms[i].ParameterType == args[i]);
+					if (matches)
+						return mi;
+				}
+			}
+
+			return null;
+		}
 	}
 
 }
