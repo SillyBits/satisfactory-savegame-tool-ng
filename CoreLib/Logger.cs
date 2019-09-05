@@ -173,8 +173,11 @@ namespace CoreLib
 
 			string s = msg + ":\n"
 				+ "Message   : " + exc.Message + "\n"
-				+ "TargetSite: " + exc.TargetSite.Name + ", " + exc.TargetSite.Module.FullyQualifiedName + "\n"
-				+ "Source    : " + exc.Source + "\n"
+				;
+			if (exc.TargetSite != null)
+				msg += "TargetSite: " + exc.TargetSite.Name + ", " + exc.TargetSite.Module.FullyQualifiedName + "\n"
+					;
+			msg += "Source    : " + exc.Source + "\n"
 				+ "StackTrace:\n" 
 				+ stack_trace + "\n"
 				;

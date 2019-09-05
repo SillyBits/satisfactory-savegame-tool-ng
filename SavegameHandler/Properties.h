@@ -818,7 +818,7 @@ namespace Savegame
 				ValueProperty^ prop = (ValueProperty^) Value[i];
 				if (*(prop->Name) == "Scale3D")
 				{
-					prop->Value = Scale::FromVector((Vector^)prop->Value);
+					prop->Value = Savegame::Properties::Scale::FromVector((Vector^)prop->Value);
 					break;
 				}
 			}
@@ -1381,7 +1381,7 @@ namespace Savegame
 		PUB_i(NeedTransform)
 		PUB(Rotation,Quat^)
 		PUB(Translate,Vector^)
-		PUB(Scale,Scale^)
+		PUB(Scale,Savegame::Properties::Scale^)
 		PUB_i(WasPlacedInLevel)
 		PUB(EntityObj,Property^)
 		READ

@@ -54,7 +54,9 @@ namespace SatisfactorySavegameTool.Supplements
 		/// <param name="action">Action to trigger on nodes visited</param>
 		public void Run(string title, Runner action)
 		{
-			_progress = new ProgressDialog(Application.Current.MainWindow, title);
+			Application.Current.Dispatcher.Invoke(() => {
+				_progress = new ProgressDialog(Application.Current.MainWindow, title);
+			});
 			_progress.CounterFormat = Translate._("HierarchyRunner.Progress.CounterFormat");
 			_progress.Interval = !_deep_run ? 1000 : 10000;
 

@@ -93,6 +93,7 @@
     <Compile Include="Supplements\Callback.cs" />
     <Compile Include="Supplements\Enums.cs" />
     <Compile Include="Supplements\Extensions.cs" />
+    <Compile Include="Supplements\Helper.cs" />
     <Compile Include="Supplements\HierarchyRunner.cs" />
     <Compile Include="Supplements\Splashscreen.xaml.cs">
       <DependentUpon>Splashscreen.xaml</DependentUpon>

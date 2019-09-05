@@ -429,7 +429,7 @@ namespace TestBed
 			//TestSavegame();
 			//TestSavegameLoader();
 			//TestConfigFile();
-			TestRegex();
+			//TestRegex();
 		}
 
 

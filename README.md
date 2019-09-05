@@ -13,9 +13,10 @@ You can also get ready-made executables in the download section at
 https://www.satisfactory-forum.de.
 
 
-Credits to bitowl, S4XXX and Goz3rr for their work on deciphering 
-the structure of satisfactory savegames.
+Credits to bitowl, S4XXX, Goz3rr and Vilsol for their work on deciphering the 
+structure of satisfactory savegames.
 Also thanks to Panossa for doing the graphics.
+
 
 Cheers, and always remember:
 

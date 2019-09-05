@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
@@ -16,6 +17,11 @@ namespace SatisfactorySavegameTool.Supplements
 	/// </summary>
 	public static class Extensions
 	{
+		public static List<_KeyType> Keys<_KeyType,_ValueType>(this Dictionary<_KeyType,_ValueType> dict)
+		{
+			return dict.ToList().Select(pair => pair.Key).ToList();
+		}
+
 
 		public static string ToLongString(this Exception exc)
 		{
@@ -110,10 +116,49 @@ namespace SatisfactorySavegameTool.Supplements
 		}
 
 
-		// Find a value property by name
-		internal static P.Property Named(this P.Properties props, string name)
+		// Get all named value properties
+		internal static List<string> Names(this P.Properties props)
 		{
-			return props.Find(prop => {
+			return props
+				.Where(prop => (prop is P.ValueProperty) && !str.IsNullOrEmpty((prop as P.ValueProperty).Name))
+				.Select(prop => {
+					P.ValueProperty val = prop as P.ValueProperty;
+					string s = val.Name.ToString();
+					if (val.Index != 0)
+						s += "#" + val.Index;
+					return s;
+				})
+				.ToList()
+				;
+		}
+
+		// Find a value property by name
+		internal static P.Property Named(this P.Properties props, string name, int index = -1)
+		{
+			if (index < 0)
+			{
+				int pos = name.IndexOf('#');
+				if (pos > 0)
+				{
+					string idx = name.Substring(pos + 1);
+					name = name.Substring(0, pos);
+					if (!int.TryParse(idx, out index))
+						return null;
+				}
+			}
+			if (index >= 0)
+				return props.FirstOrDefault(prop => {
+					if (prop is P.ValueProperty)
+					{
+						P.ValueProperty val = prop as P.ValueProperty;
+						str prop_name = val.Name;
+						if (!str.IsNullOrEmpty(prop_name))
+							return (val.Index == index) && (prop_name.ToString() == name);
+					}
+					return false;
+				});
+
+			return props.FirstOrDefault(prop => {
 				if (prop is P.ValueProperty)
 				{
 					str prop_name = (prop as P.ValueProperty).Name;

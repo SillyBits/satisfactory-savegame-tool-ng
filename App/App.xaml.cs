@@ -22,11 +22,12 @@ namespace SatisfactorySavegameTool
     /// </summary>
     public partial class App : Application
     {
-		protected Uploader _uploader = null;
-		protected Logger _logger = null;
-		protected ConfigFile _config = null;
-		protected LanguageHandler _languages = null;
-		protected VersionTable _versions = null;
+		protected Uploader        _uploader;
+		protected Logger          _logger;
+		protected ConfigFile      _config;
+		protected LanguageHandler _languages;
+
+		protected VersionTable    _versions;
 
 
 		protected override void OnStartup(StartupEventArgs e)
@@ -52,8 +53,8 @@ namespace SatisfactorySavegameTool
 
 			Settings.Init();
 
-			_versions = new VersionTable();
-			// Add more, like research table
+			Splashscreen.SetMessage("Loading tables");
+			_versions   = new VersionTable();
 
 			base.OnStartup(e);
 		}
