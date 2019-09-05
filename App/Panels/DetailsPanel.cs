@@ -47,6 +47,10 @@ namespace SatisfactorySavegameTool.Panels
 
 		internal void ShowProperty(Property prop)
 		{
+			// Prevent re-displaying as tree might have fired OnSelChange while scrolling
+			if (_curr_vis == prop)
+				return;
+
 			_ClearAll();
 
 			Log.Debug("Visualizing property '{0}'", prop != null ? prop.ToString() : EMPTY);
@@ -59,31 +63,47 @@ namespace SatisfactorySavegameTool.Panels
 			}
 			(element as INotifyPropertyChanged).PropertyChanged += Panel_PropertyChanged;
 			Children.Add(element.Visual);
+
+			_curr_vis = prop;
 		}
 
 		internal void ShowLiving(LivingTree.Living living)
 		{
+			// Prevent re-displaying as tree might have fired OnSelChange while scrolling
+			if (_curr_vis == living)
+				return;
+
 			_ClearAll();
 
 			Log.Debug("Visualizing living entity '{0}'", living != null ? living.Title : EMPTY);
 			Details.IElement element = new Details.LivingEntity(living);
 			(element as INotifyPropertyChanged).PropertyChanged += Panel_PropertyChanged;
 			Children.Add(element.Visual);
+
+			_curr_vis = living;
 		}
 
 		internal void ShowBuilding(BuildingsTree.Building building)
 		{
+			// Prevent re-displaying as tree might have fired OnSelChange while scrolling
+			if (_curr_vis == building)
+				return;
+
 			_ClearAll();
 
 			Log.Debug("Visualizing building '{0}'", building != null ? building.Title : EMPTY);
 			Details.IElement element = new Details.Building(building);
 			(element as INotifyPropertyChanged).PropertyChanged += Panel_PropertyChanged;
 			Children.Add(element.Visual);
+
+			_curr_vis = building;
 		}
 
 
 		internal void _ClearAll()
 		{
+			_curr_vis = null;
+
 			foreach (var child in Children)
 				(child as INotifyPropertyChanged).PropertyChanged -= Panel_PropertyChanged;
 			Children.Clear();
@@ -95,6 +115,7 @@ namespace SatisfactorySavegameTool.Panels
 			Modified?.Invoke();
 		}
 
+		private object _curr_vis;
 	}
 
 }
@@ -134,6 +155,9 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 		internal static Dictionary<string, CreatorFunc> _named = new Dictionary<string, CreatorFunc>
 		{
+			{ "ClassName",			(p,l,o) => new ReadonlySimpleValueControl<str>(p, l, (str)o) },
+			{ "LevelName",			(p,l,o) => new ReadonlySimpleValueControl<str>(p, l, (str)o) },
+			{ "PathName",			(p,l,o) => new ReadonlySimpleValueControl<str>(p, l, (str)o) },
 			{ "Length",				(p,l,o) => new ReadonlySimpleValueControl<int>(p, l, (int)o) },
 			{ "Missing",			(p,l,o) => new HexdumpControl(p, l, o as byte[]) },
 			{ "Unknown",			(p,l,o) => new HexdumpControl(p, l, o as byte[]) },
@@ -478,7 +502,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			if (val is float)	return new FloatControl ((float) val);
 			if (val is str)		return new StrControl   ((str)   val);
 			// Last resort: Simple .ToString
-			return				       new StringControl(val.ToString());
+			return new StringControl(val != null ? val.ToString() : DetailsPanel.EMPTY);
 		}
 	}
 
@@ -3260,17 +3284,21 @@ namespace SatisfactorySavegameTool.Panels.Details
 			P.Actor building = tag.Actor;
 			P.NamedEntity ent_named = building.EntityObj as P.NamedEntity;
 
+			// Find base type
+			//
+			string b_pathname = building.PathName.ToString();
+
 			// Is this a passive or active actor?
 			// - Passives: E.g. walls, conveyors, merger, ... -> Connectors only (up to 3 inputs, 1 output)
 			// - Active  : E.g. constructors, miner, ...      -> Above (up to 4 inputs) plus invi(s), power, ...
 			bool is_passive = (ent_named.Value.Named("mCurrentRecipe") == null);
 
 			// Is this a simple conveyor?
-			bool is_conveyor = (building.PathName.ToString().Contains("ConveyorBeltMk") 
-				|| building.PathName.ToString().Contains("ConveyorLiftMk"));
+			bool is_conveyor = (b_pathname.Contains("ConveyorBeltMk") || b_pathname.Contains("ConveyorLiftMk"));
 
 			// Is this a simple power pole?
-			bool is_powerpole = (building.PathName.ToString().Contains("PowerPoleMk"));
+			bool is_powerpole = b_pathname.Contains("PowerPoleMk");
+
 
 			// Start generating visuals
 			//
@@ -3523,7 +3551,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 				_try_add_inventory("Storage", ".StorageInventory");
 
 				// Some machines do have an inventory potential, the OC slots ^^
-				//TODO: Add those
 				//|-> [FloatProperty] mCurrentPotential
 				//|  .Name = str:'mCurrentPotential'
 				//|  .Length = Int32:4
@@ -3549,7 +3576,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 				}
 
 				_try_add_inventory("Overclocking slots", ".InventoryPotential");
-
 
 				// All buildings do have a power consumption info
 				// *.powerInfo
@@ -3584,7 +3610,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 					{
 						prop = entity.Value.Named("mTargetConsumption");
 						if (prop is P.FloatProperty)
-							_childs.Add(MainFactory.Create(this, "Power consumption [kW?]", (prop as P.FloatProperty).Value));
+							_childs.Add(MainFactory.Create(this, "Power consumption [MW]", (prop as P.FloatProperty).Value));
 					}
 				}
 
@@ -3593,8 +3619,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 				_try_add_power_conn("Power connection", ".PowerConnection");
 				_try_add_power_conn("Power connection", ".FGPowerConnection");
 
-				// Buildings with dynamic legs will also carry those offsets
-				//
+				// Buildings with dynamic legs will also carry those cached offsets
 				//-> [Object] /Script/FactoryGame.FGFactoryLegsComponent
 				//  .ClassName = str:'/Script/FactoryGame.FGFactoryLegsComponent'
 				//  .LevelName = str:'Persistent_Level'
@@ -3631,10 +3656,26 @@ namespace SatisfactorySavegameTool.Panels.Details
 				//TODO: Add .Private, if any
 			}
 
-
-			// Handle type-specific childs remaining
+			// Handle any type-specific child remaining
 			if (is_passive)
 			{
+				//	|-> [ArrayProperty] mSortRules
+				//	|  .InnerType = str:'StructProperty'
+				//	|  .Name = str:'mSortRules'
+				//	|  .Length = Int32:522
+				//	|  .Index = Int32:0
+				//	|  .Value =
+				//	|	-> [StructProperty] mSortRules
+				//	|	  .Unknown = list<Byte>(17):[0,]
+				//	|	  .Name = str:'mSortRules'
+				//	|	  .Length = Int32:438
+				//	|	  .Index = Int32:0
+				//	|	  .Value =
+				//	|		/ List with 3 elements:
+				prop = ent_named.Value.Named("mSortRules");
+				if (prop is P.ArrayProperty)
+					_childs.Add(new SortRules(this, "Sort rules", prop));
+
 				// Some passive buildings will also carry snap-only data
 
 				//TODO:
@@ -3659,6 +3700,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 				//|  .Length = Int32:4
 				//|  .Index = Int32:0
 				//|  .Value = Int32:2
+				// Same with mLastOutputIndex (smart + programmable splitters)
+				// Same with mIsProducing (simple splitters)
 			}
 			else
 			{
@@ -3666,34 +3709,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 				//
 
 				// What to do with those? Also contained in "Children"
-				//|-> [ObjectProperty] Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.InputInventory
-				//|  .LevelName = str:'Persistent_Level'
-				//|  .PathName = str:'Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.InputInventory'
-				//|  .Name = str:'mInputInventory'
-				//|  .Length = Int32:100
-				//|  .Index = Int32:0
-				//|  .Value = <empty>
-				//|-> [ObjectProperty] Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.OutputInventory
-				//|  .LevelName = str:'Persistent_Level'
-				//|  .PathName = str:'Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.OutputInventory'
-				//|  .Name = str:'mOutputInventory'
-				//|  .Length = Int32:101
-				//|  .Index = Int32:0
-				//|  .Value = <empty>
-				//|-> [ObjectProperty] Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.powerInfo
-				//|  .LevelName = str:'Persistent_Level'
-				//|  .PathName = str:'Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.powerInfo'
-				//|  .Name = str:'mPowerInfo'
-				//|  .Length = Int32:95
-				//|  .Index = Int32:0
-				//|  .Value = <empty>
-				//|-> [ObjectProperty] Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.InventoryPotential
-				//|  .LevelName = str:'Persistent_Level'
-				//|  .PathName = str:'Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.InventoryPotential'
-				//|  .Name = str:'mInventoryPotential'
-				//|  .Length = Int32:104
-				//|  .Index = Int32:0
-				//|  .Value = <empty>
+				//=> None yet. Find more "dangling" childs not consumed yet
 
 				// Ignored for now:
 				//
@@ -3756,7 +3772,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 				//|        |   ...
 				//|		|	\ end of list
 				//|		\ end of list
-				VersionTable.Version version = MainWindow.CurrFile.Header.GetVersion();
 				List<object[]> rows = new List<object[]>();
 				foreach (P.ItemAmount amount in coll)
 				{
@@ -3997,6 +4012,138 @@ namespace SatisfactorySavegameTool.Panels.Details
 			}
 
 			private P.Object _object;
+		}
+
+		internal class SortRules : Expando
+		{
+			public SortRules(IElement parent, string label, object obj)
+				: base(parent, label, null)
+			{
+				_array = obj as P.ArrayProperty;
+			}
+
+			internal override void _CreateChilds()
+			{
+				//|-> [ArrayProperty] mSortRules
+				//|  .InnerType = str:'StructProperty'
+				//|  .Name = str:'mSortRules'
+				//|  .Length = Int32:522
+				//|  .Index = Int32:0
+				//|  .Value =
+				//|	-> [StructProperty] mSortRules
+				//|	  .Unknown = list<Byte>(17):[0,]
+				//|	  .Name = str:'mSortRules'
+				//|	  .Length = Int32:438
+				//|	  .Index = Int32:0
+				//|	  .Value =
+				//|		/ List with 3 elements:
+				P.StructProperty stru = _array.Value as P.StructProperty;
+
+				_childs = new List<IElement>();
+				List<P.SplitterSortRule> rules = stru.Value.ListOf<P.SplitterSortRule>();
+
+				Header = "Sort rules";
+				if (rules.Count == 0)
+					IsEnabled = false;
+
+				Action<string, List<P.SplitterSortRule>> build_listview = (list_label, coll) => {
+					int index = 0;
+					List<object[]> rows = new List<object[]>();
+					foreach (P.SplitterSortRule rule in coll)
+					{
+						P.Properties props = rule.Value as P.Properties;
+
+						//|		|-> [SplitterSortRule].Value[2]
+						//|		|  .Value =
+						//|		|	/ List with 2 elements:
+						//|		|	|-> [ObjectProperty] /Script/FactoryGame.FGWildCardDescriptor
+						//|		|	 or [ObjectProperty] /Script/FactoryGame.FGNoneDescriptor
+						//|		|	 or [ObjectProperty] (empty .PathName)
+						//|		|	 or [ObjectProperty] /Game/FactoryGame/Resource/RawResources/OreBauxite/Desc_OreBauxite.Desc_OreBauxite_C
+						//|		|	|  .LevelName = str:''
+						//|		|	|  .PathName = str:'/Script/FactoryGame.FGWildCardDescriptor'
+						//|		|	|  .Name = str:'ItemClass'
+						//|		|	|  .Length = Int32:49
+						//|		|	|  .Index = Int32:0
+						//|		|	|  .Value = <empty>
+						//|		|	|-> [IntProperty] OutputIndex
+						//|		|	|  .Name = str:'OutputIndex'
+						//|		|	|  .Length = Int32:4
+						//|		|	|  .Index = Int32:0
+						//|		|	|  .Value = Int32:0
+						//|		|	\ end of list
+						P.ObjectProperty objprop = props.Named("ItemClass") as P.ObjectProperty;
+						string item_name = objprop.PathName.LastName();
+						if (!string.IsNullOrEmpty(item_name))
+						{
+							if (Translate.Has(item_name))
+								item_name = Translate._(item_name);
+						}
+						else
+						{
+							item_name = "None";
+						}
+
+						if (list_label == null)
+						{
+							P.IntProperty output = props.Named("OutputIndex") as P.IntProperty;
+							string item_output = ((OutputIndex)((int)output.Value)).ToString();
+
+							rows.Add(new object[] {
+								item_output,
+								item_name,
+							});
+						}
+						else
+						{
+							++index;
+							string label = index.ToString();
+
+							rows.Add(new object[] {
+								label,
+								item_name
+							});
+						}
+					}
+
+					List<ListViewControl.ColumnDefinition> columns = new List<ListViewControl.ColumnDefinition>();
+					if (list_label == null)
+						columns.Add(new ListViewControl.ColumnDefinition("Side", 50));
+					else
+						columns.Add(new ListViewControl.ColumnDefinition("#", 25));
+					columns.Add(new ListViewControl.ColumnDefinition("Item", 150));
+
+					ListViewControl lvc = new ListViewControl(columns.ToArray());
+					if (list_label != null)
+						lvc.Label = list_label;
+					lvc.Value = rows;
+
+					_childs.Add(lvc);
+				};
+
+				// Group by output index, and check if we do need to create 3 separate controls, one for each direction
+				// (as programmable splitters can have more than one rule per side)
+				var groups = rules.GroupBy(r => (int)(r.Value.Named("OutputIndex") as P.IntProperty).Value);
+				int multiple = groups.Count(g => g.Count() > 1);
+				if (multiple == 0)
+				{
+					// At most one rule per direction, so put all rules into a single list
+					build_listview(null, rules);
+				}
+				else
+				{
+					// One listview per direction
+					foreach (var group in groups)
+					{
+						string label = ((OutputIndex)group.Key).ToString();
+						if (Translate.Has(label))
+							label = Translate._(label);
+						build_listview(label, group.ToList());
+					}
+				}
+			}
+
+			private P.ArrayProperty _array;
 		}
 
 		internal class FeetOffsets : Expando
