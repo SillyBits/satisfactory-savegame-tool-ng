@@ -118,6 +118,12 @@ namespace SatisfactorySavegameTool.Panels
 				(tab.Content as BasicTree).ClearTree();
 		}
 
+		public void ResetModified()
+		{
+			foreach (TabItem tab in _Tabs)
+				(tab.Content as BasicTree).ResetModified();
+		}
+
 
 		private List<TabItem> _Tabs;
 
@@ -162,9 +168,9 @@ namespace SatisfactorySavegameTool.Panels
 			: base(collection)
 		{ }
 
-		public TreeNode Add(string title, object tag)
+		public TreeNode Add(TreeNode parent, string title, object tag)
 		{
-			TreeNode node = new TreeNode(title, tag);
+			TreeNode node = new TreeNode(parent, title, tag);
 			Add(node);
 			return node;
 		}
@@ -189,38 +195,78 @@ namespace SatisfactorySavegameTool.Panels
 		public bool IsEnabled
 		{
 			get { return _enabled; }
-			set	{ _enabled = value; _Notify("IsEnabled"); }
+			set
+			{
+				if (_enabled == value)
+					return;
+				_enabled = value;
+				_Notify("IsEnabled");
+			}
 		}
 
 		public bool IsExpanded
 		{
 			get { return _expanded; }
-			set	{ _expanded = value; _Notify("IsExpanded"); }
+			set
+			{
+				if (_expanded == value)
+					return;
+				_expanded = value;
+				_Notify("IsExpanded");
+			}
 		}
 
 		public bool IsSelected
 		{
 			get { return _selected; }
-			set	{ _selected = value; _Notify("IsSelected"); }
+			set
+			{
+				if (_selected == value)
+					return;
+				_selected = value;
+				_Notify("IsSelected");
+			}
 		}
+
+		public bool IsModified
+		{
+			get { return _modified; }
+			set
+			{
+				if (_modified == value)
+					return;
+				_modified = value;
+				_Notify("FontWeight");
+
+				// Go up the chain, populating this change
+				if (value && _parent != null)
+					_parent.IsModified = value;
+			}
+		}
+
+		public FontWeight FontWeight {
+			get { return _modified ? FontWeights.Bold : FontWeights.Normal; }
+		}
+
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
 
-		public TreeNode(string title, object tag)
+		public TreeNode(TreeNode parent, string title, object tag)
 		{
-			_title = title;
-			Tag = tag;
-			Childs = null;
-
-			_enabled = true;
+			_parent   = parent;
+			_title    = title;
+			Tag       = tag;
+			Childs    = null;
+			_enabled  = true;
 			_expanded = false;
 			_selected = false;
+			_modified = false;
 		}
 
-		public TreeNode Add(string title, object tag)
+		public TreeNode Add(TreeNode parent, string title, object tag)
 		{
-			TreeNode node = new TreeNode(title, tag);
+			TreeNode node = new TreeNode(parent, title, tag);
 			if (Childs == null)
 			{
 				Childs = new TreeNodes();
@@ -249,10 +295,12 @@ namespace SatisfactorySavegameTool.Panels
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
 		}
 
-		private string _title;
-		private bool _enabled;
-		private bool _expanded;
-		private bool _selected;
+		private TreeNode _parent;
+		private string   _title;
+		private bool     _enabled;
+		private bool     _expanded;
+		private bool     _selected;
+		private bool     _modified;
 	}
 
 
@@ -270,6 +318,8 @@ namespace SatisfactorySavegameTool.Panels
 
 			ItemTemplate = FindResource("treeTemplate") as HierarchicalDataTemplate;
 			ItemContainerStyle = FindResource("treeitemStyle") as Style;
+
+			_reverse_lookup = new Dictionary<object, TreeNode>();
 		}
 
 
@@ -280,10 +330,15 @@ namespace SatisfactorySavegameTool.Panels
 			_Setup();
 
 			Dispatcher.Invoke(() => {
-				SelectedItemChanged -= (Application.Current.MainWindow as MainWindow).TreeView_SelectedItemChanged;
-				SelectedItemChanged += (Application.Current.MainWindow as MainWindow).TreeView_SelectedItemChanged;
+				MainWindow wnd = Application.Current.MainWindow as MainWindow;
+				SelectedItemChanged -= wnd.TreeView_SelectedItemChanged;
+				SelectedItemChanged += wnd.TreeView_SelectedItemChanged;
+				wnd.Details.Modified -= _Details_Modified;
+				wnd.Details.Modified += _Details_Modified;
+
 				_CreateContextMenu();
 				Model.Nodes.Clear();
+				_reverse_lookup.Clear();
 			});
 
 			Log.Debug("- " + GetType().Name);
@@ -308,6 +363,17 @@ namespace SatisfactorySavegameTool.Panels
 			Model.Nodes.Clear();
 		}
 
+		public void ResetModified()
+		{
+			RecursExecuter(Model.Nodes.First(), (node) => node.IsModified = false);
+		}
+
+
+		private void _Details_Modified(P.Property prop)
+		{
+			if (_reverse_lookup.ContainsKey(prop))
+				_reverse_lookup[prop].IsModified = true;
+		}
 
 		internal abstract int NoOfElements { get; }
 
@@ -329,9 +395,11 @@ namespace SatisfactorySavegameTool.Panels
 			return Dispatcher.Invoke(() => {
 				TreeNode node;
 				if (parent == null)
-					node = Model.Nodes.Add(label, tag);
+					node = Model.Nodes.Add(parent, label, tag);
 				else
-					node = parent.Add(label, tag);
+					node = parent.Add(parent, label, tag);
+				if (tag != null)
+					_reverse_lookup.Add(tag, node);
 				return node;
 			});
 		}
@@ -441,6 +509,7 @@ namespace SatisfactorySavegameTool.Panels
 		}
 
 
+		private Dictionary<object, TreeNode> _reverse_lookup;
 		private MenuItem _inspect;
 
 	}

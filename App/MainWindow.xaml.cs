@@ -330,7 +330,7 @@ namespace SatisfactorySavegameTool
 			}
 		}
 
-		private void Details_Modified()
+		private void Details_Modified(Property prop)
 		{
 			CurrFile.Modified = true;
 			_UpdateUIState();
@@ -455,6 +455,9 @@ namespace SatisfactorySavegameTool
 				TimeSpan ofs = end_time - start_time;
 				Log.Info("Saving took {0}", ofs);
 			});
+
+			if (!CurrFile.Modified)
+				TreeView.ResetModified();
 
 			progress = null;
 			_SetStatusbar();

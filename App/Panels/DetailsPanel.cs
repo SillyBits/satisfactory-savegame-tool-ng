@@ -41,7 +41,7 @@ namespace SatisfactorySavegameTool.Panels
 		{ }
 
 
-		public delegate void ModifiedHandler();
+		public delegate void ModifiedHandler(Property prop);
 		public event ModifiedHandler Modified;
 
 
@@ -112,7 +112,7 @@ namespace SatisfactorySavegameTool.Panels
 
 		private void Panel_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			Modified?.Invoke();
+			Modified?.Invoke(sender as Property);
 		}
 
 		private object _curr_vis;
@@ -469,7 +469,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 		protected virtual void _PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Value"));
+			PropertyChanged?.Invoke(sender is Property ? sender : Tag, e);
 		}
 
 		internal IElement _parent;
@@ -907,7 +907,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 		protected virtual void _PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Value"));
+			PropertyChanged?.Invoke(this, e);
 		}
 
 		internal IElement _parent;
@@ -1187,7 +1187,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 		protected virtual void _PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Value"));
+			PropertyChanged?.Invoke(sender is Property ? sender : _prop, e);
 		}
 
 		internal IElement _parent;
@@ -1225,6 +1225,12 @@ namespace SatisfactorySavegameTool.Panels.Details
 				Label = null;
 				_value = default(_ValueType);
 			}
+		}
+
+		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			//PropertyChanged?.Invoke(sender, new PropertyChangedEventArgs("Value"));
+			base._PropertyChanged(_prop, e);
 		}
 
 		internal ValueProperty _prop;
@@ -1341,7 +1347,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			_header.MapOptions  = _map_options.Value;
 			_header.SessionName = _session_name.Value;
 
-			base._PropertyChanged(sender, e);
+			base._PropertyChanged(_header, e);
 		}
 
 		internal P.Header _header;
@@ -1459,7 +1465,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			_prop.Y = vals[1];
 			_prop.Z = vals[2];
 
-			base._PropertyChanged(sender, e);
+			base._PropertyChanged(_prop, e);
 		}
 
 		internal P.Vector _prop;
@@ -1512,7 +1518,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			box.MaxY = max[1];
 			box.MaxZ = max[2];
 
-			base._PropertyChanged(sender, e);
+			base._PropertyChanged(box, e);
 		}
 	}
 
@@ -1553,8 +1559,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			_prop.B = vals[2];
 			_prop.A = vals[3];
 
-			base._PropertyChanged(sender, e);
-			//IsModified = true;
+			base._PropertyChanged(_prop, e);
 		}
 
 		internal P.Color _prop;
@@ -1597,7 +1602,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			_prop.B = vals[2];
 			_prop.A = vals[3];
 
-			base._PropertyChanged(sender, e);
+			base._PropertyChanged(_prop, e);
 		}
 
 		internal P.LinearColor _prop;
@@ -1656,8 +1661,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			_prop.C = vals[2];
 			_prop.D = vals[3];
 
-			base._PropertyChanged(sender, e);
-			//IsModified = true;
+			base._PropertyChanged(_prop, e);
 		}
 
 		internal P.Quat _prop;
@@ -2072,7 +2076,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			_name.PathName = Value;
-			base._PropertyChanged(sender, e);
+
+			base._PropertyChanged(_name.Parent, e);
 		}
 
 		private P.NamedEntity.Name _name;

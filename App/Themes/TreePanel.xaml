@@ -9,9 +9,10 @@
 	</HierarchicalDataTemplate>
 	
 	<Style x:Key="treeitemStyle" TargetType="TreeViewItem">
-		<Setter Property="IsEnabled" Value="{Binding IsEnabled}"/>
-		<Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
-		<Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+		<Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
+		<Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
+		<Setter Property="IsSelected" Value="{Binding IsSelected}" />
+		<Setter Property="FontWeight" Value="{Binding FontWeight}" />
 	</Style>
 
 </ResourceDictionary>
