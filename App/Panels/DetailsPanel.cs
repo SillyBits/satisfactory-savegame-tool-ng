@@ -523,7 +523,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 			: base()
 		{
 			HorizontalAlignment = HorizontalAlignment.Left;
-			VerticalAlignment = VerticalAlignment.Center;
+			VerticalAlignment = VerticalAlignment.Stretch;
+			VerticalContentAlignment = VerticalAlignment.Center;
 			Margin = new Thickness(0, 4, 0, 4);
 			Value = val;
 		}
@@ -550,6 +551,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 		{
 			Width = new GridLength((Math.Abs(val) > 1e7f) ? 200 : 100).Value;
 			HorizontalAlignment = HorizontalAlignment.Left;
+			VerticalAlignment = VerticalAlignment.Stretch;
+			VerticalContentAlignment = VerticalAlignment.Center;
 			TextAlignment = TextAlignment.Right;
 			Mask = @"^[<S>]?([0-9]{1,3}(<T>[0-9]{3})|[0-9])*(<D>[0-9]{0,5})?$";
 			Value = val;
@@ -572,6 +575,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 		{
 			Width = new GridLength(50).Value;
 			HorizontalAlignment = HorizontalAlignment.Left;
+			VerticalAlignment = VerticalAlignment.Stretch;
+			VerticalContentAlignment = VerticalAlignment.Center;
 			TextAlignment = TextAlignment.Right;
 			Mask = @"^[0-9]{1,3}$";
 			Value = val;
@@ -594,6 +599,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 		{
 			Width = new GridLength((Math.Abs(val) > 1e10) ? 200 : 100).Value;
 			HorizontalAlignment = HorizontalAlignment.Left;
+			VerticalAlignment = VerticalAlignment.Stretch;
+			VerticalContentAlignment = VerticalAlignment.Center;
 			TextAlignment = TextAlignment.Right;
 			Mask = @"^[<S>]?([0-9]{1,3}(<T>[0-9]{3})|[0-9])*$";
 			Value = val;
@@ -616,6 +623,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 		{
 			Width = new GridLength(200).Value;
 			HorizontalAlignment = HorizontalAlignment.Left;
+			VerticalAlignment = VerticalAlignment.Stretch;
+			VerticalContentAlignment = VerticalAlignment.Center;
 			TextAlignment = TextAlignment.Right;
 			Mask = @"^[<S>]?([0-9]{1,3}(<T>[0-9]{3})|[0-9])*$";
 			Value = val;
@@ -638,6 +647,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 		{
 			HorizontalAlignment = HorizontalAlignment.Stretch;
 			VerticalAlignment = VerticalAlignment.Stretch;
+			VerticalContentAlignment = VerticalAlignment.Center;
 			Value = val;
 			_ascii = val.IsAscii();
 		}
@@ -674,6 +684,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 		{
 			HorizontalAlignment = HorizontalAlignment.Stretch;
 			VerticalAlignment = VerticalAlignment.Stretch;
+			VerticalContentAlignment = VerticalAlignment.Center;
 			Value = val;
 		}
 
