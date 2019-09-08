@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using Microsoft.Win32;
 
 
@@ -331,6 +332,18 @@ namespace CoreLib
 			}
 
 			return null;
+		}
+
+
+		/// <summary>
+		/// Allows for triggering dispatcher while waiting for some other task to complete
+		/// </summary>
+		/// <param name="dispatcher"></param>
+		public static void TriggerDispatcher(Dispatcher dispatcher)
+		{
+			dispatcher.Invoke(() => { }, DispatcherPriority.Render);
+			System.Threading.Thread.Yield();
+			dispatcher.Invoke(() => { }, DispatcherPriority.ContextIdle);
 		}
 	}
 
