@@ -68,6 +68,7 @@ namespace SatisfactorySavegameTool.Dialogs
 
 		private void Exit_Click(object sender, RoutedEventArgs e)
 		{
+			MainWindow.CurrFile = null;
 			Application.Current.Shutdown();
 		}
 

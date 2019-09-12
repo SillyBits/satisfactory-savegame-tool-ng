@@ -167,7 +167,7 @@ namespace SatisfactorySavegameTool
 
 		protected void _SetStatusbar(string text = null)
 		{
-			StatBarText.Text = (text != null) ? text : Translate._("MainWindow.Menu.Statusbar.Ready");
+			StatBarText.Text = (text != null) ? text : Translate._("MainWindow.Statusbar.Ready");
 			StatBarText.Refresh();
 		}
 
@@ -250,7 +250,8 @@ namespace SatisfactorySavegameTool
 
 		private void File_Exit_Click(object sender, RoutedEventArgs e)
 		{
-			_CloseGamefile();
+			if (!_CloseGamefile())
+				return;
 
 			Application.Current.Shutdown();
 		}

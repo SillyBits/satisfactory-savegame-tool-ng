@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Threading;
 using System.Windows;
+using System.Windows.Threading;
 
 using CoreLib;
 using CoreLib.PubSub;
@@ -35,6 +36,8 @@ namespace SatisfactorySavegameTool.Dialogs
 			if (!string.IsNullOrEmpty(title))
 				Title = title;
 
+			CounterFormat = "{0:#,#0} / {1:#,#0}";
+
 			Interval = interval;
 
 			// Bind our events
@@ -66,17 +69,33 @@ namespace SatisfactorySavegameTool.Dialogs
 		private DefaultCallbackImpl _callback;
 		private long _max_val;
 		private long _last_val;
+		private static readonly Action EmptyDelegate = delegate { };
 
 		private void Update(long value, string status, string info)
 		{
-			Progress.Value = value;
-			Counts.Text = string.Format(CounterFormat, value, _max_val);
+			bool updated = false;
+
+			if ((long)Progress.Value != value)
+			{
+				Progress.Value = value;
+				Counts.Text = string.Format(CounterFormat, value, _max_val);
+				updated = true;
+			}
 
 			if (!string.IsNullOrEmpty(status))
+			{
 				Status.Text = status;
+				updated = true;
+			}
 
 			if (!string.IsNullOrEmpty(info))
+			{
 				Info.Text = info;
+				updated = true;
+			}
+
+			if (updated)
+				Dispatcher.Invoke(DispatcherPriority.Render, EmptyDelegate);
 		}
 
 		private void OnStart(Publisher sender, DefaultCallbackImpl.StartData data)

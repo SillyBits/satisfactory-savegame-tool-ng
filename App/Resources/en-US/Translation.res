@@ -51,7 +51,8 @@
 	<MainWindow.Menu.Help.Changelog.TT>Shows current changelog</MainWindow.Menu.Help.Changelog.TT>
 	<MainWindow.Menu.Help.About>About ...</MainWindow.Menu.Help.About>
 	<MainWindow.Menu.Help.About.TT>Shows info on this tool</MainWindow.Menu.Help.About.TT>
-	<MainWindow.Menu.Statusbar.Ready>Ready.</MainWindow.Menu.Statusbar.Ready>
+
+	<MainWindow.Statusbar.Ready>Ready.</MainWindow.Statusbar.Ready>
 
 	<MainWindow.Gamefile.Modified>Modified</MainWindow.Gamefile.Modified>
 	<MainWindow.Gamefile.modified>modified</MainWindow.Gamefile.modified>

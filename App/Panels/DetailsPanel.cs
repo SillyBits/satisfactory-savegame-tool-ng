@@ -352,8 +352,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 		// Override this method if expando needs to be modified
 		internal virtual void _CreateVisual()
 		{
-			if (Tag is P.Property)
-				Header = (Tag as P.Property).ToString();
+			if (Tag is Property)
+				Header = (Tag as Property).ToString();
 			else
 				Header = _label;
 
@@ -493,8 +493,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 	{
 		internal static FrameworkElement Create(object val)
 		{
-			// The 'bool' was just to get the right thing here, but it must be at least a byte,
-			// and fields like 'int32:WasPlacedInLevel' use this control too.
 			if (val is bool)	return new BoolControl  ((bool)  val);
 			if (val is byte)	return new ByteControl  ((byte)  val);
 			if (val is int)		return new IntControl   ((int)   val);
@@ -727,7 +725,9 @@ namespace SatisfactorySavegameTool.Panels.Details
 				Background = new SolidColorBrush(c);
 			}
 		}
+#pragma warning disable CS0067 // The event 'ListViewControl.PropertyChanged' is never used
 		public event PropertyChangedEventHandler PropertyChanged;
+#pragma warning restore CS0067
 
 		internal P.Color _value;
 	}
@@ -756,7 +756,9 @@ namespace SatisfactorySavegameTool.Panels.Details
 				Background = new SolidColorBrush(c);
 			}
 		}
+#pragma warning disable CS0067 // The event 'ListViewControl.PropertyChanged' is never used
 		public event PropertyChangedEventHandler PropertyChanged;
+#pragma warning restore CS0067
 
 		internal P.LinearColor _value;
 	}
@@ -768,7 +770,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 		//      on how to display value, e.g. coloring
 		//TODO: Also allow for adding framework elements like buttons,
 		//      checkboxes, dropdowns and alike
-		//TODO: Allow for changing elements
+		//TODO: Allow for changing elements (edit/add/remove)
 		internal ListViewControl(ColumnDefinition[] columns = null)
 		{
 			_columns = columns != null ? columns.ToList() : null;
@@ -810,7 +812,9 @@ namespace SatisfactorySavegameTool.Panels.Details
 			get { return ItemsSource as List<object[]>; }
 			set	{ ItemsSource = value; }
 		}
+#pragma warning disable CS0067 // The event 'ListViewControl.PropertyChanged' is never used
 		public event PropertyChangedEventHandler PropertyChanged;
+#pragma warning restore CS0067
 
 		internal string _label;
 		internal List<ColumnDefinition> _columns;
@@ -1285,7 +1289,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 		public ByteProperty(IElement parent, string label, object obj) 
 			: base(parent, label, null)
 		{
-			_prop = obj as P.ValueProperty;
+			_prop = obj as ValueProperty;
 			//if ((_prop as P.ByteProperty).Unknown.ToString() == "None")
 			//	_value = _prop.Value.ToString();
 			_value = _prop.Value.ToString();
@@ -1330,7 +1334,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			_childs.Add(ValueControlFactory.Create(this, "SaveVersion" , _header.SaveVersion, true));
 
 			int build_version = _header.BuildVersion + 34682;
-			Supplements.VersionTable.VersionEntry v = Supplements.VersionTable.INSTANCE.Find(build_version);
+			VersionTable.VersionEntry v = VersionTable.INSTANCE.Find(build_version);
 			string build_v = v != null ? v.ToString() : string.Format("#{0}", build_version);
 			_childs.Add(ValueControlFactory.Create(this, "BuildVersion", build_v, true));
 

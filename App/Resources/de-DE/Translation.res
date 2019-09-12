@@ -51,7 +51,8 @@
 	<MainWindow.Menu.Help.Changelog.TT>Zeigt das aktuelle Änderungsprotokoll an</MainWindow.Menu.Help.Changelog.TT>
 	<MainWindow.Menu.Help.About>Über ...</MainWindow.Menu.Help.About>
 	<MainWindow.Menu.Help.About.TT>Zeigt Informationen über dieses Programm</MainWindow.Menu.Help.About.TT>
-	<MainWindow.Menu.Statusbar.Ready>Bereit.</MainWindow.Menu.Statusbar.Ready>
+
+	<MainWindow.Statusbar.Ready>Bereit.</MainWindow.Statusbar.Ready>
 
 	<MainWindow.Gamefile.Modified>Geändert</MainWindow.Gamefile.Modified>
 	<MainWindow.Gamefile.modified>geändert</MainWindow.Gamefile.modified>

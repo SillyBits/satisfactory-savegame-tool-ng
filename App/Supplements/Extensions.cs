@@ -61,8 +61,8 @@ namespace SatisfactorySavegameTool.Supplements
 		}
 
 
-		internal static bool IsNullOrEmpty(this byte[] arr) { return _IsNullOrEmpty(arr); }
-		internal static bool IsNullOrEmpty(this int[] arr)  { return _IsNullOrEmpty(arr); }
+		public static bool IsNullOrEmpty(this byte[] arr) { return _IsNullOrEmpty(arr); }
+		public static bool IsNullOrEmpty(this int[] arr)  { return _IsNullOrEmpty(arr); }
 		private static bool _IsNullOrEmpty<_ValueType>(_ValueType[] arr)
 			where _ValueType : IConvertible
 		{
@@ -74,18 +74,18 @@ namespace SatisfactorySavegameTool.Supplements
 
 
 		// Used to get game version info from savegame header
-		internal static VersionTable.VersionEntry GetVersionEntry(this P.Header header)
+		public static VersionTable.VersionEntry GetVersionEntry(this P.Header header)
 		{
 			int build_version = header.BuildVersion + 34682;
 			return VersionTable.INSTANCE.Find(build_version);
 		}
 
-		internal static int GetBuildVersion(this P.Header header)
+		public static int GetBuildVersion(this P.Header header)
 		{
 			return header.BuildVersion + 34682;
 		}
 
-		internal static VersionTable.Version GetVersion(this P.Header header)
+		public static VersionTable.Version GetVersion(this P.Header header)
 		{
 			int build_version = header.BuildVersion + 34682;
 			VersionTable.VersionEntry version = VersionTable.INSTANCE.Find(build_version);
@@ -97,14 +97,14 @@ namespace SatisfactorySavegameTool.Supplements
 
 		// Used to extract last portion of a string which can be split using given separator
 		// (e.g. "/Script/FactoryGame.FGInventoryComponent" -> "FGInventoryComponent")
-		internal static string LastName(this str name, char separator = '.')
+		public static string LastName(this str name, char separator = '.')
 		{
 			if (str.IsNullOrEmpty(name))
 				return null;
 			return LastName(name.ToString(), separator);
 		}
 
-		internal static string LastName(this string name, char separator = '.')
+		public static string LastName(this string name, char separator = '.')
 		{
 			if (!string.IsNullOrEmpty(name))
 			{
@@ -117,7 +117,7 @@ namespace SatisfactorySavegameTool.Supplements
 
 
 		// Get all named value properties
-		internal static List<string> Names(this P.Properties props)
+		public static List<string> Names(this P.Properties props)
 		{
 			return props
 				.Where(prop => (prop is P.ValueProperty) && !str.IsNullOrEmpty((prop as P.ValueProperty).Name))
@@ -133,7 +133,7 @@ namespace SatisfactorySavegameTool.Supplements
 		}
 
 		// Find a value property by name
-		internal static P.Property Named(this P.Properties props, string name, int index = -1)
+		public static P.Property Named(this P.Properties props, string name, int index = -1)
 		{
 			if (index < 0)
 			{
@@ -171,7 +171,7 @@ namespace SatisfactorySavegameTool.Supplements
 
 
 		// Convert a Properties list into another type, e.g. List<InventoryStack>
-		internal static List<_PropertyType> ListOf<_PropertyType>(this object props)
+		public static List<_PropertyType> ListOf<_PropertyType>(this object props)
 		{
 			if (props is P.Properties)
 				return (props as P.Properties).Cast<_PropertyType>().ToList();
@@ -180,12 +180,12 @@ namespace SatisfactorySavegameTool.Supplements
 
 
 		// Find a property by it's path name
-		internal static P.Property FindByPathName(this P.Properties props, str pathname, bool case_insensitive = false)
+		public static P.Property FindByPathName(this P.Properties props, str pathname, bool case_insensitive = false)
 		{
 			return props.FindByPathName(pathname.ToString(), case_insensitive);
 		}
 
-		internal static P.Property FindByPathName(this P.Properties props, string pathname, bool case_insensitive = false)
+		public static P.Property FindByPathName(this P.Properties props, string pathname, bool case_insensitive = false)
 		{
 			if (case_insensitive)
 			{
@@ -206,25 +206,25 @@ namespace SatisfactorySavegameTool.Supplements
 
 
 		// Check float for being with range of value given
-		internal static bool IsNear(this float val, float near, float range = float.Epsilon)
+		public static bool IsNear(this float val, float near, float range = float.Epsilon)
 		{
 			return (near - range <= val) && (val <= near + range);
 		}
 
 		// Check float for being near 0
-		internal static bool IsNearZero(this float val, float range = 10 * float.Epsilon)
+		public static bool IsNearZero(this float val, float range = 10 * float.Epsilon)
 		{
 			return (-range <= val) && (val <= +range);
 		}
 
 		// Check vector for being identity
-		internal static bool IsIdentity(this P.Vector val)
+		public static bool IsIdentity(this P.Vector val)
 		{
 			return val.X.IsNear(1.0f) && val.Y.IsNear(1.0f) && val.Z.IsNear(1.0f);
 		}
 
 		// Check scale for being identity
-		internal static bool IsIdentity(this P.Scale val)
+		public static bool IsIdentity(this P.Scale val)
 		{
 			return (val as P.Vector).IsIdentity();
 		}
