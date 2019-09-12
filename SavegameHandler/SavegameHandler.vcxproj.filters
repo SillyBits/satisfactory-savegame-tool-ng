@@ -33,6 +33,13 @@
     <ClInclude Include="PropertyDumper.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="CloudsaveReader.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CloudsaveWriter.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Cloudsave.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
@@ -44,6 +51,15 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Stdafx.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="CloudsaveReader.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="CloudsaveWriter.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Cloudsave.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,6 +1,10 @@
 #pragma once
 
 
+#include "CloudsaveReader.h"
+#include "CloudsaveWriter.h"
+
+
 namespace Savegame {
 
 	public ref class Savegame
@@ -17,14 +21,19 @@ namespace Savegame {
 
 		Savegame(String^ filename) 
 			: Filename(filename)
-			, Modified(false)
-			, TotalElements(0)
-			, Header(nullptr)
-			, Objects(nullptr)
-			, Collected(nullptr)
-			, Missing(nullptr)
+			, _reader(nullptr)
 		{
+			Reset();
 			Properties::Property::DeepAnalysis = false;
+		}
+
+		virtual ~Savegame()
+		{
+			if (_reader)
+				_reader->Close();
+			_reader = nullptr;
+
+			Reset();
 		}
 
 
@@ -33,6 +42,18 @@ namespace Savegame {
 			Properties::Property::DeepAnalysis = enable;
 		}
 
+		void Reset()
+		{
+			Modified      = false;
+			TotalElements = 0;
+			Header        = nullptr;
+			Objects       = nullptr;
+			Collected     = nullptr;
+			Missing       = nullptr;
+
+			if (_reader)
+				_reader->Seek(0, IReader::Positioning::Start);
+		}
 
 		Properties::Header^ PeekHeader()
 		{
@@ -41,21 +62,40 @@ namespace Savegame {
 
 		void Load(ICallback^ callback)
 		{
-			_Load(callback);
+			_callback = callback;
+
+			if (!Header)
+				_PeekHeader();
+
+			if (Header->SaveVersion <= 20)
+				_Load(_reader);
+			else
+				_LoadCloudsave();
 		}
 
 		void Save(ICallback^ callback)
 		{
-			_Save(Filename, callback);
+			_callback = callback;
+
+			if (Header->SaveVersion <= 20)
+				_Save(Filename);
+			else
+				_SaveCloudsave(Filename);
 		}
 
 		void SaveAs(ICallback^ callback, String^ new_filename)
 		{
-			_Save(new_filename, callback);
+			_callback = callback;
+
+			if (Header->SaveVersion <= 20)
+				_Save(new_filename);
+			else
+				_SaveCloudsave(new_filename);
 		}
 
 
 	protected:
+		IReader^   _reader;
 		ICallback^ _callback;
 
 		void _cbStart(__int64 size, String^ status, String^ info)
@@ -85,71 +125,47 @@ namespace Savegame {
 
 		Properties::Header^ _PeekHeader()
 		{
-			Properties::Header^ header = nullptr;
-			FileReader^ reader = nullptr;
 			try
 			{
-				reader = gcnew FileReader(Filename, nullptr);
-				header = (Properties::Header^) (gcnew Properties::Header(nullptr))->Read(reader);
+				if (!_reader)
+					_reader = gcnew FileReader(Filename, nullptr);
+				else
+					_reader->Seek(0, IReader::Positioning::Start);
+				Header = (Properties::Header^) (gcnew Properties::Header(nullptr))->Read(_reader);
 			}
 			catch (Exception^ exc)
 			{
 				Log::Error(String::Format("Error loading header from '{0}'", Filename), exc);
-				header = nullptr;
-			}
-			finally
-			{
-				if (reader != nullptr)
-					reader->Close();
-				reader = nullptr;
+				_reader->Seek(0, IReader::Positioning::Start);
+				Header = nullptr;
 			}
 
-			return header;
+			return Header;
 		}
 
-		void _Load(ICallback^ callback)
+		void _LoadCloudsave()
 		{
-			_callback = callback;
+			CloudsaveReader^ cs_reader = gcnew CloudsaveReader(_reader, nullptr);
+			_Load(cs_reader);
+		}
+
+		void _Load(IReader^ reader)
+		{
 			TotalElements = 0;
 
-			FileReader^ reader = gcnew FileReader(Filename, nullptr);
 			Log::Info("-> {0:#,#0} Bytes", reader->Size);
 
 			_cbStart(reader->Size, "Loading file ...", "");
 
 			try
 			{
-				Header = (Properties::Header^) (gcnew Properties::Header(nullptr))->Read(reader);
-				TotalElements++;
-				_cbUpdate(reader->Pos, nullptr, "Header");
-
 				// Writing header to log
-				//Log::Info("-> {0}", Header);
 				Properties::Dumper::WriteFunc^ writer = gcnew Properties::Dumper::WriteFunc(&LogRedirect);
 				Properties::Dumper::Dump(Header, writer);
 
 				Objects = gcnew Properties::Properties;
 				Collected = gcnew Properties::Properties;
 
-				/* /vvvvv DEBUG
-				count = reader.readInt()
-				prev_pos = reader.Pos
-				_type = reader.readInt()
-				if _type == 1:
-					obj = Property.Actor(self)
-				elif _type == 0:
-					obj = Property.Object(self)
-				else:
-					raise AssertionError("Savegame at pos {:,d}: Unhandled type {}"\
-										.format(prev_pos, _type))
-				new_child = obj.read(reader) 
-				self.__total += 1
-				self.Objects.append(new_child)
-				#self.__total += self.__count_recurs(new_child.Childs)
-				#-> Entity not yet read, so down below instead
-				self.__cb_read_update(reader, None, str(obj))
-				//^^^^^ DEBUG */
-			
 				int count = reader->ReadInt();
 				Log::Info("-> {0:#,#0} game objects", count);
 				for (int i=0; i<count; ++i)
@@ -228,26 +244,57 @@ namespace Savegame {
 			finally
 			{
 				_cbStop(nullptr, nullptr);
-				reader->Close();
-				reader = nullptr;
 			}
 		}
 
-		void _Save(String^ filename, ICallback^ callback)
+		void _Save(String^ filename)
 		{
-			_callback = callback;
-
 			FileWriter^ writer = gcnew FileWriter(filename, nullptr);
+			Header->Write(writer);
+			_Save(writer);
+		}
 
+		void _SaveCloudsave(String^ filename)
+		{
+			FileWriter^ writer = gcnew FileWriter(filename+".test", nullptr);
+
+			_cbStart(TotalElements, "Querying file ...", "");
+			int count = 0;
+
+			Header->Write(writer);
+
+			int total_size = 8;//count*2
+			for each (Properties::Property^ prop in Objects)
+			{
+				total_size += prop->GetSize() + 4;//Type
+				_cbUpdate(++count, nullptr, prop->ToString());
+			}
+			total_size += 4;//count
+			for each (Properties::Property^ prop in Collected)
+			{
+				total_size += prop->GetSize();
+				_cbUpdate(++count, nullptr, prop->ToString());
+			}
+			if (Missing)
+			{
+				total_size += Missing->Length;
+				_cbUpdate(++count, nullptr, Missing->ToString());
+			}
+
+			CloudsaveWriter^ cs_writer = gcnew CloudsaveWriter(writer, nullptr);
+			cs_writer->Write(total_size);
+			_Save(cs_writer);
+			Log::Debug("... written a total of {0:#,#0} bytes, compressed down to {1:#,#0} bytes)", 
+				total_size, writer->Pos);
+		}
+
+		void _Save(IWriter^ writer)
+		{
 			_cbStart(TotalElements, "Saving file ...", "");
-			__int64 saved = 0;
+			__int64 saved = 1;
 
 			try
 			{
-				Header->Write(writer);
-				saved++;
-				_cbUpdate(saved, nullptr, "Header");
-
 				writer->Write((int)Objects->Count);
 				Log::Info("-> {0:#,#0} game objects", Objects->Count);
 				for each (Properties::Property^ prop in Objects)
@@ -308,7 +355,7 @@ namespace Savegame {
 			}
 			catch (Exception^ exc)
 			{
-				Log::Error(String::Format("Error saving '{0}'", filename), exc);
+				Log::Error(String::Format("Error saving '{0}'", writer->Name), exc);
 				throw;
 			}
 			finally

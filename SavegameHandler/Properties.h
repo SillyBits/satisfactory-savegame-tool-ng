@@ -5,6 +5,7 @@ using namespace System::Reflection;
 using namespace System::Text;
 
 using namespace CoreLib;
+
 using namespace Reader;
 using namespace Writer;
 
@@ -211,6 +212,8 @@ namespace Savegame
 			return _GetChilds(nullptr);
 		}
 
+		virtual int GetSize() abstract;
+
 
 		virtual Property^ Read(IReader^ reader) abstract;
 
@@ -383,8 +386,20 @@ namespace Savegame
 	#define PUB_s(name)			PUB(name,str^)
 	#define PUB_o(name)			PUB(name,Object^)
 	#define PUB_p(name)			PUB(name,ValueProperty^)
-	#define PUB_a(name,type)	PUB(name,array<type>^)
 	#define PUB_ab(name)		PUB(name,ByteArray^)
+
+	#define SIZE				int GetSize() override { int size = 0;
+	#define SIZE_(base)			int GetSize() override { int size = base::GetSize();
+	#define ADD(s)              { size += (s); }
+	#define ADD_b(name)			ADD(sizeof(byte))
+	#define ADD_i(name)			ADD(sizeof(__int32))
+	#define ADD_l(name)			ADD(sizeof(__int64))
+	#define ADD_f(name)			ADD(sizeof(float))
+	#define ADD_s(name)			ADD(str::GetRawLength(name))
+	#define ADD_p(name)			{ if (name) ADD((name)->GetSize()) }
+	#define ADD_a(name,type)	{ if (name) ADD(((array<type>^)name)->Length*sizeof(type)) }
+	#define ADD_ab(name)		{ if (name) ADD((name)->Length) }
+	#define SIZE_END			return size; }
 
 	#define READ				Property^ Read(IReader^ reader) override {
 	#define READ_END			return this; }
@@ -416,6 +431,22 @@ namespace Savegame
 			, Index(index)
 			, Value(value)
 		{ }
+
+
+		static int GetSize(ValueProperty^ prop)
+		{
+			int size = 0;
+			ADD_s(prop->Name)
+			ADD(4 + prop->TypeName->Length + 1)
+			ADD_i(prop->Length)
+			ADD_i(prop->Index)
+			//ADD_o(prop->Value) -> Done by derived class
+			return size;
+		}
+
+		SIZE
+			ADD(GetSize(this))
+		SIZE_END
 
 
 		static ValueProperty^ Read(IReader^ reader, Property^ parent)
@@ -498,6 +529,14 @@ namespace Savegame
 	// Multiple properties as array
 	CLS(PropertyList)
 		PUB(Value,Properties^)
+		SIZE
+			for each (ValueProperty^ prop in Value)
+			{
+				ADD(ValueProperty::GetSize(prop))
+				ADD_p(prop)
+			}
+			ADD_s(ValueProperty::NONE)
+		SIZE_END
 		READ
 			Value = gcnew Properties;
 			while (true)
@@ -511,7 +550,6 @@ namespace Savegame
 		WRITE
 			for each (ValueProperty^ prop in Value)
 				ValueProperty::Write(writer, prop);
-			//ValueProperty::Write(writer, nullptr);
 			writer->Write(ValueProperty::NONE);
 		WRITE_END
 		STR(String::Format("[{0}].Value[{1}]", TypeName, Value->Count))
@@ -523,6 +561,10 @@ namespace Savegame
 	//
 
 	CLS_(BoolProperty, ValueProperty)
+		SIZE
+			ADD_b(Value)
+			ADD_b(NullByte)
+		SIZE_END
 		READ
 			Value = reader->ReadByte();
 			CheckNullByte(reader);
@@ -535,6 +577,14 @@ namespace Savegame
 
 	CLS_(ByteProperty, ValueProperty)
 		PUB(Unknown,str^)
+		SIZE
+			ADD_s(Unknown)
+			ADD_b(NullByte)
+			if (*Unknown == "None")
+				ADD_b(Value)
+			else
+				ADD_s((str^)Value)
+		SIZE_END
 		READ
 			Unknown = reader->ReadString();
 			CheckNullByte(reader);
@@ -554,6 +604,10 @@ namespace Savegame
 	CLS_END
 	
 	CLS_(IntProperty, ValueProperty)
+		SIZE
+			ADD_b(NullByte)
+			ADD_i(Value)
+		SIZE_END
 		READ
 			CheckNullByte(reader);
 			Value = reader->ReadInt();
@@ -565,6 +619,10 @@ namespace Savegame
 	CLS_END
 
 	CLS_(FloatProperty, ValueProperty)
+		SIZE
+			ADD_b(NullByte)
+			ADD_f(Value)
+		SIZE_END
 		READ
 			CheckNullByte(reader);
 			Value = reader->ReadFloat();
@@ -576,6 +634,10 @@ namespace Savegame
 	CLS_END
 	
 	CLS_(StrProperty, ValueProperty)
+		SIZE
+			ADD_b(NullByte)
+			ADD_s((str^)Value)
+		SIZE_END
 		READ
 			CheckNullByte(reader);
 			Value = reader->ReadString();
@@ -601,6 +663,17 @@ namespace Savegame
 		PUB_i(PlayDuration)
 		PUB_l(SaveDateTime)
 		PUB_b(Visibility)
+		SIZE
+			ADD_i(Type)
+			ADD_i(SaveVersion)
+			ADD_i(BuildVersion)
+			ADD_s(MapName)
+			ADD_s(MapOptions)
+			ADD_s(SessionName)
+			ADD_i(PlayDuration)
+			ADD_l(SaveDateTime)
+			ADD_b(Visibility)
+		SIZE_END
 		READ
 			Type = reader->ReadInt();
 			SaveVersion = reader->ReadInt();
@@ -637,6 +710,10 @@ namespace Savegame
 		//TODO: Find correct name, if any
 		PUB_s(LevelName)
 		PUB_s(PathName)
+		SIZE
+			ADD_s(LevelName)
+			ADD_s(PathName)
+		SIZE_END
 		READ
 			LevelName = reader->ReadString();
 			PathName = reader->ReadString();
@@ -651,6 +728,21 @@ namespace Savegame
 	CLS_(StructProperty,ValueProperty)
 		PUB_ab(Unknown)
 		bool IsArray;
+		SIZE
+			if (!IsArray)
+			{
+				ADD_s(_Inner)
+				ADD(17)//Unknown
+				ADD_p((Property^)Value)
+			}
+			else
+			{
+				ADD_s(_Inner)
+				ADD(17)//Unknown
+				for each (Property^ prop in (Properties^)Value)
+					ADD_p(prop)
+			}
+		SIZE_END
 		READ
 			__int64 last = reader->Pos;
 			IsArray = false;
@@ -716,6 +808,9 @@ namespace Savegame
 		PUB_f(X)
 		PUB_f(Y)
 		PUB_f(Z)
+		SIZE
+			ADD(sizeof(float)*3)
+		SIZE_END
 		READ
 			X = reader->ReadFloat();
 			Y = reader->ReadFloat();
@@ -752,6 +847,10 @@ namespace Savegame
 		PUB_f(MaxY)
 		PUB_f(MaxZ)
 		PUB_b(IsValid)
+		SIZE
+			ADD(sizeof(float)*6)
+			ADD_b(IsValid)
+		SIZE_END
 		READ
 			MinX = reader->ReadFloat();
 			MinY = reader->ReadFloat();
@@ -777,6 +876,9 @@ namespace Savegame
 		PUB_b(G)
 		PUB_b(B)
 		PUB_b(A)
+		SIZE
+			ADD(sizeof(byte)*4)
+		SIZE_END
 		READ
 			R = reader->ReadByte();
 			G = reader->ReadByte();
@@ -796,6 +898,9 @@ namespace Savegame
 		PUB_f(G)
 		PUB_f(B)
 		PUB_f(A)
+		SIZE
+			ADD(sizeof(float)*4)
+		SIZE_END
 		READ
 			R = reader->ReadFloat();
 			G = reader->ReadFloat();
@@ -831,6 +936,9 @@ namespace Savegame
 		PUB_f(B)
 		PUB_f(C)
 		PUB_f(D)
+		SIZE
+			ADD(sizeof(float)*4)
+		SIZE_END
 		READ
 			A = reader->ReadFloat();
 			B = reader->ReadFloat();
@@ -861,6 +969,14 @@ namespace Savegame
 		PUB_s(LevelName)
 		PUB_s(PathName)
 		PUB_p(Value)
+		SIZE
+			ADD_s(Unknown)
+			ADD_s(ItemName)
+			ADD_s(LevelName)
+			ADD_s(PathName)
+			ADD_p((ValueProperty^)Value)
+			if (Value) ADD(ValueProperty::GetSize(Value))
+		SIZE_END
 		READ
 			Unknown = reader->ReadString();
 			ItemName = reader->ReadString();
@@ -882,6 +998,9 @@ namespace Savegame
 	CLS_END
 
 	CLS_(ItemAmount, PropertyList)
+	CLS_END
+
+	CLS_(ResearchTime,PropertyList)
 	CLS_END
 
 	CLS_(ResearchCost, PropertyList)
@@ -926,6 +1045,18 @@ namespace Savegame
 		// (depending on its 'context' when loaded)
 		PUB_s(LevelName)
 		PUB_s(PathName)
+		SIZE
+			ADD(GetSize(true))
+		SIZE_END
+		int GetSize(bool null_check) 
+		{
+			int size = 0;
+			if (null_check)
+				ADD_b(NullByte)
+			ADD_s(LevelName)
+			ADD_s(PathName)
+			return size;
+		}
 		READ
 			Read(reader, true);
 		READ_END
@@ -977,6 +1108,41 @@ namespace Savegame
 
 	CLS_(ArrayProperty,ValueProperty)
 		PUB_s(InnerType)
+		SIZE
+			ADD_s(InnerType)
+			if (InnerType == "StructProperty")
+			{
+				ADD_b(NullByte)
+				ADD_i(count)
+				StructProperty^ stru = (StructProperty^)Value;
+				ADD_s(stru->Name)
+				ADD_s(_type)
+				ADD_i(stru->Length)
+				ADD_i(stru->Index)
+				ADD(((StructProperty^)Value)->GetSize())
+			}
+			else if (InnerType == "ObjectProperty")
+			{
+				ADD_b(NullByte)
+				ADD_i(count)
+				for each (ObjectProperty^ prop in (Properties^)Value)
+					ADD(prop->GetSize(false))
+			}
+			else if (InnerType == "IntProperty")
+			{
+				ADD_b(NullByte)
+				ADD_i(count);
+				ADD_a(Value, int)
+			}
+			else if (InnerType == "ByteProperty")
+			{
+				ADD_b(NullByte)
+				ADD_i(count)
+				ADD_a(Value, byte);
+			}
+			else
+				throw gcnew Exception(String::Format("Unknown inner array type '{0}'", InnerType));
+		SIZE_END
 		READ
 			InnerType = reader->ReadString();
 			if (InnerType == "StructProperty")
@@ -984,7 +1150,7 @@ namespace Savegame
 				CheckNullByte(reader);
 				int count = reader->ReadInt();
 				str^ name = reader->ReadString();
-				str^ type = reader->ReadString();
+				_type = reader->ReadString();
 				//assert _type == self.InnerType
 				int length = reader->ReadInt();
 				int index = reader->ReadInt();
@@ -1061,10 +1227,17 @@ namespace Savegame
 			else
 				throw gcnew WriteException(writer, String::Format("Unknown inner array type '{0}'", InnerType));
 		WRITE_END
+	protected:
+		str^ _type;
 	CLS_END
 
 	CLS_(EnumProperty,ValueProperty)
 		PUB_s(EnumName)
+		SIZE
+			ADD_s(EnumName)
+			ADD_b(NullByte)
+			ADD_s((str^)Value)
+		SIZE_END
 		READ
 			EnumName = reader->ReadString();
 			CheckNullByte(reader);
@@ -1087,6 +1260,28 @@ namespace Savegame
 		PUB_s(KeyType)
 		PUB_s(ValueType)
 		PUB(Value, Entries^)
+		SIZE
+			ADD_s(KeyType)
+			ADD_s(ValueType)
+			ADD(sizeof(byte)*5)
+			ADD_i(count)
+			for each (KeyValuePair<Object^, Object^>^ pair in (Entries^)Value)
+			{
+				if (*KeyType == "IntProperty")
+					ADD_i(pair->Key)
+				else if (*KeyType == "ObjectProperty")
+					ADD(safe_cast<ObjectProperty^>(pair->Key)->GetSize(false))
+				else
+					throw gcnew Exception(String::Format("Unknown key type '{0}'", KeyType->ToString()));
+
+				if (*ValueType == "ByteProperty")
+					ADD_b(pair->Value)
+				else if (*ValueType == "StructProperty")
+					ADD(safe_cast<PropertyList^>(pair->Value)->GetSize())
+				else
+					throw gcnew Exception(String::Format("Unknown value type '{0}'", ValueType->ToString()));
+			}
+		SIZE_END
 		READ
 			KeyType = reader->ReadString();
 			ValueType = reader->ReadString();
@@ -1142,6 +1337,11 @@ namespace Savegame
 
 	CLS_(TextProperty,ValueProperty)
 		PUB_ab(Unknown)
+		SIZE
+			ADD_b(NullByte)
+			ADD(13)
+			ADD_s((str^)Value)
+		SIZE_END
 		READ
 			CheckNullByte(reader);
 			Unknown = reader->ReadBytes(13);
@@ -1159,18 +1359,24 @@ namespace Savegame
 		PUB_s(PathName)
 		PUB_f(Offset)
 		PUB_f(Forward)
-	READ
-		ClassName = reader->ReadString();
-		PathName = reader->ReadString();
-		Offset = reader->ReadFloat();
-		Forward = reader->ReadFloat();
-	READ_END
-	WRITE
-		writer->Write(ClassName);
-		writer->Write(PathName);
-		writer->Write(Offset);
-		writer->Write(Forward);
-	WRITE_END
+		SIZE
+			ADD_s(ClassName)
+			ADD_s(PathName)
+			ADD_f(Offset)
+			ADD_f(Forward)
+		SIZE_END
+		READ
+			ClassName = reader->ReadString();
+			PathName = reader->ReadString();
+			Offset = reader->ReadFloat();
+			Forward = reader->ReadFloat();
+		READ_END
+		WRITE
+			writer->Write(ClassName);
+			writer->Write(PathName);
+			writer->Write(Offset);
+			writer->Write(Forward);
+		WRITE_END
 	CLS_END
 
 
@@ -1200,6 +1406,10 @@ namespace Savegame
 		int MissingUsed;
 #endif
 
+		SIZE_(PropertyList)
+			ADD_i(Unknown)
+			ADD_ab(Missing)
+		SIZE_END
 		Property^ Read(IReader^ reader, int length)
 		{
 			__int64 last_pos = reader->Pos;
@@ -1252,6 +1462,10 @@ namespace Savegame
 
 			PUB_s(LevelName)
 			PUB_s(PathName)
+			SIZE
+				ADD_s(LevelName)
+				ADD_s(PathName)
+			SIZE_END
 			READ
 				LevelName = reader->ReadString();
 				PathName = reader->ReadString();
@@ -1265,6 +1479,14 @@ namespace Savegame
 		NamedEntity(Property^ parent, str^ level_name, str^ path_name, Properties^ children)
 			: Entity(parent, level_name, path_name, children)
 		{ }
+
+		SIZE_(Entity)
+			ADD_s(LevelName)
+			ADD_s(PathName)
+			ADD_i(count)
+			for each (Name^ name in Children)
+				ADD(name->GetSize())
+		SIZE_END
 
 		Property^ Read(IReader^ reader, int length)
 		{
@@ -1319,6 +1541,14 @@ namespace Savegame
 		PUB_s(PathName)
 		PUB_s(OuterPathName)
 		PUB(EntityObj,Property^)
+		SIZE
+			ADD_s(ClassName)
+			ADD_s(LevelName)
+			ADD_s(PathName)
+			ADD_s(OuterPathName)
+			ADD_i(_EntityLength)
+			ADD_p(EntityObj)
+		SIZE_END
 		READ
 			ClassName = reader->ReadString();
 			LevelName = reader->ReadString();
@@ -1345,7 +1575,7 @@ namespace Savegame
 					entity->Private = nullptr;
 					entity->MissingUsed = 0;
 					if (VERBOSITY)
-						Log::Debug(String::Format("Error loading private data for '{0}'", PathName), exc);
+						Log::Debug(String::Format("Error loading private data for entity '{0}'", PathName), exc);
 				}
 			}
 #endif
@@ -1384,6 +1614,18 @@ namespace Savegame
 		PUB(Scale,Savegame::Properties::Scale^)
 		PUB_i(WasPlacedInLevel)
 		PUB(EntityObj,Property^)
+		SIZE
+			ADD_s(ClassName)
+			ADD_s(LevelName)
+			ADD_s(PathName)
+			ADD_i(NeedTransform)
+			ADD_p(Rotation)
+			ADD_p(Translate)
+			ADD_p(Scale)
+			ADD_i(WasPlacedInLevel)
+			ADD_i(_EntityLength)
+			ADD_p(EntityObj)
+		SIZE_END
 		READ
 			ClassName = reader->ReadString();
 			LevelName = reader->ReadString();
@@ -1414,7 +1656,7 @@ namespace Savegame
 					entity->Private = nullptr;
 					entity->MissingUsed = 0;
 					if (VERBOSITY)
-						Log::Debug(String::Format("Error loading private data for '{0}'", PathName), exc);
+						Log::Debug(String::Format("Error loading private data for named entity '{0}'", PathName), exc);
 				}
 			}
 #endif
@@ -1647,6 +1889,8 @@ namespace Savegame
 		PUB_i(Index)
 		PUB_s(ItemName)
 		PUB(Translate, Vector^)
+		SIZE
+		SIZE_END
 		READ
 			Index = reader->ReadInt();
 			ItemName = reader->ReadString();
@@ -1687,6 +1931,8 @@ namespace Savegame
 		PUB_i(Index)
 		PUB_s(ItemName)
 		PUB(Translate, Vector^)
+		SIZE
+		SIZE_END
 		READ
 			Index = reader->ReadInt();
 			ItemName = reader->ReadString();
@@ -1732,6 +1978,8 @@ namespace Savegame
 	CLS_(BP_Vehicle, Property)
 		PUB_s(Node)
 		PUB_ab(Unknown)
+		SIZE
+		SIZE_END
 		READ
 			// Seems like some animation data?
 			Node = reader->ReadString();

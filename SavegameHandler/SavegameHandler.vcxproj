@@ -56,10 +56,12 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <AdditionalIncludeDirectories>3rdparty\zlib-1.2.11\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies />
+      <AdditionalLibraryDirectories>3rdparty\zlib-1.2.11\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -67,10 +69,12 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <AdditionalIncludeDirectories>3rdparty\zlib-1.2.11\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies />
+      <AdditionalLibraryDirectories>3rdparty\zlib-1.2.11\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -78,6 +82,9 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Cloudsave.h" />
+    <ClInclude Include="CloudsaveReader.h" />
+    <ClInclude Include="CloudsaveWriter.h" />
     <ClInclude Include="Properties.h" />
     <ClInclude Include="PropertyDumper.h" />
     <ClInclude Include="resource.h" />
@@ -87,6 +94,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="Cloudsave.cpp" />
+    <ClCompile Include="CloudsaveReader.cpp" />
+    <ClCompile Include="CloudsaveWriter.cpp" />
     <ClCompile Include="SavegameHandler.cpp" />
     <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

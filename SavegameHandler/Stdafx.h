@@ -15,6 +15,11 @@
 #include <share.h>
 
 
+// Include zlib
+#include "zlib.h"
+#pragma comment(lib, "zlibstat.lib")
+
+
 using namespace System;
 using namespace System::Collections::Generic;
 using namespace System::IO;
