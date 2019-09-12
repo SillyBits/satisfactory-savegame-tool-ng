@@ -80,12 +80,10 @@
   <ItemGroup>
     <ClInclude Include="Properties.h" />
     <ClInclude Include="PropertyDumper.h" />
-    <ClInclude Include="Reader.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SavegameHandler.h" />
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="Types.h" />
-    <ClInclude Include="Writer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
@@ -101,6 +99,9 @@
   <ItemGroup>
     <ProjectReference Include="..\CoreLib\CoreLib.csproj">
       <Project>{0dede00f-7e56-49f3-8a28-ddbb1f83a8b8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\FileHandler\FileHandler.vcxproj">
+      <Project>{d9c82451-5129-4f70-9d78-f292d3f2b9ab}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

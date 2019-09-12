@@ -24,9 +24,6 @@
     <ClInclude Include="resource.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Reader.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="Types.h">
       <Filter>Headers</Filter>
     </ClInclude>
@@ -36,7 +33,6 @@
     <ClInclude Include="PropertyDumper.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Writer.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

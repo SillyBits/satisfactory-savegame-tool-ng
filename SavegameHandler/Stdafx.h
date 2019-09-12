@@ -23,6 +23,8 @@ using namespace System::IO;
 using namespace CoreLib;
 using namespace PubSub;
 
+using namespace FileHandler;
+
 
 #ifdef _DEBUG
 const bool VERBOSITY = true;
@@ -34,10 +36,9 @@ const bool VERBOSITY = false;
 // Enables experimental deep analysis code
 #define EXPERIMENTAL
 
-
 #include "Types.h"
-#include "Reader.h"
-#include "Writer.h"
+
 #include "Properties.h"
 #include "PropertyDumper.h"
+
 //#include "SavegameHandler.h"
