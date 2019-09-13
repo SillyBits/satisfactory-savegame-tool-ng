@@ -95,6 +95,10 @@
     <Compile Include="Supplements\Extensions.cs" />
     <Compile Include="Supplements\Helper.cs" />
     <Compile Include="Supplements\HierarchyRunner.cs" />
+    <Compile Include="Supplements\ItemTable.cs" />
+    <Compile Include="Supplements\SchematicTable.cs" />
+    <Compile Include="Supplements\RecipeTable.cs" />
+    <Compile Include="Supplements\ResearchTable.cs" />
     <Compile Include="Supplements\Splashscreen.xaml.cs">
       <DependentUpon>Splashscreen.xaml</DependentUpon>
     </Compile>
@@ -208,6 +212,10 @@
       <Project>{0dede00f-7e56-49f3-8a28-ddbb1f83a8b8}</Project>
       <Name>CoreLib</Name>
     </ProjectReference>
+    <ProjectReference Include="..\FileHandler\FileHandler.vcxproj">
+      <Project>{d9c82451-5129-4f70-9d78-f292d3f2b9ab}</Project>
+      <Name>FileHandler</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SavegameHandler\SavegameHandler.vcxproj">
       <Project>{096f67ea-d61b-4950-8b21-65dda14ee113}</Project>
       <Name>SavegameHandler</Name>
@@ -237,6 +245,10 @@
     <Content Include="Resources\en-US\Changelog.res" />
     <Content Include="Resources\en-US\FactoryGame.res" />
     <Content Include="Resources\en-US\Translation.res" />
+    <Resource Include="Resources\ItemTable.xml" />
+    <Resource Include="Resources\SchematicTable.xml" />
+    <Resource Include="Resources\ResearchTable.xml" />
+    <Resource Include="Resources\RecipeTable.xml" />
     <Resource Include="Resources\Icon.TreePanel.Simple.png" />
     <Resource Include="Resources\Icon.TreePanel.Buildings.png" />
     <Resource Include="Resources\Splashscreen.png" />

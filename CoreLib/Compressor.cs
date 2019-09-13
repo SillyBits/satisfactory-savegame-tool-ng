@@ -241,6 +241,82 @@ namespace CoreLib
 
 
 		/// <summary>
+		/// Decompresses given data into stream given.
+		/// </summary>
+		/// <param name="data">Data to decompress</param>
+		/// <returns>Byte array instance on success, null on failure</returns>
+		public static byte[] DecompressToArray(byte[] data)
+		{
+			if (data == null)
+				return null;
+
+			try
+			{
+				using (MemoryStream mem = new MemoryStream(data))
+				{
+					return DecompressToArray(mem);
+				}
+			}
+			catch
+			{
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// Decompresses given data into stream given.
+		/// </summary>
+		/// <param name="data">Data to decompress</param>
+		/// <returns>Byte array instance on success, null on failure</returns>
+		public static byte[] DecompressToArray(Stream data)
+		{
+			if (data == null || !data.CanRead)
+				return null;
+
+			try
+			{
+				using (MemoryStream mem = new MemoryStream())
+				{
+					if (!DecompressToStream(mem, data))
+						return null;
+					return mem.ToArray();
+				}
+			}
+			catch
+			{
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// Decompresses given data into stream given.
+		/// </summary>
+		/// <param name="stream">Stream to write decompressed data to</param>
+		/// <param name="data">Data to decompress</param>
+		/// <returns>True on success, else False</returns>
+		public static bool DecompressToStream(Stream stream, Stream data)
+		{
+			if (stream == null || !stream.CanWrite || data == null || !data.CanRead)
+				return false;
+
+			try
+			{
+				using (GZipStream zip = new GZipStream(data, CompressionMode.Decompress, true))
+				{
+					zip.CopyTo(stream);
+				}
+
+				stream.Flush();
+				return true;
+			}
+			catch //(Exception exc)
+			{
+				return false;
+			}
+		}
+
+
+		/// <summary>
 		/// Compresses data array, returning inflated byte array.
 		/// </summary>
 		/// <param name="data">Data to compress</param>

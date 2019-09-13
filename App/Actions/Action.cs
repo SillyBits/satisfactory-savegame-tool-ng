@@ -93,7 +93,24 @@ namespace SatisfactorySavegameTool.Actions
 
 		protected void _AddToMenu(MenuItem menu, RoutedEventHandler handler)
 		{
-			Action<string,ConstructorInfo> add = (name,ci) => {
+			Func<MenuItem,string,MenuItem> add_plugin = (m,name) => {
+				string header = name;
+				if (Translate.Has(header))
+					header = Translate._(header);
+
+				MenuItem action = new MenuItem() {
+					Header = name,
+					Tag = name,
+				};
+
+				m.Items.Add(action);
+
+				return action;
+			};
+			Action<MenuItem,string,ConstructorInfo> add_action = (m,name,ci) => {
+				if (ci == null)
+					return;
+
 				Type cls = ci.DeclaringType;
 				if (!Attributes.Name.Has(cls))
 					return;
@@ -119,22 +136,31 @@ namespace SatisfactorySavegameTool.Actions
 
 				action.Click += handler;
 
-				menu.Items.Add(action);
+				m.Items.Add(action);
 			};
 
 			menu.Items.Clear();
 
 			var all = GetKnown();
-			var builtin = all.Where(pair => pair.Key[0] != '[');
+			var builtin = all.Where(pair => !pair.Key.Contains('\\'));
 			foreach (var pair in builtin)
-				add(pair.Key, pair.Value);
+				add_action(menu, pair.Key, pair.Value);
 
 			var plugins = all.Except(builtin);
 			if (plugins.Count() > 0)
 			{
-				menu.Items.Add(new Separator());
-				foreach (var pair in plugins)
-					add(pair.Key, pair.Value);
+				var groups = plugins.GroupBy(pair => pair.Key.Split('\\')[0]);
+				if (groups.Count() > 0)
+				{
+					menu.Items.Add(new Separator());
+					foreach (var group in groups)
+					{
+						MenuItem plugin = add_plugin(menu, group.Key);
+						int keylen = group.Key.Length + 1;
+						foreach (var pair in plugins)
+							add_action(plugin, pair.Key.Substring(keylen), pair.Value);
+					}
+				}
 			}
 		}
 

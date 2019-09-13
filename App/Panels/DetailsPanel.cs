@@ -14,6 +14,8 @@ using System.Windows.Media.Imaging;
 
 using CoreLib;
 
+using FileHandler;
+
 using Savegame.Properties;
 using P = Savegame.Properties;
 

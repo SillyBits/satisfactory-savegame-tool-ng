@@ -8,9 +8,7 @@ using System.Windows.Input;
 using Microsoft.Win32;
 
 using CoreLib;
-using CoreLib.PubSub;
 
-using Savegame;
 using Savegame.Properties;
 
 using SatisfactorySavegameTool.Actions;
@@ -42,9 +40,9 @@ namespace SatisfactorySavegameTool
 
 		protected void _Init()
 		{
-			// Load options
 			Splashscreen.SetMessage("Creating main window");
 
+			// Load options
 			// - Position window
 			if (Config.Root.HasSection("window"))
 			{
@@ -78,6 +76,7 @@ namespace SatisfactorySavegameTool
 
 			_SetupMRU();
 
+			Splashscreen.SetMessage("Registering plugins");
 			ActionFactory.AddToMenu(actions_menu, Actions_Click);
 
 			_SetStatusbar();

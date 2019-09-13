@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<researchs>
+  <!-- Added 2019-09-02T23:35:05 -->
+  <recipe name="ResearchRecipe_AlienCarapace1" path="/Game/FactoryGame/Recipes/Research/ResearchRecipe_AlienCarapace1" />
+  <recipe name="ResearchRecipe_AlienCarapace2" path="/Game/FactoryGame/Recipes/Research/ResearchRecipe_AlienCarapace2" />
+  <recipe name="ResearchRecipe_AlienOrgans1" path="/Game/FactoryGame/Recipes/Research/ResearchRecipe_AlienOrgans1" />
+  <recipe name="ResearchRecipe_Berry" path="/Game/FactoryGame/Recipes/Research/ResearchRecipe_Berry" />
+  <recipe name="ResearchRecipe_Caterium1" path="/Game/FactoryGame/Recipes/Research/ResearchRecipe_Caterium1" />
+  <recipe name="ResearchRecipe_Caterium2" path="/Game/FactoryGame/Recipes/Research/ResearchRecipe_Caterium2" />
+  <recipe name="ResearchRecipe_Caterium3" path="/Game/FactoryGame/Recipes/Research/ResearchRecipe_Caterium3" />
+  <recipe name="ResearchRecipe_Fabric" path="/Game/FactoryGame/Recipes/Research/ResearchRecipe_Fabric" />
+  <recipe name="ResearchRecipe_FlowerPetal" path="/Game/FactoryGame/Recipes/Research/ResearchRecipe_FlowerPetal" />
+  <recipe name="ResearchRecipe_HardDrive_Repeatable" path="/Game/FactoryGame/Recipes/Research/ResearchRecipe_HardDrive_Repeatable" />
+  <recipe name="ResearchRecipe_Mushroom" path="/Game/FactoryGame/Recipes/Research/ResearchRecipe_Mushroom" />
+  <recipe name="ResearchRecipe_Mycelia" path="/Game/FactoryGame/Recipes/Research/ResearchRecipe_Mycelia" />
+  <recipe name="ResearchRecipe_Mycelia2" path="/Game/FactoryGame/Recipes/Research/ResearchRecipe_Mycelia2" />
+  <recipe name="ResearchRecipe_Nut" path="/Game/FactoryGame/Recipes/Research/ResearchRecipe_Nut" />
+  <recipe name="ResearchRecipe_Quartz1" path="/Game/FactoryGame/Recipes/Research/ResearchRecipe_Quartz1" />
+  <recipe name="ResearchRecipe_Quartz2" path="/Game/FactoryGame/Recipes/Research/ResearchRecipe_Quartz2" />
+  <recipe name="ResearchRecipe_Slug1" path="/Game/FactoryGame/Recipes/Research/ResearchRecipe_Slug1" />
+  <recipe name="ResearchRecipe_Slug2" path="/Game/FactoryGame/Recipes/Research/ResearchRecipe_Slug2" />
+  <recipe name="ResearchRecipe_Slug3" path="/Game/FactoryGame/Recipes/Research/ResearchRecipe_Slug3" />
+  <recipe name="ResearchRecipe_Sulfur1" path="/Game/FactoryGame/Recipes/Research/ResearchRecipe_Sulfur1" />
+  <recipe name="ResearchRecipe_Sulfur2" path="/Game/FactoryGame/Recipes/Research/ResearchRecipe_Sulfur2" />
+</researchs>

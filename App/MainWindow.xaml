@@ -72,7 +72,7 @@
 
 		<StatusBar DockPanel.Dock="Bottom" Background="Beige">
 			<StatusBarItem>
-				<TextBlock x:Name="StatBarText" Text="{lang:Translate Key=MainWindow.Menu.Statusbar.Ready}" />
+				<TextBlock x:Name="StatBarText" Text="{lang:Translate Key=MainWindow.Statusbar.Ready}" />
 			</StatusBarItem>
 		</StatusBar>
 

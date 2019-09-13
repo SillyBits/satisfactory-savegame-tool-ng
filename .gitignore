@@ -1,16 +1,5 @@
-__unused
-__releases
-__internal
-
-logs
-*.log
-
-reports
-
-exports
-*.export
-
-dist
+# All folders starting with 2 underscores are to be treated 'private'
+__*
 
 
 

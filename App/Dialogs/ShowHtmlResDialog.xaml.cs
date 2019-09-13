@@ -17,18 +17,19 @@ namespace SatisfactorySavegameTool.Dialogs
 	/// </summary>
 	public partial class ShowHtmlResDialog : Window
 	{
-		public static void Show(string title, string content)
+		public static bool Show(string title, string content, string[] extra = null)
 		{
-			Show(null, title, content);
+			return Show(null, title, content, extra);
 		}
 
-		public static void Show(Window parent, string title, string content)
+		public static bool Show(Window parent, string title, string content, string[] extra = null)
 		{
-			new ShowHtmlResDialog(parent, title, content).ShowDialog();
+			var dlg = new ShowHtmlResDialog(parent, title, content, extra);
+			return dlg.ShowDialog().GetValueOrDefault();
 		}
 
 
-		private ShowHtmlResDialog(Window parent, string title, string content)
+		private ShowHtmlResDialog(Window parent, string title, string content, string[] extra = null)
 			: base()
 		{
 			InitializeComponent();
@@ -56,6 +57,18 @@ namespace SatisfactorySavegameTool.Dialogs
 
 			if (!string.IsNullOrEmpty(title))
 				Title = title;
+
+			if (extra != null && extra.Length >= 2)
+			{
+				ExtraBtn.Content = extra[0];
+				ExtraBtn.Visibility = Visibility.Visible;
+				CloseBtn.Content = extra[1];
+				if (extra.Length == 3)
+				{
+					Hint.Content = extra[2];
+					Hint.Visibility = Visibility.Visible;
+				}
+			}
 
 			// Replace image tags with embedded base64
 			Dictionary<string,string> images = new Dictionary<string, string>();
@@ -87,9 +100,16 @@ namespace SatisfactorySavegameTool.Dialogs
 
 			WebCtrl.NavigateToString(content);
 		}
-				
+
+		private void Extra_Click(object sender, RoutedEventArgs e)
+		{
+			DialogResult = true;
+			Close();
+		}
+
 		private void Close_Click(object sender, RoutedEventArgs e)
 		{
+			DialogResult = false;
 			Close();
 		}
 
@@ -122,12 +142,12 @@ namespace SatisfactorySavegameTool.Dialogs
 		protected override void OnKeyUp(KeyEventArgs e)
 		{
 			base.OnKeyUp(e);
-			if (e.Key == Key.Escape)
+			if (ExtraBtn.Visibility == Visibility.Collapsed && e.Key == Key.Escape)
 				Close();
 		}
 
 		private static Regex _regex = new Regex(@"\[\[IMG\:(?<file>.*?)\]\]", 
-			/*RegexOptions.Compiled|*/RegexOptions.CultureInvariant|RegexOptions.ExplicitCapture);
+			RegexOptions.Compiled|RegexOptions.CultureInvariant|RegexOptions.ExplicitCapture);
 		
 	}
 }

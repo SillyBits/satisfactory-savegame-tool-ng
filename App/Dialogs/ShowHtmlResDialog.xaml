@@ -10,6 +10,7 @@
 		ResizeMode="CanResizeWithGrip" ShowInTaskbar="False">
 	<Grid Margin="5,5">
 		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
 			<RowDefinition Height="*" />
 			<RowDefinition Height="10" />
 			<RowDefinition Height="25"/>
@@ -18,11 +19,18 @@
 			<ColumnDefinition Width="*" />
 		</Grid.ColumnDefinitions>
 
-		<WebBrowser x:Name="WebCtrl" Grid.Row="0" 
+		<Label Grid.Row="0" x:Name="Hint" Visibility="Collapsed" HorizontalAlignment="Stretch"
+			   BorderThickness="0,0,0,2" BorderBrush="DarkGray" Padding="0,0,0,10" />
+
+		<WebBrowser x:Name="WebCtrl" Grid.Row="1" 
 					ScrollViewer.HorizontalScrollBarVisibility="auto" ScrollViewer.VerticalScrollBarVisibility="auto" />
 
-		<Button x:Name="CloseBtn" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Top"
-			Width="75" Height="21" Content="{lang:Translate Key=Close}" Click="Close_Click" />
-
+		<StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+			<Button x:Name="ExtraBtn" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75" Height="21" Margin="5,0"
+					Content="" Click="Extra_Click" Visibility="Collapsed" />
+			<Button x:Name="CloseBtn" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75" Height="21" Margin="5,0"
+					Content="{lang:Translate Key=Close}" Click="Close_Click" />
+		</StackPanel>
+		
 	</Grid>
 </Window>

@@ -257,7 +257,7 @@ namespace CoreLib
 					{
 						string name;
 						if (long_naming)
-							name = "[" + ass_name + "]" + ti.Name;
+							name = ass_name + "\\" + ti.Name;
 						else
 							name = ti.Name;
 

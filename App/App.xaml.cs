@@ -5,6 +5,7 @@ using System.IO;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,6 +29,10 @@ namespace SatisfactorySavegameTool
 		protected LanguageHandler _languages;
 
 		protected VersionTable    _versions;
+		protected ItemTable       _items;
+		protected RecipeTable     _recipes;
+		protected ResearchTable   _researchs;
+		protected SchematicTable  _schematics;
 
 
 		protected override void OnStartup(StartupEventArgs e)
@@ -53,8 +58,9 @@ namespace SatisfactorySavegameTool
 
 			Settings.Init();
 
-			Splashscreen.SetMessage("Loading tables");
-			_versions   = new VersionTable();
+			// Stuff which can be run in parallel
+			Task load_data_tables = Task.Run(async() => await _LoadDataTables());
+			Task.WaitAll(load_data_tables);
 
 			base.OnStartup(e);
 		}
@@ -152,6 +158,19 @@ namespace SatisfactorySavegameTool
 		}
 
 
+		private async Task _LoadDataTables()
+		{
+			Task[] loaders = new Task[] {
+				Task.Run(() => _versions   = new VersionTable()),
+				Task.Run(() => _items      = new ItemTable()),
+				Task.Run(() => _recipes    = new RecipeTable()),
+				Task.Run(() => _researchs  = new ResearchTable()),
+				Task.Run(() => _schematics = new SchematicTable()),
+			};
+			await Task.WhenAll(loaders);
+		}
+
+
 		internal void SaveConfig()
 		{
 			_config.Flush();
@@ -164,7 +183,7 @@ namespace SatisfactorySavegameTool
 #else
 			// Gather relevant data
 			Dictionary<string,byte[]> content = new Dictionary<string, byte[]>();
-			content.Add(type + ".txt", Encoding.ASCII.GetBytes(report));
+			content.Add(type + "-" + Settings.USER_ID + ".txt", Encoding.ASCII.GetBytes(report));
 			if (type == "Crash" || type == "Incident")
 				content.Add("Latest.log", _logger.GetSnapshot(false));
 			if (type == "Crash")
@@ -207,6 +226,12 @@ namespace SatisfactorySavegameTool
 		// Path to where exports are to be stored - configured by user
 		public const  string EXPORTS              = "exports";
 		public static string EXPORTPATH           = null;
+
+
+		// Anonymous user id, used for reporting crashes and such and to allow for grouping such reports
+		public static string USER_ID              = null;
+		// User key (MUST be a 32 bytes)
+		public static byte[] USER_KEY             = null;
 
 
 		// Localisation related - configured by user
@@ -346,6 +371,32 @@ namespace SatisfactorySavegameTool
 				}
 
 				Config.Root.core.defaultpath = path;
+			}
+
+
+			// Read user id from registry, resp. create one if none was found in registry
+			string id = null;
+			try
+			{
+				using (RegistryKey key = Helpers.OpenRegKey(Registry.CurrentUser,
+					"SOFTWARE/Epic Games/Unreal Engine/Identifiers"))
+				{
+					if (key != null)
+						id = key.GetValue("AccountId") as string;
+				}
+			}
+			catch { }
+			if (id == null)
+				id = Environment.UserName + Environment.MachineName;
+			if (id != null)
+			{
+				// Create anonymous id on info found
+				using (SHA256 sha = SHA256.Create())
+				{
+					byte[] arr = Encoding.ASCII.GetBytes(id);
+					USER_KEY = sha.ComputeHash(arr);
+					USER_ID  = BitConverter.ToString(USER_KEY).Replace("-", "");
+				}
 			}
 
 

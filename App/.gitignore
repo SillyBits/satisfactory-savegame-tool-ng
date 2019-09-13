@@ -1,0 +1,7 @@
+__*
+
+exports
+*.export
+
+logs
+*.log
