@@ -31,7 +31,8 @@ besteht die Möglichkeit eine ausführbare Anwendung herunterzuladen.<br/>
 <br/>
 Danke an <i>bitowl</i>, <i>S4XXX</i>, <i>Goz3rr</i> und <i>Vilsol</i> für ihre Vorarbeit bzgl. der 
 Struktur von Satisfactory Spielständen.<br/>
-Ebenfalls Danke an <i>Panossa</i> fürs Erstellen der Grafiken.
+Ebenfalls Danke an <i>Panossa</i> fürs Erstellen der Grafiken, und an <i>RapierTropf</i> für die
+Hilfe bei den deutschen Übersetzungen.<br/>
 <br/>
 <br/>
 Grüße, und nie vergessen:<br/>

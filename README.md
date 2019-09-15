@@ -15,7 +15,8 @@ https://www.satisfactory-forum.de.
 
 Credits to bitowl, S4XXX, Goz3rr and Vilsol for their work on deciphering the 
 structure of satisfactory savegames.
-Also thanks to Panossa for doing the graphics.
+Also thanks to Panossa for doing the graphics, and to RapierTropf for helping out
+on those german translations.
 
 
 Cheers, and always remember:
