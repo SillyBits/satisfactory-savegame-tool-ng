@@ -28,9 +28,13 @@ namespace Savegame
   namespace Properties
   {
 
-	// Needed for PropertyFactory
+	// Forward declarations needed
 	ref class Property;
 	ref class ValueProperty;
+#ifdef EXPERIMENTAL
+	template<typename _Parent>
+	static Property^ ReadPrivateData(_Parent^ parent, [out] int UsedUp);
+#endif
 
 
 	// Our class factory to generate instances based on content read from save game
@@ -212,6 +216,8 @@ namespace Savegame
 			return _GetChilds(nullptr);
 		}
 
+
+		// Denotes overall size of property as stored in save
 		virtual int GetSize() abstract;
 
 
@@ -378,6 +384,7 @@ namespace Savegame
 	#define CLS(name)			CLS_(name,Property)
 	#define CLS_END				};
 
+	// For publishing a properties member so they will show up in GetKeys/GetChilds
 	#define PUB(name,type)		[Publish] type name;
 	#define PUB_b(name)			PUB(name,byte)
 	#define PUB_i(name)			PUB(name,__int32)
@@ -388,6 +395,7 @@ namespace Savegame
 	#define PUB_p(name)			PUB(name,ValueProperty^)
 	#define PUB_ab(name)		PUB(name,ByteArray^)
 
+	// To calculate a properties size in save
 	#define SIZE				int GetSize() override { int size = 0;
 	#define SIZE_(base)			int GetSize() override { int size = base::GetSize();
 	#define ADD(s)              { size += (s); }
@@ -401,17 +409,20 @@ namespace Savegame
 	#define ADD_ab(name)		{ if (name) ADD((name)->Length) }
 	#define SIZE_END			return size; }
 
+	// Handling for reading/writing a property
 	#define READ				Property^ Read(IReader^ reader) override {
 	#define READ_END			return this; }
 
 	#define WRITE				void Write(IWriter^ writer) override {
 	#define WRITE_END			}
 
+	// Human-readable string conversion (e.g. for exporting)
 	#define STR(s)				String^ ToString() override { return s; };
 	#define STR_(s)				STR("[" + TypeName + "] " + s)
 
 
-	// Most basic property of all
+
+	// Most basic (valued) property of all
 	public ref class ValueProperty : Property
 	{
 	public:
@@ -492,11 +503,6 @@ namespace Savegame
 
 			if (prop == nullptr)
 				throw gcnew WriteException(writer, "Empty property");
-			//if (prop == nullptr)
-			//{
-			//	writer->Write(NONE);
-			//	return;
-			//}
 
 			writer->Write(prop->Name);
 
@@ -508,6 +514,7 @@ namespace Savegame
 			writer->Write((byte)0);
 
 			writer->Write(prop->Length);
+
 			writer->Write(prop->Index);
 
 			prop->Write(writer);
@@ -517,7 +524,9 @@ namespace Savegame
 			Write(writer, this);
 		WRITE_END
 
+
 		String^ ToString() override { return "[" + TypeName + "] " + (Name ? Name : str::Statics::empty); };
+
 
 		static str^ NONE = gcnew str((char*)"None");
 
@@ -526,6 +535,7 @@ namespace Savegame
 	public ref class Properties : List<Property^> { };
 
 
+	#pragma region PropertyList
 	// Multiple properties as array
 	CLS(PropertyList)
 		PUB(Value,Properties^)
@@ -554,11 +564,9 @@ namespace Savegame
 		WRITE_END
 		STR(String::Format("[{0}].Value[{1}]", TypeName, Value->Count))
 	CLS_END
+	#pragma endregion
 
-
-	//
-	// Simple types
-	//
+	#pragma region Simple types
 
 	CLS_(BoolProperty, ValueProperty)
 		SIZE
@@ -648,11 +656,11 @@ namespace Savegame
 		WRITE_END
 	CLS_END
 
+	#pragma endregion
 
-	//
-	// Complex types
-	//
+	#pragma region Complex types
 
+	#pragma region Header
 	CLS(Header)
 		PUB_i(Type)
 		PUB_i(SaveVersion)
@@ -705,7 +713,9 @@ namespace Savegame
 			writer->Write(Visibility);
 		WRITE_END	
 	CLS_END
+	#pragma endregion
 
+	#pragma region Collected
 	CLS(Collected) 
 		//TODO: Find correct name, if any
 		PUB_s(LevelName)
@@ -724,7 +734,9 @@ namespace Savegame
 		WRITE_END
 		STR_(PathName)
 	CLS_END
+	#pragma endregion
 
+	#pragma region StructProperty
 	CLS_(StructProperty,ValueProperty)
 		PUB_ab(Unknown)
 		bool IsArray;
@@ -803,7 +815,9 @@ namespace Savegame
 	protected:
 		str^ _Inner;
 	CLS_END
+	#pragma endregion
 
+	#pragma region Vector
 	CLS(Vector)
 		PUB_f(X)
 		PUB_f(Y)
@@ -822,23 +836,29 @@ namespace Savegame
 			writer->Write(Z);
 		WRITE_END
 	CLS_END
+	#pragma endregion
 
+	#pragma region Rotator
 	CLS_(Rotator,Vector)
 	CLS_END
+	#pragma endregion
 
+	#pragma region Scale
 	// 'Scale' is a pseudo-class and not contained, added for the 
 	// validation step as different set of bounds must be used
 	CLS_(Scale,Vector)
 		static Scale^ FromVector(Vector^ v)
 		{
-			Scale^ scale = gcnew Scale(v->Parent);
+			Savegame::Properties::Scale^ scale = gcnew Savegame::Properties::Scale(v->Parent);
 			scale->X = v->X;
 			scale->Y = v->Y;
 			scale->Z = v->Z;
 			return scale;
 		}
 	CLS_END
+	#pragma endregion
 
+	#pragma region Box
 	CLS(Box)
 		PUB_f(MinY)
 		PUB_f(MinX)
@@ -870,7 +890,9 @@ namespace Savegame
 			writer->Write(IsValid);
 		WRITE_END
 	CLS_END
+	#pragma endregion
 
+	#pragma region Color
 	CLS(Color)
 		PUB_b(R)
 		PUB_b(G)
@@ -892,7 +914,9 @@ namespace Savegame
 			writer->Write(A);
 		WRITE_END
 	CLS_END
+	#pragma endregion
 
+	#pragma region LinearColor
 	CLS(LinearColor)
 		PUB_f(R)
 		PUB_f(G)
@@ -914,7 +938,9 @@ namespace Savegame
 			writer->Write(A);
 		WRITE_END
 	CLS_END
+	#pragma endregion
 
+	#pragma region Transform
 	CLS_(Transform,PropertyList)
 		READ
 			PropertyList^ obj = (PropertyList^) PropertyList::Read(reader);
@@ -930,7 +956,9 @@ namespace Savegame
 			return obj;
 		READ_END
 	CLS_END
+	#pragma endregion
 
+	#pragma region Quat
 	CLS(Quat)
 		PUB_f(A)
 		PUB_f(B)
@@ -952,16 +980,9 @@ namespace Savegame
 			writer->Write(D);
 		WRITE_END
 	CLS_END
+	#pragma endregion
 
-	CLS_(RemovedInstanceArray,PropertyList)
-	CLS_END
-
-	CLS_(RemovedInstance,PropertyList)
-	CLS_END
-
-	CLS_(InventoryStack,PropertyList)
-	CLS_END
-
+	#pragma region InventoryItem
 	CLS(InventoryItem)
 		//TODO: Might also be some PropertyList? Investigate	
 		PUB_s(Unknown)
@@ -993,52 +1014,9 @@ namespace Savegame
 		WRITE_END
 		STR_(ItemName)
 	CLS_END
+	#pragma endregion
 
-	CLS_(PhaseCost, PropertyList)
-	CLS_END
-
-	CLS_(ItemAmount, PropertyList)
-	CLS_END
-
-	CLS_(ResearchTime,PropertyList)
-	CLS_END
-
-	CLS_(ResearchCost, PropertyList)
-	CLS_END
-
-	CLS_(CompletedResearch, PropertyList)
-	CLS_END
-
-	CLS_(ResearchRecipeReward, PropertyList)
-	CLS_END
-
-	CLS_(ItemFoundData, PropertyList)
-	CLS_END
-
-	CLS_(RecipeAmountStruct, PropertyList)
-	CLS_END
-
-	CLS_(MessageData, PropertyList)
-	CLS_END
-
-	CLS_(SplinePointData, PropertyList)
-	CLS_END
-
-	CLS_(SpawnData, PropertyList)
-	CLS_END
-
-	CLS_(FeetOffset, PropertyList)
-	CLS_END
-
-	CLS_(SplitterSortRule, PropertyList)
-	CLS_END
-
-	CLS_(SchematicCost, PropertyList)
-	CLS_END
-
-	CLS_(TimerHandle,PropertyList)
-	CLS_END
-
+	#pragma region ObjectProperty
 	CLS_(ObjectProperty,ValueProperty)
 		// Note that ObjectProperty is somewhat special with having
 		// two different faces: w/ .Name + .Value and w/o those.
@@ -1105,7 +1083,9 @@ namespace Savegame
 		}
 		static List<String^>^ _excludes = nullptr;
 	CLS_END
+	#pragma endregion
 
+	#pragma region ArrayProperty
 	CLS_(ArrayProperty,ValueProperty)
 		PUB_s(InnerType)
 		SIZE
@@ -1230,7 +1210,9 @@ namespace Savegame
 	protected:
 		str^ _type;
 	CLS_END
+	#pragma endregion
 
+	#pragma region EnumProperty
 	CLS_(EnumProperty,ValueProperty)
 		PUB_s(EnumName)
 		SIZE
@@ -1250,10 +1232,9 @@ namespace Savegame
 		WRITE_END
 		STR_(EnumName)
 	CLS_END
+	#pragma endregion
 
-	CLS_(NameProperty,StrProperty)
-	CLS_END
-
+	#pragma region MapProperty
 	CLS_(MapProperty,ValueProperty)
 		ref class Entries : Dictionary<Object^, Object^> {};
 
@@ -1334,7 +1315,9 @@ namespace Savegame
 			}
 		WRITE_END
 	CLS_END
+	#pragma endregion
 
+	#pragma region TextProperty
 	CLS_(TextProperty,ValueProperty)
 		PUB_ab(Unknown)
 		SIZE
@@ -1353,7 +1336,9 @@ namespace Savegame
 			writer->Write((str^)Value);
 		WRITE_END
 	CLS_END
+	#pragma endregion
 
+	#pragma region RailroadTrackPosition
 	CLS_(RailroadTrackPosition,ValueProperty)
 		PUB_s(ClassName)
 		PUB_s(PathName)
@@ -1378,8 +1363,72 @@ namespace Savegame
 			writer->Write(Forward);
 		WRITE_END
 	CLS_END
+	#pragma endregion
 
+	#pragma region Simple derived types
 
+	CLS_(NameProperty,StrProperty)
+	CLS_END
+
+	CLS_(RemovedInstanceArray,PropertyList)
+	CLS_END
+
+	CLS_(RemovedInstance,PropertyList)
+	CLS_END
+
+	CLS_(InventoryStack,PropertyList)
+	CLS_END
+
+	CLS_(PhaseCost, PropertyList)
+	CLS_END
+
+	CLS_(ItemAmount, PropertyList)
+	CLS_END
+
+	CLS_(ResearchTime,PropertyList)
+	CLS_END
+
+	CLS_(ResearchCost, PropertyList)
+	CLS_END
+
+	CLS_(CompletedResearch, PropertyList)
+	CLS_END
+
+	CLS_(ResearchRecipeReward, PropertyList)
+	CLS_END
+
+	CLS_(ItemFoundData, PropertyList)
+	CLS_END
+
+	CLS_(RecipeAmountStruct, PropertyList)
+	CLS_END
+
+	CLS_(MessageData, PropertyList)
+	CLS_END
+
+	CLS_(SplinePointData, PropertyList)
+	CLS_END
+
+	CLS_(SpawnData, PropertyList)
+	CLS_END
+
+	CLS_(FeetOffset, PropertyList)
+	CLS_END
+
+	CLS_(SplitterSortRule, PropertyList)
+	CLS_END
+
+	CLS_(SchematicCost, PropertyList)
+	CLS_END
+
+	CLS_(TimerHandle,PropertyList)
+	CLS_END
+
+	#pragma endregion
+
+	#pragma endregion
+
+	#pragma region Entities
 
 	public ref class Entity : PropertyList
 	{
@@ -1396,6 +1445,7 @@ namespace Savegame
 			, MissingUsed(0)
 #endif
 		{ }
+
 		PUB_s(LevelName)
 		PUB_s(PathName)
 		PUB(Children, Properties^)
@@ -1528,13 +1578,7 @@ namespace Savegame
 		}
 	};
 
-
-#ifdef EXPERIMENTAL
-	template<typename _Parent>
-	static Property^ ReadPrivateData(_Parent^ parent, [out] int UsedUp);
-#endif
-
-
+	#pragma region Object
 	CLS(Object)
 		PUB_s(ClassName)
 		PUB_s(LevelName)
@@ -1603,7 +1647,9 @@ namespace Savegame
 	protected:
 		int _EntityLength;
 	CLS_END
+	#pragma endregion
 
+	#pragma region Actor
 	CLS(Actor)
 		PUB_s(ClassName)
 		PUB_s(LevelName)
@@ -1688,6 +1734,9 @@ namespace Savegame
 	protected:
 		int _EntityLength;
 	CLS_END
+	#pragma endregion
+
+	#pragma endregion
 
 
 #ifdef EXPERIMENTAL
@@ -2000,8 +2049,8 @@ namespace Savegame
 	CLS_(BP_Explorer_C, BP_Vehicle)
 	CLS_END
 
-
 #endif // EXPERIMENTAL
+
   }
 
 }
