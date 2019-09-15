@@ -16,11 +16,11 @@ using namespace Writer;
  * - Eliminate shadows like _Inner, _Missing and _EntityLength, else will
  *   need quite some efforts in regards to adding new elements
  *   - _Inner: "Type" actually stored in .Value, but what if empty? (e.g. lists)
- *   - _Missing: Just don't "eat" the pointer and indicate using other means 
- *               (store no. of bytes used for example)
- *   - _EntityLength: Must calculate real length by traversing hierarchy 2-pass like.
  *
  */
+
+//#define VALIDATE_SIZE
+//#define VALIDATE_LENGTH
 
 
 namespace Savegame
@@ -220,6 +220,9 @@ namespace Savegame
 		// Denotes overall size of property as stored in save
 		virtual int GetSize() abstract;
 
+		// Denotes a property's length stored in save, used with ValueProperty::Length
+		virtual int GetLength() abstract;
+
 
 		virtual Property^ Read(IReader^ reader) abstract;
 
@@ -376,6 +379,20 @@ namespace Savegame
 			return childs;
 		}
 
+
+#if defined(VALIDATE_SIZE) || defined(VALIDATE_LENGTH)
+	public:
+		void    __Begin(IReader^ reader) { __StartPos = reader->Pos; }
+		void    __End  (IReader^ reader) { __EndPos   = reader->Pos; __Length = (int)(__EndPos - __StartPos); }
+		__int64 __StartPos;
+		__int64 __EndPos;
+		int     __Length;
+	#define BEGIN_READ	Property::__Begin(reader);
+	#define END_READ	Property::__End(reader);
+#else
+	#define BEGIN_READ
+	#define END_READ
+#endif
 	};
 
 
@@ -398,28 +415,49 @@ namespace Savegame
 	// To calculate a properties size in save
 	#define SIZE				int GetSize() override { int size = 0;
 	#define SIZE_(base)			int GetSize() override { int size = base::GetSize();
+#ifdef VALIDATE_SIZE
+	#define SIZE_CHECK_(a,b)	{ if (a) SizeCheck(#a, a, #b, b, this, __StartPos); }
+	#define SIZE_CHECK			SIZE_CHECK_(__Length,size)
+	static void SizeCheck(String^ a, int A, String^ b, int B, Object^ obj, __int64 p)
+	{
+		if (A < B)
+			Log::Warning("{0:X8} | {1}:{2:X8} << {3}:{4:X8} in {5}", p, a, A, b, B, obj->ToString());
+		else if (A > B)
+			Log::Error  ("{0:X8} | {1}:{2:X8} >> {3}:{4:X8} in {5}", p, a, A, b, B, obj->ToString());
+	}
+#else
+	#define SIZE_CHECK_(a,b)
+	#define SIZE_CHECK
+#endif
+	#define SIZE_END			return size; }
+
+	// To calculate a properties stored length, used with ValueProperty::Length
+	#define LENGTH				int GetLength() override { int size = 0;
+	#define LENGTH_(base)		int GetLength() override { int size = base::GetLength();
+	#define LENGTH_END			return size; }
+
+	// Both calc. size and length above do share same macros
+	// (besides [SIZE|LEN]_p as those have to call different methods)
 	#define ADD(s)              { size += (s); }
 	#define ADD_b(name)			ADD(sizeof(byte))
 	#define ADD_i(name)			ADD(sizeof(__int32))
 	#define ADD_l(name)			ADD(sizeof(__int64))
 	#define ADD_f(name)			ADD(sizeof(float))
 	#define ADD_s(name)			ADD(str::GetRawLength(name))
-	#define ADD_p(name)			{ if (name) ADD((name)->GetSize()) }
+	#define SIZE_p(name)		{ if (name) ADD((name)->GetSize()) }
+	#define LEN_p(name)			{ if (name) ADD((name)->GetLength()) }
 	#define ADD_a(name,type)	{ if (name) ADD(((array<type>^)name)->Length*sizeof(type)) }
 	#define ADD_ab(name)		{ if (name) ADD((name)->Length) }
-	#define SIZE_END			return size; }
 
 	// Handling for reading/writing a property
-	#define READ				Property^ Read(IReader^ reader) override {
-	#define READ_END			return this; }
-
+	#define READ				Property^ Read(IReader^ reader) override { BEGIN_READ
+	#define READ_END			END_READ; return this; }
 	#define WRITE				void Write(IWriter^ writer) override {
 	#define WRITE_END			}
 
 	// Human-readable string conversion (e.g. for exporting)
 	#define STR(s)				String^ ToString() override { return s; };
 	#define STR_(s)				STR("[" + TypeName + "] " + s)
-
 
 
 	// Most basic (valued) property of all
@@ -460,6 +498,19 @@ namespace Savegame
 		SIZE_END
 
 
+		static int GetLength(ValueProperty^ prop) 
+		{
+#ifdef VALIDATE_LENGTH
+			Log::Warning("{0:X8} | Length override missing for {1}", prop->__StartPos, prop->ToString());
+#endif
+			return 0;
+		}
+
+		LENGTH
+			ADD(GetLength(this))
+		LENGTH_END
+
+
 		static ValueProperty^ Read(IReader^ reader, Property^ parent)
 		{
 			__int64 last = reader->Pos;
@@ -493,7 +544,7 @@ namespace Savegame
 		}
 
 		READ
-			return Read(reader, this);
+			Read(reader, this);
 		READ_END
 
 
@@ -513,6 +564,15 @@ namespace Savegame
 			writer->Write(chars);
 			writer->Write((byte)0);
 
+#ifdef VALIDATE_LENGTH
+			int new_length = prop->GetLength();
+			if (new_length != prop->Length)
+				Log::Error("{0:X8} | Length mismatch: {1:X8} != {2:X8} in {3}", 
+					prop->__StartPos, prop->Length, new_length, prop->ToString());
+			prop->Length = new_length;
+#else
+			prop->Length = prop->GetLength();
+#endif
 			writer->Write(prop->Length);
 
 			writer->Write(prop->Index);
@@ -530,7 +590,7 @@ namespace Savegame
 
 		static str^ NONE = gcnew str((char*)"None");
 
-	CLS_END
+	};
 
 	public ref class Properties : List<Property^> { };
 
@@ -540,13 +600,17 @@ namespace Savegame
 	CLS(PropertyList)
 		PUB(Value,Properties^)
 		SIZE
+			ADD(PropertyList::GetLength())
+			SIZE_CHECK
+		SIZE_END
+		LENGTH
 			for each (ValueProperty^ prop in Value)
 			{
 				ADD(ValueProperty::GetSize(prop))
-				ADD_p(prop)
+				SIZE_p(prop)
 			}
 			ADD_s(ValueProperty::NONE)
-		SIZE_END
+		LENGTH_END
 		READ
 			Value = gcnew Properties;
 			while (true)
@@ -572,7 +636,11 @@ namespace Savegame
 		SIZE
 			ADD_b(Value)
 			ADD_b(NullByte)
+			SIZE_CHECK
 		SIZE_END
+		LENGTH
+			// Always a 0 bytes
+		LENGTH_END
 		READ
 			Value = reader->ReadByte();
 			CheckNullByte(reader);
@@ -588,11 +656,15 @@ namespace Savegame
 		SIZE
 			ADD_s(Unknown)
 			ADD_b(NullByte)
+			ADD(ByteProperty::GetLength())
+			SIZE_CHECK
+		SIZE_END
+		LENGTH
 			if (*Unknown == "None")
 				ADD_b(Value)
 			else
 				ADD_s((str^)Value)
-		SIZE_END
+		LENGTH_END
 		READ
 			Unknown = reader->ReadString();
 			CheckNullByte(reader);
@@ -614,8 +686,12 @@ namespace Savegame
 	CLS_(IntProperty, ValueProperty)
 		SIZE
 			ADD_b(NullByte)
-			ADD_i(Value)
+			ADD(IntProperty::GetLength())
+			SIZE_CHECK
 		SIZE_END
+		LENGTH
+			ADD_i(Value)// Always a 4 bytes
+		LENGTH_END
 		READ
 			CheckNullByte(reader);
 			Value = reader->ReadInt();
@@ -629,8 +705,12 @@ namespace Savegame
 	CLS_(FloatProperty, ValueProperty)
 		SIZE
 			ADD_b(NullByte)
-			ADD_f(Value)
+			ADD(FloatProperty::GetLength())
+			SIZE_CHECK
 		SIZE_END
+		LENGTH
+			ADD_f(Value)// Always a 4 bytes
+		LENGTH_END
 		READ
 			CheckNullByte(reader);
 			Value = reader->ReadFloat();
@@ -644,8 +724,12 @@ namespace Savegame
 	CLS_(StrProperty, ValueProperty)
 		SIZE
 			ADD_b(NullByte)
-			ADD_s((str^)Value)
+			ADD(StrProperty::GetLength())
+			SIZE_CHECK
 		SIZE_END
+		LENGTH
+			ADD_s((str^)Value)
+		LENGTH_END
 		READ
 			CheckNullByte(reader);
 			Value = reader->ReadString();
@@ -681,7 +765,11 @@ namespace Savegame
 			ADD_i(PlayDuration)
 			ADD_l(SaveDateTime)
 			ADD_b(Visibility)
+			SIZE_CHECK
 		SIZE_END
+		LENGTH
+			throw gcnew InvalidOperationException();
+		LENGTH_END
 		READ
 			Type = reader->ReadInt();
 			SaveVersion = reader->ReadInt();
@@ -723,7 +811,11 @@ namespace Savegame
 		SIZE
 			ADD_s(LevelName)
 			ADD_s(PathName)
+			SIZE_CHECK
 		SIZE_END
+		LENGTH
+			throw gcnew InvalidOperationException();
+		LENGTH_END
 		READ
 			LevelName = reader->ReadString();
 			PathName = reader->ReadString();
@@ -741,20 +833,30 @@ namespace Savegame
 		PUB_ab(Unknown)
 		bool IsArray;
 		SIZE
+			ADD_s(_Inner)
+			ADD(17)//Unknown
 			if (!IsArray)
 			{
-				ADD_s(_Inner)
-				ADD(17)//Unknown
-				ADD_p((Property^)Value)
+				SIZE_p((Property^)Value)
 			}
 			else
 			{
-				ADD_s(_Inner)
-				ADD(17)//Unknown
 				for each (Property^ prop in (Properties^)Value)
-					ADD_p(prop)
+					SIZE_p(prop)
 			}
+			SIZE_CHECK
 		SIZE_END
+		LENGTH
+			if (!IsArray)
+			{
+				LEN_p((Property^)Value)
+			}
+			else
+			{
+				for each (Property^ prop in (Properties^)Value)
+					LEN_p(prop)
+			}
+		LENGTH_END
 		READ
 			__int64 last = reader->Pos;
 			IsArray = false;
@@ -797,6 +899,15 @@ namespace Savegame
 			if (IsArray)
 				throw gcnew WriteException(writer, String::Format(
 					"Expected IsArray=false while saving structure type '{0}'", _Inner));
+#ifdef VALIDATE_LENGTH
+			int new_length = GetLength();
+			if (new_length != Length)
+				Log::Error("{0:X8} | Length mismatch: {1:X8} != {2:X8} in struct {3}", 
+					__StartPos, Length, new_length, ToString());
+			Length = new_length;
+#else
+			Length = GetLength();
+#endif
 			writer->Write(_Inner);
 			writer->Write(Unknown);
 			dynamic_cast<Property^>(Value)->Write(writer);
@@ -806,6 +917,15 @@ namespace Savegame
 			if (!IsArray)
 				throw gcnew WriteException(writer, String::Format(
 					"Expected IsArray=true while saving structure type '{0}'", _Inner));
+#ifdef VALIDATE_LENGTH
+			int new_length = GetLength();
+			if (new_length != Length)
+				Log::Error("{0:X8} | Length mismatch: {1:X8} != {2:X8} in struct (as array) {3}", 
+					__StartPos, Length, new_length, ToString());
+			Length = new_length;
+#else
+			Length = GetLength();
+#endif
 			writer->Write(_Inner);
 			writer->Write(Unknown);
 			Properties^ props = (Properties^) Value;
@@ -823,8 +943,12 @@ namespace Savegame
 		PUB_f(Y)
 		PUB_f(Z)
 		SIZE
-			ADD(sizeof(float)*3)
+			ADD(Vector::GetLength())
+			SIZE_CHECK
 		SIZE_END
+		LENGTH
+			ADD(sizeof(float)*3)
+		LENGTH_END
 		READ
 			X = reader->ReadFloat();
 			Y = reader->ReadFloat();
@@ -868,9 +992,13 @@ namespace Savegame
 		PUB_f(MaxZ)
 		PUB_b(IsValid)
 		SIZE
+			ADD(Box::GetLength())
+			SIZE_CHECK
+		SIZE_END
+		LENGTH
 			ADD(sizeof(float)*6)
 			ADD_b(IsValid)
-		SIZE_END
+		LENGTH_END
 		READ
 			MinX = reader->ReadFloat();
 			MinY = reader->ReadFloat();
@@ -899,8 +1027,12 @@ namespace Savegame
 		PUB_b(B)
 		PUB_b(A)
 		SIZE
-			ADD(sizeof(byte)*4)
+			ADD(Color::GetLength())
+			SIZE_CHECK
 		SIZE_END
+		LENGTH
+			ADD(sizeof(byte)*4)
+		LENGTH_END
 		READ
 			R = reader->ReadByte();
 			G = reader->ReadByte();
@@ -923,8 +1055,12 @@ namespace Savegame
 		PUB_f(B)
 		PUB_f(A)
 		SIZE
-			ADD(sizeof(float)*4)
+			ADD(LinearColor::GetLength())
+			SIZE_CHECK
 		SIZE_END
+		LENGTH
+			ADD(sizeof(float)*4)
+		LENGTH_END
 		READ
 			R = reader->ReadFloat();
 			G = reader->ReadFloat();
@@ -942,9 +1078,10 @@ namespace Savegame
 
 	#pragma region Transform
 	CLS_(Transform,PropertyList)
-		READ
-			PropertyList^ obj = (PropertyList^) PropertyList::Read(reader);
-			for (int i = 0; i < obj->Value->Count; ++i)
+		Property^ Read(IReader^ reader) override
+		{
+			PropertyList::Read(reader);
+			for (int i = 0; i < Value->Count; ++i)
 			{
 				ValueProperty^ prop = (ValueProperty^) Value[i];
 				if (*(prop->Name) == "Scale3D")
@@ -953,8 +1090,8 @@ namespace Savegame
 					break;
 				}
 			}
-			return obj;
-		READ_END
+			return this;
+		}
 	CLS_END
 	#pragma endregion
 
@@ -965,8 +1102,12 @@ namespace Savegame
 		PUB_f(C)
 		PUB_f(D)
 		SIZE
-			ADD(sizeof(float)*4)
+			ADD(Quat::GetLength())
+			SIZE_CHECK
 		SIZE_END
+		LENGTH
+			ADD(sizeof(float)*4)
+		LENGTH_END
 		READ
 			A = reader->ReadFloat();
 			B = reader->ReadFloat();
@@ -984,20 +1125,23 @@ namespace Savegame
 
 	#pragma region InventoryItem
 	CLS(InventoryItem)
-		//TODO: Might also be some PropertyList? Investigate	
 		PUB_s(Unknown)
 		PUB_s(ItemName)
 		PUB_s(LevelName)
 		PUB_s(PathName)
 		PUB_p(Value)
 		SIZE
+			ADD(InventoryItem::GetLength())
+			SIZE_p((ValueProperty^)Value)
+			if (Value) ADD(ValueProperty::GetSize(Value))
+			SIZE_CHECK
+		SIZE_END
+		LENGTH
 			ADD_s(Unknown)
 			ADD_s(ItemName)
 			ADD_s(LevelName)
 			ADD_s(PathName)
-			ADD_p((ValueProperty^)Value)
-			if (Value) ADD(ValueProperty::GetSize(Value))
-		SIZE_END
+		LENGTH_END
 		READ
 			Unknown = reader->ReadString();
 			ItemName = reader->ReadString();
@@ -1017,16 +1161,42 @@ namespace Savegame
 	#pragma endregion
 
 	#pragma region ObjectProperty
-	CLS_(ObjectProperty,ValueProperty)
-		// Note that ObjectProperty is somewhat special with having
-		// two different faces: w/ .Name + .Value and w/o those.
-		// (depending on its 'context' when loaded)
+	// Note that ObjectProperty is somewhat special with having
+	// two different faces: w/ .Name + .Value and w/o those.
+	// (depending on its 'context' when loaded)
+	public ref class ObjectProperty : ValueProperty
+	{
+	public:
+		ObjectProperty(Property^ parent) 
+			: ObjectProperty(parent, true)
+		{ }
+
+		ObjectProperty(Property^ parent, bool has_nullbyte) 
+			: ValueProperty(parent)
+			, _has_nullbyte(has_nullbyte)
+		{ }
+
 		PUB_s(LevelName)
 		PUB_s(PathName)
+
 		SIZE
-			ADD(GetSize(true))
+			ADD(GetSize(_has_nullbyte))
 		SIZE_END
 		int GetSize(bool null_check) 
+		{
+#ifdef VALIDATE_SIZE
+			int size = GetLength(null_check);
+			SIZE_CHECK
+			return size;
+#else
+			return GetLength(null_check);
+#endif
+		}
+
+		LENGTH
+			ADD(GetLength(false))
+		LENGTH_END
+		int GetLength(bool null_check)
 		{
 			int size = 0;
 			if (null_check)
@@ -1035,28 +1205,37 @@ namespace Savegame
 			ADD_s(PathName)
 			return size;
 		}
+
 		READ
 			Read(reader, true);
 		READ_END
 		Property^ Read(IReader^ reader, bool null_check)
 		{
+			BEGIN_READ
+			_has_nullbyte = null_check;
 			if (null_check)
 				CheckNullByte(reader);
 			LevelName = reader->ReadString();
 			PathName = reader->ReadString();
+			END_READ
 			return this;
 		}
+
 		WRITE
-			Write(writer, true);
+			Write(writer, _has_nullbyte);
 		WRITE_END
 		void Write(IWriter^ writer, bool add_null)
 		{
+			if (_has_nullbyte != add_null)
+				Log::Error("{0:X8} | Invalid null byte state with object property {1}", writer->Pos, ToString());
 			if (add_null)
 				writer->Write((byte)0);
 			writer->Write(LevelName);
 			writer->Write(PathName);
 		}
+
 		STR_(PathName)
+
 		Keys^ GetKeys() override
 		{
 			return Property::_GetKeys(_GetExcludes());
@@ -1065,6 +1244,7 @@ namespace Savegame
 		{
 			return Property::_GetChilds(_GetExcludes());
 		}
+
 	protected:
 		List<String^>^ _GetExcludes()
 		{
@@ -1081,8 +1261,10 @@ namespace Savegame
 			}
 			return nullptr;
 		}
+
 		static List<String^>^ _excludes = nullptr;
-	CLS_END
+		bool _has_nullbyte;
+	};
 	#pragma endregion
 
 	#pragma region ArrayProperty
@@ -1090,44 +1272,45 @@ namespace Savegame
 		PUB_s(InnerType)
 		SIZE
 			ADD_s(InnerType)
+			ADD_b(NullByte)
+			ADD(ArrayProperty::GetLength())
+			SIZE_CHECK
+		SIZE_END
+		LENGTH
 			if (InnerType == "StructProperty")
 			{
-				ADD_b(NullByte)
 				ADD_i(count)
 				StructProperty^ stru = (StructProperty^)Value;
 				ADD_s(stru->Name)
 				ADD_s(_type)
 				ADD_i(stru->Length)
 				ADD_i(stru->Index)
-				ADD(((StructProperty^)Value)->GetSize())
+				ADD(stru->GetSize())
 			}
 			else if (InnerType == "ObjectProperty")
 			{
-				ADD_b(NullByte)
 				ADD_i(count)
 				for each (ObjectProperty^ prop in (Properties^)Value)
 					ADD(prop->GetSize(false))
 			}
 			else if (InnerType == "IntProperty")
 			{
-				ADD_b(NullByte)
 				ADD_i(count);
 				ADD_a(Value, int)
 			}
 			else if (InnerType == "ByteProperty")
 			{
-				ADD_b(NullByte)
 				ADD_i(count)
 				ADD_a(Value, byte);
 			}
 			else
 				throw gcnew Exception(String::Format("Unknown inner array type '{0}'", InnerType));
-		SIZE_END
+		LENGTH_END
 		READ
 			InnerType = reader->ReadString();
+			CheckNullByte(reader);
 			if (InnerType == "StructProperty")
 			{
-				CheckNullByte(reader);
 				int count = reader->ReadInt();
 				str^ name = reader->ReadString();
 				_type = reader->ReadString();
@@ -1143,25 +1326,22 @@ namespace Savegame
 			}
 			else if (InnerType == "ObjectProperty")
 			{
-				CheckNullByte(reader);
 				int count = reader->ReadInt();
 				Properties^ objs = gcnew Properties;
 				for (int i = 0; i < count; ++i)
 				{
-					ObjectProperty^ prop = gcnew ObjectProperty(this);
+					ObjectProperty^ prop = gcnew ObjectProperty(this, false);
 					objs->Add(prop->Read(reader, false));
 				}
 				Value = objs;
 			}
 			else if (InnerType == "IntProperty")
 			{
-				CheckNullByte(reader);
 				int count = reader->ReadInt();
 				Value = reader->ReadInts(count);
 			}
 			else if (InnerType == "ByteProperty")
 			{
-				CheckNullByte(reader);
 				int count = reader->ReadInt();
 				Value = reader->ReadBytes(count);
 			}
@@ -1170,21 +1350,29 @@ namespace Savegame
 		READ_END
 		WRITE
 			writer->Write(InnerType);
+			writer->Write((byte)0);
 			if (InnerType == "StructProperty")
 			{
-				writer->Write((byte)0);
 				StructProperty^ stru = (StructProperty^) Value;
 				Properties^ props = (Properties^) stru->Value;
 				writer->Write((int)props->Count);
 				writer->Write(stru->Name);
 				writer->Write(InnerType);
+#ifdef VALIDATE_LENGTH
+				int new_length = stru->GetLength();
+				if (new_length != stru->Length)
+					Log::Error("{0:X8} | Length mismatch: {1:X8} != {2:X8} in array type {3}", 
+						stru->__StartPos, stru->Length, new_length, stru->ToString());
+				stru->Length = new_length;
+#else
+				stru->Length = stru->GetLength();
+#endif
 				writer->Write(stru->Length);
 				writer->Write(stru->Index);
 				stru->WriteAsArray(writer);
 			}
 			else if (InnerType == "ObjectProperty")
 			{
-				writer->Write((byte)0);
 				Properties^ props = (Properties^) Value;
 				writer->Write((int)props->Count);
 				for each (Property^ prop in props)
@@ -1192,14 +1380,12 @@ namespace Savegame
 			}
 			else if (InnerType == "IntProperty")
 			{
-				writer->Write((byte)0);
 				array<__int32>^ arr = (array<__int32>^) Value;
 				writer->Write((int)arr->Length);
 				writer->Write(arr);
 			}
 			else if (InnerType == "ByteProperty")
 			{
-				writer->Write((byte)0);
 				ByteArray^ arr = (ByteArray^) Value;
 				writer->Write((int)arr->Length);
 				writer->Write(arr);
@@ -1218,8 +1404,12 @@ namespace Savegame
 		SIZE
 			ADD_s(EnumName)
 			ADD_b(NullByte)
-			ADD_s((str^)Value)
+			ADD(EnumProperty::GetLength())
+			SIZE_CHECK
 		SIZE_END
+		LENGTH
+			ADD_s((str^)Value)
+		LENGTH_END
 		READ
 			EnumName = reader->ReadString();
 			CheckNullByte(reader);
@@ -1244,7 +1434,14 @@ namespace Savegame
 		SIZE
 			ADD_s(KeyType)
 			ADD_s(ValueType)
-			ADD(sizeof(byte)*5)
+			// Seems like only a single null byte here, remain might be an int32 -> Investigate why resp. what the real origin for those
+			ADD_b(NullCheck)
+			ADD(MapProperty::GetLength())
+			SIZE_CHECK
+		SIZE_END
+		LENGTH
+			// We've to take 4 of those 5 null bytes into account here -> Investigate why resp. what the real origin for those
+			ADD(sizeof(byte)*4)
 			ADD_i(count)
 			for each (KeyValuePair<Object^, Object^>^ pair in (Entries^)Value)
 			{
@@ -1262,11 +1459,13 @@ namespace Savegame
 				else
 					throw gcnew Exception(String::Format("Unknown value type '{0}'", ValueType->ToString()));
 			}
-		SIZE_END
+		LENGTH_END
 		READ
 			KeyType = reader->ReadString();
 			ValueType = reader->ReadString();
-			/*5*/ CheckNullByte(reader); CheckNullByte(reader); CheckNullByte(reader); CheckNullByte(reader); CheckNullByte(reader);
+			// Seems like only a single null byte here, remain might be an int32 -> Investigate why resp. what the real origin for those
+			CheckNullByte(reader); 
+			CheckNullByte(reader); CheckNullByte(reader); CheckNullByte(reader); CheckNullByte(reader);
 			int count = reader->ReadInt();
 			Value = gcnew Entries;
 			for (int i = 0; i < count; ++i)
@@ -1275,7 +1474,7 @@ namespace Savegame
 				if (*KeyType == "IntProperty")
 					key = reader->ReadInt();
 				else if (*KeyType == "ObjectProperty")
-					key = (gcnew ObjectProperty(this))->Read(reader, false);
+					key = (gcnew ObjectProperty(this, false))->Read(reader, false);
 				else
 					throw gcnew ReadException(reader, String::Format("Unknown key type '{0}'", KeyType->ToString()));
 
@@ -1293,7 +1492,9 @@ namespace Savegame
 		WRITE
 			writer->Write(KeyType);
 			writer->Write(ValueType);
-			/*5*/ writer->Write((byte)0); writer->Write((byte)0); writer->Write((byte)0); writer->Write((byte)0); writer->Write((byte)0);
+			// Seems like only a single null byte here, remain might be an int32 -> Investigate why resp. what the real origin for those
+			writer->Write((byte)0); 
+			writer->Write((byte)0); writer->Write((byte)0); writer->Write((byte)0); writer->Write((byte)0);
 			Entries^ entries = (Entries^) Value;
 			writer->Write((int)entries->Count);
 			//TODO: This might write in a different order. Investigate!
@@ -1322,9 +1523,13 @@ namespace Savegame
 		PUB_ab(Unknown)
 		SIZE
 			ADD_b(NullByte)
+			ADD(TextProperty::GetLength())
+			SIZE_CHECK
+		SIZE_END
+		LENGTH
 			ADD(13)
 			ADD_s((str^)Value)
-		SIZE_END
+		LENGTH_END
 		READ
 			CheckNullByte(reader);
 			Unknown = reader->ReadBytes(13);
@@ -1345,11 +1550,15 @@ namespace Savegame
 		PUB_f(Offset)
 		PUB_f(Forward)
 		SIZE
+			ADD(RailroadTrackPosition::GetLength())
+			SIZE_CHECK
+		SIZE_END
+		LENGTH
 			ADD_s(ClassName)
 			ADD_s(PathName)
 			ADD_f(Offset)
 			ADD_f(Forward)
-		SIZE_END
+		LENGTH_END
 		READ
 			ClassName = reader->ReadString();
 			PathName = reader->ReadString();
@@ -1456,12 +1665,22 @@ namespace Savegame
 		int MissingUsed;
 #endif
 
-		SIZE_(PropertyList)
+		SIZE
+			ADD(Entity::GetLength())
+			SIZE_CHECK_(__Length_Passed,size)
+		SIZE_END
+
+		LENGTH_(PropertyList)
 			ADD_i(Unknown)
 			ADD_ab(Missing)
-		SIZE_END
+		LENGTH_END
+
 		Property^ Read(IReader^ reader, int length)
 		{
+#ifdef VALIDATE_SIZE
+			__Length_Passed = length;
+#endif
+
 			__int64 last_pos = reader->Pos;
 			PropertyList::Read(reader);
 			//TODO: There is an extra 'int' following, investigate!
@@ -1476,8 +1695,16 @@ namespace Savegame
 				Missing = reader->ReadBytes((int)(length - bytes_read));
 			return this;
 		}
+
 		void Write(IWriter^ writer, int length)
 		{
+#ifdef VALIDATE_LENGTH
+			int new_length = Entity::GetLength();
+			if (new_length != length)
+				Log::Error("{0:X8} | Length mismatch: {1:X8} != {2:X8} in entity obj {3}", 
+					__StartPos, length, new_length, ToString());
+#endif
+
 			__int64 last_pos = writer->Pos;
 			PropertyList::Write(writer);
 			//TODO: There is an extra 'int' following, investigate!
@@ -1486,7 +1713,6 @@ namespace Savegame
 			// Might this be the same "int" discovered with entities below???
 			writer->Write(Unknown);
 
-			// Using shadow here in case reading private data removed .Missing
 			__int64 bytes_written = writer->Pos - last_pos;
 			if (bytes_written < 0)
 				throw gcnew WriteException(writer, "Negative offset!");
@@ -1497,7 +1723,12 @@ namespace Savegame
 			if (Missing != nullptr)
 				writer->Write(Missing);
 		}
+
 		STR_(PathName)
+
+#ifdef VALIDATE_SIZE
+		int __Length_Passed;
+#endif
 	};
 
 	public ref class NamedEntity : Entity
@@ -1512,14 +1743,22 @@ namespace Savegame
 
 			PUB_s(LevelName)
 			PUB_s(PathName)
+
 			SIZE
+				ADD(Name::GetLength())
+				SIZE_CHECK
+			SIZE_END
+
+			LENGTH
 				ADD_s(LevelName)
 				ADD_s(PathName)
-			SIZE_END
+			LENGTH_END
+
 			READ
 				LevelName = reader->ReadString();
 				PathName = reader->ReadString();
 			READ_END
+
 			WRITE
 				writer->Write(LevelName);
 				writer->Write(PathName);
@@ -1530,16 +1769,27 @@ namespace Savegame
 			: Entity(parent, level_name, path_name, children)
 		{ }
 
-		SIZE_(Entity)
+		SIZE
+			ADD(NamedEntity::GetLength())
+			SIZE_CHECK_(__Length_Passed,size)
+		SIZE_END
+
+		LENGTH_(Entity)
 			ADD_s(LevelName)
 			ADD_s(PathName)
 			ADD_i(count)
 			for each (Name^ name in Children)
 				ADD(name->GetSize())
-		SIZE_END
+		LENGTH_END
 
 		Property^ Read(IReader^ reader, int length)
 		{
+			BEGIN_READ
+
+#ifdef VALIDATE_SIZE
+			__Length_Passed = length;
+#endif
+
 			__int64 last_pos = reader->Pos;
 			LevelName = reader->ReadString();
 			PathName = reader->ReadString();
@@ -1556,10 +1806,20 @@ namespace Savegame
 			//if (bytes_read != length)
 			//	Missing = ReadBytes(reader, length - bytes_read);
 			Entity::Read(reader, (int)(length - bytes_read));
+
+			END_READ
 			return this;
 		}
+
 		void Write(IWriter^ writer, int length)
 		{
+#ifdef VALIDATE_LENGTH
+			int new_length = GetLength();
+			if (new_length != length)
+				Log::Error("{0:X8} | Length mismatch: {1:X8} != {2:X8} in named entity obj {3}", 
+					__StartPos, length, new_length, ToString());
+#endif
+
 			__int64 last_pos = writer->Pos;
 			writer->Write(LevelName);
 			writer->Write(PathName);
@@ -1576,6 +1836,10 @@ namespace Savegame
 			// better do some integrity checking there
 			Entity::Write(writer, (int)(length - bytes_written));
 		}
+
+#ifdef VALIDATE_SIZE
+		int __Length_Passed;
+#endif
 	};
 
 	#pragma region Object
@@ -1590,9 +1854,14 @@ namespace Savegame
 			ADD_s(LevelName)
 			ADD_s(PathName)
 			ADD_s(OuterPathName)
+			SIZE_CHECK
 			ADD_i(_EntityLength)
-			ADD_p(EntityObj)
+			SIZE_p(EntityObj)
+			SIZE_CHECK_(_EntityLength,EntityObj->GetSize())
 		SIZE_END
+		LENGTH
+			throw gcnew InvalidOperationException();
+		LENGTH_END
 		READ
 			ClassName = reader->ReadString();
 			LevelName = reader->ReadString();
@@ -1634,10 +1903,17 @@ namespace Savegame
 		WRITE_END
 		void WriteEntity(IWriter^ writer)
 		{
-			writer->Write(_EntityLength);
 			Entity^ entity = (Entity^) EntityObj;
-			// Even if length isn't needed for writing, 
-			// better do some integrity checking there
+#ifdef VALIDATE_LENGTH
+			int new_length = entity->GetSize();
+			if (new_length != _EntityLength)
+				Log::Error("{0:X8} | Length mismatch: {1:X8} != {2:X8} in object's entity {3}", 
+					entity->__StartPos, _EntityLength, new_length, entity->ToString());
+			_EntityLength = new_length;
+#else
+			_EntityLength = entity->GetSize();
+#endif
+			writer->Write(_EntityLength);
 			entity->Write(writer, _EntityLength);
 
 			// EXPERIMENTAL
@@ -1665,13 +1941,18 @@ namespace Savegame
 			ADD_s(LevelName)
 			ADD_s(PathName)
 			ADD_i(NeedTransform)
-			ADD_p(Rotation)
-			ADD_p(Translate)
-			ADD_p(Scale)
+			SIZE_p(Rotation)
+			SIZE_p(Translate)
+			SIZE_p(Scale)
 			ADD_i(WasPlacedInLevel)
+			SIZE_CHECK
 			ADD_i(_EntityLength)
-			ADD_p(EntityObj)
+			SIZE_p(EntityObj)
+			SIZE_CHECK_(_EntityLength, EntityObj->GetSize())
 		SIZE_END
+		LENGTH
+			throw gcnew InvalidOperationException();
+		LENGTH_END
 		READ
 			ClassName = reader->ReadString();
 			LevelName = reader->ReadString();
@@ -1721,10 +2002,17 @@ namespace Savegame
 		WRITE_END
 		void WriteEntity(IWriter^ writer)
 		{
-			writer->Write(_EntityLength);
 			NamedEntity^ entity = (NamedEntity^) EntityObj;
-			// Even if length isn't needed for writing, 
-			// better do some integrity checking there
+#ifdef VALIDATE_LENGTH
+			int new_length = entity->GetSize();
+			if (new_length != _EntityLength)
+				Log::Error("{0:X8} | Length mismatch: {1:X8} != {2:X8} in actor' entity {3}", 
+					entity->__StartPos, _EntityLength, new_length, entity->ToString());
+			_EntityLength = new_length;
+#else
+			_EntityLength = entity->GetSize();
+#endif
+			writer->Write(_EntityLength);
 			entity->Write(writer, _EntityLength);
 
 			// EXPERIMENTAL
@@ -1940,6 +2228,8 @@ namespace Savegame
 		PUB(Translate, Vector^)
 		SIZE
 		SIZE_END
+		LENGTH
+		LENGTH_END
 		READ
 			Index = reader->ReadInt();
 			ItemName = reader->ReadString();
@@ -1982,6 +2272,8 @@ namespace Savegame
 		PUB(Translate, Vector^)
 		SIZE
 		SIZE_END
+		LENGTH
+		LENGTH_END
 		READ
 			Index = reader->ReadInt();
 			ItemName = reader->ReadString();
@@ -2029,6 +2321,8 @@ namespace Savegame
 		PUB_ab(Unknown)
 		SIZE
 		SIZE_END
+		LENGTH
+		LENGTH_END
 		READ
 			// Seems like some animation data?
 			Node = reader->ReadString();
