@@ -80,6 +80,7 @@
 	<Deposit_Stone_C>[Deposit] Stone</Deposit_Stone_C>
 	<Deposit_Sulfur_C>[Deposit] Sulfur</Deposit_Sulfur_C>
 	<Deposit_Uranium_C>[Deposit] Uranium</Deposit_Uranium_C>
+	<Desc_Geyser_C>Geyser</Desc_Geyser_C>
 	<ResourceNode_Middle_Quartz01_C>Quartz</ResourceNode_Middle_Quartz01_C>
 	
 	<!-- Mobs, dangers, and "remains" -->
@@ -138,6 +139,8 @@
 	<BP_EquipmentDescriptorStunSpear_C>Stun Spear</BP_EquipmentDescriptorStunSpear_C>
 	<BP_ItemDescriptorPortableMiner_C>Portable Miner</BP_ItemDescriptorPortableMiner_C>
 	<BP_ResourceScanner_C>Resource Scanner</BP_ResourceScanner_C>
+	<Desc_Chainsaw_C>Chainsaw</Desc_Chainsaw_C>
+	<Desc_Parachute>Parachute</Desc_Parachute>
 	<Equip_Chainsaw_C>Chainsaw</Equip_Chainsaw_C>
 	<Equip_ColorGun_C>Color Gun</Equip_ColorGun_C>
 	<Equip_GasMask_C>Gas Mask</Equip_GasMask_C>
@@ -187,7 +190,6 @@
 	<Desc_FlowerPetals_C>Flower Petals</Desc_FlowerPetals_C>
 	<Desc_Fuel_C>Fuel</Desc_Fuel_C>
 	<Desc_GenericBiomass_C>Generic Biomass</Desc_GenericBiomass_C>
-	<Desc_Geyser_C>Geyser</Desc_Geyser_C>
 	<Desc_GoldIngot_C>Gold Ingot</Desc_GoldIngot_C>
 	<Desc_Gunpowder_C>Gunpowder</Desc_Gunpowder_C>
 	<Desc_HUBParts_C>HUB Parts</Desc_HUBParts_C>
@@ -205,6 +207,7 @@
 	<Desc_Medkit_C>Medkit</Desc_Medkit_C>
 	<Desc_ModularFrame_C>Modular Frame</Desc_ModularFrame_C>
 	<Desc_ModularFrameHeavy_C>Heavy Modular Frame</Desc_ModularFrameHeavy_C>
+	<Desc_ModularFrameLightweight>Light Modular Frame</Desc_ModularFrameLightweight>
 	<Desc_Motor_C>Motor</Desc_Motor_C>
 	<Desc_MotorLightweight_C>Lightweight Motor</Desc_MotorLightweight_C>
 	<Desc_Mycelia_C>Mycelia</Desc_Mycelia_C>
@@ -227,7 +230,7 @@
 	<Desc_SAM_C>SAM</Desc_SAM_C>
 	<Desc_Shroom_C>Shroom</Desc_Shroom_C>
 	<Desc_Silica_C>Silica</Desc_Silica_C>
-	<Desc_SpaceElevatorBlocker_C>Space Elevator Blocker</Desc_SpaceElevatorBlocker_C>
+	<!--<Desc_SpaceElevatorBlocker_C>Space Elevator Blocker</Desc_SpaceElevatorBlocker_C>-->
 	<Desc_SpikedRebar_C>Spiked Rebar</Desc_SpikedRebar_C>
 	<Desc_SpitterParts_C>Spitter Parts</Desc_SpitterParts_C>
 	<Desc_Stator_C>Stator</Desc_Stator_C>
@@ -338,20 +341,20 @@
 	<Build_WalkwayTrun_C>Walkway Turn</Build_WalkwayTrun_C>
 	<Build_Wall_8x4_01_C>Wall 8x4</Build_Wall_8x4_01_C>
 	<Build_Wall_8x4_02_C>Wall 8x4</Build_Wall_8x4_02_C>
-	<Build_Wall_Conveyor_8x4_01_C>Wall Conveyor 8x4 (1 belt)</Build_Wall_Conveyor_8x4_01_C>
-	<Build_Wall_Conveyor_8x4_01_Steel_C>Wall Conveyor 8x4 Steel (1 belt)</Build_Wall_Conveyor_8x4_01_Steel_C>
+	<Build_Wall_Conveyor_8x4_01_C>Wall Conveyor 8x4 (3 belts)</Build_Wall_Conveyor_8x4_01_C>
+	<Build_Wall_Conveyor_8x4_01_Steel_C>Wall Conveyor 8x4 Steel (3 belts)</Build_Wall_Conveyor_8x4_01_Steel_C>
 	<Build_Wall_Conveyor_8x4_02_C>Wall Conveyor 8x4 (2 belts)</Build_Wall_Conveyor_8x4_02_C>
 	<Build_Wall_Conveyor_8x4_02_Steel_C>Wall Conveyor 8x4 Steel (2 belts)</Build_Wall_Conveyor_8x4_02_Steel_C>
-	<Build_Wall_Conveyor_8x4_03_C>Wall Conveyor 8x4 (3 belts)</Build_Wall_Conveyor_8x4_03_C>
-	<Build_Wall_Conveyor_8x4_03_Steel_C>Wall Conveyor 8x4 Steel (3 belts)</Build_Wall_Conveyor_8x4_03_Steel_C>
-	<Build_Wall_Conveyor_8x4_04_C>Wall Conveyor 8x4 (4 belts)</Build_Wall_Conveyor_8x4_04_C>
-	<Build_Wall_Conveyor_8x4_04_Steel_C>Wall Conveyor 8x4 Steel (4 belt)</Build_Wall_Conveyor_8x4_04_Steel_C>
-	<Build_Wall_Door_8x4_01_C>Wall Door 8x4 (c/r/l?)</Build_Wall_Door_8x4_01_C>
-	<Build_Wall_Door_8x4_01_Steel_C>Wall Door 8x4 Steel (c/r/l?)</Build_Wall_Door_8x4_01_Steel_C>
-	<Build_Wall_Door_8x4_02_C>Wall Door 8x4 (c/r/l?)</Build_Wall_Door_8x4_02_C>
-	<Build_Wall_Door_8x4_02_Steel_C>Wall Door 8x4 Steel (c/r/l?)</Build_Wall_Door_8x4_02_Steel_C>
-	<Build_Wall_Door_8x4_03_C>Wall Door 8x4 (c/r/l?)</Build_Wall_Door_8x4_03_C>
-	<Build_Wall_Door_8x4_03_Steel_C>Wall Door 8x4 Steel (c/r/l?)</Build_Wall_Door_8x4_03_Steel_C>
+	<Build_Wall_Conveyor_8x4_03_C>Wall Conveyor 8x4 (1 belt)</Build_Wall_Conveyor_8x4_03_C>
+	<Build_Wall_Conveyor_8x4_03_Steel_C>Wall Conveyor 8x4 Steel (1 belt)</Build_Wall_Conveyor_8x4_03_Steel_C>
+	<Build_Wall_Conveyor_8x4_04_C>Wall Conveyor Straight 8x4 (1 belt)</Build_Wall_Conveyor_8x4_04_C>
+	<Build_Wall_Conveyor_8x4_04_Steel_C>Wall Conveyor Straight 8x4 Steel (1 belt)</Build_Wall_Conveyor_8x4_04_Steel_C>
+	<Build_Wall_Door_8x4_01_C>Wall Door Center 8x4</Build_Wall_Door_8x4_01_C>
+	<Build_Wall_Door_8x4_01_Steel_C>Wall Door Center 8x4 Steel</Build_Wall_Door_8x4_01_Steel_C>
+	<Build_Wall_Door_8x4_02_C>Wall Door Left 8x4</Build_Wall_Door_8x4_02_C>
+	<Build_Wall_Door_8x4_02_Steel_C>Wall Door Left 8x4 Steel</Build_Wall_Door_8x4_02_Steel_C>
+	<Build_Wall_Door_8x4_03_C>Wall Door Right 8x4</Build_Wall_Door_8x4_03_C>
+	<Build_Wall_Door_8x4_03_Steel_C>Wall Door Right 8x4 Steel</Build_Wall_Door_8x4_03_Steel_C>
 	<Build_Wall_Gate_8x4_01_C>Wall Gate 8x4</Build_Wall_Gate_8x4_01_C>
 	<Build_WorkBench_C>Work Bench</Build_WorkBench_C>
 	<Build_WorkBenchIntegrated_C>Work Bench Integrated</Build_WorkBenchIntegrated_C>
@@ -550,20 +553,20 @@
 	<Recipe_Walkway_Turn_C>[Recipe] Walkway Turn</Recipe_Walkway_Turn_C>
 	<Recipe_Wall_8x4_01_C>[Recipe] Wall 8x4</Recipe_Wall_8x4_01_C>
 	<Recipe_Wall_8x4_02_C>[Recipe] Wall 8x4</Recipe_Wall_8x4_02_C>
-	<Recipe_Wall_Conveyor_8x4_01_C>[Recipe] Wall Conveyor 8x4 (1 belt)</Recipe_Wall_Conveyor_8x4_01_C>
-	<Recipe_Wall_Conveyor_8x4_01_Steel_C>[Recipe] Wall Conveyor 8x4 Steel (1 belt)</Recipe_Wall_Conveyor_8x4_01_Steel_C>
+	<Recipe_Wall_Conveyor_8x4_01_C>[Recipe] Wall Conveyor 8x4 (3 belts)</Recipe_Wall_Conveyor_8x4_01_C>
+	<Recipe_Wall_Conveyor_8x4_01_Steel_C>[Recipe] Wall Conveyor 8x4 Steel (3 belts)</Recipe_Wall_Conveyor_8x4_01_Steel_C>
 	<Recipe_Wall_Conveyor_8x4_02_C>[Recipe] Wall Conveyor 8x4 (2 belts)</Recipe_Wall_Conveyor_8x4_02_C>
 	<Recipe_Wall_Conveyor_8x4_02_Steel_C>[Recipe] Wall Conveyor 8x4 Steel (2 belts)</Recipe_Wall_Conveyor_8x4_02_Steel_C>
-	<Recipe_Wall_Conveyor_8x4_03_C>[Recipe] Wall Conveyor 8x4 (3 belts)</Recipe_Wall_Conveyor_8x4_03_C>
-	<Recipe_Wall_Conveyor_8x4_03_Steel_C>[Recipe] Wall Conveyor 8x4 Steel (3 belts)</Recipe_Wall_Conveyor_8x4_03_Steel_C>
-	<Recipe_Wall_Conveyor_8x4_04_C>[Recipe] Wall Conveyor 8x4 (4 belts)</Recipe_Wall_Conveyor_8x4_04_C>
-	<Recipe_Wall_Conveyor_8x4_04_Steel_C>[Recipe] Wall Conveyor 8x4 Steel (4 belts)</Recipe_Wall_Conveyor_8x4_04_Steel_C>
-	<Recipe_Wall_Door_8x4_01_C>[Recipe] Wall Door 8x4 (c/r/l?)</Recipe_Wall_Door_8x4_01_C>
-	<Recipe_Wall_Door_8x4_01_Steel_C>[Recipe] Wall Door 8x4 Steel (c/r/l?)</Recipe_Wall_Door_8x4_01_Steel_C>
-	<Recipe_Wall_Door_8x4_02_C>[Recipe] Wall Door 8x4 (c/r/l?)</Recipe_Wall_Door_8x4_02_C>
-	<Recipe_Wall_Door_8x4_02_Steel_C>[Recipe] Wall Door 8x4 Steel (c/r/l?)</Recipe_Wall_Door_8x4_02_Steel_C>
-	<Recipe_Wall_Door_8x4_03_C>[Recipe] Wall Door 8x4 (c/r/l?)</Recipe_Wall_Door_8x4_03_C>
-	<Recipe_Wall_Door_8x4_03_Steel_C>[Recipe] Wall Door 8x4 Steel (c/r/l?)</Recipe_Wall_Door_8x4_03_Steel_C>
+	<Recipe_Wall_Conveyor_8x4_03_C>[Recipe] Wall Conveyor 8x4 (1 belt)</Recipe_Wall_Conveyor_8x4_03_C>
+	<Recipe_Wall_Conveyor_8x4_03_Steel_C>[Recipe] Wall Conveyor 8x4 Steel (1 belt)</Recipe_Wall_Conveyor_8x4_03_Steel_C>
+	<Recipe_Wall_Conveyor_8x4_04_C>[Recipe] Wall Conveyor Straight 8x4 (1 belt)</Recipe_Wall_Conveyor_8x4_04_C>
+	<Recipe_Wall_Conveyor_8x4_04_Steel_C>[Recipe] Wall Conveyor Straight 8x4 Steel (1 belt)</Recipe_Wall_Conveyor_8x4_04_Steel_C>
+	<Recipe_Wall_Door_8x4_01_C>[Recipe] Wall Door Center 8x4</Recipe_Wall_Door_8x4_01_C>
+	<Recipe_Wall_Door_8x4_01_Steel_C>[Recipe] Wall Door Center 8x4 Steel</Recipe_Wall_Door_8x4_01_Steel_C>
+	<Recipe_Wall_Door_8x4_02_C>[Recipe] Wall Door Left 8x4</Recipe_Wall_Door_8x4_02_C>
+	<Recipe_Wall_Door_8x4_02_Steel_C>[Recipe] Wall Door Left 8x4 Steel</Recipe_Wall_Door_8x4_02_Steel_C>
+	<Recipe_Wall_Door_8x4_03_C>[Recipe] Wall Door Right 8x4</Recipe_Wall_Door_8x4_03_C>
+	<Recipe_Wall_Door_8x4_03_Steel_C>[Recipe] Wall Door Right 8x4 Steel</Recipe_Wall_Door_8x4_03_Steel_C>
 	<Recipe_Wall_Gate_8x4_01_C>[Recipe] Wall Gate 8x4</Recipe_Wall_Gate_8x4_01_C>
 	<Recipe_Wire_C>[Recipe] Wire</Recipe_Wire_C>
 	<Recipe_WorkBench_C>[Recipe] Work Bench</Recipe_WorkBench_C>
@@ -682,5 +685,9 @@
 	<Schematic_Tutorial3_C>[Schematic] Tutorial 3</Schematic_Tutorial3_C>
 	<Schematic_Tutorial4_C>[Schematic] Tutorial 4</Schematic_Tutorial4_C>
 	<Schematic_Tutorial5_C>[Schematic] Tutorial 5</Schematic_Tutorial5_C>
+
+	<!-- Random -->
+	<FGWildCardDescriptor>Any</FGWildCardDescriptor>
+	<FGNoneDescriptor>None (closed output)</FGNoneDescriptor>
 
 </translation>
