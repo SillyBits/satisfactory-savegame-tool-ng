@@ -1093,6 +1093,15 @@ namespace SatisfactorySavegameTool.Panels
 		internal void _AddFactory(TreeNode parent, P.Actor actor)
 		{
 			string objname = actor.PathName.LastName();
+			if (objname.Contains("Integrated") || objname.Contains("HubTerminal"))
+				return;// Those are to be combined into trading post node
+
+			_AddFactoryInternal(parent, actor);
+		}
+
+		internal void _AddFactoryInternal(TreeNode parent, P.Actor actor)
+		{
+			string objname = actor.PathName.LastName();
 			var names = objname
 				.Split('_')
 				.Where(s => !_excludes.Contains(s))
@@ -1140,7 +1149,30 @@ namespace SatisfactorySavegameTool.Panels
 			string title = short_title + string.Format(" ({0})", objname);
 
 			Building building = new Building(title, actor, true);
-			_AddItem(group, short_title, building);
+			TreeNode node = _AddItem(group, short_title, building);
+
+			// Trading posts will have those 'integrated' devices attached
+			if (!objname.Contains("TradingPost"))
+				return;
+			Action<FileHandler.str> _add = (path) => {
+				P.Property p = MainWindow.CurrFile.Objects.FindByPathName(path);
+				if (p is P.Actor)
+					_AddFactoryInternal(node, p as P.Actor);
+			};
+			P.NamedEntity entity = actor.EntityObj;
+			P.Property prop = entity.Value.Named("mGenerators");
+			if (prop is P.ArrayProperty)
+			{
+				P.ArrayProperty arr = prop as P.ArrayProperty;
+				foreach (P.ObjectProperty gen in arr.Value as P.Properties)
+					_add(gen.PathName);
+			}
+			foreach (string child in _trading_post)
+			{
+				prop = entity.Value.Named(child);
+				if (prop is P.ObjectProperty)
+					_add((prop as P.ObjectProperty).PathName);
+			}
 		}
 
 		internal void _AddBuilding(TreeNode parent, P.Actor actor)
@@ -1312,7 +1344,7 @@ namespace SatisfactorySavegameTool.Panels
 		private static string[] _excludes = new string[] { "Build", "BP", "C" };
 		private static RegexOptions _default_options = RegexOptions.Compiled | RegexOptions.CultureInvariant;
 		private static Regex _regex_mk = new Regex(@"^(?<group>.+)(?<tier>Mk\d)(?<name>.*)$", _default_options);
-
+		private static string[] _trading_post = new string[] { "mStorage", "mMAM", "mHubTerminal", "mWorkBench"	};
 
 		internal class Building
 		{
