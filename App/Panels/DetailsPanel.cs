@@ -2235,6 +2235,11 @@ namespace SatisfactorySavegameTool.Panels.Details
 			P.Object prop = Tag as P.Object;
 			P.Entity entity = prop.EntityObj as P.Entity;
 
+			// Add optional "mCanBeRearrange"
+			P.BoolProperty rearrange = entity.Value.Named("mCanBeRearrange") as P.BoolProperty;
+			if (rearrange != null)
+				_childs.Add(MainFactory.Create(this, "Can be re-arranged", rearrange.Value));
+
 			// Add optional "mAdjustedSizeDiff"
 			P.ValueProperty inv_size = entity.Value.Named("mAdjustedSizeDiff") as P.ValueProperty;
 			if (inv_size != null)
@@ -3001,7 +3006,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 					if (prop is P.FloatProperty)
 						health = (float) (prop as P.FloatProperty).Value;
 				}
-				_childs.Add(MainFactory.Create(this, "Health", string.Format("{0:#,#0} %", health)));
+				_childs.Add(MainFactory.Create(this, "Health [%]", health));
 			}
 
 			_childs.Add(MainFactory.Create(this, "Position", living.Entity.Translate));
@@ -3313,38 +3318,59 @@ namespace SatisfactorySavegameTool.Panels.Details
 			// Is this a passive or active actor?
 			// - Passives: E.g. walls, conveyors, merger, ... -> Connectors only (up to 3 inputs, 1 output)
 			// - Active  : E.g. constructors, miner, ...      -> Above (up to 4 inputs) plus invi(s), power, ...
-			bool is_passive = (ent_named.Value.Named("mCurrentRecipe") == null);
+			bool is_passive = (ent_named.Value.Named("mPowerInfo") == null);
+
+			// Is this some sort of generator?
+			bool is_generator = b_pathname.Contains("Generator");
 
 			// Is this a simple conveyor?
-			bool is_conveyor = (b_pathname.Contains("ConveyorBeltMk") || b_pathname.Contains("ConveyorLiftMk"));
+			bool is_conveyor_belt = b_pathname.Contains("ConveyorBeltMk");
+			bool is_conveyor_lift = b_pathname.Contains("ConveyorLiftMk");
+			bool is_conveyor = is_conveyor_belt || is_conveyor_lift;
+
+			// Is this a (stackable) conveyor pole?
+			bool is_conveyor_pole = b_pathname.Contains("ConveyorPole_");
+			bool is_conveyor_pole_st = b_pathname.Contains("ConveyorPoleStackable_");
 
 			// Is this a simple power pole?
 			bool is_powerpole = b_pathname.Contains("PowerPoleMk");
+
+			// Is this a radar tower?
+			bool is_radar_tower = b_pathname.Contains("RadarTower");
 
 
 			// Start generating visuals
 			//
 
-			_childs.Add(MainFactory.Create(this, "Position", building.Translate));
-			_childs.Add(MainFactory.Create(this, "Rotation", building.Rotation));
-			_childs.Add(MainFactory.Create(this, "Scale"   , building.Scale));
+			// Create list of values, processed ones are to be removed and 
+			// remain - if any - will be logged as "dangling"
+			var values = ent_named.Value.Names();
+			Func<string,P.Property> _try_value = (name) => {
+				P.Property p = ent_named.Value.Named(name);
+				if (p != null)
+					values.Remove(name);
+				return p;
+			};
 
 			P.Property prop;
 			P.StructProperty stru;
 			P.ObjectProperty objprop;
 			//P.Properties props;
 			P.ArrayProperty arr;
-			P.Object obj;
+			//P.Object obj;
 			P.Entity entity;
+
+			// Show transforms in separate expando
+			_childs.Add(new Transforms(this, "Transform", building));
 
 			//|-> [IntProperty] mBuildingID
 			//|  .Name = str:'mBuildingID'
 			//|  .Length = Int32:4
 			//|  .Index = Int32:0
 			//|  .Value = Int32:1
-			prop = ent_named.Value.Named("mBuildingID");
+			prop = _try_value("mBuildingID");
 			if (prop is P.IntProperty)
-				_childs.Add(MainFactory.Create(this, "Building id", (prop as P.IntProperty).Value, true));
+				_childs.Add(MainFactory.Create(this, "Chunk id", (prop as P.IntProperty).Value, true));
 
 			//|-> [FloatProperty] mBuildTimeStamp
 			//|  .Name = str:'mBuildTimeStamp'
@@ -3352,7 +3378,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			//|  .Index = Int32:0
 			//|  .Value = Single:-434694
 			//TODO: Find correct unit
-			prop = ent_named.Value.Named("mBuildTimeStamp");
+			prop = _try_value("mBuildTimeStamp");
 			if (prop is P.FloatProperty)
 				_childs.Add(MainFactory.Create(this, "Built at", (prop as P.FloatProperty).Value, true));
 
@@ -3363,7 +3389,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			//|  .Length = Int32:90
 			//|  .Index = Int32:0
 			//|  .Value = <empty>
-			prop = ent_named.Value.Named("mBuiltWithRecipe");
+			prop = _try_value("mBuiltWithRecipe");
 			if (prop is P.ObjectProperty)
 			{
 				objprop = prop as P.ObjectProperty;
@@ -3374,7 +3400,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			}
 
 			//|-> [StructProperty] mPrimaryColor
-			prop = ent_named.Value.Named("mPrimaryColor");
+			prop = _try_value("mPrimaryColor");
 			if (prop is P.StructProperty)
 			{
 				stru = prop as P.StructProperty;
@@ -3383,7 +3409,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			}
 
 			//|-> [StructProperty] mSecondaryColor
-			prop = ent_named.Value.Named("mSecondaryColor");
+			prop = _try_value("mSecondaryColor");
 			if (prop is P.StructProperty)
 			{
 				stru = prop as P.StructProperty;
@@ -3392,12 +3418,21 @@ namespace SatisfactorySavegameTool.Panels.Details
 			}
 
 			//|-> [ArrayProperty] mDismantleRefund
-			prop = ent_named.Value.Named("mDismantleRefund");
+			prop = _try_value("mDismantleRefund");
 			if (prop is P.ArrayProperty)
 			{
 				arr = prop as P.ArrayProperty;
 				_childs.Add(new DismantleRefund(this, null, arr.Value));
 			}
+
+			//|-> [BoolProperty] mDidFirstTimeUse
+			//|  .Name = str:'mDidFirstTimeUse'
+			//|  .Length = Int32:0
+			//|  .Index = Int32:0
+			//|  .Value = Byte:1
+			prop = _try_value("mDidFirstTimeUse");
+			if (prop is P.BoolProperty)
+				_childs.Add(MainFactory.Create(this, "Is paused?", (prop as P.BoolProperty).Value, true));
 
 			if (!is_passive)
 			{
@@ -3416,7 +3451,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 					//|  .Index = Int32:0
 					//|  .Value = <empty>
 					string recipe = DetailsPanel.EMPTY;
-					prop = ent_named.Value.Named("mCurrentRecipe");
+					prop = _try_value("mCurrentRecipe");
 					if (prop is P.ObjectProperty)
 					{
 						objprop = prop as P.ObjectProperty;
@@ -3431,7 +3466,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 					//|  .Length = Int32:4
 					//|  .Index = Int32:0
 					//|  .Value = Single:0,003470778
-					prop = ent_named.Value.Named("mCurrentManufacturingProgress");
+					prop = _try_value("mCurrentManufacturingProgress");
 					if (prop is P.FloatProperty)
 					{
 						float progress = ((float)(prop as P.FloatProperty).Value) * 100.0f;
@@ -3449,7 +3484,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 					//|  .Index = Int32:0
 					//|  .Value = <empty>
 					string node = DetailsPanel.EMPTY;
-					prop = ent_named.Value.Named("mExtractResourceNode");
+					prop = _try_value("mExtractResourceNode");
 					if (prop is P.ObjectProperty)
 					{
 						objprop = prop as P.ObjectProperty;
@@ -3462,7 +3497,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 					//|  .Length = Int32:4
 					//|  .Index = Int32:0
 					//|  .Value = Single:0,04885578
-					prop = ent_named.Value.Named("mCurrentExtractProgress");
+					prop = _try_value("mCurrentExtractProgress");
 					if (prop is P.FloatProperty)
 					{
 						float progress = ((float)(prop as P.FloatProperty).Value) * 100.0f;
@@ -3470,15 +3505,34 @@ namespace SatisfactorySavegameTool.Panels.Details
 					}
 				}
 
+				//|-> [BoolProperty] mIsProducing
+				//|  .Name = str:'mIsProducing'
+				//|  .Length = Int32:0
+				//|  .Index = Int32:0
+				//|  .Value = Byte:1
+				prop = _try_value("mIsProducing");
+				if (prop is P.BoolProperty)
+					_childs.Add(MainFactory.Create(this, "Is producing?", (prop as P.BoolProperty).Value, true));
+
 				//|-> [FloatProperty] mTimeSinceStartStopProducing
 				//|  .Name = str:'mTimeSinceStartStopProducing'
 				//|  .Length = Int32:4
 				//|  .Index = Int32:0
 				//|  .Value = Single:2918,587
 				//TODO: Find correct unit
-				prop = ent_named.Value.Named("mTimeSinceStartStopProducing");
+				prop = _try_value("mTimeSinceStartStopProducing");
 				if (prop is P.FloatProperty)
 					_childs.Add(MainFactory.Create(this, "Time since start", (prop as P.FloatProperty).Value, true));
+
+				//|-> [BoolProperty] mIsProductionPaused
+				//|  .Name = str:'mIsProductionPaused'
+				//|  .Length = Int32:0
+				//|  .Index = Int32:0
+				//|  .Value = Byte:1
+				//=> Seems only avail if paused?
+				prop = _try_value("mIsProductionPaused");
+				if (prop is P.BoolProperty)
+					_childs.Add(MainFactory.Create(this, "Is paused?", (prop as P.BoolProperty).Value, true));
 			}
 
 			// Create list of childs, processed ones are to be removed and 
@@ -3534,6 +3588,26 @@ namespace SatisfactorySavegameTool.Panels.Details
 				_try_add_item_conn("Input", ".ConveyorAny0");
 				_try_add_item_conn("Output", ".ConveyorAny1");
 
+				prop = _try_value("mIsReversed");
+				if (prop is P.BoolProperty)
+				{
+					bool reversed = (bool)(prop as P.BoolProperty).Value;
+					_childs.Add(MainFactory.Create(this, "Is Reversed?", reversed, true));
+				}
+
+				//TODO: Add .Private, if any
+			}
+			else if (is_conveyor_pole || is_conveyor_pole_st)
+			{
+				// Has property 'mHeight' if height > 1 (300,500,700). So height=1 => 100 units => 100cm
+				float height;
+				prop = _try_value("mHeight");
+				if (prop is P.FloatProperty)
+					height = (float)(prop as P.FloatProperty).Value;
+				else
+					height = 100.0f;
+				_childs.Add(MainFactory.Create(this, "Height [m]", height / 100.0f, true));
+
 				//TODO: Add .Private, if any
 			}
 			else if (is_powerpole)
@@ -3541,6 +3615,46 @@ namespace SatisfactorySavegameTool.Panels.Details
 				_try_add_power_conn("Power connection", ".PowerConnection");
 
 				//TODO: Add .Private, if any
+			}
+			else if (is_radar_tower)
+			{
+				//- mMapText
+				//|-> [TextProperty] mMapText
+				//|  .Unknown = Byte:[ 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  ]
+				//|  .Name = str:'mMapText'
+				//|  .Length = Int32:27
+				//|  .Index = Int32:0
+				//|  .Value = str:'Main Base'
+				prop = _try_value("mMapText");
+				if (prop is P.TextProperty)
+					_childs.Add(MainFactory.Create(this, "Map text", (prop as P.TextProperty).Value, true));
+
+				//|-> [IntProperty] mCurrentExpansionStep
+				//|  .Name = str:'mCurrentExpansionStep'
+				//|  .Length = Int32:4
+				//|  .Index = Int32:0
+				//|  .Value = Int32:10
+				prop = _try_value("mCurrentExpansionStep");
+				if (prop is P.IntProperty)
+					_childs.Add(MainFactory.Create(this, "Current expansion step", (prop as P.IntProperty).Value, true));
+
+				//|-> [FloatProperty] mTimeToNextExpansion
+				//|  .Name = str:'mTimeToNextExpansion'
+				//|  .Length = Int32:4
+				//|  .Index = Int32:0
+				//|  .Value = Single:-1
+				prop = _try_value("mTimeToNextExpansion");
+				if (prop is P.FloatProperty)
+					_childs.Add(MainFactory.Create(this, "Time to next exp. step", (prop as P.FloatProperty).Value, true));
+
+				//|-> [FloatProperty] mTimeSinceStartStopProducing
+				//|  .Name = str:'mTimeSinceStartStopProducing'
+				//|  .Length = Int32:4
+				//|  .Index = Int32:0
+				//|  .Value = Single:2918,587
+				prop = _try_value("mTimeSinceStartStopProducing");
+				if (prop is P.FloatProperty)
+					_childs.Add(MainFactory.Create(this, "Time since start", (prop as P.FloatProperty).Value, true));
 			}
 			else
 			{
@@ -3578,7 +3692,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 				//|  .Length = Int32:4
 				//|  .Index = Int32:0
 				//|  .Value = Single:1,88
-				prop = ent_named.Value.Named("mCurrentPotential");
+				prop = _try_value("mCurrentPotential");
 				if (prop is P.FloatProperty)
 				{
 					float potential = (((float)(prop as P.FloatProperty).Value) + 1.0f) * 100.0f;;
@@ -3590,7 +3704,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 				//|  .Length = Int32:4
 				//|  .Index = Int32:0
 				//|  .Value = Single:1,88
-				prop = ent_named.Value.Named("mPendingPotential");
+				prop = _try_value("mPendingPotential");
 				if (prop is P.FloatProperty)
 				{
 					float potential = (((float)(prop as P.FloatProperty).Value) + 1.0f) * 100.0f;;
@@ -3599,84 +3713,143 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 				_try_add_inventory("Overclocking slots", ".InventoryPotential");
 
-				// All buildings do have a power consumption info
-				// *.powerInfo
-				//
-				//-> [Object] /Script/FactoryGame.FGPowerInfoComponent
-				//  .ClassName = str:'/Script/FactoryGame.FGPowerInfoComponent'
-				//  .LevelName = str:'Persistent_Level'
-				//  .PathName = str:'Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.powerInfo'
-				//  .OuterPathName = str:'Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118'
-				//  .EntityObj =
-				//	-> [Entity] 
-				//	  .LevelName = <empty>
-				//	  .PathName = <empty>
-				//	  .Children = <empty>
-				//	  .Unknown = Int32:0
-				//	  .Missing = <empty>
-				//	  .Private = <empty>
-				//	  .Value =
-				//		/ List with 1 elements:
-				//		|-> [FloatProperty] mTargetConsumption
-				//		|  .Name = str:'mTargetConsumption'
-				//		|  .Length = Int32:4
-				//		|  .Index = Int32:0
-				//		|  .Value = Single:0,1
-				//		\ end of list
-				//TODO: Find correct unit, maybe kW?
-				prop = MainWindow.CurrFile.Objects.FindByPathName(building_pathname + ".powerInfo");
-				if (prop is P.Object)
+				if (is_generator)
 				{
-					entity = (prop as P.Object).EntityObj as P.Entity;
-					if (entity != null)
+					// Only with generators accepting varying fuels
+
+					//|-> [BoolProperty] mHasFuleCached
+					//|  .Name = str:'mHasFuleCached'
+					//|  .Length = Int32:0
+					//|  .Index = Int32:0
+					//|  .Value = Byte:1
+					prop = _try_value("mHasFuleCached");
+					if (prop is P.BoolProperty)
+						_childs.Add(MainFactory.Create(this, "Has cached fuel?", (prop as P.BoolProperty).Value, true));
+
+					//|-> [FloatProperty] mCurrentFuelAmount
+					//|  .Name = str:'mCurrentFuelAmount'
+					//|  .Length = Int32:4
+					//|  .Index = Int32:0
+					//|  .Value = Single:194,6298
+					prop = _try_value("mCurrentFuelAmount");
+					if (prop is P.FloatProperty)
+						_childs.Add(MainFactory.Create(this, "Current fuel amount", (prop as P.FloatProperty).Value, true));
+
+					//|-> [ObjectProperty] /Game/FactoryGame/Resource/RawResources/Coal/Desc_Coal.Desc_Coal_C
+					//|  .LevelName = str:''
+					//|  .PathName = str:'/Game/FactoryGame/Resource/RawResources/Coal/Desc_Coal.Desc_Coal_C'
+					//|  .Name = str:'mCurrentFuelClass'
+					//|  .Length = Int32:75
+					//|  .Index = Int32:0
+					//|  .Value = <empty>
+					prop = _try_value("mCurrentFuelClass");
+					if (prop is P.ObjectProperty)
 					{
-						prop = entity.Value.Named("mTargetConsumption");
-						if (prop is P.FloatProperty)
-							_childs.Add(MainFactory.Create(this, "Power consumption [MW]", (prop as P.FloatProperty).Value));
+						objprop = prop as P.ObjectProperty;
+						string fuel = objprop.PathName.LastName();
+						if (Translate.Has(fuel))
+							fuel = Translate._(fuel);
+						_childs.Add(MainFactory.Create(this, "Current fuel class", fuel, true));
 					}
 				}
 
-				// Buildings can also have one of those
-				_try_add_power_conn("Power connection", ".PowerInput");
-				_try_add_power_conn("Power connection", ".PowerConnection");
-				_try_add_power_conn("Power connection", ".FGPowerConnection");
-
-				// Buildings with dynamic legs will also carry those cached offsets
-				//-> [Object] /Script/FactoryGame.FGFactoryLegsComponent
-				//  .ClassName = str:'/Script/FactoryGame.FGFactoryLegsComponent'
-				//  .LevelName = str:'Persistent_Level'
-				//  .PathName = str:'Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.FGFactoryLegs'
-				//  .OuterPathName = str:'Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118'
-				//  .EntityObj =
-				//	-> [Entity] 
-				//	  .LevelName = <empty>
-				//	  .PathName = <empty>
-				//	  .Children = <empty>
-				//	  .Unknown = Int32:0
-				//	  .Missing = <empty>
-				//	  .Private = <empty>
-				//	  .Value =
-				//		/ List with 1 elements:
-				//		|-> [ArrayProperty] mCachedFeetOffset
-				//		|  .InnerType = str:'StructProperty'
-				//		|  .Name = str:'mCachedFeetOffset'
-				//		|  .Length = Int32:665
-				//		|  .Index = Int32:0
-				//		|  .Value =
-				//		|	-> [StructProperty] mCachedFeetOffset
-				//		|	  .Unknown = list<Byte>(17):[0,]
-				//		|	  .Name = str:'mCachedFeetOffset'
-				//		|	  .Length = Int32:580
-				//		|	  .Index = Int32:0
-				//		|	  .Value =
-				//		|		/ List with 4 elements:
-				//		|		|-> [FeetOffset].Value[3]
-				prop = MainWindow.CurrFile.Objects.FindByPathName(building_pathname + ".FGFactoryLegs");
-				if (prop is P.Object)
-					_childs.Add(new FeetOffsets(this, "Feet offsets", prop));
-
 				//TODO: Add .Private, if any
 			}
+
+			// All buildings do have a power consumption info
+			// *.powerInfo
+			//
+			//-> [Object] /Script/FactoryGame.FGPowerInfoComponent
+			//  .ClassName = str:'/Script/FactoryGame.FGPowerInfoComponent'
+			//  .LevelName = str:'Persistent_Level'
+			//  .PathName = str:'Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118.powerInfo'
+			//  .OuterPathName = str:'Persistent_Level:PersistentLevel.Build_ConstructorMk1_C_118'
+			//  .EntityObj =
+			//	-> [Entity] 
+			//	  .LevelName = <empty>
+			//	  .PathName = <empty>
+			//	  .Children = <empty>
+			//	  .Unknown = Int32:0
+			//	  .Missing = <empty>
+			//	  .Private = <empty>
+			//	  .Value =
+			//		/ List with N elements:
+			//		|-> [FloatProperty] mTargetConsumption
+			//		|  .Name = str:'mTargetConsumption'
+			//		|  .Length = Int32:4
+			//		|  .Index = Int32:0
+			//		|  .Value = Single:0,1
+			//		|  ...
+			//		|-> [FloatProperty] mDynamicProductionCapacity
+			//		|-> [FloatProperty] mBaseProduction
+			//		\ end of list
+			prop = MainWindow.CurrFile.Objects.FindByPathName(building_pathname + ".powerInfo");
+			if (prop is P.Object)
+			{
+				entity = (prop as P.Object).EntityObj as P.Entity;
+				if (entity != null)
+				{
+					var names = entity.Value.Names();
+
+					// * Crafting: Assembler, Constructor, Foundry, Locomotives, Manufacturer, Miner, OilPump, Smelter, ...
+					// * Stations: TrainDockingStation, TrainStation, TruckStation, ...
+					// * Remain  : JumpPad, LandingPad, RadarTower, DropPod (if energy is needed to open it), ...
+					//|-> [FloatProperty] mTargetConsumption
+					//|  .Name = str:'mTargetConsumption'
+					//|  .Length = Int32:4
+					//|  .Index = Int32:0
+					//|  .Value = Single:25
+					prop = entity.Value.Named("mTargetConsumption");
+					if (prop is P.FloatProperty)
+					{
+						_childs.Add(MainFactory.Create(this, "Power consumption [MW]", (prop as P.FloatProperty).Value));
+						names.Remove("mTargetConsumption");
+					}
+
+					// * Generators: Coal, Fuel, (Nuclear?)
+					//|-> [FloatProperty] mDynamicProductionCapacity
+					//|  .Name = str:'mDynamicProductionCapacity'
+					//|  .Length = Int32:4
+					//|  .Index = Int32:0
+					//|  .Value = Single:150
+					prop = entity.Value.Named("mDynamicProductionCapacity");
+					if (prop is P.FloatProperty)
+					{
+						_childs.Add(MainFactory.Create(this, "Production capacity [MW]", (prop as P.FloatProperty).Value));
+						names.Remove("mDynamicProductionCapacity");
+					}
+
+					// * Generators: GeoThermal
+					//|-> [FloatProperty] mBaseProduction
+					//|  .Name = str:'mBaseProduction'
+					//|  .Length = Int32:4
+					//|  .Index = Int32:0
+					//|  .Value = Single:200
+					prop = entity.Value.Named("mBaseProduction");
+					if (prop is P.FloatProperty)
+					{
+						_childs.Add(MainFactory.Create(this, "Base production [MW]", (prop as P.FloatProperty).Value));
+						names.Remove("mBaseProduction");
+					}
+
+					if (names.Count > 0 && Settings.VERBOSE)
+					{
+						Log.Warning("Building '{0}' has a {1} dangling .powerInfo entries:", building_pathname, names.Count);
+						foreach (string name in names)
+							Log.Warning("- {0}", name);
+					}
+				}
+			}
+
+			// Buildings can also have one of those
+			_try_add_power_conn("Power connection", ".PowerInput");
+			_try_add_power_conn("Power connection", ".PowerConnection");
+			_try_add_power_conn("Power connection", ".FGPowerConnection");
+
+			// Buildings with dynamic legs might also carry those cached offsets
+			prop = MainWindow.CurrFile.Objects.FindByPathName(building_pathname + ".FGFactoryLegs");
+			if (prop is P.Object)
+				_childs.Add(new FeetOffsets(this, "Feet offsets", prop));
 
 			// Handle any type-specific child remaining
 			if (is_passive)
@@ -3694,13 +3867,12 @@ namespace SatisfactorySavegameTool.Panels.Details
 				//	|	  .Index = Int32:0
 				//	|	  .Value =
 				//	|		/ List with 3 elements:
-				prop = ent_named.Value.Named("mSortRules");
+				prop = _try_value("mSortRules");
 				if (prop is P.ArrayProperty)
 					_childs.Add(new SortRules(this, "Sort rules", prop));
 
 				// Some passive buildings will also carry snap-only data
-
-				//TODO:
+				//
 				//.SnapOnly0
 				//- /Game/FactoryGame/Buildable/Building/Wall/Build_Wall_Conveyor_8x4_01.Build_Wall_Conveyor_8x4_01_C
 				//- /Game/FactoryGame/Buildable/Building/Wall/Build_Wall_Conveyor_8x4_03_Steel.Build_Wall_Conveyor_8x4_03_Steel_C
@@ -3722,24 +3894,24 @@ namespace SatisfactorySavegameTool.Panels.Details
 				//|  .Length = Int32:4
 				//|  .Index = Int32:0
 				//|  .Value = Int32:2
+				_try_value("mCurrentInputIndex");
 				// Same with mLastOutputIndex (smart + programmable splitters)
-				// Same with mIsProducing (simple splitters)
+				_try_value("mLastOutputIndex");
 			}
 			else
 			{
 				// Active "buildings"
 				//
 
-				// What to do with those? Also contained in "Children"
-				//=> None yet. Find more "dangling" childs not consumed yet
-
 				// Ignored for now:
-				//
-				//|-> [BoolProperty] mDidFirstTimeUse
-				//|  .Name = str:'mDidFirstTimeUse'
-				//|  .Length = Int32:0
-				//|  .Index = Int32:0
-				//|  .Value = Byte:1
+				// n/a
+			}
+
+			if (values.Count > 0 && Settings.VERBOSE)
+			{
+				Log.Warning("Building '{0}' has a {1} dangling values:", building_pathname, values.Count);
+				foreach (string value in values)
+					Log.Warning("- {0}", value);
 			}
 
 			if (childs.Count > 0 && Settings.VERBOSE)
@@ -3751,6 +3923,40 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 		}
 
+
+		internal class Transforms : Expando
+		{
+			public Transforms(IElement parent, string label, object obj)
+				: base(parent, label, obj)
+			{ }
+
+			internal override void _CreateVisual()
+			{
+				base._CreateVisual();
+				Header = "Transforms";
+			}
+
+			internal override void _CreateChilds()
+			{
+				P.Actor actor = Tag as P.Actor;
+
+				_childs.Add(MainFactory.Create(this, "Position", actor.Translate));
+				_childs.Add(MainFactory.Create(this, "Rotation", actor.Rotation));
+				_childs.Add(MainFactory.Create(this, "Scale"   , actor.Scale));
+				if (actor.ClassName.ToString().Contains("ConveyorLiftMk"))
+				{
+					P.Entity entity = actor.EntityObj as P.NamedEntity;
+					P.Property prop = entity.Value.Named("mTopTransform");
+					if (prop is P.StructProperty)
+					{
+						P.StructProperty stru = prop as P.StructProperty;
+						P.Transform transforms = stru.Value as P.Transform;
+						foreach (P.ValueProperty val in transforms.Value)
+							_childs.Add(MainFactory.Create(this, "Top " + val.Name, val.Value));
+					}
+				}
+			}
+		}
 
 		internal class DismantleRefund : Expando
 		{
