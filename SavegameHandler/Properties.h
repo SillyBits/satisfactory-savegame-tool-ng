@@ -1022,6 +1022,7 @@ namespace Savegame
 
 	#pragma region Color
 	CLS(Color)
+		// Even if stored as BGRA, we'll keep RGBA order here
 		PUB_b(R)
 		PUB_b(G)
 		PUB_b(B)
@@ -1034,15 +1035,15 @@ namespace Savegame
 			ADD(sizeof(byte)*4)
 		LENGTH_END
 		READ
-			R = reader->ReadByte();
-			G = reader->ReadByte();
 			B = reader->ReadByte();
+			G = reader->ReadByte();
+			R = reader->ReadByte();
 			A = reader->ReadByte();
 		READ_END
 		WRITE
-			writer->Write(R);
-			writer->Write(G);
 			writer->Write(B);
+			writer->Write(G);
+			writer->Write(R);
 			writer->Write(A);
 		WRITE_END
 	CLS_END
@@ -1848,7 +1849,7 @@ namespace Savegame
 		PUB_s(LevelName)
 		PUB_s(PathName)
 		PUB_s(OuterPathName)
-		PUB(EntityObj,Property^)
+		PUB(EntityObj,Entity^)
 		SIZE
 			ADD_s(ClassName)
 			ADD_s(LevelName)
@@ -1903,18 +1904,17 @@ namespace Savegame
 		WRITE_END
 		void WriteEntity(IWriter^ writer)
 		{
-			Entity^ entity = (Entity^) EntityObj;
 #ifdef VALIDATE_LENGTH
-			int new_length = entity->GetSize();
+			int new_length = EntityObj->GetSize();
 			if (new_length != _EntityLength)
 				Log::Error("{0:X8} | Length mismatch: {1:X8} != {2:X8} in object's entity {3}", 
-					entity->__StartPos, _EntityLength, new_length, entity->ToString());
+					EntityObj->__StartPos, _EntityLength, new_length, EntityObj->ToString());
 			_EntityLength = new_length;
 #else
-			_EntityLength = entity->GetSize();
+			_EntityLength = EntityObj->GetSize();
 #endif
 			writer->Write(_EntityLength);
-			entity->Write(writer, _EntityLength);
+			EntityObj->Write(writer, _EntityLength);
 
 			// EXPERIMENTAL
 			//=> No need to save anything, enough to store Missing
@@ -1935,7 +1935,7 @@ namespace Savegame
 		PUB(Translate,Vector^)
 		PUB(Scale,Savegame::Properties::Scale^)
 		PUB_i(WasPlacedInLevel)
-		PUB(EntityObj,Property^)
+		PUB(EntityObj,NamedEntity^)
 		SIZE
 			ADD_s(ClassName)
 			ADD_s(LevelName)
@@ -2002,18 +2002,17 @@ namespace Savegame
 		WRITE_END
 		void WriteEntity(IWriter^ writer)
 		{
-			NamedEntity^ entity = (NamedEntity^) EntityObj;
 #ifdef VALIDATE_LENGTH
-			int new_length = entity->GetSize();
+			int new_length = EntityObj->GetSize();
 			if (new_length != _EntityLength)
 				Log::Error("{0:X8} | Length mismatch: {1:X8} != {2:X8} in actor' entity {3}", 
-					entity->__StartPos, _EntityLength, new_length, entity->ToString());
+					EntityObj->__StartPos, _EntityLength, new_length, EntityObj->ToString());
 			_EntityLength = new_length;
 #else
-			_EntityLength = entity->GetSize();
+			_EntityLength = EntityObj->GetSize();
 #endif
 			writer->Write(_EntityLength);
-			entity->Write(writer, _EntityLength);
+			EntityObj->Write(writer, _EntityLength);
 
 			// EXPERIMENTAL
 			//=> No need to save anything, enough to store shadow _Missing
