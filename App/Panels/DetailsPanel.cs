@@ -2953,6 +2953,109 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 	}
 
+	internal class BP_BuildableSubsystem_C : SpecializedViewer
+	{
+		public BP_BuildableSubsystem_C(IElement parent, string label, object obj)
+			: base(parent, label, obj)
+		{
+			_excluded.Add("NeedTransform");
+			_excluded.Add("Rotation");
+			_excluded.Add("Translate");
+			_excluded.Add("Scale");
+			_excluded.Add("WasPlacedInLevel");
+			_excluded.Add("EntityObj");
+		}
+
+		internal override void _CreateChilds()
+		{
+			base._CreateChilds();
+
+			P.Actor actor = Tag as P.Actor;
+			_childs.Add(new FGWorldSettings(this, "", actor.EntityObj));
+		}
+
+		internal class FGWorldSettings : SpecializedViewer
+		{
+			public FGWorldSettings(IElement parent, string label, object obj)
+				: base(parent, label, obj)
+			{ }
+
+			internal override void _CreateVisual()
+			{
+				base._CreateVisual();
+				(Visual as Expando).IsExpanded = true;
+			}
+
+			internal override void _CreateChilds()
+			{
+				P.NamedEntity entity = Tag as P.NamedEntity;
+				var values = entity.Value.Names();
+
+				int count = values.Count(n => n.StartsWith("mColorSlotsPrimary"));
+				for (int i = 0; i < count; ++i)
+				{
+					values.Remove("mColorSlotsPrimary");
+					values.Remove("mColorSlotsSecondary");
+					_childs.Add(new ColorSlot(this, null, i));
+				}
+			}
+		}
+	}
+
+
+	internal class ColorSlot : ElementContainer<object>
+	{
+		public ColorSlot(IElement parent, string label, object obj)
+			: base(parent, label, obj)
+		{ }
+
+		internal override void _CreateVisual()
+		{
+			Label = "Color";
+			_CreateChilds();
+		}
+
+		internal override void _CreateChilds()
+		{
+			StackPanel panel = new StackPanel() {
+				Orientation = Orientation.Horizontal,
+			};
+			_visual = panel;
+
+			byte slot_no = 0;
+			if (_prop is P.ByteProperty)
+				slot_no = (byte)(_prop as P.ByteProperty).Value;
+			else if (_prop is byte)
+				slot_no = (byte)_prop;
+			else if (_prop is int)
+				slot_no = (byte)(int)_prop;
+			panel.Children.Add(new ByteControl(slot_no));
+
+			P.Property prop = MainWindow.CurrFile.Objects.FindByPathName("Persistent_Level:PersistentLevel.BuildableSubsystem");
+			if (prop is P.Actor)
+			{
+				P.Entity entity = (prop as P.Actor).EntityObj;
+				P.StructProperty stru;
+
+				prop = entity.Value.Named("mColorSlotsPrimary", slot_no);
+				if (prop is P.StructProperty)
+				{
+					stru = prop as P.StructProperty;
+					if (stru != null && stru.Value is P.Color)
+						panel.Children.Add(new ColorControl(stru.Value as P.Color));
+				}
+
+				prop = entity.Value.Named("mColorSlotsSecondary", slot_no);
+				if (prop is P.StructProperty)
+				{
+					stru = prop as P.StructProperty;
+					if (stru != null && stru.Value is P.Color)
+						panel.Children.Add(new ColorControl(stru.Value as P.Color));
+				}
+			}
+		}
+	}
+
 
 	// More specialized visualizers
 	//
@@ -3307,6 +3410,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 		internal override void _CreateChilds()
 		{
+			int save_version = MainWindow.CurrFile.Header.SaveVersion;
+
 			BuildingsTree.Building tag = Tag as BuildingsTree.Building;
 			P.Actor building = tag.Actor;
 			P.NamedEntity ent_named = building.EntityObj as P.NamedEntity;
@@ -3399,22 +3504,33 @@ namespace SatisfactorySavegameTool.Panels.Details
 				_childs.Add(MainFactory.Create(this, "Recipe used", recipe, true));
 			}
 
-			//|-> [StructProperty] mPrimaryColor
-			prop = _try_value("mPrimaryColor");
-			if (prop is P.StructProperty)
+			if (save_version >= 20)
 			{
-				stru = prop as P.StructProperty;
-				if (stru != null && stru.Value is P.LinearColor)
-					_childs.Add(MainFactory.Create(this, "Primary color", stru.Value));
+				// Use new coloring system
+				prop = _try_value("mColorSlot");
+				_childs.Add(new ColorSlot(this, "Color slot", prop));
 			}
-
-			//|-> [StructProperty] mSecondaryColor
-			prop = _try_value("mSecondaryColor");
-			if (prop is P.StructProperty)
+			else
 			{
-				stru = prop as P.StructProperty;
-				if (stru != null && stru.Value is P.LinearColor)
-					_childs.Add(MainFactory.Create(this, "Secondary color", stru.Value));
+				// Display old color system
+
+				//|-> [StructProperty] mPrimaryColor
+				prop = _try_value("mPrimaryColor");
+				if (prop is P.StructProperty)
+				{
+					stru = prop as P.StructProperty;
+					if (stru != null && stru.Value is P.LinearColor)
+						_childs.Add(MainFactory.Create(this, "Primary color", stru.Value));
+				}
+
+				//|-> [StructProperty] mSecondaryColor
+				prop = _try_value("mSecondaryColor");
+				if (prop is P.StructProperty)
+				{
+					stru = prop as P.StructProperty;
+					if (stru != null && stru.Value is P.LinearColor)
+						_childs.Add(MainFactory.Create(this, "Secondary color", stru.Value));
+				}
 			}
 
 			//|-> [ArrayProperty] mDismantleRefund
