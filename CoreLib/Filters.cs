@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -18,9 +19,141 @@ namespace CoreLib
 	public static class Filters
 	{
 
+		public interface IResult
+		{
+			bool         Success  { get; }
+
+			bool         IsSingle { get; }
+			object       Single   { get; }
+
+			bool         IsMulti  { get; }
+			List<object> Multi    { get; }
+
+			List<object> AsList();
+		}
+
+		public class Result : IResult
+		{
+			public bool Success { get { return IsSingle || IsMulti; } }
+
+			public bool IsSingle
+			{
+				get
+				{
+					if (Single == null)
+						return false;
+					if (Single is IResult)
+						return (Single as IResult).Success;
+					return true;
+				}
+			}
+			public object Single { get; }
+
+			public bool IsMulti
+			{
+				get
+				{
+					if ((Multi == null) || (Multi.Count == 0))
+						return false;
+					if (Multi[0] is IResult)
+					{
+						try
+						{
+							return Multi
+								.Cast<IResult>()
+								.All(r => r.Success)
+								;
+						}
+						catch (Exception exc)
+						{
+							Log.Error("Error querying result", exc);
+#if DEBUG
+							if (Debugger.IsAttached)
+								Debugger.Break();
+#else
+							return false;
+#endif
+						}
+					}
+					return true;
+				}
+			}
+			public List<object> Multi { get; }
+
+
+			public Result()
+			{ }
+
+			public Result(params object[] objects)
+				: this(objects.ToList())
+			{ }
+
+			public Result(IEnumerable<object> objects)
+				: this(objects.ToList())
+			{ }
+
+			public Result(List<object> objects)
+			{
+				if (objects.Count == 1)
+					Single = objects[0];
+				else
+					Multi = objects;
+			}
+
+
+			public List<object> AsList()
+			{
+				List<object> list = null;
+				if (IsSingle)
+				{
+					if (Single is IResult)
+						list = (Single as IResult).AsList();
+					else
+						list = new List<object>() { Single };
+				}
+				else if (IsMulti)
+				{
+					if (Multi[0] is IResult)
+					{
+						list = new List<object>();
+						try
+						{
+							Multi.ForEach(r => list.AddRange((r as IResult).AsList()));
+						}
+						catch (Exception exc)
+						{
+							Log.Error("Error querying result", exc);
+#if DEBUG
+							if (Debugger.IsAttached)
+								Debugger.Break();
+#else
+							list.Clear();
+#endif
+						}
+					}
+					else
+						list = Multi;
+				}
+				return list;
+			}
+
+			public override string ToString()
+			{
+				string s = Success.ToString();
+				if (IsSingle)
+					s += " -> " + Single;
+				else if (IsMulti)
+					s += " => [" + Multi.Count + "]";
+				return s;
+			}
+		}
+
+		public static IResult EMPTY_RESULT = new Result();
+
+
 		public interface IFilter
 		{
-			bool Test(object value);
+			IResult Test(object value);
 		}
 
 
@@ -59,7 +192,15 @@ namespace CoreLib
 
 
 		#region Filter chain
+		public delegate IFilter CreatorCallback(Definition def);
+
 		public static FilterChain CreateChain(Definitions defs)
+		{
+			CreatorCallback defaultCreator = (def) => CreateFilterOp(def.Condition, def.Value);
+			return CreateChain(defs, defaultCreator);
+		}
+
+		public static FilterChain CreateChain(Definitions defs, CreatorCallback creator)
 		{
 			FilterChain chain = new AndChain();
 
@@ -68,11 +209,11 @@ namespace CoreLib
 				if (!defs.Any(f => f.Operation == Operations.Or))
 				{
 					// Simple AND chain
-					defs.ForEach(def => chain.Add(CreateFilterOp(def.Condition, def.Value)));
+					defs.ForEach(def => chain.Add(creator(def)));
 				}
 				else
 				{
-					//TODO:
+					// Mixed chain
 					Definition prev = defs[0];
 					Definition curr;
 					FilterChain or = new OrChain();
@@ -82,21 +223,21 @@ namespace CoreLib
 						if (curr.Operation == Operations.Or && prev.Operation == Operations.Or)
 						{
 							// Add another "or"
-							or.Add(prev);
+							or.Add(creator(prev));
 						}
 						else
 						{
 							if (or.Count != 0)
 							{
 								// End current "or" and create new chain
-								or.Add(prev);
+								or.Add(creator(prev));
 								chain.Add(or);
 								or = new OrChain();
 							}
 							else
 							{
 								// Add single filter
-								chain.Add(prev);
+								chain.Add(creator(prev));
 							}
 						}
 
@@ -105,11 +246,11 @@ namespace CoreLib
 
 					// Add last pending
 					if (prev.Operation == Operations.Or)
-						or.Add(prev);
+						or.Add(creator(prev));
 					if (or.Count > 0)
 						chain.Add(or);
 					if (prev.Operation == Operations.And)
-						chain.Add(prev);
+						chain.Add(creator(prev));
 				}
 			}
 
@@ -123,7 +264,7 @@ namespace CoreLib
 				Add(CreateFilterOp(def.Condition, def.Value));
 			}
 
-			public abstract bool Test(object value);
+			public abstract IResult Test(object value);
 		}
 
 		internal class AndChain : FilterChain
@@ -133,9 +274,13 @@ namespace CoreLib
 			internal AndChain(List<IFilter> filters) { AddRange(filters); }
 			internal AndChain(IEnumerable<IFilter> filters) { AddRange(filters); }
 
-			public override bool Test(object value)
+			public override IResult Test(object value)
 			{
-				return this.All(f => f.Test(value));
+				var results = this.Select(f => f.Test(value));
+				bool all = results.All(r => r.Success);
+				if (!all)
+					return EMPTY_RESULT;
+				return new Result(results);
 			}
 		}
 
@@ -146,16 +291,27 @@ namespace CoreLib
 			internal OrChain(List<IFilter> filters) { AddRange(filters); }
 			internal OrChain(IEnumerable<IFilter> filters) { AddRange(filters); }
 
-			public override bool Test(object value)
+			public override IResult Test(object value)
 			{
-				return this.Any(f => f.Test(value));
+				var results = this.Select(f => f.Test(value));
+				bool any = results.Any(r => r.Success);
+				if (!any)
+					return EMPTY_RESULT;
+				var distinct = results
+					.Where(r => r.Success)
+					.Select(r => r.AsList())
+					.Distinct()
+					;
+				if (distinct.Count() != 1)
+					return EMPTY_RESULT;
+				return results.First(r => r.Success);
 			}
 		}
 		#endregion
 
 
 		#region Basic filter ops
-		internal static IFilter CreateFilterOp(Conditions cond, object filterval)
+		public static IFilter CreateFilterOp(Conditions cond, object filterval)
 		{
 			switch (cond)
 			{
@@ -223,14 +379,14 @@ namespace CoreLib
 
 		private class None : IFilter
 		{
-			public bool Test(object value) { return true; }
+			public IResult Test(object value) { return new Result(value); }
 		}
 
 		private class Equal<_Type> : IFilter 
 			where _Type : IComparable
 		{
 			internal Equal(_Type filterval) { _filterval = filterval; }
-			public bool Test(object value) { return ((_Type)value).CompareTo(_filterval) == 0; }
+			public IResult Test(object value) { return (((_Type)value).CompareTo(_filterval) == 0) ? new Result(value) : EMPTY_RESULT; }
 			private _Type _filterval;
 		}
 
@@ -238,7 +394,7 @@ namespace CoreLib
 			where _Type : IComparable
 		{
 			internal NotEqual(_Type filterval) { _filterval = filterval; }
-			public bool Test(object value) { return ((_Type)value).CompareTo(_filterval) != 0; }
+			public IResult Test(object value) { return (((_Type)value).CompareTo(_filterval) != 0) ? new Result(value) : EMPTY_RESULT; }
 			private _Type _filterval;
 		}
 
@@ -246,7 +402,7 @@ namespace CoreLib
 			where _Type : IComparable
 		{
 			internal Less(_Type filterval) { _filterval = filterval; }
-			public bool Test(object value) { return ((_Type)value).CompareTo(_filterval) < 0; }
+			public IResult Test(object value) { return (((_Type)value).CompareTo(_filterval) < 0) ? new Result(value) : EMPTY_RESULT; }
 			private _Type _filterval;
 		}
 
@@ -254,7 +410,7 @@ namespace CoreLib
 			where _Type : IComparable
 		{
 			internal LessEqual(_Type filterval) { _filterval = filterval; }
-			public bool Test(object value) { return ((_Type)value).CompareTo(_filterval) <= 0; }
+			public IResult Test(object value) { return (((_Type)value).CompareTo(_filterval) <= 0) ? new Result(value) : EMPTY_RESULT; }
 			private _Type _filterval;
 		}
 
@@ -262,7 +418,7 @@ namespace CoreLib
 			where _Type : IComparable
 		{
 			internal Greater(_Type filterval) { _filterval = filterval; }
-			public bool Test(object value) { return ((_Type)value).CompareTo(_filterval) > 0; }
+			public IResult Test(object value) { return (((_Type)value).CompareTo(_filterval) > 0) ? new Result(value) : EMPTY_RESULT; }
 			private _Type _filterval;
 		}
 
@@ -270,7 +426,7 @@ namespace CoreLib
 			where _Type : IComparable
 		{
 			internal GreaterEqual(_Type filterval) { _filterval = filterval; }
-			public bool Test(object value) { return ((_Type)value).CompareTo(_filterval) >= 0; }
+			public IResult Test(object value) { return (((_Type)value).CompareTo(_filterval) >= 0) ? new Result(value) : EMPTY_RESULT; }
 			private _Type _filterval;
 		}
 
@@ -278,21 +434,21 @@ namespace CoreLib
 		private class Contains : IFilter
 		{
 			internal Contains(string filterval) { _filterval = filterval; }
-			public bool Test(object value) { return ((string)value).Contains(_filterval); }
+			public IResult Test(object value) { return ((string)value).Contains(_filterval) ? new Result(value) : EMPTY_RESULT; }
 			private string _filterval;
 		}
 
 		private class StartsWith : IFilter
 		{
 			internal StartsWith(string filterval) { _filterval = filterval; }
-			public bool Test(object value) { return ((string)value).StartsWith(_filterval); }
+			public IResult Test(object value) { return ((string)value).StartsWith(_filterval) ? new Result(value) : EMPTY_RESULT; }
 			private string _filterval;
 		}
 
 		private class EndsWith : IFilter
 		{
 			internal EndsWith(string filterval) { _filterval = filterval; }
-			public bool Test(object value) { return ((string)value).EndsWith(_filterval); }
+			public IResult Test(object value) { return ((string)value).EndsWith(_filterval) ? new Result(value) : EMPTY_RESULT; }
 			private string _filterval;
 		}
 
@@ -300,7 +456,7 @@ namespace CoreLib
 		{
 			internal RegularEx(string regex) : this(new Regex(regex, RegexOptions.CultureInvariant|RegexOptions.IgnoreCase)) { }
 			internal RegularEx(Regex regex) { _regex = regex; }
-			public bool Test(object value) { return _regex.IsMatch((string)value); }
+			public IResult Test(object value) { return _regex.IsMatch((string)value) ? new Result(value) : EMPTY_RESULT; }
 			private Regex _regex;
 		}
 		#endregion

@@ -252,15 +252,14 @@ namespace SatisfactorySavegameTool.Actions
 				}
 
 				var defs = new F.Definitions(filters.Cast<F.Definition>());
-				F.FilterChain chain = F.CreateChain(defs);
+				F.CreatorCallback creator = (def) => FilterImpl.CreateFilter(def as FilterDefinition);
+				F.FilterChain chain = F.CreateChain(defs, creator);
 				if (chain == null)
 				{
 					string msg = "Internal error!\n\nUnable to create filter chain.";
 					MessageBox.Show(msg, Translate._("MainWindow.Title"), MessageBoxButton.OK, MessageBoxImage.Exclamation);
 					return;
 				}
-
-				FilterImpl.Filters source_filters = new FilterImpl.Filters(filters.Select(def => FilterImpl.CreateFilter(def)));
 
 				HierarchyRunner.Runner action;
 				if (chain.Count == 0)
@@ -271,15 +270,10 @@ namespace SatisfactorySavegameTool.Actions
 				else
 					action = (prop) => {
 						// Test property against filter(s) given
-						FilterImpl.Result result = source_filters.Test(prop, chain);
+						F.IResult result = chain.Test(prop);
 						// If successful, pass to writer
-						if (result != null)
-						{
-							if (result.Single != null)
-								writer.Write(result.Single);
-							else if (result.Multi != null)
-								result.Multi.ForEach(res => writer.Write(res));
-						}
+						if (result.Success)
+							writer.Write(prop);
 					};
 
 				try
@@ -410,55 +404,80 @@ namespace SatisfactorySavegameTool.Actions
 
 			private class CSVExporter : BaseWriter
 			{
-				public CSVExporter(string filename, bool recursive_export)
+				public CSVExporter(string filename, bool recursive_export, char separator = ';')
 					: base(filename, recursive_export)
 				{
+					_separator = separator;
 					_first_line = true;
 					_stringbuilder = new StringBuilder();
 				}
 
 				public override void Write(object value)
 				{
-					// For now, CSV export won't use recursive flag,
-					// but recursion might be added in future
+					if (_first_line)
+					{
+						_first_line = false;
+						_WriteHeader(value);
+						if (_stringbuilder.Length > 0)
+							_stringbuilder.Replace(_separator, '\n', _stringbuilder.Length - 1, 1);
+						base.Write(_stringbuilder.ToString());
+						_stringbuilder.Clear();
+					}
+
+					_Write(value);
+					if (_stringbuilder.Length > 0)
+						_stringbuilder.Replace(_separator, '\n', _stringbuilder.Length - 1, 1);
+					base.Write(_stringbuilder.ToString());
+					_stringbuilder.Clear();
+				}
+				
+				private void _WriteHeader(object value)
+				{
 					if (value is P.Property)
 					{
 						var childs = (value as P.Property).GetChilds();
 
-						if (_first_line)
+						foreach (var pair in childs)
 						{
-							_first_line = false;
-							foreach (var pair in childs)
-							{
-								_stringbuilder.Append(pair.Key);
-								_stringbuilder.Append(',');
-							}
-							if (_stringbuilder.Length > 0)
-								_stringbuilder.Remove(_stringbuilder.Length - 1, 1);
-							_stringbuilder.Append('\n');
-							base.Write(_stringbuilder.ToString());
-							_stringbuilder.Clear();
+							_stringbuilder.Append(pair.Key);
+							_stringbuilder.Append(_separator);
+
+							if (_recursive && pair.Value is P.Property)
+								_WriteHeader(pair.Value);
 						}
+					}
+					else
+					{
+						_stringbuilder.Append("Value");
+						_stringbuilder.Append(_separator);
+					}
+				}
+				
+				private void _Write(object value)
+				{
+					if (value is P.Property)
+					{
+						var childs = (value as P.Property).GetChilds();
 
 						foreach (var pair in childs)
 						{
 							if (pair.Value != null)
 								_stringbuilder.Append(pair.Value);
-							_stringbuilder.Append(',');
+							_stringbuilder.Append(_separator);
+
+							if (_recursive && pair.Value is P.Property)
+								_Write(pair.Value);
 						}
-						if (_stringbuilder.Length > 0)
-							_stringbuilder.Remove(_stringbuilder.Length - 1, 1);
-						_stringbuilder.Append('\n');
-						base.Write(_stringbuilder.ToString());
-						_stringbuilder.Clear();
 					}
 					else
 					{
-						base.Write(value + "\n");
+						_stringbuilder.Append(value);
+						_stringbuilder.Append(_separator);
 					}
 				}
 
-				private bool _first_line;
+				private char          _separator;
+				private bool          _first_line;
 				private StringBuilder _stringbuilder;
 			}
 
@@ -474,164 +493,125 @@ namespace SatisfactorySavegameTool.Actions
 		public static class FilterImpl
 		{
 
-			public class Result
+			public static F.IFilter CreateFilter(FilterDefinition def)
 			{
-				public object       Single;
-				public List<object> Multi;
+				F.IFilter baseFilter = F.CreateFilterOp(def.Condition, def.Value);
 
-				public Result()
-				{ }
-
-				public Result(object single)
-				{
-					Single = single;
-				}
-
-				public Result(IEnumerable<object> multi)
-					: this(multi.ToList())
-				{ }
-
-				public Result(List<object> multi)
-				{
-					Multi = multi;
-				}
-			}
-
-			public interface IFilter
-			{
-				Result Test(P.Property prop, F.FilterChain chain);
-			}
-
-			public class Filters : List<IFilter>, IFilter
-			{
-				public Filters(IEnumerable<IFilter> filters)
-					: base(filters)
-				{ }
-
-				public Result Test(P.Property prop, F.FilterChain chain)
-				{
-					// Get all matches and compress results into a flat, distinct list
-
-					// Do test first, eliminating empty results
-					List<object> empty = new List<object>();
-					var results = this
-						.Select(filter => filter.Test(prop, chain))
-						.Where(r => r != null)
-						;
-					// Any Property-related result?
-					var filtered = results
-						.SelectMany(r =>
-						{
-							if (r.Single != null && r.Single is P.Property)
-								return new List<object> { r.Single };
-							if (r.Multi != null)
-								return r.Multi.Where(o => o is P.Property);
-							return empty;
-						})
-						.Distinct()
-						;
-					//??? Add ourself to list ???
-					int count = filtered.Count();
-					if (count > 1)
-						return new Result(filtered);
-					if (count == 1)
-						return new Result(filtered.First());
-					// Any non-Property result? If so, we're the goal
-					if (results.Count() > 0)
-						return new Result(prop);
-					return null;
-					//bool outcome = this
-					//	.Select(filter => filter.Test(prop, chain))
-					//	.Any(r => r != null)
-					//	;
-					//if (outcome)
-					//	return new Result(prop);
-					//return null;
-				}
-			}
-
-			public static IFilter CreateFilter(FilterDefinition def)
-			{
 				switch (def.Source)
 				{
-					case Sources.None      : return new None();
-					case Sources.ClassName : return new ChildFilter("ClassName");
-					case Sources.PathName  : return new ChildFilter("PathName");
-					case Sources.LevelName : return new ChildFilter("LevelName");
-					case Sources.FieldName : return new FieldName();
-					case Sources.FieldValue: return new FieldValue();
+					case Sources.None      : return new None(baseFilter);
+					case Sources.ClassName : return new ChildFilter(baseFilter, "ClassName");
+					case Sources.PathName  : return new ChildFilter(baseFilter, "PathName");
+					case Sources.LevelName : return new ChildFilter(baseFilter, "LevelName");
+					case Sources.FieldName : return new FieldName(baseFilter);
+					case Sources.FieldValue: return new FieldValue(baseFilter);
 				}
 				return null;
 			}
 
-			private class None : IFilter
+			private abstract class FilterBase : F.IFilter
 			{
-				public Result Test(P.Property prop, F.FilterChain chain)
+				protected FilterBase(F.IFilter filter)
 				{
-					return new Result(prop);
+					_filter = filter;
+				}
+
+				public abstract F.IResult Test(object value);
+
+				protected F.IFilter _filter;
+			}
+
+			// A match-all filter
+			private class None : FilterBase
+			{
+				public None(F.IFilter filter)
+					: base(filter)
+				{ }
+
+				public override F.IResult Test(object value)
+				{
+					return new F.Result(value);
 				}
 			}
 
-			private class ChildFilter : IFilter
+			private class ChildFilter : FilterBase
 			{
-				public ChildFilter(string name)
+				public ChildFilter(F.IFilter filter, string name)
+					: base(filter)
 				{
 					_name = name;
 				}
 
-				public Result Test(P.Property prop, F.FilterChain chain)
+				public override F.IResult Test(object value)
 				{
-					var childs = prop.GetChilds();
-					if (childs.ContainsKey(_name))
-						if (chain.Test(childs[_name].ToString()))
-							return new Result(childs[_name]);
-					return null;
+					if (value is P.Property)
+					{
+						P.Property prop = value as P.Property;
+						var childs = prop.GetChilds();
+						if (childs.ContainsKey(_name))
+						{
+							F.IResult result = _filter.Test(childs[_name].ToString());
+							if (result.Success)
+								return new F.Result(childs[_name]);
+						}
+					}
+					return F.EMPTY_RESULT;
 				}
 
 				private string _name;
 			}
 
-			private class FieldName : IFilter 
+			private class FieldName : FilterBase
 			{
-				public Result Test(P.Property prop, F.FilterChain chain)
+				public FieldName(F.IFilter filter)
+					: base(filter)
+				{ }
+
+				public override F.IResult Test(object value)
 				{
-					var result = prop
-						.GetChilds()
-						.Where(pair => chain.Test(pair.Key))
-						;
-					int count = result.Count();
-					if (count > 1)
-						return new Result(result);
-					if (count == 1)
-						return new Result(result.First());
-					return null;
+					if (value is P.Property)
+					{
+						P.Property prop = value as P.Property;
+						var result = prop
+							.GetChilds()
+							.Select(pair => _filter.Test(pair.Key))
+							.Where(r => r.Success)
+							;
+						if (result.Count() >= 1)
+							return new F.Result(result);
+					}
+					return F.EMPTY_RESULT;
 				}
 			}
 
-			private class FieldValue : IFilter 
+			private class FieldValue : FilterBase
 			{
-				public Result Test(P.Property prop, F.FilterChain chain)
+				public FieldValue(F.IFilter filter)
+					: base(filter)
+				{ }
+
+				public override F.IResult Test(object value)
 				{
-					//return prop.GetChilds().Any(pair => pair.Value != null ? chain.Test(pair.Value) : false);
-					var result = prop
-						.GetChilds()
-						.Where(pair => {
-							if (pair.Value != null)
-							{
-								if (pair.Value is string)
-									return chain.Test(pair.Value);
-								else
-									return chain.Test(pair.Value.ToString());
-							}
-							return false;
-						})
-						;
-					int count = result.Count();
-					if (count > 1)
-						return new Result(result);
-					if (count == 1)
-						return new Result(result.First());
-					return null;
+					if (value is P.Property)
+					{
+						P.Property prop = value as P.Property;
+						var result = prop
+							.GetChilds()
+							.Select(pair => {
+								if (pair.Value != null)
+								{
+									if (pair.Value is string)
+										return _filter.Test(pair.Value);
+									return _filter.Test(pair.Value.ToString());
+								}
+								return F.EMPTY_RESULT;
+							})
+							.Where(r => r.Success)
+							;
+						if (result.Count() >= 1)
+							return new F.Result(result);
+					}
+					return F.EMPTY_RESULT;
 				}
 			}
 
