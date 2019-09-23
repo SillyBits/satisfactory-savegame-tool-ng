@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -72,6 +73,14 @@ namespace SatisfactorySavegameTool
 					if (Config.Root.window.splitter != -1)
 						MainGrid.ColumnDefinitions[0].Width = new GridLength(Config.Root.window.splitter);
 				}
+			}
+
+			if (Config.Root.HasSection("update_check") && 
+				Config.Root.update_check.HasItem("check_for_updates") && 
+				Config.Root.update_check.check_for_updates)
+			{
+				Splashscreen.SetMessage("Checking for updates");
+				_RunUpdateChecker(true);
 			}
 
 			_SetupMRU();
@@ -301,6 +310,11 @@ namespace SatisfactorySavegameTool
 			string filename = Path.Combine(Settings.RESOURCEPATH, Settings.LANGUAGE, "About.res");
 			string content = File.ReadAllText(filename);
 			ShowHtmlResDialog.Show(Translate._("Dialog.About.Title"), content);
+		}
+
+		private void Help_UpdateCheck_Click(object sender, RoutedEventArgs e)
+		{
+			_RunUpdateChecker(false);
 		}
 #endregion
 
@@ -551,6 +565,91 @@ namespace SatisfactorySavegameTool
 			_UpdateMRU();
 		}
 #endregion
+
+		private async void _RunUpdateChecker(bool background_check)
+		{
+			// Do update check, with or without a progress dialog
+			ProgressDialog progress = null;
+			if (!background_check)
+			{
+				progress = new ProgressDialog(this, " ");
+				progress.CounterFormat = "";
+				progress.Interval = 0;
+				progress.Events.Start(-1, Translate._("MainWindow.UpdateCheck.Progress.Title"), " ");
+			}
+
+			string changelog = null;
+			Task<string> check = Task.Run(() => {
+				UpdateChecker checker = new UpdateChecker(
+					Helpers.Unpack("yygpKSi20tc3STNKsUw008vPy8nMS9UtTi0qSy3SS87JL03RL8vxM0jzjAop8IhMTDL2MPDITc/QB0oXZ+bn6WbmpeXrVeTmAAA="), 
+					progress != null? progress.Events : null, Logger.LOG);
+				string url = checker.Check(Settings.APPTITLE, /*Settings.APPVERSION*/"0.0 alpha", out changelog);
+				checker.Close();
+				checker = null;
+				return url;
+			});
+			await check;
+			string dl_url = check.Result;
+
+			if (progress != null)
+				progress.Close();
+			progress = null;
+
+			if (string.IsNullOrEmpty(dl_url))
+			{
+				if (!background_check)
+					MessageBox.Show(Translate._("MainWindow.UpdateCheck.NoUpdateAvail"), Translate._("MainWindow.UpdateCheck.Title"));
+				return;
+			}
+
+			// Prompt user to continue installation
+			bool update = false;
+			if (string.IsNullOrEmpty(changelog))
+			{
+				var ret = MessageBox.Show(Translate._("MainWindow.UpdateCheck.NewVersionAvail"), 
+					Translate._("MainWindow.UpdateCheck.Title"), MessageBoxButton.YesNo, MessageBoxImage.Question);
+				update = (ret == MessageBoxResult.Yes);
+			}
+			else
+			{
+				string[] buttons = new string[] { Translate._("Yes"), Translate._("No"),
+					Translate._("MainWindow.UpdateCheck.NewVersionAvail") };
+				update = ShowHtmlResDialog.Show(Translate._("MainWindow.UpdateCheck.Title"), changelog, buttons);
+			}
+			if (!update)
+				return;
+			
+			// Download installer package, ...
+			string dest_file = Path.Combine(Settings.APPPATH, Path.GetFileName(dl_url));
+			using (Stream strm = File.Create(dest_file))
+			{
+				Downloader dl = new Downloader(dl_url, progress.Events, Logger.LOG);
+				if (!dl.Download(strm))
+				{
+					MessageBox.Show(Translate._("MainWindow.UpdateCheck.DownloadFailed"), Translate._("MainWindow.UpdateCheck.Title"));
+					return;
+				}
+			}
+			// ..., and start installer in silent mode (installer will wait until program has closed)
+			ProcessStartInfo info = new ProcessStartInfo() {
+				FileName = dest_file,
+				Arguments = "/S",
+				WorkingDirectory = Settings.APPPATH,
+				UseShellExecute = false,
+				ErrorDialog = false,
+			};
+			Process process = Process.Start(info);
+			if (process == null || process.HasExited)
+			{
+				MessageBox.Show(Translate._("MainWindow.UpdateCheck.InstallFailed"), Translate._("MainWindow.UpdateCheck.Title"));
+				if (process != null)
+					process.Dispose();
+				return;
+			}
+
+			// End program and let installer do its job
+			Close();
+		}
 
 	}
 

@@ -51,8 +51,20 @@
 	<MainWindow.Menu.Help.Changelog.TT>Shows current changelog</MainWindow.Menu.Help.Changelog.TT>
 	<MainWindow.Menu.Help.About>About ...</MainWindow.Menu.Help.About>
 	<MainWindow.Menu.Help.About.TT>Shows info on this tool</MainWindow.Menu.Help.About.TT>
+	<MainWindow.Menu.Help.UpdateCheck>Check for updates ...</MainWindow.Menu.Help.UpdateCheck>
+	<MainWindow.Menu.Help.UpdateCheck.TT>Checks for program updates</MainWindow.Menu.Help.UpdateCheck.TT>
 
 	<MainWindow.Statusbar.Ready>Ready.</MainWindow.Statusbar.Ready>
+
+	<MainWindow.UpdateCheck.Title>Update check</MainWindow.UpdateCheck.Title>
+	<MainWindow.UpdateCheck.Progress.Title>Checking availability ...</MainWindow.UpdateCheck.Progress.Title>
+	<MainWindow.UpdateCheck.NoUpdateAvail>No update available.</MainWindow.UpdateCheck.NoUpdateAvail>
+	<MainWindow.UpdateCheck.NewVersionAvail>An update is available, would you like to install this now?
+This requires restarting the program.</MainWindow.UpdateCheck.NewVersionAvail>
+	<MainWindow.UpdateCheck.DownloadFailed>Download failed!
+
+This might be a temporary issue, advised to try again later.</MainWindow.UpdateCheck.DownloadFailed>
+	<MainWindow.UpdateCheck.InstallFailed>Failed to start installer.</MainWindow.UpdateCheck.InstallFailed>
 
 	<MainWindow.Gamefile.Modified>Modified</MainWindow.Gamefile.Modified>
 	<MainWindow.Gamefile.modified>modified</MainWindow.Gamefile.modified>

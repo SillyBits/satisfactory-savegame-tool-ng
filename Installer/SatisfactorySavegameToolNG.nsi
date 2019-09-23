@@ -18,7 +18,7 @@ LangString APPNAMEDESKTOP 1031 "Satisfactory Spielstand Helfer - ${APPVERSION}"
 LangString APPUNINSTALL   1033 "Uninstall"
 LangString APPUNINSTALL   1031 "Deinstallieren"
 LangString APPWINVERFAIL  1033 "Sorry to say, but this version of Windows isn't supported anymore."
-LangString APPWINVERFAIL  1031 "Es tut mit leid, aber diese Version von Windows wird leider nicht mehr unterstützt."
+LangString APPWINVERFAIL  1031 "Es tut mir leid, aber diese Version von Windows wird leider nicht mehr unterstützt."
 LangString APPNO64BITOS   1033 "Sorry to say, but this software requires a 64bit version of Windows."
 LangString APPNO64BITOS   1031 "Es tut mir leid, aber dieses Programm benötigt eine 64bit Version von Windows."
 
@@ -45,8 +45,10 @@ BrandingText "(c)2019 SillyBits"
 
 SetCompressor /SOLID /FINAL LZMA
 
-ManifestSupportedOS Win7 Win8 Win8.1 Win10 ; Just in case default values are changed
+SetDateSave on
+SetOverwrite ifnewer
 
+ManifestSupportedOS Win7 Win8 Win8.1 Win10 ; Just in case default values are changed
 ManifestDPIAware true
 
 RequestExecutionLevel user ;admin

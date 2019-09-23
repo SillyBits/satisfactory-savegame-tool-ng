@@ -66,6 +66,9 @@
 				<MenuItem Header="{lang:Translate Key=MainWindow.Menu.Help.About}" 
 						  ToolTip="{lang:Translate Key=MainWindow.Menu.Help.About.TT}" 
 						  Click="Help_About_Click" />
+				<MenuItem Header="{lang:Translate Key=MainWindow.Menu.Help.UpdateCheck}" 
+						  ToolTip="{lang:Translate Key=MainWindow.Menu.Help.UpdateCheck.TT}" 
+						  Click="Help_UpdateCheck_Click" />
 			</MenuItem>
 
 		</Menu>

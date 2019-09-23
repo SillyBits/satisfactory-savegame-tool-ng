@@ -36,9 +36,10 @@ namespace SatisfactorySavegameTool.Dialogs
 
 			Icon = Application.Current.MainWindow.Icon;
 
-			if (parent == null)
+			if (parent == null && Application.Current.MainWindow.IsLoaded)
 				parent = Application.Current.MainWindow;
-			Owner = parent;
+			if (parent != null)
+				Owner = parent;
 
 			if (Config.Root.HasSection("dialogs") && Config.Root.dialogs.HasSection("html_res"))
 			{
