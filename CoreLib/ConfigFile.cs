@@ -682,10 +682,16 @@ namespace CoreLib
 
 			_filename = filename;
 
-			//TODO: Detect non-existing config file and create basic skeleton structure
-
 			_config = new XmlDocument();
-			_config.Load(filename);
+			try
+			{
+				_config.Load(filename);
+			}
+			catch (Exception /*exc*/)
+			{
+				_Create();
+				return;
+			}
 			if (_config.ChildNodes.Count != 2)
 				throw new Exception("INVALID CONFIG FILE!");
 
@@ -712,6 +718,24 @@ namespace CoreLib
 				if (changes)
 					_config.Save(_filename);
 			}
+		}
+
+		internal void _Create()
+		{
+			XmlDeclaration decl = _config.CreateXmlDeclaration("1.0", "utf-8", null);
+			_config.AppendChild(decl);
+
+			XmlElement root = _config.CreateElement("configuration");
+			_config.AppendChild(root);
+
+			XmlAttribute version = _config.CreateAttribute("version");
+			version.Value = "0.1";
+			root.Attributes.Append(version);
+
+			_version = version.Value;
+			_root = new Section(root);
+
+			_Save();
 		}
 
 
