@@ -21,7 +21,7 @@ if exist "__delivery" (
 	rmdir /S /Q "__delivery"
 )
 mkdir "__delivery"
-cd __delivery"
+cd __delivery
 set ROOTDIR=%~dp0\..
 
 
