@@ -9,8 +9,9 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
+
+using M = System.Windows.Media;
 
 using CoreLib;
 
@@ -368,13 +369,13 @@ namespace SatisfactorySavegameTool.Panels.Details
 			});
 			_grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength( 1, GridUnitType.Star ) });
 			_grid.Margin = new Thickness(10, 4, 5, 4);//LTRB
-			_grid.Background = Brushes.Transparent;
+			_grid.Background = M.Brushes.Transparent;
 
 			if (_parent != null)
 				Grid.SetIsSharedSizeScope(_parent.Visual, true);
 
 			Border b = new Border() {
-				BorderBrush = Brushes.DarkGray,
+				BorderBrush = M.Brushes.DarkGray,
 				BorderThickness = new Thickness(1, 0, 0, 1),//LTRB
 				Margin = new Thickness(10, 0, 0, 0),//LTRB
 			};
@@ -705,64 +706,80 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 	// Needed later to allow for modification by opening a color picker control, 
 	// for now just a dumb display
-	internal class ColorControl : Label, IValueContainer<P.Color>
+	internal class ColorControl : Label, IValueContainer<byte[]>
 	{
-		internal ColorControl(P.Color color)
+		internal ColorControl(P.Color color, bool read_only = false)
+			: this(new byte[] { color.R, color.G, color.B, color.A }, read_only)
+		{ }
+		internal ColorControl(M.Color color, bool read_only = false)
+			: this(new byte[] { color.R, color.G, color.B, color.A }, read_only)
+		{ }
+		internal ColorControl(byte[] color, bool read_only = false)
 		{
+			_readonly = read_only;
+
 			Content = "";
 			Width = new GridLength(100).Value;
-			BorderBrush = Brushes.DarkGray;
+			BorderBrush = M.Brushes.DarkGray;
 			BorderThickness = new Thickness(1);
 			Value = color;
 		}
 
-		public P.Color Value
+		public byte[] Value
 		{
 			get { return _value; }
 			set
 			{
 				_value = value;
-				System.Windows.Media.Color c = 
-					System.Windows.Media.Color.FromArgb(value.A, value.R, value.G, value.B);
-				Background = new SolidColorBrush(c);
+				M.Color c = M.Color.FromArgb(value[3], value[0], value[1], value[2]);
+				Background = new M.SolidColorBrush(c);
 			}
 		}
 #pragma warning disable CS0067 // The event 'ListViewControl.PropertyChanged' is never used
 		public event PropertyChangedEventHandler PropertyChanged;
 #pragma warning restore CS0067
 
-		internal P.Color _value;
+		internal byte[] _value;
+		internal bool   _readonly;
 	}
 
 	// Needed later to allow for modification by opening a color picker control, 
 	// for now just a dumb display
-	internal class LinearColorControl : Label, IValueContainer<P.LinearColor>
+	internal class LinearColorControl : Label, IValueContainer<float[]>
 	{
-		internal LinearColorControl(P.LinearColor color)
+		internal LinearColorControl(P.LinearColor color, bool read_only = false)
+			: this(new float[] { color.R, color.G, color.B, color.A }, read_only)
+		{ }
+		internal LinearColorControl(M.Color color, bool read_only = false)
+			: this(new float[] { color.ScR, color.ScG, color.ScB, color.ScA }, read_only)
+		{ }
+		internal LinearColorControl(float[] color, bool read_only = false)
 		{
+			_readonly = read_only;
+
 			Content = "";
 			Width = new GridLength(100).Value;
-			BorderBrush = Brushes.DarkGray;
+			BorderBrush = M.Brushes.DarkGray;
 			BorderThickness = new Thickness(1);
 			Value = color;
 		}
 
-		public P.LinearColor Value
+		public float[] Value
 		{
 			get { return _value; }
 			set
 			{
 				_value = value;
-				System.Windows.Media.Color c = 
-					System.Windows.Media.Color.FromScRgb(value.A, value.R, value.G, value.B);
-				Background = new SolidColorBrush(c);
+				M.Color c = M.Color.FromScRgb(value[3], value[0], value[1], value[2]);
+				Background = new M.SolidColorBrush(c);
 			}
 		}
 #pragma warning disable CS0067 // The event 'ListViewControl.PropertyChanged' is never used
 		public event PropertyChangedEventHandler PropertyChanged;
 #pragma warning restore CS0067
 
-		internal P.LinearColor _value;
+		internal float[] _value;
+		internal bool    _readonly;
 	}
 
 
@@ -1034,7 +1051,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 		{
 			_visual = new TextBox() {
 				Text = Helpers.Hexdump(_value, indent:0),
-				FontFamily = new FontFamily("Consolas, FixedSys, Terminal"),
+				FontFamily = new M.FontFamily("Consolas, FixedSys, Terminal"),
 				FontSize = 12,
 				MaxLines = 10,
 				VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
@@ -2991,12 +3008,14 @@ namespace SatisfactorySavegameTool.Panels.Details
 				P.NamedEntity entity = Tag as P.NamedEntity;
 				var values = entity.Value.Names();
 
-				int count = values.Count(n => n.StartsWith("mColorSlotsPrimary"));
-				for (int i = 0; i < count; ++i)
+				var colors = entity.Value
+					.Where(p => p is P.StructProperty && !str.IsNullOrEmpty((p as P.StructProperty).Name))
+					.Cast<P.StructProperty>()
+					.Where(s => s.Name.ToString() == "mColorSlotsPrimary")
+					;
+				foreach (P.StructProperty stru in colors)
 				{
-					values.Remove("mColorSlotsPrimary");
-					values.Remove("mColorSlotsSecondary");
-					_childs.Add(new ColorSlot(this, null, i));
+					_childs.Add(new ColorSlot(this, null, stru.Index));
 				}
 			}
 		}
@@ -3037,20 +3056,25 @@ namespace SatisfactorySavegameTool.Panels.Details
 				P.Entity entity = (prop as P.Actor).EntityObj;
 				P.StructProperty stru;
 
-				prop = entity.Value.Named("mColorSlotsPrimary", slot_no);
-				if (prop is P.StructProperty)
-				{
-					stru = prop as P.StructProperty;
-					if (stru != null && stru.Value is P.Color)
-						panel.Children.Add(new ColorControl(stru.Value as P.Color));
-				}
+				stru = entity.Value.Named("mColorSlotsPrimary", slot_no) as P.StructProperty;
+				P.Color primary = (stru != null && stru.Value is P.Color) ? stru.Value as P.Color : null;
 
-				prop = entity.Value.Named("mColorSlotsSecondary", slot_no);
-				if (prop is P.StructProperty)
+				stru = entity.Value.Named("mColorSlotsSecondary", slot_no) as P.StructProperty;
+				P.Color secondary = (stru != null && stru.Value is P.Color) ? stru.Value as P.Color : null;
+
+				if (primary != null && secondary != null)
 				{
-					stru = prop as P.StructProperty;
-					if (stru != null && stru.Value is P.Color)
-						panel.Children.Add(new ColorControl(stru.Value as P.Color));
+					panel.Children.Add(new ColorControl(primary));
+					panel.Children.Add(new ColorControl(secondary));
+				}
+				else
+				{
+					ColorTable.Color color = ColorTable.INSTANCE.Find(slot_no);
+					if (color != null)
+					{
+						panel.Children.Add(new ColorControl(color.Primary));
+						panel.Children.Add(new ColorControl(color.Secondary));
+					}
 				}
 			}
 		}

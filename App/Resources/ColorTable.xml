@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<colors>
+  <!-- Added 2019-09-24T09:10:34 -->
+  <color index="0"><primary r="255" g="177" b="109" a="255"/><secondary r="95" g="102" b="140" a="255"/></color>
+  <color index="1"><primary r="108" g="168" b="212" a="255"/><secondary r="157" g="137" b="98" a="255"/></color>
+  <color index="2"><primary r="232" g="125" b="77" a="255"/><secondary r="150" g="152" b="166" a="255"/></color>
+  <color index="3"><primary r="99" g="101" b="119" a="255"/><secondary r="134" g="162" b="148" a="255"/></color>
+  
+  <color index="4"><primary r="224" g="227" b="233" a="255"/><secondary r="95" g="102" b="140" a="255"/></color>
+  <color index="5"><primary r="187" g="222" b="146" a="255"/><secondary r="95" g="102" b="140" a="255"/></color>
+  <color index="6"><primary r="255" g="160" b="231" a="255"/><secondary r="95" g="102" b="140" a="255"/></color>
+  <color index="7"><primary r="179" g="241" b="237" a="255"/><secondary r="93" g="101" b="139" a="255"/></color>
+  
+  <color index="8"><primary r="186" g="155" b="90" a="255"/><secondary r="155" g="159" b="159" a="255"/></color>
+  <color index="9"><primary r="251" g="237" b="216" a="255"/><secondary r="93" g="101" b="139" a="255"/></color>
+  <color index="10"><primary r="201" g="155" b="253" a="255"/><secondary r="93" g="101" b="139" a="255"/></color>
+  <color index="11"><primary r="124" g="210" b="185" a="255"/><secondary r="93" g="101" b="139" a="255"/></color>
+  
+  <color index="12"><primary r="247" g="237" b="154" a="255"/><secondary r="93" g="101" b="139" a="255"/></color>
+  <color index="13"><primary r="150" g="151" b="141" a="255"/><secondary r="93" g="101" b="139" a="255"/></color>
+  <color index="14"><primary r="183" g="88" b="173" a="255"/><secondary r="93" g="101" b="139" a="255"/></color>
+  <color index="15"><primary r="130" g="130" b="130" a="255"/><secondary r="229" g="231" b="241" a="255"/></color>
+</colors>

@@ -96,6 +96,7 @@
     <Compile Include="Supplements\Helper.cs" />
     <Compile Include="Supplements\HierarchyRunner.cs" />
     <Compile Include="Supplements\ItemTable.cs" />
+    <Compile Include="Supplements\ColorTable.cs" />
     <Compile Include="Supplements\SchematicTable.cs" />
     <Compile Include="Supplements\RecipeTable.cs" />
     <Compile Include="Supplements\ResearchTable.cs" />
@@ -237,6 +238,7 @@
     <Resource Include="Resources\Logo-128x128.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\ColorTable.xml" />
     <Content Include="Resources\de-DE\About.res" />
     <Content Include="Resources\de-DE\Changelog.res" />
     <Content Include="Resources\de-DE\FactoryGame.res" />

@@ -29,6 +29,7 @@ namespace SatisfactorySavegameTool
 		protected LanguageHandler _languages;
 
 		protected VersionTable    _versions;
+		protected ColorTable      _colors;
 		protected ItemTable       _items;
 		protected RecipeTable     _recipes;
 		protected ResearchTable   _researchs;
@@ -162,6 +163,7 @@ namespace SatisfactorySavegameTool
 		{
 			Task[] loaders = new Task[] {
 				Task.Run(() => _versions   = new VersionTable()),
+				Task.Run(() => _colors     = new ColorTable()),
 				Task.Run(() => _items      = new ItemTable()),
 				Task.Run(() => _recipes    = new RecipeTable()),
 				Task.Run(() => _researchs  = new ResearchTable()),
