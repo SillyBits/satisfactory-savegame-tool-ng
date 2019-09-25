@@ -3467,6 +3467,12 @@ namespace SatisfactorySavegameTool.Panels.Details
 			// Is this a radar tower?
 			bool is_radar_tower = b_pathname.Contains("RadarTower");
 
+			// Is this a train-related building?
+			bool is_train = b_pathname.Contains("Train");
+
+			// Is this a train track?
+			bool is_track = b_pathname.Contains("RailroadTrack");
+
 
 			// Start generating visuals
 			//
@@ -3484,7 +3490,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			P.Property prop;
 			P.StructProperty stru;
 			P.ObjectProperty objprop;
-			//P.Properties props;
+			P.Properties props;
 			P.ArrayProperty arr;
 			//P.Object obj;
 			P.Entity entity;
@@ -3583,34 +3589,38 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 				if (has_recipe)
 				{
-					//|-> [ObjectProperty] /Game/FactoryGame/Recipes/Constructor/Recipe_Wire.Recipe_Wire_C
-					//|  .LevelName = str:''
-					//|  .PathName = str:'/Game/FactoryGame/Recipes/Constructor/Recipe_Wire.Recipe_Wire_C'
-					//|  .Name = str:'mCurrentRecipe'
-					//|  .Length = Int32:72
-					//|  .Index = Int32:0
-					//|  .Value = <empty>
-					string recipe = DetailsPanel.EMPTY;
-					prop = _try_value("mCurrentRecipe");
-					if (prop is P.ObjectProperty)
+					// Exclude train (docking) stations
+					if (!is_train)
 					{
-						objprop = prop as P.ObjectProperty;
-						recipe = objprop.PathName.LastName();
-						if (Translate.Has(recipe))
-							recipe = Translate._(recipe);
-					}
-					_childs.Add(MainFactory.Create(this, "Current recipe", recipe, true));
+						//|-> [ObjectProperty] /Game/FactoryGame/Recipes/Constructor/Recipe_Wire.Recipe_Wire_C
+						//|  .LevelName = str:''
+						//|  .PathName = str:'/Game/FactoryGame/Recipes/Constructor/Recipe_Wire.Recipe_Wire_C'
+						//|  .Name = str:'mCurrentRecipe'
+						//|  .Length = Int32:72
+						//|  .Index = Int32:0
+						//|  .Value = <empty>
+						string recipe = DetailsPanel.EMPTY;
+						prop = _try_value("mCurrentRecipe");
+						if (prop is P.ObjectProperty)
+						{
+							objprop = prop as P.ObjectProperty;
+							recipe = objprop.PathName.LastName();
+							if (Translate.Has(recipe))
+								recipe = Translate._(recipe);
+						}
+						_childs.Add(MainFactory.Create(this, "Current recipe", recipe, true));
 
-					//|-> [FloatProperty] mCurrentManufacturingProgress
-					//|  .Name = str:'mCurrentManufacturingProgress'
-					//|  .Length = Int32:4
-					//|  .Index = Int32:0
-					//|  .Value = Single:0,003470778
-					prop = _try_value("mCurrentManufacturingProgress");
-					if (prop is P.FloatProperty)
-					{
-						float progress = ((float)(prop as P.FloatProperty).Value) * 100.0f;
-						_childs.Add(MainFactory.Create(this, "Current progress [%]", progress, true));
+						//|-> [FloatProperty] mCurrentManufacturingProgress
+						//|  .Name = str:'mCurrentManufacturingProgress'
+						//|  .Length = Int32:4
+						//|  .Index = Int32:0
+						//|  .Value = Single:0,003470778
+						prop = _try_value("mCurrentManufacturingProgress");
+						if (prop is P.FloatProperty)
+						{
+							float progress = ((float)(prop as P.FloatProperty).Value) * 100.0f;
+							_childs.Add(MainFactory.Create(this, "Current progress [%]", progress, true));
+						}
 					}
 				}
 				else
@@ -3720,6 +3730,24 @@ namespace SatisfactorySavegameTool.Panels.Details
 					_childs.Add(new PowerConnection(this, title, prop));
 				}
 			};
+			Action<string, string> _try_add_train_platform = (title, path) => {
+				string p = building_pathname + path;
+				prop = MainWindow.CurrFile.Objects.FindByPathName(p, true);
+				if (prop != null)
+				{
+					_eat(path);
+					_childs.Add(new PlatformConnection(this, title, prop));
+				}
+			};
+			Action<string, string> _try_add_track_conn = (title, path) => {
+				string p = building_pathname + path;
+				prop = MainWindow.CurrFile.Objects.FindByPathName(p, true);
+				if (prop != null)
+				{
+					_eat(path);
+					_childs.Add(new TrackConnection(this, title, prop));
+				}
+			};
 
 			// Distinguish between conveyors, power poles and "more intelligent" 
 			// buildings to ease things a bit in regards to no. of lookups
@@ -3747,6 +3775,28 @@ namespace SatisfactorySavegameTool.Panels.Details
 				else
 					height = 100.0f;
 				_childs.Add(MainFactory.Create(this, "Height [m]", height / 100.0f, true));
+			}
+			else if (is_track)
+			{
+				_try_add_track_conn("Previous", ".TrackConnection0");
+				_try_add_track_conn("Next", ".TrackConnection1");
+
+				//|-> [BoolProperty] mIsOwnedByPlatform
+				//|  .Name = str:'mIsOwnedByPlatform'
+				//|  .Length = Int32:0
+				//|  .Index = Int32:0
+				//|  .Value = Byte:1
+				prop = _try_value("mIsOwnedByPlatform");
+				if (prop is P.BoolProperty)
+				{
+					bool owned = (bool)(prop as P.BoolProperty).Value;
+					_childs.Add(MainFactory.Create(this, "Owned by platform?", owned, true));
+
+					// Find platform?
+				}
+
+				// Skipped:
+				// - mSplineData
 
 				//TODO: Add .Private, if any
 			}
@@ -3825,6 +3875,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 				// Handle special types like storage containers and alike
 				_try_add_inventory("Storage", ".StorageInventory");
+				_try_add_inventory("Storage", ".inventory");// TrainDockingStation
 
 				// Some machines do have an inventory potential, the OC slots ^^
 				//|-> [FloatProperty] mCurrentPotential
@@ -3890,6 +3941,86 @@ namespace SatisfactorySavegameTool.Panels.Details
 						if (Translate.Has(fuel))
 							fuel = Translate._(fuel);
 						_childs.Add(MainFactory.Create(this, "Current fuel class", fuel, true));
+					}
+				}
+				else if (is_train)
+				{
+					//|-> [Name]
+					//|  .LevelName = str:'Persistent_Level'
+					//|  .PathName = str:'Persistent_Level:PersistentLevel.Build_TrainStation_C_0.PlatformConnection0'
+					//|  .PathName = str:'Persistent_Level:PersistentLevel.Build_TrainStation_C_0.PlatformConnection1'
+					_try_add_train_platform("Platform connection #0", ".PlatformConnection0");
+					_try_add_train_platform("Platform connection #1", ".PlatformConnection1");
+
+					//|-> [ObjectProperty] Persistent_Level:PersistentLevel.BP_Locomotive_C_2
+					//|  .LevelName = str:'Persistent_Level'
+					//|  .PathName = str:'Persistent_Level:PersistentLevel.BP_Locomotive_C_2'
+					//|  .Name = str:'mDockingLocomotive'
+					//|  .Length = Int32:76
+					//|  .Index = Int32:0
+					//|  .Value = <empty>
+					prop = _try_value("mDockingLocomotive");
+					if (prop is P.ObjectProperty)
+					{
+						objprop = prop as P.ObjectProperty;
+						_childs.Add(MainFactory.Create(this, "Docked locomotive", objprop.PathName, true));
+					}
+
+					//|-> [ArrayProperty] mDockedPlatformList
+					//|  .InnerType = str:'ObjectProperty'
+					//|  .Name = str:'mDockedPlatformList'
+					//|  .Length = Int32:92
+					//|  .Index = Int32:0
+					//|  .Value =
+					//|	/ List with 1 elements:
+					//|	|-> [ObjectProperty] Persistent_Level:PersistentLevel.Build_TrainDockingStation_C_3
+					//|	|  .LevelName = str:'Persistent_Level'
+					//|	|  .PathName = str:'Persistent_Level:PersistentLevel.Build_TrainDockingStation_C_3'
+					//|	|  .Length = Int32:0
+					//|	|  .Index = Int32:0
+					//|	\ end of list
+					prop = _try_value("mDockedPlatformList");
+					if (prop is P.ArrayProperty)
+					{
+						arr = prop as P.ArrayProperty;
+						if (arr.Value is P.Properties)
+						{
+							props = arr.Value as P.Properties;
+							objprop = props[0] as P.ObjectProperty;
+							_childs.Add(MainFactory.Create(this, "Docked platform", objprop.PathName, true));
+						}
+					}
+
+					//This...
+					//|-> [StructProperty] mTrackPosition
+					//|  .Unknown = list<Byte>(17):[0,]
+					//|  .Name = str:'mTrackPosition'
+					//|  .Length = Int32:100
+					//|  .Index = Int32:0
+					//|  .Value =
+					//|	-> [RailroadTrackPosition] 
+					//|	  .ClassName = str:'Persistent_Level'
+					//|	  .PathName = str:'Persistent_Level:PersistentLevel.Build_RailroadTrackIntegrated_C_0'
+					//|	  .Offset = Single:799,9999
+					//|	  .Forward = Single:1
+					//|	  .Name = <empty>
+					//|	  .Length = Int32:0
+					//|	  .Index = Int32:0
+					//|	  .Value = <empty>
+					//...or should I use
+					//|-> [ObjectProperty] Persistent_Level:PersistentLevel.Build_RailroadTrackIntegrated_C_0
+					//|  .LevelName = str:'Persistent_Level'
+					//|  .PathName = str:'Persistent_Level:PersistentLevel.Build_RailroadTrackIntegrated_C_0'
+					//|  .Name = str:'mRailroadTrack'
+					//|  .Length = Int32:92
+					//|  .Index = Int32:0
+					//|  .Value = <empty>
+					//...phew
+					prop = _try_value("mRailroadTrack");
+					if (prop is P.ObjectProperty)
+					{
+						objprop = prop as P.ObjectProperty;
+						_childs.Add(MainFactory.Create(this, "Railroad track", objprop.PathName, true));
 					}
 				}
 
@@ -4512,6 +4643,157 @@ namespace SatisfactorySavegameTool.Panels.Details
 			}
 
 			private P.ArrayProperty _array;
+		}
+
+		internal class PlatformConnection : Expando
+		{
+			public PlatformConnection(IElement parent, string label, object obj)
+				: base(parent, label, null)
+			{
+				_object = obj as P.Object;
+			}
+
+			//-> [Object] /Script/FactoryGame.FGTrainPlatformConnection
+			//  .ClassName = str:'/Script/FactoryGame.FGTrainPlatformConnection'
+			//  .LevelName = str:'Persistent_Level'
+			//  .PathName = str:'Persistent_Level:PersistentLevel.Build_TrainStation_C_0.PlatformConnection0'
+			//  .OuterPathName = str:'Persistent_Level:PersistentLevel.Build_TrainStation_C_0'
+			//  .EntityObj =
+			//	-> [Entity] 
+			//	  .LevelName = <empty>
+			//	  .PathName = <empty>
+			//	  .Children = <empty>
+			//	  .Unknown = Int32:0
+			//	  .Missing = <empty>
+			//	  .Private = <empty>
+			//	  .Value =
+			//		/ List with 1 elements:
+			//		|-> [BoolProperty] mComponentDirection
+			//		|  .Name = str:'mComponentDirection'
+			//		|  .Length = Int32:0
+			//		|  .Index = Int32:0
+			//		|  .Value = Byte:1
+			//		|-> [ObjectProperty] Persistent_Level:PersistentLevel.Build_TrainDockingStation_C_2
+			//		|  .LevelName = str:'Persistent_Level'
+			//		|  .PathName = str:'Persistent_Level:PersistentLevel.Build_TrainDockingStation_C_2'
+			//		|  .Name = str:'platformOwner'
+			//		|  .Length = Int32:88
+			//		|  .Index = Int32:0
+			//		|  .Value = <empty>
+			//		|-> [ObjectProperty] Persistent_Level:PersistentLevel.Build_TrainDockingStation_C_2.PlatformConnection0
+			//		|  .LevelName = str:'Persistent_Level'
+			//		|  .PathName = str:'Persistent_Level:PersistentLevel.Build_TrainDockingStation_C_2.PlatformConnection0'
+			//		|  .Name = str:'mConnectedTo'
+			//		|  .Length = Int32:108
+			//		|  .Index = Int32:0
+			//		|  .Value = <empty>
+			//		\ end of list
+			internal override void _CreateChilds()
+			{
+				Header = "Platform connection";
+
+				P.Entity entity = _object.EntityObj as P.Entity;
+				if (entity.Value != null)
+				{
+					P.Property prop = entity.Value.Named("platformOwner");
+					if (prop is P.IntProperty)
+					{
+						P.ObjectProperty objprop = prop as P.ObjectProperty;
+						string pathname = objprop.PathName.ToString();
+						if (!string.IsNullOrEmpty(pathname))
+							_childs.Add(MainFactory.Create(this, "Owner", pathname, true));
+					}
+
+					prop = entity.Value.Named("mComponentDirection");
+					if (prop is P.BoolProperty)
+					{
+						byte pos = (byte) (prop as P.BoolProperty).Value;
+						_childs.Add(MainFactory.Create(this, "Direction", pos, true));
+					}
+
+					prop = entity.Value.Named("mConnectedTo");
+					if (prop is P.ObjectProperty)
+					{
+						P.ObjectProperty objprop = prop as P.ObjectProperty;
+						string pathname = objprop.PathName.ToString();
+						if (!string.IsNullOrEmpty(pathname))
+							_childs.Add(MainFactory.Create(this, "Connected to", pathname, true));
+					}
+				}
+			}
+
+			private P.Object _object;
+		}
+
+		internal class TrackConnection : Expando
+		{
+			public TrackConnection(IElement parent, string label, object obj)
+				: base(parent, label, null)
+			{
+				_object = obj as P.Object;
+			}
+
+			//-> [Object] /Script/FactoryGame.FGRailroadTrackConnectionComponent
+			//  .ClassName = str:'/Script/FactoryGame.FGRailroadTrackConnectionComponent'
+			//  .LevelName = str:'Persistent_Level'
+			//  .PathName = str:'Persistent_Level:PersistentLevel.Build_RailroadTrack_C_0.TrackConnection0'
+			//  .OuterPathName = str:'Persistent_Level:PersistentLevel.Build_RailroadTrack_C_0'
+			//  .EntityObj =
+			//	-> [Entity] 
+			//	  .LevelName = <empty>
+			//	  .PathName = <empty>
+			//	  .Children = <empty>
+			//	  .Unknown = Int32:0
+			//	  .Missing = <empty>
+			//	  .Private = <empty>
+			//	  .Value =
+			//		/ List with 2 elements:
+			//		|-> [ArrayProperty] mConnectedComponents
+			//		|  .InnerType = str:'ObjectProperty'
+			//		|  .Name = str:'mConnectedComponents'
+			//		|  .Length = Int32:104
+			//		|  .Index = Int32:0
+			//		|  .Value =
+			//		|	/ List with 1 elements:
+			//		|	|-> [ObjectProperty] Persistent_Level:PersistentLevel.Build_RailroadTrack_C_43.TrackConnection0
+			//		|	|  .LevelName = str:'Persistent_Level'
+			//		|	|  .PathName = str:'Persistent_Level:PersistentLevel.Build_RailroadTrack_C_43.TrackConnection0'
+			//		|	|  .Length = Int32:0
+			//		|	|  .Index = Int32:0
+			//		|	\ end of list
+			//		|-> [IntProperty] mSwitchPosition
+			//		|  .Name = str:'mSwitchPosition'
+			//		|  .Length = Int32:4
+			//		|  .Index = Int32:0
+			//		|  .Value = Int32:0
+			//		\ end of list
+			internal override void _CreateChilds()
+			{
+				Header = "Track connection";
+
+				P.Entity entity = _object.EntityObj as P.Entity;
+				if (entity.Value != null)
+				{
+					P.Property prop = entity.Value.Named("mConnectedComponent");
+					if (prop is P.ObjectProperty)
+					{
+						P.ObjectProperty objprop = prop as P.ObjectProperty;
+						string pathname = objprop.PathName.ToString();
+						if (!string.IsNullOrEmpty(pathname))
+							_childs.Add(MainFactory.Create(this, "Connection", pathname, true));
+					}
+
+					prop = entity.Value.Named("mSwitchPosition");
+					if (prop is P.IntProperty)
+					{
+						int pos = (int) (prop as P.IntProperty).Value;
+						//_childs.Add(MainFactory.Create(this, "Switch position", (pos == 0 ? "Left" : "Right"), true));
+						_childs.Add(MainFactory.Create(this, "Switch position", pos, true));
+					}
+				}
+			}
+
+			private P.Object _object;
 		}
 
 		internal class FeetOffsets : Expando
