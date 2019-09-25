@@ -78,18 +78,21 @@ namespace SatisfactorySavegameTool.Supplements
 		// Used to get game version info from savegame header
 		public static VersionTable.VersionEntry GetVersionEntry(this P.Header header)
 		{
-			int build_version = header.BuildVersion + 34682;
+			int build_version = header.GetBuildVersion();
 			return VersionTable.INSTANCE.Find(build_version);
 		}
 
 		public static int GetBuildVersion(this P.Header header)
 		{
-			return header.BuildVersion + 34682;
+			int build_version = header.BuildVersion;
+			if (header.SaveVersion < 21)
+				build_version += 34682;
+			return build_version;
 		}
 
 		public static VersionTable.Version GetVersion(this P.Header header)
 		{
-			int build_version = header.BuildVersion + 34682;
+			int build_version = header.GetBuildVersion();
 			VersionTable.VersionEntry version = VersionTable.INSTANCE.Find(build_version);
 			if (version == null)
 				return VersionTable.Version.Unknown;

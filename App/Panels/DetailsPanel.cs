@@ -1345,7 +1345,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 			_childs.Add(ValueControlFactory.Create(this, "SaveVersion" , _header.SaveVersion, true));
 
-			int build_version = _header.BuildVersion + 34682;
+			int build_version = _header.GetBuildVersion();
 			VersionTable.VersionEntry v = VersionTable.INSTANCE.Find(build_version);
 			string build_v = v != null ? v.ToString() : string.Format("#{0}", build_version);
 			_childs.Add(ValueControlFactory.Create(this, "BuildVersion", build_v, true));
