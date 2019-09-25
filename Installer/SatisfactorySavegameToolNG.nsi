@@ -13,8 +13,8 @@ Unicode true
 !define APPVERSIONSHORT   "0.1alpha"
 !define APPICON           "..\App\Resources\Logo-128x128.ico"
 
-LangString APPNAMEDESKTOP 1033 "Satisfactory Savegame Tool - ${APPVERSION}"
-LangString APPNAMEDESKTOP 1031 "Satisfactory Spielstand Helfer - ${APPVERSION}"
+LangString APPNAMEDESKTOP 1033 "Satisfactory Savegame Tool"
+LangString APPNAMEDESKTOP 1031 "Satisfactory Spielstand Helfer"
 LangString APPUNINSTALL   1033 "Uninstall"
 LangString APPUNINSTALL   1031 "Deinstallieren"
 LangString APPWINVERFAIL  1033 "Sorry to say, but this version of Windows isn't supported anymore."
@@ -37,7 +37,7 @@ LangString APPNO64BITOS   1031 "Es tut mir leid, aber dieses Programm benötigt e
 
 ; Main settings
 Name "${APPNAMEANDVERSION}"
-InstallDir "$PROGRAMFILES\${APPNAME}"
+InstallDir "$PROGRAMFILES64\${APPNAME}"
 InstallDirRegKey ${REGISTRYROOT} "${REGISTRYKEY}" ""
 OutFile "Setup-${APPNAMESHORT}-v${APPVERSIONSHORT}.exe"
 
@@ -51,7 +51,7 @@ SetOverwrite ifnewer
 ManifestSupportedOS Win7 Win8 Win8.1 Win10 ; Just in case default values are changed
 ManifestDPIAware true
 
-RequestExecutionLevel user ;admin
+RequestExecutionLevel admin
 
 
 ; Modern interface settings
@@ -77,15 +77,14 @@ InstType /COMPONENTSONLYONCUSTOM
 
 !define MUI_ABORTWARNING
 
+!define MUI_PAGE_CUSTOMFUNCTION_SHOW ext.WelcomePage.Show
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_DIRECTORY
 ;!insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_INSTFILES
-!insertmacro MUI_PAGE_FINISH
 
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
-!insertmacro MUI_UNPAGE_FINISH
 
 ; Set languages (first is default language)
 !insertmacro MUI_LANGUAGE "English"
@@ -159,23 +158,30 @@ Function un.onInit
 FunctionEnd
 
 
+Function ext.WelcomePage.Show
+	CreateFont $mui.WelcomePage.Title.Font "$(^Font)" "9.5u" "700"
+	SendMessage $mui.WelcomePage.Title ${WM_SETFONT} $mui.WelcomePage.Title.Font 1
+FunctionEnd
+
+
 Section InstallMain Install_Main
 
 	; Gathering files needed is to be dealt with in control script!
 
-
 	; Set Section properties
-	SetOverwrite on
+	SectionIn 1 RO
 
 	; Set Section Files and Shortcuts
+	CreateDirectory "$INSTDIR"
+	AccessControl::GrantOnFile "$INSTDIR" "(S-1-5-32-545)" "FullAccess"
+
 	SetOutPath "$INSTDIR"
 	File /r "${SOURCEDIR}\*.*"
 
 	SetShellVarContext all ; for ALL users
 	CreateDirectory "$SMPROGRAMS\${STARTMENUFOLDER}"
-	CreateShortCut "$SMPROGRAMS\${STARTMENUFOLDER}\$(APPNAMEDESKTOP).lnk" "$INSTDIR\${APPNAMESHORT}.exe"
-
 	SetOutPath "$INSTDIR"
+	CreateShortCut "$SMPROGRAMS\${STARTMENUFOLDER}\$(APPNAMEDESKTOP).lnk" "$INSTDIR\${APPNAMESHORT}.exe"
 
 SectionEnd ; Main
 
