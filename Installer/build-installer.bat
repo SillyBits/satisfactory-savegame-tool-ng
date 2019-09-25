@@ -17,10 +17,14 @@ rem Collect all files needed
 
 echo [%TIME%] Collecting files ...
 
-if exist "__delivery" (
-	rmdir /S /Q "__delivery"
+if exist __delivery (
+	rmdir /S /Q __delivery
 )
-mkdir "__delivery"
+mkdir __delivery
+if not exist __delivery (
+	echo [%TIME%] Error creating __delivery folder
+	exit /b -1
+)
 cd __delivery
 set ROOTDIR=%~dp0\..
 

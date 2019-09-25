@@ -120,7 +120,7 @@ namespace SatisfactorySavegameTool.Actions
 					header = Translate._(header.Substring(1, header.Length - 2));
 
 				MenuItem action = new MenuItem() {
-					Name = name.Replace("[", "").Replace("]", "_"),
+					Name = name.Replace('\\', '_'),
 					Header = header,
 					Tag = name,
 				};
@@ -156,9 +156,8 @@ namespace SatisfactorySavegameTool.Actions
 					foreach (var group in groups)
 					{
 						MenuItem plugin = add_plugin(menu, group.Key);
-						int keylen = group.Key.Length + 1;
 						foreach (var pair in plugins)
-							add_action(plugin, pair.Key.Substring(keylen), pair.Value);
+							add_action(plugin, pair.Key, pair.Value);
 					}
 				}
 			}

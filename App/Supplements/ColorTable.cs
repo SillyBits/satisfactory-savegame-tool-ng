@@ -26,6 +26,8 @@ namespace SatisfactorySavegameTool.Supplements
 
 		public Color Find(int index)
 		{
+			if (index < 0 || index >= _colors.Count)
+				return null;
 			return _colors[index];
 		}
 

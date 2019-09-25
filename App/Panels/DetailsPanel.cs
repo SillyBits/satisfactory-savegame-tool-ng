@@ -657,7 +657,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 		{
 			get
 			{
-				//return (Text != DetailsPanel.EMPTY) ? new str(Text) : null;
 				if (Text == DetailsPanel.EMPTY)
 					return null;
 				if (_ascii && Text.Any(c => (c <= 127)))
@@ -1263,7 +1262,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			//PropertyChanged?.Invoke(sender, new PropertyChangedEventArgs("Value"));
 			base._PropertyChanged(_prop, e);
 		}
 
@@ -1284,9 +1282,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 			P.PropertyList prop_list = Tag as P.PropertyList;
 			foreach (Property prop in prop_list.Value)
 			{
-				//IElement element = ElementFactory.Create(this, null, prop);
-				//if (element == null)
-				//	element = ValueControlFactory.Create(this, null, prop);
 				string label = prop != null ? prop.ToString() : null;
 				IElement element = MainFactory.Create(this, label, prop);
 				_childs.Add(element);
@@ -1309,8 +1304,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 			: base(parent, label, null)
 		{
 			_prop = obj as ValueProperty;
-			//if ((_prop as P.ByteProperty).Unknown.ToString() == "None")
-			//	_value = _prop.Value.ToString();
 			_value = _prop.Value.ToString();
 		}
 	}
@@ -1672,20 +1665,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 			_prop = obj as P.Quat;
 			_value = new float[] { _prop.A, _prop.B, _prop.C, _prop.D };
 		}
-
-		/*internal override void _CreateVisual()
-		{
-			StackPanel panel = new StackPanel() {
-				Orientation = Orientation.Horizontal,
-			};
-
-			panel.Children.Add(new FloatControl(_value.A));
-			panel.Children.Add(new FloatControl(_value.B));
-			panel.Children.Add(new FloatControl(_value.C));
-			panel.Children.Add(new FloatControl(_value.D));
-
-			_visual = panel;
-		}*/
 
 		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
