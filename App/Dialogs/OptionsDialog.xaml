@@ -71,6 +71,7 @@
 						<RowDefinition Height="auto" />
 						<RowDefinition Height="auto" />
 						<RowDefinition Height="auto" />
+						<RowDefinition Height="auto" />
 					</Grid.RowDefinitions>
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*" SharedSizeGroup="colGroup" />
@@ -139,7 +140,22 @@
 						</Grid>
 					</GroupBox>
 
-					<GroupBox Grid.Row="3" x:Name="deep_analysis_group">
+					<GroupBox Grid.Row="3" x:Name="update_check_group">
+						<GroupBox.Header>
+							<Label Content="{lang:Translate Key=OptionsDialog.UpdateCheck}" />
+						</GroupBox.Header>
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*" />
+							</Grid.ColumnDefinitions>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="auto" />
+							</Grid.RowDefinitions>
+							<CheckBox x:Name="update_check" Grid.Row="1" Content="{lang:Translate Key=OptionsDialog.UpdateCheck.Enable}" />
+						</Grid>
+					</GroupBox>
+
+					<GroupBox Grid.Row="4" x:Name="deep_analysis_group">
 						<GroupBox.Header>
 							<Label Content="{lang:Translate Key=OptionsDialog.DeepAnalysis}" />
 						</GroupBox.Header>

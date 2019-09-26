@@ -41,6 +41,7 @@ namespace SatisfactorySavegameTool.Dialogs
 			languages.SelectedItem = langs.FirstOrDefault(lang => lang.ID == Settings.LANGUAGE);
 			defaultpath.Text = Path.GetFullPath(Config.Root.core.defaultpath);
 			exportpath.Text = Path.GetFullPath(Config.Root.core.exportpath.Length > 0 ? Config.Root.core.exportpath : Settings.EXPORTPATH);
+			update_check.IsChecked = Config.Root.update_check.check_for_updates;
 			deep_analysis.IsChecked = Config.Root.deep_analysis.enabled;
 
 			trees.SelectedIndex = 0;
@@ -108,6 +109,7 @@ namespace SatisfactorySavegameTool.Dialogs
 				Config.Root.core.defaultpath = Path.GetFullPath(defaultpath.Text);
 			if (exportpath.Text.Length > 0)
 				Config.Root.core.exportpath = Path.GetFullPath(exportpath.Text);
+			Config.Root.update_check.check_for_updates = update_check.IsChecked;
 			Config.Root.deep_analysis.enabled = deep_analysis.IsChecked;
 
 			int order = 0;
