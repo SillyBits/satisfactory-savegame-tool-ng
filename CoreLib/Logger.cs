@@ -56,7 +56,7 @@ namespace CoreLib
 			}
 
 			Info("... log facility up and running");
-			_file.Write("\n");
+			_file.Write("\r\n");
 
 			if (as_singleton)
 				SetLog(this);
@@ -80,7 +80,7 @@ namespace CoreLib
 
 		public void Shutdown()
 		{
-			_file.Write("\n");
+			_file.Write("\r\n");
 			Info("Shutting down log facility ...");
 
 			if (LOG == this)
@@ -118,6 +118,7 @@ namespace CoreLib
 			s += msg;
 			if (add_nl)
 				s += "\n";
+			s = s.Replace("\n", "\r\n");
 
 			lock (_file)
 			{

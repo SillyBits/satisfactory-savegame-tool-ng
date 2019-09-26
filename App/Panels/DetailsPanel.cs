@@ -139,7 +139,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			IElement element = null;
 
 			if (label != null)							element = CreateNamed(parent, label, obj, read_only);
-			if (element == null && obj is P.Property)	element = ElementFactory.Create(parent, label, obj);
+			if (element == null && obj is P.Property)	element = ElementFactory.Create(parent, label, obj, read_only);
 			if (element == null && obj is IDictionary)	element = new DictControl(parent, label, obj);
 			if (element == null && obj is ICollection)	element = new ListControl(parent, label, obj);
 			if (element == null)						element = ValueControlFactory.Create(parent, label, obj, read_only);
@@ -238,7 +238,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 	//
 	internal class ElementFactory : BaseFactory<IElement>
 	{
-		internal static IElement Create(IElement parent, string label, object obj)
+		internal static IElement Create(IElement parent, string label, object obj, bool read_only = false)
 		{
 			IElement element = null;
 			if (obj != null)
@@ -247,8 +247,19 @@ namespace SatisfactorySavegameTool.Panels.Details
 				if (prop.GetKeys().Contains("ClassName"))
 				{
 					string type_name = (prop.GetChilds()["ClassName"] as str).LastName();
-					if (INSTANCE.IsKnown(type_name))
+					if (read_only)
+					{
+						if (INSTANCE.IsKnown("Readonly" + type_name))
+							element = INSTANCE["Readonly" + type_name, parent, label, obj];
+					}
+					if (element == null && INSTANCE.IsKnown(type_name))
 						element = INSTANCE[type_name, parent, label, obj];
+				}
+				if (element == null && read_only)
+				{
+					// Try to get a readonly visualizer
+					if (INSTANCE.IsKnown("Readonly" + prop.TypeName))
+						element = INSTANCE["Readonly" + prop.TypeName, parent, label, obj];
 				}
 				if (element == null && INSTANCE.IsKnown(prop.TypeName))
 					element = INSTANCE[prop.TypeName, parent, label, obj];
@@ -1039,6 +1050,20 @@ namespace SatisfactorySavegameTool.Panels.Details
 		internal _ValueType[] _values;
 	}
 
+	internal class ReadonlyMultiValueControl<_ValueType> : MultiValueControl<_ValueType>
+	{
+		public ReadonlyMultiValueControl(IElement parent, string label, object obj)
+			: base(parent, label, obj)
+		{ }
+
+		internal override void _CreateChilds()
+		{
+			base._CreateChilds();
+			foreach (FrameworkElement child in _childs)
+				child.IsEnabled = false;
+		}
+	}
+
 
 	internal class HexdumpControl : ValueControl<byte[]>
 	{
@@ -1558,24 +1583,39 @@ namespace SatisfactorySavegameTool.Panels.Details
 			_value = new byte[] { _prop.R, _prop.G, _prop.B, _prop.A };
 		}
 
-		/*internal override void _CreateVisual()
-		{
-			StackPanel panel = new StackPanel() {
-				Orientation = Orientation.Horizontal,
-			};
-
-			panel.Children.Add(new IntControl(_value.R));
-			panel.Children.Add(new IntControl(_value.G));
-			panel.Children.Add(new IntControl(_value.B));
-			panel.Children.Add(new IntControl(_value.A));
-			panel.Children.Add(new ColorControl(_value));
-
-			_visual = panel;
-		}*/
 		internal override void _CreateChilds()
 		{
 			base._CreateChilds();
 			_childs.Add(new ColorControl(_prop));
+		}
+
+		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			byte[] vals = Value;
+			_prop.R = vals[0];
+			_prop.G = vals[1];
+			_prop.B = vals[2];
+			_prop.A = vals[3];
+
+			base._PropertyChanged(_prop, e);
+		}
+
+		internal P.Color _prop;
+	}
+
+	internal class ReadonlyColor : ReadonlyMultiValueControl<byte> //ValueControl<P.Color>
+	{
+		public ReadonlyColor(IElement parent, string label, object obj)
+			: base(parent, label + " [RGBA]", null)
+		{
+			_prop = obj as P.Color;
+			_value = new byte[] { _prop.R, _prop.G, _prop.B, _prop.A };
+		}
+
+		internal override void _CreateChilds()
+		{
+			base._CreateChilds();
+			_childs.Add(new ColorControl(_prop, true));
 		}
 
 		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -1601,24 +1641,39 @@ namespace SatisfactorySavegameTool.Panels.Details
 			_value = new float[] { _prop.R, _prop.G, _prop.B, _prop.A };
 		}
 
-		/*internal override void _CreateVisual()
-		{
-			StackPanel panel = new StackPanel() {
-				Orientation = Orientation.Horizontal,
-			};
-
-			panel.Children.Add(new FloatControl(_value.R));
-			panel.Children.Add(new FloatControl(_value.G));
-			panel.Children.Add(new FloatControl(_value.B));
-			panel.Children.Add(new FloatControl(_value.A));
-			panel.Children.Add(new LinearColorControl(_value));
-
-			_visual = panel;
-		}*/
 		internal override void _CreateChilds()
 		{
 			base._CreateChilds();
 			_childs.Add(new LinearColorControl(_prop));
+		}
+
+		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			float[] vals = Value;
+			_prop.R = vals[0];
+			_prop.G = vals[1];
+			_prop.B = vals[2];
+			_prop.A = vals[3];
+
+			base._PropertyChanged(_prop, e);
+		}
+
+		internal P.LinearColor _prop;
+	}
+
+	internal class ReadonlyLinearColor : ReadonlyMultiValueControl<float> //ValueControl<P.LinearColor>
+	{
+		public ReadonlyLinearColor(IElement parent, string label, object obj)
+			: base(parent, label + " [RGBA]", null)
+		{
+			_prop = obj as P.LinearColor;
+			_value = new float[] { _prop.R, _prop.G, _prop.B, _prop.A };
+		}
+
+		internal override void _CreateChilds()
+		{
+			base._CreateChilds();
+			_childs.Add(new LinearColorControl(_prop, true));
 		}
 
 		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -2985,7 +3040,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			internal override void _CreateChilds()
 			{
 				P.NamedEntity entity = Tag as P.NamedEntity;
-				var values = entity.Value.Names();
+				//var values = entity.Value.Names();
 
 				var colors = entity.Value
 					.Where(p => p is P.StructProperty && !str.IsNullOrEmpty((p as P.StructProperty).Name))

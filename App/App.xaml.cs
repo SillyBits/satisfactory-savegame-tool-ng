@@ -338,7 +338,7 @@ namespace SatisfactorySavegameTool
 			Splashscreen.SetMessage("Setting up default savegame path");
 			if (!Config.Root.core.HasItem("defaultpath"))
 				Config.Root.core.AddItem("defaultpath");
-			if (Config.Root.core.defaultpath == "" || !Directory.Exists(Config.Root.core.defaultpath))
+			if (string.IsNullOrEmpty(Config.Root.core.defaultpath) || !Directory.Exists(Config.Root.core.defaultpath))
 			{
 				string subpath = Path.Combine("FactoryGame", "Saved", "SaveGames");
 
@@ -404,7 +404,9 @@ namespace SatisfactorySavegameTool
 
 			// Setup export path
 			if (!Config.Root.core.HasItem("exportpath"))
-				Config.Root.core.AddItem("exportpath", Path.Combine(APPPATH, EXPORTS));
+				Config.Root.core.AddItem("exportpath", "");
+			if (string.IsNullOrEmpty(Config.Root.core.exportpath) || !Directory.Exists(Config.Root.core.exportpath))
+				Config.Root.core.exportpath = Path.Combine(APPPATH, EXPORTS);
 			EXPORTPATH = Config.Root.core.exportpath;
 
 

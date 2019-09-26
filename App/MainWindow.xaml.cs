@@ -583,7 +583,7 @@ namespace SatisfactorySavegameTool
 				UpdateChecker checker = new UpdateChecker(
 					Helpers.Unpack("yygpKSi20tc3STNKsUw008vPy8nMS9UtTi0qSy3SS87JL03RL8vxM0jzjAop8IhMTDL2MPDITc/QB0oXZ+bn6WbmpeXrVeTmAAA="), 
 					progress != null? progress.Events : null, Logger.LOG);
-				string url = checker.Check(Settings.APPTITLE, /*Settings.APPVERSION*/"0.0 alpha", out changelog);
+				string url = checker.Check(Settings.APPTITLE, Settings.APPVERSION, out changelog);
 				checker.Close();
 				checker = null;
 				return url;

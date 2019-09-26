@@ -90,19 +90,6 @@ namespace SatisfactorySavegameTool.Actions
 
 				// Setup defaults, if any
 				destinationtype.SelectedIndex = 0;
-#if DEBUG
-				filename.Text = @"E:\GitHub\satisfactory-savegame-tool-ng\App\exports\test.export";
-				//(filters.ItemsSource as Filters).Add(
-				//	new FilterDefinition(F.Operations.And, Sources.ClassName, F.Conditions.Equal, 
-				//		"/Game/FactoryGame/Character/Player/Char_Player.Char_Player_C"));
-				(filters.ItemsSource as Filters).Add(
-					new FilterDefinition(F.Operations.And, Sources.ClassName, F.Conditions.StartsWith, 
-						"/Game/FactoryGame/Character/"));
-				(filters.ItemsSource as Filters).Add(
-					new FilterDefinition(F.Operations.And, Sources.ClassName, F.Conditions.Contains, 
-						"SpaceRabbit"));
-				deep_traversal.IsChecked = true;
-#endif
 
 				filename_TextChanged(null, null);
 				filters_SelectionChanged(null, null);
@@ -372,7 +359,10 @@ namespace SatisfactorySavegameTool.Actions
 				{
 					if (_stream == null)
 						throw new InvalidOperationException();
-					_stream.Write(value);
+					if (value is string)
+						_stream.Write((value as string).Replace("\n", "\r\n"));
+					else
+						_stream.Write(value);
 				}
 
 				public virtual void Close()
