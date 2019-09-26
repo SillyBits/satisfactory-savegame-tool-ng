@@ -3452,6 +3452,9 @@ namespace SatisfactorySavegameTool.Panels.Details
 			// Is this a train track?
 			bool is_track = b_pathname.Contains("RailroadTrack");
 
+			// Is this a track switch?
+			bool is_switch = b_pathname.Contains("RailroadSwitch");
+
 
 			// Start generating visuals
 			//
@@ -3459,10 +3462,14 @@ namespace SatisfactorySavegameTool.Panels.Details
 			// Create list of values, processed ones are to be removed and 
 			// remain - if any - will be logged as "dangling"
 			var values = ent_named.Value.Names();
+			Action<string> _eat_value = (name) => {
+				if (values.Contains(name))
+					values.Remove(name);
+			};
 			Func<string,P.Property> _try_value = (name) => {
 				P.Property p = ent_named.Value.Named(name);
 				if (p != null)
-					values.Remove(name);
+					_eat_value(name);
 				return p;
 			};
 
@@ -3515,9 +3522,13 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 			if (save_version >= 20)
 			{
-				// Use new coloring system
+				// Use new coloring system, ...
 				prop = _try_value("mColorSlot");
 				_childs.Add(new ColorSlot(this, "Color slot", prop));
+
+				// ... and remove the old values so they won't show up as dangling
+				_eat_value("mPrimaryColor");
+				_eat_value("mSecondaryColor");
 			}
 			else
 			{
@@ -3678,21 +3689,21 @@ namespace SatisfactorySavegameTool.Panels.Details
 				if (childs.Contains(p))
 					childs.Remove(p);
 			};
-			Action<string, string> _try_add_item_conn = (title, path) => {
-				string p = building_pathname + path;
-				prop = MainWindow.CurrFile.Objects.FindByPathName(p, true);
-				if (prop != null)
-				{
+			Func<string, P.Property> _try = (path) => {
+				P.Property p = MainWindow.CurrFile.Objects.FindByPathName(building_pathname + path, true);
+				if (p != null)
 					_eat(path);
+				return p;
+			};
+			Action<string, string> _try_add_item_conn = (title, path) => {
+				prop = _try(path);
+				if (prop != null)
 					_childs.Add(new FactoryConnection(this, title, prop));
-				}
 			};
 			Action<string, string> _try_add_inventory = (title, path) => {
-				string p = building_pathname + path;
-				prop = MainWindow.CurrFile.Objects.FindByPathName(p, true);
+				prop = _try(path);
 				if (prop != null)
 				{
-					_eat(path);
 					FGInventoryComponent invi = new FGInventoryComponent(this, null, prop);
 					invi._label = null;
 					invi._excluded.AddRange(_excluded_props);
@@ -3701,31 +3712,19 @@ namespace SatisfactorySavegameTool.Panels.Details
 				}
 			};
 			Action<string, string> _try_add_power_conn = (title, path) => {
-				string p = building_pathname + path;
-				prop = MainWindow.CurrFile.Objects.FindByPathName(p, true);
+				prop = _try(path);
 				if (prop != null)
-				{
-					_eat(path);
 					_childs.Add(new PowerConnection(this, title, prop));
-				}
 			};
 			Action<string, string> _try_add_train_platform = (title, path) => {
-				string p = building_pathname + path;
-				prop = MainWindow.CurrFile.Objects.FindByPathName(p, true);
+				prop = _try(path);
 				if (prop != null)
-				{
-					_eat(path);
 					_childs.Add(new PlatformConnection(this, title, prop));
-				}
 			};
 			Action<string, string> _try_add_track_conn = (title, path) => {
-				string p = building_pathname + path;
-				prop = MainWindow.CurrFile.Objects.FindByPathName(p, true);
+				prop = _try(path);
 				if (prop != null)
-				{
-					_eat(path);
 					_childs.Add(new TrackConnection(this, title, prop));
-				}
 			};
 
 			// Distinguish between conveyors, power poles and "more intelligent" 
@@ -3755,27 +3754,46 @@ namespace SatisfactorySavegameTool.Panels.Details
 					height = 100.0f;
 				_childs.Add(MainFactory.Create(this, "Height [m]", height / 100.0f, true));
 			}
-			else if (is_track)
+			else if (is_track || is_switch)
 			{
-				_try_add_track_conn("Previous", ".TrackConnection0");
-				_try_add_track_conn("Next", ".TrackConnection1");
-
-				//|-> [BoolProperty] mIsOwnedByPlatform
-				//|  .Name = str:'mIsOwnedByPlatform'
-				//|  .Length = Int32:0
-				//|  .Index = Int32:0
-				//|  .Value = Byte:1
-				prop = _try_value("mIsOwnedByPlatform");
-				if (prop is P.BoolProperty)
+				if (is_track)
 				{
-					bool owned = (bool)(prop as P.BoolProperty).Value;
-					_childs.Add(MainFactory.Create(this, "Owned by platform?", owned, true));
+					_try_add_track_conn("Previous", ".TrackConnection0");
+					_try_add_track_conn("Next", ".TrackConnection1");
+					_eat_value("mConnections");
+					_eat_value("mConnections#1");
 
-					// Find platform?
+					//|-> [BoolProperty] mIsOwnedByPlatform
+					//|  .Name = str:'mIsOwnedByPlatform'
+					//|  .Length = Int32:0
+					//|  .Index = Int32:0
+					//|  .Value = Byte:1
+					prop = _try_value("mIsOwnedByPlatform");
+					if (prop is P.BoolProperty)
+					{
+						bool owned = (bool)(prop as P.BoolProperty).Value;
+						_childs.Add(MainFactory.Create(this, "Owned by platform?", owned, true));
+
+						// Find platform?
+					}
+
+					// Skipped for now:
+					_eat_value("mSplineData");
+				}
+				else
+				{
+					prop = _try_value("mControlledConnection");
+					if (prop is P.ObjectProperty)
+					{
+						prop = MainWindow.CurrFile.Objects.FindByPathName((prop as P.ObjectProperty).PathName, true);
+						if (prop != null)
+							_childs.Add(new TrackConnection(this, "Controlled Connection", prop));
+					}
 				}
 
-				// Skipped:
-				// - mSplineData
+				// Skipped for now:
+				_eat_value("mTimeSinceStartStopProducing");
+				_eat_value("mIsProducing");
 
 				//TODO: Add .Private, if any
 			}
@@ -3855,6 +3873,20 @@ namespace SatisfactorySavegameTool.Panels.Details
 				// Handle special types like storage containers and alike
 				_try_add_inventory("Storage", ".StorageInventory");
 				_try_add_inventory("Storage", ".inventory");// TrainDockingStation
+
+				// Those were (or better should have been) expressed already
+				_eat_value("mInventory");
+				_eat_value("mFuelInventory");
+
+				// Trunk and train station might carry this property:
+				//|-> [BoolProperty] mIsInLoadMode
+				//|  .Name = str:'mIsInLoadMode'
+				//|  .Length = Int32:0
+				//|  .Index = Int32:0
+				//|  .Value = Byte:0
+				prop = _try_value("mIsInLoadMode");
+				if (prop is P.BoolProperty)
+					_childs.Add(MainFactory.Create(this, "Is in load mode?", (prop as P.BoolProperty).Value, true));
 
 				// Some machines do have an inventory potential, the OC slots ^^
 				//|-> [FloatProperty] mCurrentPotential
@@ -3940,10 +3972,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 					//|  .Value = <empty>
 					prop = _try_value("mDockingLocomotive");
 					if (prop is P.ObjectProperty)
-					{
-						objprop = prop as P.ObjectProperty;
-						_childs.Add(MainFactory.Create(this, "Docked locomotive", objprop.PathName, true));
-					}
+						_childs.Add(MainFactory.Create(this, "Docked locomotive", (prop as P.ObjectProperty).PathName, true));
 
 					//|-> [ArrayProperty] mDockedPlatformList
 					//|  .InnerType = str:'ObjectProperty'
@@ -3995,12 +4024,38 @@ namespace SatisfactorySavegameTool.Panels.Details
 					//|  .Index = Int32:0
 					//|  .Value = <empty>
 					//...phew
+					_eat_value("mTrackPosition");
 					prop = _try_value("mRailroadTrack");
 					if (prop is P.ObjectProperty)
-					{
-						objprop = prop as P.ObjectProperty;
-						_childs.Add(MainFactory.Create(this, "Railroad track", objprop.PathName, true));
-					}
+						_childs.Add(MainFactory.Create(this, "Railroad track", (prop as P.ObjectProperty).PathName, true));
+
+					//|-> [BoolProperty] mIsOrientationReversed
+					//|  .Name = str:'mIsOrientationReversed'
+					//|  .Length = Int32:0
+					//|  .Index = Int32:0
+					//|  .Value = Byte:1
+					prop = _try_value("mIsOrientationReversed");
+					if (prop is P.BoolProperty)
+						_childs.Add(MainFactory.Create(this, "Orientation reversed?", prop as P.BoolProperty, true));
+
+					//|-> [BoolProperty] mIsProducing
+					//|  .Name = str:'mIsProducing'
+					//|  .Length = Int32:0
+					//|  .Index = Int32:0
+					//|  .Value = Byte:1
+					prop = _try_value("mIsProducing");
+					if (prop is P.BoolProperty)
+						_childs.Add(MainFactory.Create(this, "Is producing?", (prop as P.BoolProperty).Value, true));
+
+					//|-> [FloatProperty] mTimeSinceStartStopProducing
+					//|  .Name = str:'mTimeSinceStartStopProducing'
+					//|  .Length = Int32:4
+					//|  .Index = Int32:0
+					//|  .Value = Single:2918,587
+					//TODO: Find correct unit, might be seconds, with =3600 running for an hour or more?
+					prop = _try_value("mTimeSinceStartStopProducing");
+					if (prop is P.FloatProperty)
+						_childs.Add(MainFactory.Create(this, "Time since start", (prop as P.FloatProperty).Value, true));
 				}
 
 				//TODO: Add .Private, if any
@@ -4033,7 +4088,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 			//		|-> [FloatProperty] mDynamicProductionCapacity
 			//		|-> [FloatProperty] mBaseProduction
 			//		\ end of list
-			prop = MainWindow.CurrFile.Objects.FindByPathName(building_pathname + ".powerInfo");
+			_eat_value("mPowerInfo");
+			prop = _try(".powerInfo");
 			if (prop is P.Object)
 			{
 				entity = (prop as P.Object).EntityObj as P.Entity;
@@ -4097,7 +4153,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			_try_add_power_conn("Power connection", ".FGPowerConnection");
 
 			// Buildings with dynamic legs might also carry those cached offsets
-			prop = MainWindow.CurrFile.Objects.FindByPathName(building_pathname + ".FGFactoryLegs");
+			prop = _try(".FGFactoryLegs");
 			if (prop is P.Object)
 				_childs.Add(new FeetOffsets(this, "Feet offsets", prop));
 
@@ -4753,13 +4809,26 @@ namespace SatisfactorySavegameTool.Panels.Details
 				P.Entity entity = _object.EntityObj as P.Entity;
 				if (entity.Value != null)
 				{
-					P.Property prop = entity.Value.Named("mConnectedComponent");
-					if (prop is P.ObjectProperty)
+					P.Property prop = entity.Value.Named("mConnectedComponents");
+					if (prop is P.ArrayProperty)
 					{
-						P.ObjectProperty objprop = prop as P.ObjectProperty;
-						string pathname = objprop.PathName.ToString();
-						if (!string.IsNullOrEmpty(pathname))
-							_childs.Add(MainFactory.Create(this, "Connection", pathname, true));
+						P.ArrayProperty arr = prop as P.ArrayProperty;
+						if (arr.Value is P.Properties)
+						{
+							P.Properties props = arr.Value as P.Properties;
+							int index = 0;
+							foreach (P.Property p in props)
+							{
+								P.ObjectProperty objprop = p as P.ObjectProperty;
+								string pathname = objprop.PathName.ToString();
+								if (!string.IsNullOrEmpty(pathname))
+								{
+									string label = string.Format("Connection #{0}", index);
+									_childs.Add(MainFactory.Create(this, label, pathname, true));
+									++index;
+								}
+							}
+						}
 					}
 
 					prop = entity.Value.Named("mSwitchPosition");
