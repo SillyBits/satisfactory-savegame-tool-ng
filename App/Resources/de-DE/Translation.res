@@ -173,6 +173,8 @@ kann diesen Spielstand unter Umständen komplett unbrauchbar machen!</MainWindow
 	<OptionsDialog.ExportPath>Export Pfad</OptionsDialog.ExportPath>
 	<OptionsDialog.ExportPath.Hint>Pfad zum Ordner wo Exporte gespeichert werden sollen.</OptionsDialog.ExportPath.Hint>
 	<OptionsDialog.ExportPath.Browse>Pfad zum Ordner wo Exporte gespeichert werden sollen:</OptionsDialog.ExportPath.Browse>
+	<OptionsDialog.UpdateCheck>Update-Check</OptionsDialog.UpdateCheck>
+	<OptionsDialog.UpdateCheck.Enable>Bei Programmstart nach neuer Version suchen</OptionsDialog.UpdateCheck.Enable>
 	<OptionsDialog.DeepAnalysis>Tiefenanalyse</OptionsDialog.DeepAnalysis>
 	<OptionsDialog.DeepAnalysis.Hint>Dieses Programm ist fähig auch Objektspezifische private Daten zu analysieren.\n
 Dies beinhaltet z.B. die Gegenstände auf einem Band oder Stromverbindungen.\n

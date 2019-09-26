@@ -173,6 +173,8 @@ unrecoverable damage to your save!</MainWindow.LoadGamefile.PeekHeader.Warn>
 	<OptionsDialog.ExportPath>Export path</OptionsDialog.ExportPath>
 	<OptionsDialog.ExportPath.Hint>Location where exports will be stored.</OptionsDialog.ExportPath.Hint>
 	<OptionsDialog.ExportPath.Browse>Select location where exports will be stored:</OptionsDialog.ExportPath.Browse>
+	<OptionsDialog.UpdateCheck>Update check</OptionsDialog.UpdateCheck>
+	<OptionsDialog.UpdateCheck.Enable>Check for updates on start-up</OptionsDialog.UpdateCheck.Enable>
 	<OptionsDialog.DeepAnalysis>Deep Analysis</OptionsDialog.DeepAnalysis>
 	<OptionsDialog.DeepAnalysis.Hint>This program is capable of parsing any object-specific private data.
 This includes, for example, items on conveyors or wire connections.
