@@ -3027,7 +3027,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 		internal class FGWorldSettings : SpecializedViewer
 		{
-			public FGWorldSettings(IElement parent, string label, object obj)
+			internal FGWorldSettings(IElement parent, string label, object obj)
 				: base(parent, label, obj)
 			{ }
 
@@ -3040,6 +3040,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 			internal override void _CreateChilds()
 			{
 				P.NamedEntity entity = Tag as P.NamedEntity;
+				if (entity == null)
+					return;
 				//var values = entity.Value.Names();
 
 				var colors = entity.Value
@@ -3352,7 +3354,9 @@ namespace SatisfactorySavegameTool.Panels.Details
 				}
 
 				// bp:mRememberedFirstTimeEquipmentClasses -> ArrayProperty -> [0-N] ObjectProperty.PathName -> SG.Obj.Find*;
-				_childs.Add(new FirstTimeEquipped(this, null, bp_named.Value.Named("mRememberedFirstTimeEquipmentClasses")));
+				prop = bp_named.Value.Named("mRememberedFirstTimeEquipmentClasses");
+				if (prop != null && prop is P.ArrayProperty)
+					_childs.Add(new FirstTimeEquipped(this, null, prop));
 			}
 			else
 			{
@@ -3791,10 +3795,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 				prop = _try_value("mIsReversed");
 				if (prop is P.BoolProperty)
-				{
-					bool reversed = (bool)(prop as P.BoolProperty).Value;
-					_childs.Add(MainFactory.Create(this, "Is Reversed?", reversed, true));
-				}
+					_childs.Add(MainFactory.Create(this, "Is Reversed?", (prop as P.BoolProperty).Value, true));
 
 				//TODO: Add .Private, if any
 			}
@@ -3826,10 +3827,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 					prop = _try_value("mIsOwnedByPlatform");
 					if (prop is P.BoolProperty)
 					{
-						bool owned = (bool)(prop as P.BoolProperty).Value;
+						byte owned = (byte)(prop as P.BoolProperty).Value;
 						_childs.Add(MainFactory.Create(this, "Owned by platform?", owned, true));
-
-						// Find platform?
 					}
 
 					// Skipped for now:
