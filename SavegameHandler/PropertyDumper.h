@@ -87,7 +87,7 @@ namespace Savegame
 			_writer(_indent);
 			_writer(text);
 			if (nl)
-				_writer("\r\n");
+				_writer("\n");
 		}
 
 

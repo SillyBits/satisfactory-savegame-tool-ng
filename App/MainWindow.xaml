@@ -39,10 +39,8 @@
 				<Separator/>
 				<MenuItem Header="{lang:Translate Key=MainWindow.Menu.File.MRU}" 
 						  x:Name="File_MRU" IsEnabled="False">
-					<MenuItem x:Name="Clear" 
-							  Header="{lang:Translate Key=MainWindow.Menu.File.MRU.ClearAll}" 
-							  ToolTip="{lang:Translate Key=MainWindow.Menu.File.MRU.ClearAll.TT}" 
-							  Tag="-1" IsEnabled="False" />
+					<MenuItem x:Name="Clear" Header="{lang:Translate Key=MainWindow.Menu.File.MRU.ClearAll}" 
+							  ToolTip="{lang:Translate Key=MainWindow.Menu.File.MRU.ClearAll.TT}" Tag="-1" />
 					<Separator/>
 				</MenuItem>
 				<Separator/>

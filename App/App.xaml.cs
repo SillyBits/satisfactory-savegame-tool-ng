@@ -411,6 +411,11 @@ namespace SatisfactorySavegameTool
 
 
 			// Create any missing config before continuing
+			if (!Config.Root.HasSection("update_check"))
+				Config.Root.AddSection("update_check");
+			if (!Config.Root.update_check.HasItem("check_for_updates"))
+				Config.Root.update_check.AddItem("check_for_updates", true);
+
 			if (!Config.Root.HasSection("deep_analysis"))
 				Config.Root.AddSection("deep_analysis");
 			if (!Config.Root.deep_analysis.HasItem("enabled"))

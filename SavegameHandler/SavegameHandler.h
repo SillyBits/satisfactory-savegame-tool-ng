@@ -256,7 +256,7 @@ namespace Savegame {
 
 		void _SaveCloudsave(String^ filename)
 		{
-			FileWriter^ writer = gcnew FileWriter(filename+".test", nullptr);
+			FileWriter^ writer = gcnew FileWriter(filename, nullptr);
 
 			_cbStart(TotalElements, "Querying file ...", "");
 			int count = 0;

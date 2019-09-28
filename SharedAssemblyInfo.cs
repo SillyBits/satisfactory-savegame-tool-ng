@@ -12,7 +12,7 @@ using System.Windows;
 //[assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("SillyBits")]
 [assembly: AssemblyProduct("Satisfactory Savegame Tool")]
-[assembly: AssemblyCopyright("Copyright © 2019 SillyBits")]
+[assembly: AssemblyCopyright("Copyright (c) 2019 SillyBits")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

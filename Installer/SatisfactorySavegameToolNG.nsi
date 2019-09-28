@@ -21,6 +21,12 @@ LangString APPWINVERFAIL  1033 "Sorry to say, but this version of Windows isn't 
 LangString APPWINVERFAIL  1031 "Es tut mir leid, aber diese Version von Windows wird leider nicht mehr unterstützt."
 LangString APPNO64BITOS   1033 "Sorry to say, but this software requires a 64bit version of Windows."
 LangString APPNO64BITOS   1031 "Es tut mir leid, aber dieses Programm benötigt eine 64bit Version von Windows."
+LangString INSTALL_MAIN   1033 "Main program files"
+LangString INSTALL_MAIN   1031 "Programmdateien"
+LangString INSTALL_UNINST 1033 "Uninstaller"
+LangString INSTALL_UNINST 1031 "Deinstallations-Routine"
+LangString INSTTYPE_FULL  1033 "Full installation"
+LangString INSTTYPE_FULL  1031 "Alles installieren"
 
 !define APPNAMEANDVERSION "$(APPNAMEDESKTOP) - ${APPVERSION}"
 
@@ -65,7 +71,7 @@ RequestExecutionLevel admin
 ; Allow for full & custom install type, with components only visible with custom selection
 ; Whats allowed is being decided at runtime based on cmdline switch "/custom"
 ; TODO: Add code for supporting /custom when more component sections avail
-InstType "Full installation"
+InstType "$(INSTTYPE_FULL)"
 InstType /COMPONENTSONLYONCUSTOM
 
 !define MUI_ICON   "${APPICON}"
@@ -187,7 +193,6 @@ SectionEnd ; Main
 
 
 ; This section is mandatory and therefore hidden
-; (Note: Using same section/function template as with modules to keep it streamlined)
 Section "-Create Uninstaller" Install_Uninstaller
 
 	; Set Section properties
@@ -197,13 +202,13 @@ Section "-Create Uninstaller" Install_Uninstaller
 	SectionIn RO
 
 	; Set Section Files
-	WriteUninstaller "$INSTDIR\uninstall.exe"
+	WriteUninstaller "$INSTDIR\Uninstaller.exe"
 
 	; Set Section Shortcuts
 	SetShellVarContext all ; for ALL users
 	CreateDirectory "$SMPROGRAMS\${STARTMENUFOLDER}"
 	SetOutPath "$INSTDIR" ; Explicit selection of path used as working directory as this might have been changed earlier
-	CreateShortCut "$SMPROGRAMS\${STARTMENUFOLDER}\$(APPUNINSTALL).lnk" "$INSTDIR\uninstall.exe"
+	CreateShortCut "$SMPROGRAMS\${STARTMENUFOLDER}\$(APPUNINSTALL).lnk" "$INSTDIR\Uninstaller.exe"
 
 	; Get size of installation, which is a bit tricky as components might have been deselected if installer was started using /custom switch
 	Push $0
@@ -219,7 +224,7 @@ Section "-Create Uninstaller" Install_Uninstaller
 	; Set Section Registry
 	WriteRegStr ${REGISTRYROOT} "${REGISTRYKEY}" ""               "$INSTDIR"
 	WriteRegStr ${REGISTRYROOT} "${REGISTRYKEY}" "CurrentVersion" "${APPVERSION}"
-	WriteRegStr HKLM            "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAMESHORT}" "DisplayName"     "$(APPNAMEANDVERSION)"
+	WriteRegStr HKLM            "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAMESHORT}" "DisplayName"     "${APPNAMEANDVERSION}"
 	WriteRegStr HKLM            "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAMESHORT}" "UninstallString" "$INSTDIR\uninstall.exe"
 	WriteRegStr HKLM            "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAMESHORT}" "DisplayIcon"     "$INSTDIR\uninstall.exe"
 	WriteRegStr HKLM            "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAMESHORT}" "Publisher"       "SillyBits"
@@ -239,11 +244,11 @@ Function un.Install_Uninstaller
 
 	; Delete Shortcuts
 	SetShellVarContext all ; for ALL users
-	Delete "$SMPROGRAMS\${STARTMENUFOLDER}\Uninstall.lnk"
+	Delete "$SMPROGRAMS\${STARTMENUFOLDER}\$(APPUNINSTALL).lnk"
 	RMDir "$SMPROGRAMS\${STARTMENUFOLDER}"
 
 	; Delete self
-	Delete "$INSTDIR\uninstall.exe"
+	Delete "$INSTDIR\Uninstaller.exe"
 
 FunctionEnd
 
@@ -251,8 +256,8 @@ FunctionEnd
 ; Modern install component descriptions
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 
-	!insertmacro MUI_DESCRIPTION_TEXT ${Install_Main}        "Main program files"
-	!insertmacro MUI_DESCRIPTION_TEXT ${Install_Uninstaller} "Uninstaller"
+	!insertmacro MUI_DESCRIPTION_TEXT ${Install_Main}        "$(INSTALL_MAIN)"
+	!insertmacro MUI_DESCRIPTION_TEXT ${Install_Uninstaller} "$(INSTALL_UNINST)"
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 

@@ -20,7 +20,7 @@ namespace CoreLib
 	/// <code>
 	/// &lt;?xml version="1.0" encoding="utf-8"?&gt;
 	/// &lt;version-info&gt;
-	///   &lt;latest title="appname" version="MM.mm{.rrrrr{.bbbbbb}}{{ }label}"&gt;
+	///   &lt;latest title="appname" version="MM.mm{.bbbbb{.rrrrrr}}{{ }label}"&gt;
 	///     url
 	///   &lt;/latest&gt;
 	///   {&lt;changelog&gt;
@@ -35,9 +35,9 @@ namespace CoreLib
 	///   one given to <c>Check</c>)</description></item>
 	///   <item><term>MM</term><description>The major version</description></item>
 	///   <item><term>mm</term><description>The minor version</description></item>
-	///   <item><term>rrrrr</term><description>The optional revision number</description></item>
-	///   <item><term>bbbbbb</term><description>The optional build number (only valid if revision
-	///   is given too)</description></item>
+	///   <item><term>bbbbb</term><description>The optional build number</description></item>
+	///   <item><term>rrrrrr</term><description>The optional revision number (only valid if build
+	///   number is given too)</description></item>
 	///   <item><term>label</term><description>An optional label like <c>alpha</c> or <c>beta</c>
 	///   to denote special builds</description></item>
 	///   <item><term>url</term><description>being the actual download url for your installer or 
@@ -216,7 +216,7 @@ namespace CoreLib
 		}
 
 
-		// Convert version string to a comparable long using pattern MMmmrrrrrbbbbbb
+		// Convert version string to a comparable long using pattern MMmmbbbbbrrrrrr
 		private long? _VersionAsLong(string version, out string label)
 		{
 			label = null;
@@ -237,7 +237,7 @@ namespace CoreLib
 			};
 
 			label = m.Groups["label"].Value;
-			return (((((num("major") * 100) + num("minor")) * 100000) + num("rev")) * 1000000) + num("build");
+			return (((((num("major") * 100) + num("minor")) * 100000) + num("build")) * 1000000) + num("rev");
 		}
 
 
@@ -307,7 +307,7 @@ namespace CoreLib
 #endif
 
 		private static Regex _version_regex = new Regex(
-			@"(?<major>\d{1,2})\.(?<minor>\d{1,2})(\.(?<rev>\d{1,5})(\.(?<build>\d{1,6}))?)?(\s*(?<label>\w+))?", 
+			@"(?<major>\d{1,2})\.(?<minor>\d{1,2})(\.(?<build>\d{1,5})(\.(?<rev>\d{1,6}))?)?(\s*(?<label>\w+))?", 
 			RegexOptions.Compiled|RegexOptions.CultureInvariant|RegexOptions.ExplicitCapture|RegexOptions.Singleline);
 
 	}

@@ -66,6 +66,14 @@ This requires restarting the program.</MainWindow.UpdateCheck.NewVersionAvail>
 This might be a temporary issue, advised to try again later.</MainWindow.UpdateCheck.DownloadFailed>
 	<MainWindow.UpdateCheck.InstallFailed>Failed to start installer.</MainWindow.UpdateCheck.InstallFailed>
 
+	<MainWindow.MRU.NotFound>The savegame
+
+{0}
+
+wasn't found.
+
+Should it be removed from the list of recently used savegames?</MainWindow.MRU.NotFound>
+
 	<MainWindow.Gamefile.Modified>Modified</MainWindow.Gamefile.Modified>
 	<MainWindow.Gamefile.modified>modified</MainWindow.Gamefile.modified>
 	<MainWindow.Gamefile.UnsavedChanges>Your savegame has unsaved changes!
@@ -79,13 +87,9 @@ Do you really want to close it?</MainWindow.Gamefile.UnsavedChanges>
 {0}
 
 This tool can't operate on this savegame, sorry.</MainWindow.LoadGamefile.PeekHeader.Failed>
-	<MainWindow.LoadGamefile.PeekHeader.Warn>This tool only supports savegame to up
+	<MainWindow.LoadGamefile.PeekHeader.Warn>The savegame you're trying to load uses an unknown version
 
-{0},
-
-but the savegame you're trying to load uses a more recent version
-
-{1}.
+{0}.
 
 
 The tool might still be able to load this savegame, but expect
@@ -176,10 +180,9 @@ unrecoverable damage to your save!</MainWindow.LoadGamefile.PeekHeader.Warn>
 	<OptionsDialog.UpdateCheck>Update check</OptionsDialog.UpdateCheck>
 	<OptionsDialog.UpdateCheck.Enable>Check for updates on start-up</OptionsDialog.UpdateCheck.Enable>
 	<OptionsDialog.DeepAnalysis>Deep Analysis</OptionsDialog.DeepAnalysis>
-	<OptionsDialog.DeepAnalysis.Hint>This program is capable of parsing any object-specific private data.
-This includes, for example, items on conveyors or wire connections.
-But if activated, this will increase load times dramatically!
-So activate only in case normal analysis won't do.</OptionsDialog.DeepAnalysis.Hint>
+	<OptionsDialog.DeepAnalysis.Hint>This program is capable of parsing any object-specific private data. This includes,
+for example, items on conveyors or wire connections. But if activated, this will 
+increase load times dramatically! So activate only in case normal analysis won't do.</OptionsDialog.DeepAnalysis.Hint>
 	<OptionsDialog.DeepAnalysis.Enable>Enable deep analysis</OptionsDialog.DeepAnalysis.Enable>
 	<OptionsDialog.Trees.Title>Trees</OptionsDialog.Trees.Title>
 	<OptionsDialog.Trees.Hint>Here you can select which trees to show and populate when loading a save.

@@ -385,9 +385,8 @@ namespace SatisfactorySavegameTool
 				// Log this version info in case tool crashes
 				Log.Warning("Save is newer than this tool supports: Build={0}, SaveVersion={1}, SaveType={2}", 
 					header.GetBuildVersion(), header.SaveVersion, header.Type);
-				VersionTable.VersionEntry max_version = VersionTable.INSTANCE.GetMax();
 				string save_version = string.Format("Build {0}", header.GetBuildVersion());
-				var ret = MessageBox.Show(string.Format(Translate._("MainWindow.LoadGamefile.PeekHeader.Warn"), max_version, save_version), 
+				var ret = MessageBox.Show(string.Format(Translate._("MainWindow.LoadGamefile.PeekHeader.Warn"), save_version), 
 					Translate._("MainWindow.Title"), MessageBoxButton.YesNo, MessageBoxImage.Question);
 				if (ret == MessageBoxResult.No)
 					return;
@@ -550,7 +549,19 @@ namespace SatisfactorySavegameTool
 			}
 			else
 			{
-				_LoadGamefile(Config.Root.mru.files[index]);
+				string filename = Config.Root.mru.files[index];
+				if (!File.Exists(filename))
+				{
+					var ret = MessageBox.Show(string.Format(Translate._("MainWindow.MRU.NotFound"), filename), 
+						Translate._("MainWindow.Title"), MessageBoxButton.YesNo, MessageBoxImage.Question);
+					if (ret == MessageBoxResult.Yes)
+					{
+						Config.Root.mru.files.RemoveAt(index);
+						_UpdateMRU();
+					}
+					return;
+				}
+				_LoadGamefile(filename);
 			}
 		}
 

@@ -66,6 +66,14 @@ Dies erfordert einen Neustart des Programms.</MainWindow.UpdateCheck.NewVersionA
 Dies könnte ein temporäres Problem sein, bitte versuche es später noch einmal.</MainWindow.UpdateCheck.DownloadFailed>
 	<MainWindow.UpdateCheck.InstallFailed>Fehler beim Starten des Installationsprogramms.</MainWindow.UpdateCheck.InstallFailed>
 
+	<MainWindow.MRU.NotFound>Der Spielstand
+
+{0}
+
+wurde nicht gefunden.
+
+Soll er aus der Liste der zuletzt genutzten Spielstände entfernt werden?</MainWindow.MRU.NotFound>
+
 	<MainWindow.Gamefile.Modified>Geändert</MainWindow.Gamefile.Modified>
 	<MainWindow.Gamefile.modified>geändert</MainWindow.Gamefile.modified>
 	<MainWindow.Gamefile.UnsavedChanges>Dein Spielstand hat ungespeicherte Änderungen!
@@ -79,19 +87,15 @@ Willst Du ihn wirklich schliessen?</MainWindow.Gamefile.UnsavedChanges>
 {0}
 
 Dieses Tool kann diesen Spielstand leider nicht laden.</MainWindow.LoadGamefile.PeekHeader.Failed>
-	<MainWindow.LoadGamefile.PeekHeader.Warn>Dieses Tool unterstützt nur Spielstände bis
+	<MainWindow.LoadGamefile.PeekHeader.Warn>Der zu ladende Spielstand benutzt eine unbekannte Version
 
-{0},
-
-aber der zu ladende Spielstand benutzt eine neuere Version
-
-{1}.
+{0}.
 
 
 Möglich das dieser Spielstand geladen werden kann, es kann aber
 zu ungewolltem Verhalten oder gar zu einem Absturzbericht führen.
 Auf jeden Fall sollten KEINE Änderungen gespeichert werden, dies
-kann diesen Spielstand unter Umständen komplett unbrauchbar machen!</MainWindow.LoadGamefile.PeekHeader.Warn>
+könnte den Spielstand unter Umständen komplett unbrauchbar machen!</MainWindow.LoadGamefile.PeekHeader.Warn>
 	<MainWindow.LoadGamefile.Progress.Statusbar>Lade {0} ...</MainWindow.LoadGamefile.Progress.Statusbar>
 	<MainWindow.LoadGamefile.Progress.Title>Lade Spielstand ...</MainWindow.LoadGamefile.Progress.Title>
 	<MainWindow.LoadGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} Bytes</MainWindow.LoadGamefile.Progress.CounterFormat>
@@ -176,10 +180,9 @@ kann diesen Spielstand unter Umständen komplett unbrauchbar machen!</MainWindow
 	<OptionsDialog.UpdateCheck>Update-Check</OptionsDialog.UpdateCheck>
 	<OptionsDialog.UpdateCheck.Enable>Bei Programmstart nach neuer Version suchen</OptionsDialog.UpdateCheck.Enable>
 	<OptionsDialog.DeepAnalysis>Tiefenanalyse</OptionsDialog.DeepAnalysis>
-	<OptionsDialog.DeepAnalysis.Hint>Dieses Programm ist fähig auch Objektspezifische private Daten zu analysieren.\n
-Dies beinhaltet z.B. die Gegenstände auf einem Band oder Stromverbindungen.\n
-Wenn aktiv wird dies aber beträchtlichen Einfluss auf die Ladezeit haben!\n
-Sollte nur aktiviert werden wenn die normale Analyse erfolglos war.</OptionsDialog.DeepAnalysis.Hint>
+	<OptionsDialog.DeepAnalysis.Hint>Dieses Programm ist fähig auch Objektspezifische private Daten zu analysieren. Dies beinhaltet
+z.B. die Gegenstände auf einem Band oder Stromverbindungen. Wenn aktiv wird dies aber Einfluss 
+auf die Ladezeit haben! Sollte nur aktiviert werden wenn die normale Analyse erfolglos war.</OptionsDialog.DeepAnalysis.Hint>
 	<OptionsDialog.DeepAnalysis.Enable>Tiefenanalyse aktivieren</OptionsDialog.DeepAnalysis.Enable>
 	<OptionsDialog.Trees.Title>Bäume</OptionsDialog.Trees.Title>
 	<OptionsDialog.Trees.Hint>Hier kannst Sichtbarkeit und Reihenfolge der Bäume konfigurieren die beim 
@@ -190,23 +193,23 @@ Mit den Hoch/Runter Knöpfen kannst Du die Reihenfolge beeinflussen.
 </OptionsDialog.Trees.Hint>
 	<OptionsDialog.Reporting.Title>Berichte</OptionsDialog.Reporting.Title>
 	<OptionsDialog.CrashReports>Absturzberichte</OptionsDialog.CrashReports>
-	<OptionsDialog.CrashReports.Hint>Dieses Programm ist fähig Absturzberichte zu versenden.\n
+	<OptionsDialog.CrashReports.Hint>Dieses Programm ist fähig Absturzberichte zu versenden.
 Solche Berichte helfen dem Author das Programm zu verbessern.</OptionsDialog.CrashReports.Hint>
 	<OptionsDialog.CrashReports.Enable>Absturzberichte versenden</OptionsDialog.CrashReports.Enable>
 	<OptionsDialog.IncidentReports>Berichte über Vorkommnisse</OptionsDialog.IncidentReports>
-	<OptionsDialog.IncidentReports.Hint>Dieses Programm kann bis dato unbekannte Daten als Bericht versenden.\n
-Wenn aktiv wird Dir beim auffinden unbekannter Daten ein Bericht angezeigt\n
-und Du hast vor dem Absenden die Möglichkeit jegliches Detail zu editieren.\n
+	<OptionsDialog.IncidentReports.Hint>Dieses Programm kann bis dato unbekannte Daten als Bericht versenden.
+Wenn aktiv wird Dir beim auffinden unbekannter Daten ein Bericht angezeigt
+und Du hast vor dem Absenden die Möglichkeit jegliches Detail zu editieren.
 Solche Berichte helfen dem Author das Programm zu verbessern.</OptionsDialog.IncidentReports.Hint>
 	<OptionsDialog.IncidentReports.Enable>Berichte über Vorkommnisse aktivieren</OptionsDialog.IncidentReports.Enable>
 	<OptionsDialog.Contribute>Onlinekarte</OptionsDialog.Contribute>
-	<OptionsDialog.Contribute.Hint>Dieses Programm kann zu unserer Onlinekarte beitragen.\n
+	<OptionsDialog.Contribute.Hint>Dieses Programm kann zu unserer Onlinekarte beitragen.
 Wenn aktiv werden die Position und Typ Deiner aktiv genutzten Erzvorkommen an
 Satisfactory-Community.de berichtet um unsere Onlinekarte zu verbessern.</OptionsDialog.Contribute.Hint>
 	<OptionsDialog.Contribute.Enable>Zum Projekt beitragen</OptionsDialog.Contribute.Enable>
 	<OptionsDialog.Privacy>Datenschutz</OptionsDialog.Privacy>
-	<OptionsDialog.Privacy.Hint>Alle Bericht werden, soweit möglich, anonymisiert versendet\n
-und die Daten nur im Rahmen der oben genannten Zwecke ausgewertet.\n
+	<OptionsDialog.Privacy.Hint>Alle Bericht werden, soweit möglich, anonymisiert versendet
+und die Daten nur im Rahmen der oben genannten Zwecke ausgewertet.
 Mit aktivieren einer Berichtsoption stimmt der Nutzer dieser Verwendung zu.</OptionsDialog.Privacy.Hint>
 	<OptionsDialog.Saved>Änderungen gespeichert.\n\nÄnderungen werden erst beim nächsten Programmstart aktiv.</OptionsDialog.Saved>
 
