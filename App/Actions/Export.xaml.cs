@@ -307,16 +307,21 @@ namespace SatisfactorySavegameTool.Actions
 
 			public static Destinations GetDestByExt(string filename)
 			{
-				string ext = Path.GetExtension(filename).ToLower();
-				switch (ext)
+				try
 				{
-					case ".export": return Destinations.RawText;
-					case ".csv"   : return Destinations.CSV;
-				//TODO:
-				//	case ".json"  : return Destinations.Json;
-				//	case ".xml"   : return Destinations.XML;
+					string ext = Path.GetExtension(filename).ToLower();
+					switch (ext)
+					{
+						case ".export": return Destinations.RawText;
+						case ".csv"   : return Destinations.CSV;
+					//TODO:
+					//	case ".json"  : return Destinations.Json;
+					//	case ".xml"   : return Destinations.XML;
+					}
 				}
-
+				catch
+				{
+				}
 				return Destinations.Auto;
 			}
 
