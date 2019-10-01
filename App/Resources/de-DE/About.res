@@ -16,28 +16,32 @@ td { vertical-align:center; }
 </tr></table>
 <br/>
 <br/>
-Dieses Programm erlaubt das Überarbeiten von Satisfactory Spielständen und zeigt u.a. 
+Dieses Programm erlaubt das Überarbeiten von Satisfactory Spielständen und zeigt u.a.
 Informationen über defekte Objekte an, welche dann per Klick entfernt werden können.<br/>
 <br/>
-Es wurde komplett in C#/C++ implementiert und ist um Welten schneller als der
-alte <b>Satisfactory Spielstand Überprüfer</b>, der rein in Python entwickelt wurde.<br/>
-Sein Quellcode kann unter 
+Dieses Programm ist eine Portierung des alten <b>Satisfactory Spielstand Überprüfers</b>
+und wurde für höhere Performanz komplett neu in C#/C++ implementiert.<br/>
+Dieses Programm ist Open Source und kann auf
 <a href='https://github.com/SillyBits/satisfactory-savegame-tool-ng/' target='_blank'>
-https://github.com/SillyBits/satisfactory-savegame-tool-ng/</a>
-kostenlos heruntergeladen werden.<br/>
-Auf <a href='https://www.satisfactory-forum.de' target='_blank'>https://www.satisfactory-forum.de</a>
-besteht die Möglichkeit eine ausführbare Anwendung herunterzuladen.<br/>
+Github</a> kostenlos heruntergeladen werden, ebenso stehen im
+<a href='https://github.com/SillyBits/satisfactory-savegame-tool-ng/releases' target='_blank'>
+Release</a> Bereich fertige Installer zur Verfügung. Auch gibt es ein kleines
+<a href='https://github.com/SillyBits/satisfactory-savegame-tool-ng/wiki' target='_blank'>
+Wiki</a> was die Grundlagen des Programms beschreibt. Als Lizenz wurde GPL-v3 gewählt,
+somit steht es jedem frei es nach Herzenslust zu modifizieren (zu forken). Ebenso besteht die
+Möglichkeit per Pull-Request neue Funktionalität vorzuschlagen, z.B. spezielle Aktionen die
+mit der derzeit angebotenen Aktionen-Schnittstelle nicht umgesetzt werden können.<br/>
 <br/>
 <br/>
-Danke an <i>bitowl</i>, <i>S4XXX</i>, <i>Goz3rr</i> und <i>Vilsol</i> für ihre Vorarbeit bzgl. der 
+Danke an <i>bitowl</i>, <i>S4XXX</i>, <i>Goz3rr</i> und <i>Vilsol</i> für ihre Vorarbeit bzgl. der
 Struktur von Satisfactory Spielständen.<br/>
 Ebenfalls Danke an <i>Panossa</i> fürs Erstellen der Grafiken, und an <i>RapierTropf</i> für die
 Hilfe bei den deutschen Übersetzungen.<br/>
 <br/>
 <br/>
 Grüße, und nie vergessen:<br/>
-<br/> 
-Wir vergeuden <b>nicht</b><br/> 
-... also warum einen kaputten Spielstand vergeuden wenn man ihn reparieren kann :D
+<br/>
+Wir vergeuden <b>nicht</b><br/>
+... warum also einen kaputten Spielstand vergeuden wenn man ihn reparieren kann :D
 </body>
 </html>
