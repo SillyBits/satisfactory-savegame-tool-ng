@@ -12,7 +12,7 @@ td { vertical-align:center; }
 <table width='100%'><tr>
 <td width='40'><img src='[[IMG:Logo-128x128.png]]' alt='Logo' width='32' height='32'/></td>
 <td>
-<b>Satisfactory Spielstand Helfer NG</b> - v0.1 alpha<br/>
+<b>Satisfactory Spielstand Helfer</b> - v0.2 alpha<br/>
 <b>&copy;2019 SillyBits</b>
 </td>
 </tr></table>
@@ -24,6 +24,9 @@ td { vertical-align:center; }
 
 <p><u>v0.1 alpha</u><ul>
 	<li>Portierung von "Satisfactory Spielstand Überprüfer"</li>
+</ul></p>
+
+<p><u>v0.2 alpha</u><ul>
 </ul></p>
 
 </body>

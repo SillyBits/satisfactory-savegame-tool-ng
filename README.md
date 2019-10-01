@@ -1,4 +1,4 @@
-'Satisfactory Savegame Tool NG' v0.1 alpha
+'Satisfactory Savegame Tool' v0.2 alpha
 (c) 2019 SillyBits
 
 

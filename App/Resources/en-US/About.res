@@ -10,7 +10,7 @@ td { vertical-align:center; }
 <table width='100%'><tr>
 <td width='40'><img src='[[IMG:Logo-128x128.png]]' alt='Logo' width='32' height='32'/></td>
 <td>
-<b>Satisfactory Savegame Tool NG</b> - v0.1 alpha<br/>
+<b>Satisfactory Savegame Tool</b> - v0.2 alpha<br/>
 <b>&copy;2019 SillyBits</b>
 </td>
 </tr></table>

@@ -6,8 +6,8 @@
 
 [assembly:ComVisible(false)];
 
-[assembly:AssemblyVersionAttribute("0.1.*")];
-//[assembly:AssemblyFileVersionAttribute("0.1.*")]
-[assembly: AssemblyInformationalVersion("0.1 alpha")]
+[assembly:AssemblyVersionAttribute("0.2.*")];
+//[assembly:AssemblyFileVersionAttribute("0.2.*")]
+[assembly: AssemblyInformationalVersion("0.2 alpha")]
 
 [assembly:CLSCompliantAttribute(true)];
