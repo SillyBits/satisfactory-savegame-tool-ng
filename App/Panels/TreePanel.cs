@@ -371,7 +371,7 @@ namespace SatisfactorySavegameTool.Panels
 
 		private void _Details_Modified(P.Property prop)
 		{
-			if (_reverse_lookup.ContainsKey(prop))
+			if (prop != null && _reverse_lookup.ContainsKey(prop))
 				_reverse_lookup[prop].IsModified = true;
 		}
 
