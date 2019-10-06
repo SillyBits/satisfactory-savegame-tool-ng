@@ -1304,6 +1304,18 @@ namespace Savegame
 				ADD_i(count)
 				ADD_a(Value, byte);
 			}
+			else if (InnerType == "EnumProperty")
+			{
+				ADD_i(count)
+				for each (str^ s in (List<str^>^)Value)
+					ADD_s(s);
+			}
+			else if (InnerType == "StrProperty")
+			{
+				ADD_i(count)
+				for each (str^ s in (List<str^>^)Value)
+					ADD_s(s);
+			}
 			else
 				throw gcnew Exception(String::Format("Unknown inner array type '{0}'", InnerType));
 		LENGTH_END
@@ -1346,6 +1358,22 @@ namespace Savegame
 			{
 				int count = reader->ReadInt();
 				Value = reader->ReadBytes(count);
+			}
+			else if (InnerType == "EnumProperty")
+			{
+				int count = reader->ReadInt();
+				List<str^>^ strings = gcnew List<str^>;
+				for (int i = 0; i < count; ++i)
+					strings->Add(reader->ReadString());
+				Value = strings;
+			}
+			else if (InnerType == "StrProperty")
+			{
+				int count = reader->ReadInt();
+				List<str^>^ strings = gcnew List<str^>;
+				for (int i = 0; i < count; ++i)
+					strings->Add(reader->ReadString());
+				Value = strings;
 			}
 			else
 			{
@@ -1397,6 +1425,20 @@ namespace Savegame
 				ByteArray^ arr = (ByteArray^) Value;
 				writer->Write((int)arr->Length);
 				writer->Write(arr);
+			}
+			else if (InnerType == "EnumProperty")
+			{
+				List<str^>^ strings = (List<str^>^) Value;
+				writer->Write((int)strings->Count);
+				for each (str^ s in strings)
+					writer->Write(s);
+			}
+			else if (InnerType == "StrProperty")
+			{
+				List<str^>^ strings = (List<str^>^) Value;
+				writer->Write((int)strings->Count);
+				for each (str^ s in strings)
+					writer->Write(s);
 			}
 			else
 				throw gcnew WriteException(writer, String::Format("Unknown inner array type '{0}'", InnerType));
