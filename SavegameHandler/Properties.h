@@ -756,6 +756,10 @@ namespace Savegame
 		PUB_l(SaveDateTime)
 		PUB_b(Visibility)
 		SIZE
+			ADD(Header::GetLength())
+			SIZE_CHECK
+		SIZE_END
+		LENGTH
 			ADD_i(Type)
 			ADD_i(SaveVersion)
 			ADD_i(BuildVersion)
@@ -765,10 +769,6 @@ namespace Savegame
 			ADD_i(PlayDuration)
 			ADD_l(SaveDateTime)
 			ADD_b(Visibility)
-			SIZE_CHECK
-		SIZE_END
-		LENGTH
-			throw gcnew InvalidOperationException();
 		LENGTH_END
 		READ
 			Type = reader->ReadInt();

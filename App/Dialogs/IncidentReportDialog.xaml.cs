@@ -69,7 +69,7 @@ namespace SatisfactorySavegameTool.Dialogs
 
 			long offset = (exc.ErrorPos - Settings.INCIDENT_OFFSET) & (~0xF);
 			long length = Settings.INCIDENT_LENGTH;
-			_data = CoreLib.Helpers.GetFileContents(filename, offset, length);
+			_ReadData(filename, offset, length);
 			SnapshotData.Text = CoreLib.Helpers.Hexdump(_data, 16, indent:0, rel_offset:offset);
 		}
 
@@ -108,6 +108,55 @@ namespace SatisfactorySavegameTool.Dialogs
 			}
 
 			base.OnClosing(e);
+		}
+
+		private void _ReadData(string filename, long offset, long length)
+		{
+			_data = null;
+
+			Header header = null;
+			try
+			{
+				Savegame.Savegame savegame = new Savegame.Savegame(filename);
+				header = savegame.PeekHeader();
+			}
+			catch
+			{
+			}
+
+			if (header != null)
+			{
+				if (header.SaveVersion < 21)
+				{
+					_data = CoreLib.Helpers.GetFileContents(filename, offset, length);
+				}
+				else
+				{
+					Reader.FileReader filereader = null;
+					Reader.CloudsaveReader cloudreader = null;
+					try
+					{
+						filereader = new Reader.FileReader(filename, null);
+						int header_length = header.GetLength();
+						if (filereader.Seek(header_length, Reader.IReader.Positioning.Start) == header_length)
+						{
+							cloudreader = new Reader.CloudsaveReader(filereader, null);
+							if (cloudreader.Seek(offset, Reader.IReader.Positioning.Start) == offset)
+								_data = cloudreader.ReadBytes((int)length);
+						}
+					}
+					catch
+					{
+					}
+					finally
+					{
+						if (cloudreader != null)
+							cloudreader.Close();
+						if (filereader != null)
+							filereader.Close();
+					}
+				}
+			}
 		}
 
 		private string _msg;
