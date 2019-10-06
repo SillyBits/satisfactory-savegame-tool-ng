@@ -1308,6 +1308,7 @@ namespace Savegame
 				throw gcnew Exception(String::Format("Unknown inner array type '{0}'", InnerType));
 		LENGTH_END
 		READ
+			__int64 last_pos = reader->Pos;
 			InnerType = reader->ReadString();
 			CheckNullByte(reader);
 			if (InnerType == "StructProperty")
@@ -1347,7 +1348,13 @@ namespace Savegame
 				Value = reader->ReadBytes(count);
 			}
 			else
-				throw gcnew ReadException(reader, String::Format("Unknown inner array type '{0}'", InnerType));
+			{
+				String^ msg = String::Format("Unknown inner array type '{0}'", InnerType);
+				if (!str::IsNullOrEmpty(InnerType))
+					throw gcnew UnknownPropertyException(msg, InnerType->ToString(), last_pos);
+				else
+					throw gcnew ReadException(reader, msg);
+			}
 		READ_END
 		WRITE
 			writer->Write(InnerType);
