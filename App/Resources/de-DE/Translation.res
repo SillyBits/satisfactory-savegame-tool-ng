@@ -44,8 +44,6 @@
 	<MainWindow.Menu.Edit.Options>_Optionen ...</MainWindow.Menu.Edit.Options>
 	<MainWindow.Menu.Edit.Options.TT>Zeigt den Optionsdialog an</MainWindow.Menu.Edit.Options.TT>
 	<MainWindow.Menu.Actions>A_ktionen</MainWindow.Menu.Actions>
-	<MainWindow.Menu.Actions.Validate>_Validieren ...</MainWindow.Menu.Actions.Validate>
-	<MainWindow.Menu.Actions.Validate.TT>Validiert geladenen Spielstand</MainWindow.Menu.Actions.Validate.TT>
 	<MainWindow.Menu.Help>_Hilfe</MainWindow.Menu.Help>
 	<MainWindow.Menu.Help.Changelog>Änderungen ...</MainWindow.Menu.Help.Changelog>
 	<MainWindow.Menu.Help.Changelog.TT>Zeigt das aktuelle Änderungsprotokoll an</MainWindow.Menu.Help.Changelog.TT>
@@ -295,6 +293,8 @@ Beachte aber das dies, gerade bei großen Spielständen, etwas länger dauern wi
 
 {0}</Action.Export.Done>
 
+	<Action.Validate.Name>_Validieren ...</Action.Validate.Name>
+	<Action.Validate.Description>Validiert geladenen Spielstand</Action.Validate.Description>
 	<Action.Validate.Title>Validierung</Action.Validate.Title>
 	<Action.Validate.Progress.Statusbar>Validiere {0} ...</Action.Validate.Progress.Statusbar>
 	<Action.Validate.Progress.Title>Validiere ...</Action.Validate.Progress.Title>

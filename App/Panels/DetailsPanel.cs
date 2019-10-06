@@ -1988,7 +1988,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			}
 			else if (_prop.Value is ICollection)
 			{
-				// List<ObjectProperty>
+				// List<ObjectProperty> or List<str> (InnerType:EnumProperty|StrProperty)
 				_impl = new ListControl(_parent, _prop.Name.ToString(), _prop.Value);
 			}
 			_impl.PropertyChanged += _PropertyChanged;
@@ -3373,6 +3373,13 @@ namespace SatisfactorySavegameTool.Panels.Details
 		}
 
 
+		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			LivingTree.Living living = Tag as LivingTree.Living;
+			base._PropertyChanged(living.IsPlayer ? living.Blueprint : living.Entity, e);
+		}
+
+
 		internal class LastSaveGroundPositions : PropertyList
 		{
 			public LastSaveGroundPositions(IElement parent, string label, List<P.Vector> vectors)
@@ -4281,6 +4288,13 @@ namespace SatisfactorySavegameTool.Panels.Details
 					Log.Warning("- {0}", child);
 			}
 
+		}
+
+
+		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			BuildingsTree.Building building = Tag as BuildingsTree.Building;
+			base._PropertyChanged(building.Actor, e);
 		}
 
 

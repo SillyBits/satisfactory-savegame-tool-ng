@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -56,10 +57,24 @@ namespace SatisfactorySavegameTool.Supplements
 		}
 
 
+		// Refresh given element by forcing its dispatcher to render
+		// (will eat performance like crazy, so advised to do this only with vital elements)
 		private static readonly Action EmptyDelegate = delegate { };
 		public static void Refresh(this UIElement uiElement)
 		{
 			uiElement.Dispatcher.Invoke(DispatcherPriority.Render, EmptyDelegate);
+		}
+
+		// Wait on task, but keep dispatcher actively working while waiting
+		// (will slow down tasks performance a bit, but still way better than a frozen UI)
+		public static void WaitWithDispatch(this Task task, Dispatcher dispatcher)
+		{
+			while (!task.IsCompleted)
+			{
+				dispatcher.Invoke(() => { }, DispatcherPriority.Render);
+				System.Threading.Thread.Yield();
+				dispatcher.Invoke(() => { }, DispatcherPriority.ContextIdle);
+			}
 		}
 
 
@@ -174,6 +189,36 @@ namespace SatisfactorySavegameTool.Supplements
 			});
 		}
 
+		// Find name of value instance passed, or null if not found
+		public static string FindName(this P.Properties props, object value)
+		{
+			string name = null;
+			foreach (P.Property prop in props)
+			{
+				if (prop is P.ValueProperty && prop == value)
+				{
+					P.ValueProperty v = (prop as P.ValueProperty);
+					if (!str.IsNullOrEmpty(v.Name))
+						name = v.Name.ToString();
+					break;
+				}
+			}
+			return null;
+		}
+		public static string FindName(this Dictionary<string,object> childs, object value)
+		{
+			string name = null;
+			foreach (var pair in childs)
+			{
+				if (pair.Value == value)
+				{
+					name = pair.Key;
+					break;
+				}
+			}
+			return null;
+		}
+
 
 		// Convert a Properties list into another type, e.g. List<InventoryStack>
 		public static List<_PropertyType> ListOf<_PropertyType>(this object props)
@@ -207,6 +252,43 @@ namespace SatisfactorySavegameTool.Supplements
 					|| ((prop is P.Actor ) && (prop as P.Actor ).PathName.ToString() == pathname)
 					;
 			});
+		}
+
+
+		// Tries to get .ClassName from property passed, or null if property has no such value
+		public static string GetClassName(this P.Property prop)
+		{
+			if (prop is P.Actor)
+				return (prop as P.Actor).ClassName.ToString();
+			if (prop is P.Object)
+				return (prop as P.Object).ClassName.ToString();
+			if (prop is P.RailroadTrackPosition)
+				return (prop as P.RailroadTrackPosition).ClassName.ToString();
+
+			return null;
+		}
+
+		// Tries to get .PathName from property passed, or null if property has no such value
+		public static string GetPathName(this P.Property prop)
+		{
+			if (prop is P.Actor)
+				return (prop as P.Actor).PathName.ToString();
+			if (prop is P.Object)
+				return (prop as P.Object).PathName.ToString();
+			if (prop is P.Collected)
+				return (prop as P.Collected).PathName.ToString();
+			if (prop is P.InventoryItem)
+				return (prop as P.InventoryItem).PathName.ToString();
+			if (prop is P.ObjectProperty)
+				return (prop as P.ObjectProperty).PathName.ToString();
+			if (prop is P.RailroadTrackPosition)
+				return (prop as P.RailroadTrackPosition).PathName.ToString();
+			if (prop is P.Entity)
+				return (prop as P.Entity).PathName.ToString();
+			if (prop is P.NamedEntity.Name)
+				return (prop as P.NamedEntity.Name).PathName.ToString();
+
+			return null;
 		}
 
 

@@ -21,7 +21,7 @@ namespace SatisfactorySavegameTool.Actions
 
 	// Stuff used to validate those stored objects
 	//
-	[A.Name("[MainWindow.Menu.Actions.Validate]"), A.Description("[MainWindow.Menu.Actions.Validate.TT]")/*, A.Icon("?")*/]
+	[A.Name("[Action.Validate.Name]"), A.Description("[Action.Validate.Description]")/*, A.Icon("?")*/]
 	public class ValidateSavegame : IAction
 	{
 		public ValidateSavegame(Savegame.Savegame savegame)

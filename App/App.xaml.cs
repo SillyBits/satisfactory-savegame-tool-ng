@@ -316,6 +316,9 @@ namespace SatisfactorySavegameTool
 			Splashscreen.ShowSplash("Starting up...");
 			Application.Current.MainWindow = null;
 
+			// Note version
+			Log.Info("{0}, version {1}", APPNAME, APPVERSION);
+
 
 			if (!Config.Root.HasSection("core"))
 				Config.Root.AddSection("core");

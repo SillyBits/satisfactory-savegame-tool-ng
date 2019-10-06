@@ -369,7 +369,7 @@ namespace SatisfactorySavegameTool.Panels
 		}
 
 
-		private void _Details_Modified(P.Property prop)
+		protected virtual void _Details_Modified(P.Property prop)
 		{
 			if (prop != null && _reverse_lookup.ContainsKey(prop))
 				_reverse_lookup[prop].IsModified = true;
@@ -383,6 +383,7 @@ namespace SatisfactorySavegameTool.Panels
 
 
 		public TreeModel Model { get; private set; }
+		protected TreeNode SelectedNode { get { return SelectedItem as TreeNode; } }
 		internal ICallback _callback;
 		internal long _count;
 
@@ -998,6 +999,21 @@ namespace SatisfactorySavegameTool.Panels
 		//}
 
 
+		protected override void _Details_Modified(P.Property prop)
+		{
+			if (prop != null)
+			{
+				TreeNode node = SelectedNode;
+				if (node != null)
+				{
+					Living living = node.Tag as Living;
+					if (living != null && (living.Blueprint == prop || living.Entity == prop))
+						node.IsModified = true;
+				}
+			}
+		}
+
+
 		internal List<P.Actor> _players;
 		internal List<P.Actor> _enemies;
 		internal List<P.Actor> _wildlife;
@@ -1336,6 +1352,21 @@ namespace SatisfactorySavegameTool.Panels
 		//
 		//	...
 		//}
+
+
+		protected override void _Details_Modified(P.Property prop)
+		{
+			if (prop != null)
+			{
+				TreeNode node = SelectedNode;
+				if (node != null)
+				{
+					Building building = node.Tag as Building;
+					if (building != null && building.Actor == prop)
+						node.IsModified = true;
+				}
+			}
+		}
 
 
 		private List<P.Actor> _factories;

@@ -191,7 +191,7 @@ namespace SatisfactorySavegameTool
 				{
 					case 'O':
 #if DEBUG
-						_LoadGamefile(@"C:\Users\SillyBits\AppData\Local\FactoryGame\Saved\SaveGames\NF-Start-100979.sav");
+						_LoadGamefile(@"C:\Users\SillyBits\AppData\Local\FactoryGame\Saved\SaveGames\common\NF-Start-103400.sav");
 #else
 						File_Open_Click(e.OriginalSource, null);
 #endif

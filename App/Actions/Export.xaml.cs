@@ -130,6 +130,8 @@ namespace SatisfactorySavegameTool.Actions
 				delButton.IsEnabled  = has_sel;
 				upButton.IsEnabled   = has_sel && filters.SelectedIndex > 0;
 				downButton.IsEnabled = has_sel && filters.SelectedIndex < (filters.Items.Count - 1);
+				// Deep option only avail with filters
+				deep_traversal.IsEnabled = (filters.Items.Count > 0);
 			}
 
 			private void addButton_Click(object sender, RoutedEventArgs e)
@@ -254,6 +256,8 @@ namespace SatisfactorySavegameTool.Actions
 						// Empty "Export all" filter was passed
 						writer.Write(prop);
 					};
+					// Also remove deep flag
+					deep_traversal = false;
 				else
 					action = (prop) => {
 						// Test property against filter(s) given

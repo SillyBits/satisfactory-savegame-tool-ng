@@ -44,8 +44,6 @@
 	<MainWindow.Menu.Edit.Options>_Options ...</MainWindow.Menu.Edit.Options>
 	<MainWindow.Menu.Edit.Options.TT>Opens up options dialog</MainWindow.Menu.Edit.Options.TT>
 	<MainWindow.Menu.Actions>A_ctions</MainWindow.Menu.Actions>
-	<MainWindow.Menu.Actions.Validate>_Validate ...</MainWindow.Menu.Actions.Validate>
-	<MainWindow.Menu.Actions.Validate.TT>Validate loaded savegames</MainWindow.Menu.Actions.Validate.TT>
 	<MainWindow.Menu.Help>_Help</MainWindow.Menu.Help>
 	<MainWindow.Menu.Help.Changelog>Changelog ...</MainWindow.Menu.Help.Changelog>
 	<MainWindow.Menu.Help.Changelog.TT>Shows current changelog</MainWindow.Menu.Help.Changelog.TT>
@@ -294,6 +292,8 @@ Note that this will take quite a while with big savegames.</Action.Export.Dialog
 
 {0}</Action.Export.Done>
 
+	<Action.Validate.Name>_Validate ...</Action.Validate.Name>
+	<Action.Validate.Description>Validate loaded savegames</Action.Validate.Description>
 	<Action.Validate.Title>Validation</Action.Validate.Title>
 	<Action.Validate.Progress.Statusbar>Validating {0} ...</Action.Validate.Progress.Statusbar>
 	<Action.Validate.Progress.Title>Validating ...</Action.Validate.Progress.Title>

@@ -19,6 +19,14 @@ echo [%TIME%] Collecting files ...
 
 if exist __delivery (
 	rmdir /S /Q __delivery
+	if %errorlevel% neq 0 (
+		echo [%TIME%] Error deleting old __delivery folder
+		exit /b -1
+	)
+	if exist __delivery (
+		echo [%TIME%] Error deleting old __delivery folder
+		exit /b -1
+	)
 )
 mkdir __delivery
 if not exist __delivery (
