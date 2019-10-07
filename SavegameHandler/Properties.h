@@ -1683,6 +1683,9 @@ namespace Savegame
 	CLS_(TimerHandle,PropertyList)
 	CLS_END
 
+	CLS_(TimeTableStop,PropertyList)
+	CLS_END
+
 	#pragma endregion
 
 	#pragma endregion
