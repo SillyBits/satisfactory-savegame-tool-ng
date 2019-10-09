@@ -252,12 +252,14 @@ namespace SatisfactorySavegameTool.Actions
 
 				HierarchyRunner.Runner action;
 				if (chain.Count == 0)
+				{
 					action = (prop) => {
 						// Empty "Export all" filter was passed
 						writer.Write(prop);
 					};
 					// Also remove deep flag
 					deep_traversal = false;
+				}
 				else
 					action = (prop) => {
 						// Test property against filter(s) given

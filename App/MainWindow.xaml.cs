@@ -634,7 +634,7 @@ namespace SatisfactorySavegameTool
 			string dest_file = Path.Combine(Settings.APPPATH, Path.GetFileName(dl_url));
 			using (Stream strm = File.Create(dest_file))
 			{
-				Downloader dl = new Downloader(dl_url, progress.Events, Logger.LOG);
+				Downloader dl = new Downloader(dl_url, null, Logger.LOG);
 				if (!dl.Download(strm))
 				{
 					MessageBox.Show(Translate._("MainWindow.UpdateCheck.DownloadFailed"), Translate._("MainWindow.UpdateCheck.Title"));
