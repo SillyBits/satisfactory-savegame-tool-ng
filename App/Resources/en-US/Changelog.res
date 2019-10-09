@@ -22,11 +22,19 @@ td { vertical-align:center; }
 <b>Changelog</b><br/>
 <br/>
 
-<p><u>v0.1 alpha</u><ul>
-	<li>Full port of "Satisfactory Savegame Repairer".</li>
+<p><u>v0.2 alpha</u><ul>
+	<li>Support for savegames up to current v0.2.1.17 (Build 106504).</li>
+	<li>Bugfix: Fixed crash when editing within one of those specialized viewers (#2).</li>
+	<li>Bugfix: Extended 'ArrayProperty' to also handle inner types 'EnumProperty' and 'StrProperty' (#3).</li>
+	<li>Bugfix: Fixed missing 'Data.bin' with incident reports on cloud saves (#4).</li>
+	<li>Bugfix: Added type missing: TimeTableStop.</li>
+	<li>Bugfix: Added visualizers missing: InventoryStack, InventoryItem, TimeTableStop &amp; RailroadTrackPosition.</li>
+	<li>Change: Enabled specialized trees to show modification state.</li>
+	<li>Change: Unknown inner types with 'ArrayProperty' will raise an 'UnknownPropertyException' instead.</li>
 </ul></p>
 
-<p><u>v0.2 alpha</u><ul>
+<p><u>v0.1 alpha</u><ul>
+	<li>Full port of "Satisfactory Savegame Repairer".</li>
 </ul></p>
 
 </body>
