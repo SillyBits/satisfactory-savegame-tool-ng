@@ -892,7 +892,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 				if (val is str)		return new SimpleValueControl<str>			 (parent, label, (str)   val);
 				if (val is string)	return new SimpleValueControl<string>		 (parent, label, (string)val);
 				// Last resort: Empty string
-				Log.Debug("! Label='{0}': Fallback to empty SimpleValueControl<string>", label);
+				if (val != null)
+					Log.Warning("! Label='{0}': Missing specialisation for {1}", label, val.GetType().Name);
 				return                     new SimpleValueControl<string>        (parent, label, DetailsPanel.EMPTY);
 			}
 			else
@@ -904,8 +905,9 @@ namespace SatisfactorySavegameTool.Panels.Details
 				if (val is float)	return new ReadonlySimpleValueControl<float> (parent, label, (float) val);
 				if (val is str)		return new ReadonlySimpleValueControl<str>   (parent, label, (str)   val);
 				if (val is string)	return new ReadonlySimpleValueControl<string>(parent, label, (string)val);
-				// Last resort: Simple .ToString
-				Log.Debug("! Label='{0}': Fallback to empty ReadonlySimpleValueControl<string>", label);
+				// Last resort: Empty string
+				if (val != null)
+					Log.Warning("! Label='{0}': Missing specialisation for {1}", label, val.GetType().Name);
 				return                     new ReadonlySimpleValueControl<string>(parent, label, DetailsPanel.EMPTY);
 			}
 		}
@@ -1845,6 +1847,75 @@ namespace SatisfactorySavegameTool.Panels.Details
 		public TimerHandle(IElement parent, string label, object obj)
 			: base(parent, label, obj)
 		{ }
+	}
+
+	internal class InventoryStack : PropertyList
+	{
+		public InventoryStack(IElement parent, string label, object obj)
+			: base(parent, label, obj)
+		{ }
+	}
+
+	internal class InventoryItem : Expando
+	{
+		public InventoryItem(IElement parent, string label, object obj)
+			: base(parent, label, obj)
+		{ }
+
+		internal override void _CreateChilds()
+		{
+			P.InventoryItem item = Tag as P.InventoryItem;
+
+			//|	-> [InventoryItem] /Game/FactoryGame/Resource/Parts/IronPlateReinforced/Desc_IronPlateReinforced.Desc_IronPlateReinforced_C
+			//|	  .Unknown = str:''
+			//|	  .ItemName = str:'/Game/FactoryGame/Resource/Parts/IronPlateReinforced/Desc_IronPlateReinforced.Desc_IronPlateReinforced_C'
+			//|	  .LevelName = str:''
+			//|	  .PathName = str:''
+			//|	  .Value =
+			//|		-> [IntProperty] NumItems
+			//|		  .Name = str:'NumItems'
+			//|		  .Length = Int32:4
+			//|		  .Index = Int32:0
+			//|		  .Value = Int32:11
+			string name = null;
+			if (str.IsNullOrEmpty(item.ItemName))
+				name = DetailsPanel.EMPTY;
+			else
+			{
+				name = item.ItemName.LastName();
+				if (name != null && Translate.Has(name))
+					name = Translate._(name);
+			}
+			item_name = MainFactory.Create(this, "ItemName", name, true);
+			_childs.Add(item_name);
+
+			item_count = new ValueProperty<int>(this, "Count", item.Value);
+			_childs.Add(item_count);
+		}
+
+		private IElement item_name;
+		private ValueProperty<int> item_count;
+	}
+
+	internal class TimeTableStop : PropertyList
+	{
+		public TimeTableStop(IElement parent, string label, object obj)
+			: base(parent, label, obj)
+		{ }
+	}
+
+	internal class RailroadTrackPosition : Expando
+	{
+		public RailroadTrackPosition(IElement parent, string label, object obj)
+			: base(parent, label, obj)
+		{ }
+
+		internal override void _CreateChilds()
+		{
+			P.RailroadTrackPosition pos = Tag as P.RailroadTrackPosition;
+			_childs.Add(MainFactory.Create(this, "Offset", pos.Offset));
+			_childs.Add(MainFactory.Create(this, "Forward", pos.Forward));
+		}
 	}
 
 	internal class ObjectProperty : ElementContainer<P.ObjectProperty>
