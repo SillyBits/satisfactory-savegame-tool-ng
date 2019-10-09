@@ -164,6 +164,16 @@ Function un.onInit
 FunctionEnd
 
 
+Function .onInstSuccess
+
+	; Restart tool with silent installs
+	${If} ${Silent}
+		Exec "$INSTDIR\${APPNAMESHORT}.exe"
+	${EndIf}
+	
+FunctionEnd
+
+
 Function ext.WelcomePage.Show
 	CreateFont $mui.WelcomePage.Title.Font "$(^Font)" "9.5u" "700"
 	SendMessage $mui.WelcomePage.Title ${WM_SETFONT} $mui.WelcomePage.Title.Font 1
