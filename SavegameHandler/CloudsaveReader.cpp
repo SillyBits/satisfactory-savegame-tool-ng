@@ -133,6 +133,8 @@ namespace Reader
 	void CloudsaveReader::_Init()
 	{
 		_chunks = new Cloudsave::ChunkList();
+		Cloudsave::ChunkInfo infos[128];
+		int count;
 		__int64 curr_offset = 0;
 		while (_reader->Pos < _reader->Size)
 		{
@@ -146,26 +148,27 @@ namespace Reader
 		
 			Cloudsave::ChunkInfo summary;
 			summary.Read(_reader);
-			//Log::Debug("[Pos:{0:X8}]          New chunk with {1:X8} bytes will yield {2:X8} bytes", 
-			//	curr_offset, summary.CompressedSize, summary.UncompressedSize);
 
+			count = 0;
 			while (summary.UncompressedSize > 0)
 			{
-				__int64 curr_pos = _reader->Pos;
-				Cloudsave::ChunkInfo chunk;
-				chunk.Read(_reader);
+				infos[count].Read(_reader);
 
-				_chunks->Add(_reader->Pos, chunk.CompressedSize, curr_offset, chunk.UncompressedSize);
-				//Log::Debug("[Pos:{0:X8}|Rem:{1:X8}] Chunk with {2:X8} bytes will yield {3:X8} bytes", 
-				//	curr_offset, summary.UncompressedSize, chunk.CompressedSize, chunk.UncompressedSize);
-				curr_offset += chunk.UncompressedSize;
-
-				_reader->Seek(chunk.CompressedSize, IReader::Positioning::Relative);
-
-				summary.CompressedSize   -= chunk.CompressedSize;
-				summary.UncompressedSize -= chunk.UncompressedSize;
+				summary.UncompressedSize -= infos[count].UncompressedSize;
+				++count;
 			}
-			//TODO: Check summary.* for invalid params (e.g. < 0), throw if encountered using last_pos
+
+			if (summary.UncompressedSize < 0)
+				throw gcnew Exception(String::Format("CloudsaveReader at pos {0:#,#0}: Underflow! {1:#,#0}", 
+					last_pos, summary.UncompressedSize));
+
+			for (int i = 0; i < count; ++i)
+			{
+				_chunks->Add(_reader->Pos, infos[i].CompressedSize, curr_offset, infos[i].UncompressedSize);
+				curr_offset += infos[i].UncompressedSize;
+
+				_reader->Seek(infos[i].CompressedSize, IReader::Positioning::Relative);
+			}
 		}
 
 	//	//vvvvv TEMP

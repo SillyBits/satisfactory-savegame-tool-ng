@@ -127,6 +127,9 @@ namespace Writer
 
 		int compr_size = Cloudsave::ChunkList::Compress(_write_buf, store_amount, _chunk_buf, _chunk_buf_len);
 
+		//HINT: For now, writing will always produce a single sub-chunk.
+		//      This might change with future versions
+
 		Cloudsave::ChunkInfo tag(Cloudsave::CHUNK_MAGIC, store_amount);
 		tag.Write(_writer);
 
