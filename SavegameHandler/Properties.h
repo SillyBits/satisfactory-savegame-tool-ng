@@ -1686,6 +1686,9 @@ namespace Savegame
 	CLS_(TimeTableStop,PropertyList)
 	CLS_END
 
+	CLS_(TrainSimulationData,PropertyList)
+	CLS_END
+
 	#pragma endregion
 
 	#pragma endregion
