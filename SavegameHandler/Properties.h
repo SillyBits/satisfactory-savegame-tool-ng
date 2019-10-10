@@ -1689,6 +1689,9 @@ namespace Savegame
 	CLS_(TrainSimulationData,PropertyList)
 	CLS_END
 
+	CLS_(ProjectileData,PropertyList)
+	CLS_END
+
 	#pragma endregion
 
 	#pragma endregion
