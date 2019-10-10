@@ -98,7 +98,7 @@ namespace Reader
 
 		_offset = new_offset - _curr_chunk->Offset;
 
-		return _offset;
+		return new_offset;
 	}
 
 	// Read N bytes from underlying 'data object', returning no. of bytes read

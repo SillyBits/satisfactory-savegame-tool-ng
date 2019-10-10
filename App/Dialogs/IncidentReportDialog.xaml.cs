@@ -141,6 +141,7 @@ namespace SatisfactorySavegameTool.Dialogs
 						if (filereader.Seek(header_length, Reader.IReader.Positioning.Start) == header_length)
 						{
 							cloudreader = new Reader.CloudsaveReader(filereader, null);
+							offset += 4; // Take leading 'size' into account
 							if (cloudreader.Seek(offset, Reader.IReader.Positioning.Start) == offset)
 								_data = cloudreader.ReadBytes((int)length);
 						}
