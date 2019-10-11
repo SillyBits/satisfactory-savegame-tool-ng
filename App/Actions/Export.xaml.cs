@@ -15,6 +15,7 @@ using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 
+using CoreLib;
 using F = CoreLib.Filters;
 
 using P = Savegame.Properties;

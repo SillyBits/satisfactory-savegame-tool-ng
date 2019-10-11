@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -15,6 +16,42 @@ namespace CoreLib
 	// Random helpers
 	public static class Helpers
 	{
+
+		/// <summary>
+		/// Convert exception into human-readable form
+		/// </summary>
+		/// <param name="exc">Exception to convert</param>
+		/// <returns>String representation of exception</returns>
+		public static string ToLongString(this Exception exc)
+		{
+			string stack_trace = null;
+			try
+			{
+				var trace = new StackTrace(exc);
+				if (trace != null)
+					stack_trace = trace.ToString();
+			}
+			catch { }
+			if (stack_trace == null)
+				stack_trace = exc.StackTrace;
+
+			string msg = "Message: " + exc.Message + "\n"
+					   + "TargetSite: " + exc.TargetSite.Name + ", " + exc.TargetSite.Module.FullyQualifiedName + "\n"
+					   + "Source: " + exc.Source + "\n"
+					   + "StackTrace:\n" 
+					   + stack_trace + "\n"
+					   ;
+
+			if (exc.InnerException != null)
+				msg += "\nInner exception:\n" + exc.InnerException.ToLongString();
+
+			Exception base_exc = exc.GetBaseException();
+			if (base_exc != null && base_exc != exc && base_exc != exc.InnerException)
+				msg += "\nBase exception:\n" + base_exc.ToLongString();
+
+			return msg;
+		}
+
 
 		/// <summary>
 		/// Reads a file, returning it's content as byte array.

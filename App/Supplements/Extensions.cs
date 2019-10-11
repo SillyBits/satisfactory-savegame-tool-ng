@@ -26,37 +26,6 @@ namespace SatisfactorySavegameTool.Supplements
 		}
 
 
-		public static string ToLongString(this Exception exc)
-		{
-			string stack_trace = null;
-			try
-			{
-				var trace = new StackTrace(exc);
-				if (trace != null)
-					stack_trace = trace.ToString();
-			}
-			catch { }
-			if (stack_trace == null)
-				stack_trace = exc.StackTrace;
-
-			string msg = "Message: " + exc.Message + "\n"
-					   + "TargetSite: " + exc.TargetSite.Name + ", " + exc.TargetSite.Module.FullyQualifiedName + "\n"
-					   + "Source: " + exc.Source + "\n"
-					   + "StackTrace:\n" 
-					   + stack_trace + "\n"
-					   ;
-
-			if (exc.InnerException != null)
-				msg += "\nInner exception:\n" + exc.InnerException.ToLongString();
-
-			Exception base_exc = exc.GetBaseException();
-			if (base_exc != null && base_exc != exc && base_exc != exc.InnerException)
-				msg += "\nBase exception:\n" + base_exc.ToLongString();
-
-			return msg;
-		}
-
-
 		// Refresh given element by forcing its dispatcher to render
 		// (will eat performance like crazy, so advised to do this only with vital elements)
 		private static readonly Action EmptyDelegate = delegate { };
