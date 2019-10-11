@@ -3,7 +3,7 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Threading;
 using System.Xml;
 
@@ -47,6 +47,8 @@ namespace CoreLib
 	/// 
 	/// You can also include a <c>changelog</c> tag which will be returned when using the second 
 	/// variant of <c>Check</c> (be sure to use CDATA if your text contains XML markup chars).
+	/// As an extension, this tag may contain an attribute <c>lang</c> to allow for a localized
+	/// changelog to be returned.
 	/// </para>
 	/// </summary>
 	public class UpdateChecker
@@ -206,9 +208,23 @@ namespace CoreLib
 			{
 				if (node.Name == "changelog")
 				{
-					if (node.HasChildNodes && node.FirstChild is XmlCDataSection)
-						node = node.FirstChild;
-					changelog = node.Value;
+					if (node.Attributes["lang"] != null)
+					{
+						// Localized change logs avail, try to pick suitable one
+						string langid = null;
+						if (LanguageHandler.LANG != null)
+							langid = LanguageHandler.LANG._langid;
+						if (langid == null)
+							langid = Thread.CurrentThread.CurrentUICulture.Name;
+						changelog = _GetLocalizedChangeLog(node, langid);
+					}
+					if (changelog == null)
+					{
+						// Fallback to old behaviour with just picking first avail
+						if (node.HasChildNodes && node.FirstChild is XmlCDataSection)
+							node = node.FirstChild;
+						changelog = node.Value;
+					}
 				}
 			}
 
@@ -238,6 +254,23 @@ namespace CoreLib
 
 			label = m.Groups["label"].Value;
 			return (((((num("major") * 100) + num("minor")) * 100000) + num("build")) * 1000000) + num("rev");
+		}
+
+		// Try to get localized changelog for language id given, returning null if not avail
+		private string _GetLocalizedChangeLog(XmlNode node, string langid)
+		{
+			while (node != null)
+			{
+				if (node.Attributes["lang"].Value == langid)
+				{
+					if (node.HasChildNodes && node.FirstChild is XmlCDataSection)
+						node = node.FirstChild;
+					return node.Value;
+				}
+				node = node.NextSibling;
+			}
+
+			return null;
 		}
 
 
