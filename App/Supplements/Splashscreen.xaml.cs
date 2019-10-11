@@ -37,7 +37,8 @@ namespace SatisfactorySavegameTool.Supplements
 
 		public static void HideSplash()
 		{
-			_Instance.Close();
+			if (_Instance != null)
+				_Instance.Close();
 			_Instance = null;
 		}
 
@@ -47,7 +48,9 @@ namespace SatisfactorySavegameTool.Supplements
 			_Instance.Refresh();
 		}
 
-		public static ICallback Callback { get { return _Instance._callback; } }
+		public static ICallback Callback { get { return _Instance != null ? _Instance._callback : null; } }
+
+		public static bool IsSplashAvail { get { return (_Instance != null); } }
 
 
 		private Splashscreen()

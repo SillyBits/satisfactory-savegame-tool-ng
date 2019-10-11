@@ -150,12 +150,26 @@ namespace SatisfactorySavegameTool
 			string msg = "Catched an unhandled exception raised from: " + sender.ToString();
 			_logger.Error(msg, exc);
 
+			// Try to close splash
+			bool has_splash = Splashscreen.IsSplashAvail;
 			try
 			{
-				// Not sure which state we're in, so better be careful with creating this dialog
-				Dialogs.ErrorReportingDialog.Show(msg, exc);
+				if (has_splash)
+					Splashscreen.HideSplash();
 			}
 			catch { }
+
+			// Not sure which state we're in, so better be careful with creating this dialog
+			try
+			{
+				Dialogs.ErrorReportingDialog.Show(msg, exc);
+				return;
+			}
+			catch { }
+
+			// So showing error reporting dialog didn't work, uhhh ... last report: traditional message box
+			msg += string.Format("\n\nThe latest log file located at\n\n{0}\n\nmight contain further details on its cause.\n", Settings.LOGPATH);
+			MessageBox.Show(msg, "Fatal error occured", MessageBoxButton.OK, MessageBoxImage.Error);
 		}
 
 
