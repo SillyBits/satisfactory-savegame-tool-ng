@@ -10,7 +10,7 @@ namespace Reader
 	{ }
 
 	ReadException::ReadException(IReader^ reader, String^ msg)
-		: Exception(String::Format("Reader({0}|{1}): %s",
+		: Exception(String::Format("Reader({0}|{1}): {2}",
 			reader->Name, reader->PrevPos, msg))
 	{ }
 
