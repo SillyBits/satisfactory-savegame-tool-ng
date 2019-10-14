@@ -344,6 +344,8 @@ namespace SatisfactorySavegameTool
 				Config.Root.core.AddItem("language");
 			if (string.IsNullOrEmpty(Config.Root.core.language))
 				Config.Root.core.language = Thread.CurrentThread.CurrentUICulture.Name;
+			if (!LanguageHandler.LANG.LanguagesAvail.ToList().Contains(Config.Root.core.language))
+				Config.Root.core.language = "en-US";//Fallback to a language known
 			// Setup actual language for translations
 			Splashscreen.SetMessage("Loading language resources");
 			LANGUAGE = Config.Root.core.language;
