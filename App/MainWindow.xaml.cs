@@ -75,6 +75,7 @@ namespace SatisfactorySavegameTool
 				}
 			}
 
+#if !DEVENV
 			if (Config.Root.HasSection("update_check") && 
 				Config.Root.update_check.HasItem("check_for_updates") && 
 				Config.Root.update_check.check_for_updates)
@@ -82,6 +83,7 @@ namespace SatisfactorySavegameTool
 				Splashscreen.SetMessage("Checking for updates");
 				_RunUpdateChecker(true);
 			}
+#endif
 
 			_SetupMRU();
 

@@ -36,7 +36,7 @@ namespace SatisfactorySavegameTool.Actions
 			_progress = new ProgressDialog(null, Translate._("Action.Validate.Progress.Title"));
 			_callback = _progress.Events;
 			_progress.CounterFormat = Translate._("Action.Validate.Progress.CounterFormat");
-			_progress.Interval = 100;
+			_progress.Interval = 1000;
 
 			//_Run();
 			var task = Task.Run(async() => await RunAsync());

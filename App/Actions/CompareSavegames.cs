@@ -1,20 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using Microsoft.Win32;
 
 using CoreLib;
 
-//using Savegame;
-using Savegame.Properties;//<= Refactor away and replace all refs with "P.*"
 using P = Savegame.Properties;
 
 using SatisfactorySavegameTool.Supplements;
@@ -41,21 +34,23 @@ namespace SatisfactorySavegameTool.Actions.Compare
 
 		public void Run()
 		{
-			//OpenFileDialog dlg = new OpenFileDialog();
-			//dlg.Title = Translate._("Action.Compare.Load2ndGamefile.Title");//"Select savegame to load";
-			//dlg.InitialDirectory = Config.Root.core.defaultpath;
-			//dlg.Filter = Translate._("Action.Compare.Load2ndGamefile.Filter");//"Savegames (*.sav)|*.sav|All files (*.*)|*.*";
-			//if (dlg.ShowDialog().GetValueOrDefault(false) == false || !File.Exists(dlg.FileName))
-			//	return;
-			//string filename_2nd = dlg.FileName;
+#if !DEVENV
+			OpenFileDialog dlg = new OpenFileDialog();
+			dlg.Title = Translate._("Action.Compare.Load2ndGamefile.Title");//"Select savegame to load";
+			dlg.InitialDirectory = Config.Root.core.defaultpath;
+			dlg.Filter = Translate._("Action.Compare.Load2ndGamefile.Filter");//"Savegames (*.sav)|*.sav|All files (*.*)|*.*";
+			if (dlg.ShowDialog().GetValueOrDefault(false) == false || !File.Exists(dlg.FileName))
+				return;
+			string filename_2nd = dlg.FileName;
+#else
 			string filename_2nd = @"C:\Users\SillyBits\AppData\Local\FactoryGame\Saved\SaveGames\common\NF-Start-100979.sav";
 			//string filename_2nd = @"C:\Users\SillyBits\AppData\Local\FactoryGame\Saved\SaveGames\common\First trial ... Paused for now.sav";
 			//string filename_2nd = @"D:\src\tools\satisfactory-savegame-tool-ng-20190823\__internal\NF-Start-100979.sav";
+#endif
 
 			_progress = new ProgressDialog(null, Translate._("Action.Compare.Progress.Title"));
 			_callback = _progress.Events;
 
-			//bool outcome = Task.Run(async() => await RunAsync(filename_2nd));
 			var task = Task.Run(async() => await RunAsync(filename_2nd));
 			while (!task.IsCompleted)
 			{
@@ -170,16 +165,16 @@ namespace SatisfactorySavegameTool.Actions.Compare
 			}
 
 
-			List<Property> left_objects  = new List<Property>(_left_save.Objects);
-			List<Property> right_objects = new List<Property>(_right_save.Objects);
+			List<P.Property> left_objects  = new List<P.Property>(_left_save.Objects);
+			List<P.Property> right_objects = new List<P.Property>(_right_save.Objects);
 			while (left_objects.Count > 0)
 			{
-				Property left = left_objects[0];
+				P.Property left = left_objects[0];
 				left_objects.RemoveAt(0);
 
 				_cbUpdate(null, left.ToString());
 
-				Property right = _FindMatch(left, right_objects);
+				P.Property right = _FindMatch(left, right_objects);
 				if (right == null)
 					sub = new DifferenceNode(left.ToString(), left, null);
 				else
@@ -193,7 +188,7 @@ namespace SatisfactorySavegameTool.Actions.Compare
 					nodes.Add(sub);
 				}
 			}
-			foreach (Property right in right_objects)
+			foreach (P.Property right in right_objects)
 				nodes.Add(new DifferenceNode(right.ToString(), null, right));
 			if (nodes.Count > 0)
 			{
@@ -205,16 +200,16 @@ namespace SatisfactorySavegameTool.Actions.Compare
 
 
 			DifferenceNode collected = new DifferenceNode("Collected", "", "");
-			List<Property> left_coll  = new List<Property>(_left_save.Collected);
-			List<Property> right_coll = new List<Property>(_right_save.Collected);
+			List<P.Property> left_coll  = new List<P.Property>(_left_save.Collected);
+			List<P.Property> right_coll = new List<P.Property>(_right_save.Collected);
 			while (left_coll.Count > 0)
 			{
-				Property left = left_coll[0];
+				P.Property left = left_coll[0];
 				left_coll.RemoveAt(0);
 
 				_cbUpdate(null, left.ToString());
 
-				Property right = _FindMatch(left, right_coll);
+				P.Property right = _FindMatch(left, right_coll);
 				if (right == null)
 					sub = new DifferenceNode(left.ToString(), left, null);
 				else
@@ -228,7 +223,7 @@ namespace SatisfactorySavegameTool.Actions.Compare
 					collected.Add(sub);
 				}
 			}
-			foreach (Property right in right_coll)
+			foreach (P.Property right in right_coll)
 				collected.Add(right.ToString(), null, right);
 			if (collected.ChildCount > 0)
 			{
@@ -250,13 +245,13 @@ namespace SatisfactorySavegameTool.Actions.Compare
 			return (differences == 0);
 		}
 
-		internal Property _FindMatch(Property left, List<Property> right_coll)
+		internal P.Property _FindMatch(P.Property left, List<P.Property> right_coll)
 		{
 			string left_pathname = left.GetPathName();
 			if (string.IsNullOrEmpty(left_pathname))
 				return null;
 
-			foreach (Property right in right_coll)
+			foreach (P.Property right in right_coll)
 			{
 				string right_pathname = right.GetPathName();
 				if (left_pathname.Equals(right_pathname))
@@ -266,7 +261,7 @@ namespace SatisfactorySavegameTool.Actions.Compare
 			return null;
 		}
 
-		internal DifferenceNode _Compare(Property left, Property right)
+		internal DifferenceNode _Compare(P.Property left, P.Property right)
 		{
 			DifferenceNode node = new DifferenceNode(left.ToString(), left, right);
 			DifferenceNode sub;
@@ -296,8 +291,8 @@ namespace SatisfactorySavegameTool.Actions.Compare
 
 				if (right_sub == null && left_sub != null)
 					sub = new DifferenceNode(null, left_sub, null);
-				else if (left_sub is Property)
-					sub = _Compare(left_sub as Property, right_sub as Property);
+				else if (left_sub is P.Property)
+					sub = _Compare(left_sub as P.Property, right_sub as P.Property);
 				else 
 					sub = _CompareObject(left_sub, right_sub);
 				if (sub != null)
@@ -345,14 +340,6 @@ namespace SatisfactorySavegameTool.Actions.Compare
 
 
 		#region Comparison helpers
-
-		//
-		// Most compares can be done the abstract way, but a few will need special 
-		// handling which is being dealt with by adding pseudo-classes in between which
-		// can then be referenced below. For example Actor.Scale, which uses class 
-		// 'Scale' instead of 'Vector' and class 'Scale' being a sub-class of 'Vector'.
-		// This follows same pattern as with, for example, validation action.
-		//
 
 		internal DifferenceNode _CompareObject(object left, object right)
 		{
@@ -402,8 +389,8 @@ namespace SatisfactorySavegameTool.Actions.Compare
 
 					if (right_sub == null && left_sub != null)
 						sub = new DifferenceNode(null, left_sub, null);
-					else if (left_sub is Property)
-						sub = _Compare(left_sub as Property, right_sub as Property);
+					else if (left_sub is P.Property)
+						sub = _Compare(left_sub as P.Property, right_sub as P.Property);
 					else
 						sub = _CompareObject(left_sub, right_sub);
 					if (sub != null)
@@ -444,8 +431,8 @@ namespace SatisfactorySavegameTool.Actions.Compare
 
 					if (right_sub == null && left_sub != null)
 						sub = new DifferenceNode(null, left_sub, null);
-					else if (left_sub is Property)
-						sub = _Compare(left_sub as Property, right_sub as Property);
+					else if (left_sub is P.Property)
+						sub = _Compare(left_sub as P.Property, right_sub as P.Property);
 					else
 						sub = _CompareObject(left_sub, right_sub);
 					if (sub != null)
@@ -489,7 +476,7 @@ namespace SatisfactorySavegameTool.Actions.Compare
 
 		public void Add(DifferenceNode node)
 		{
-			Property prop = ((node.Left != null) ? node.Left : node.Right) as Property;
+			P.Property prop = ((node.Left != null) ? node.Left : node.Right) as P.Property;
 			if (prop != null)
 			{
 				DifferenceNode class_node = _AddClassRecurs(Root, "/", prop);
@@ -504,15 +491,15 @@ namespace SatisfactorySavegameTool.Actions.Compare
 		}
 
 		//HINT: Methods following are copied from TreePanel.cs, ensure to update those if TreePanel.cs changes!
-		private DifferenceNode _AddClassRecurs(DifferenceNode parent, string path, Property prop)
+		private DifferenceNode _AddClassRecurs(DifferenceNode parent, string path, P.Property prop)
 		{
 			string classname, fullname, label;
 			DifferenceNode class_item;
 
 			string ClassName, PathName;
-			if (prop is Actor)
+			if (prop is P.Actor)
 			{
-				P.Actor actor = prop as Actor;
+				P.Actor actor = prop as P.Actor;
 				ClassName = actor.ClassName.ToString();
 				PathName = actor.PathName.ToString();
 			}
