@@ -1,0 +1,107 @@
+﻿<Window x:Class="SatisfactorySavegameTool.Dialogs.DifferencesDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SatisfactorySavegameTool.Dialogs"
+		xmlns:lang="clr-namespace:CoreLib.Language.XAML;assembly=CoreLib"
+        xmlns:diff="clr-namespace:SatisfactorySavegameTool.Dialogs.Difference"
+		xmlns:compare="clr-namespace:SatisfactorySavegameTool.Actions.Compare"
+		xmlns:icsd="http://icsharpcode.net/sharpdevelop/treeview"
+        mc:Ignorable="d"
+        Title="{lang:Translate Key=DifferencesDialog.Title}"
+		ResizeMode="CanResizeWithGrip" ShowInTaskbar="False"
+		Height="500" Width="750">
+
+	<Window.Resources>
+		<diff:DiffNodeValueConverter x:Key="diffnodeValueConverter" />
+		<diff:DiffNodeColorConverter x:Key="diffnodeColorConverter" />
+	</Window.Resources>
+
+	<Grid Margin="5,5">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="25"/>
+			<RowDefinition Height="5" />
+			<RowDefinition Height="*" />
+			<RowDefinition Height="10" />
+			<RowDefinition Height="25"/>
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+
+		<StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" >
+			<ToggleButton x:Name="LeftMissingBtn" HorizontalAlignment="Center" VerticalAlignment="Center"
+						  Width="20" Height="20" Click="LeftMissing_Click" Margin="0,0,5,0" IsChecked="True"
+						  ToolTip="{lang:Translate Key=DifferencesDialog.LeftMissing.TT}">
+				<Image Source="../Resources/Button.Diff.LeftMissing.png" />
+			</ToggleButton>
+			<ToggleButton x:Name="DifferentBtn" HorizontalAlignment="Center" VerticalAlignment="Center"
+						  Width="20" Height="20" Click="Different_Click" Margin="0,0,5,0" IsChecked="True"
+						  ToolTip="{lang:Translate Key=DifferencesDialog.Different.TT}">
+				<Image Source="../Resources/Button.Diff.Different.png" />
+			</ToggleButton>
+			<ToggleButton x:Name="RightMissingBtn" HorizontalAlignment="Center" VerticalAlignment="Center"
+						  Width="20" Height="20" Click="RightMissing_Click" Margin="0" IsChecked="True"
+						  ToolTip="{lang:Translate Key=DifferencesDialog.RightMissing.TT}">
+				<Image Source="../Resources/Button.Diff.RightMissing.png" />
+			</ToggleButton>
+		</StackPanel>
+
+		<icsd:SharpTreeView x:Name="view" Grid.Row="2" Grid.Column="0"
+							HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0"
+                            AllowDrop="False" ShowAlternation="True">
+			<ListView.View>
+				<icsd:SharpGridView>
+					<GridView.Columns>
+						<GridViewColumn Width="300">
+							<GridViewColumn.CellTemplate>
+								<DataTemplate>
+									<icsd:SharpTreeNodeView />
+								</DataTemplate>
+							</GridViewColumn.CellTemplate>
+						</GridViewColumn>
+						<GridViewColumn Width="200">
+							<GridViewColumn.CellTemplate>
+								<DataTemplate>
+									<TextBlock Text="{Binding Left, Converter={StaticResource diffnodeValueConverter}}"
+											   Foreground="{Binding Left, Converter={StaticResource diffnodeColorConverter}}" />
+								</DataTemplate>
+							</GridViewColumn.CellTemplate>
+						</GridViewColumn>
+						<!--
+						<GridViewColumn Width="22">
+							<GridViewColumn.CellTemplate>
+								<DataTemplate>
+									<Button Width="20" Height="20" Margin="0" VerticalAlignment="Top" Click="CenterBtn_Click"
+											ToolTip="{Binding, Converter={StaticResource diffnodeCenterBtnTTConverter}}">
+										<Image Source="{Binding, Converter={StaticResource diffnodeCenterBtnImageConverter}}" />
+									</Button>
+								</DataTemplate>
+							</GridViewColumn.CellTemplate>
+						</GridViewColumn>
+						-->
+						<GridViewColumn Width="200">
+							<GridViewColumn.CellTemplate>
+								<DataTemplate>
+									<TextBlock Text="{Binding Right, Converter={StaticResource diffnodeValueConverter}}"
+											   Foreground="{Binding Right, Converter={StaticResource diffnodeColorConverter}}" />
+								</DataTemplate>
+							</GridViewColumn.CellTemplate>
+						</GridViewColumn>
+					</GridView.Columns>
+				</icsd:SharpGridView>
+			</ListView.View>
+		</icsd:SharpTreeView>
+
+		<StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center" >
+			<!--<Button x:Name="SaveBtn" HorizontalAlignment="Center" VerticalAlignment="Center"
+					Width="75" Height="21" Content="{lang:Translate Key=Save}" Click="Save_Click"
+					Margin="0,0,10,0" />-->
+
+			<Button x:Name="CloseBtn" HorizontalAlignment="Center" VerticalAlignment="Center"
+					Width="75" Height="21" Content="{lang:Translate Key=Close}" Click="Close_Click" />
+		</StackPanel>
+
+	</Grid>
+</Window>

@@ -232,6 +232,12 @@ This property needs to be dealt with to allow this tool to load this savegame.</
 	<IncidentReportDialog.Hint>You can enable reporting such incidents within the options dialog.</IncidentReportDialog.Hint>
 	<IncidentReportDialog.Snapshot>Following a small snapshot from your savegame which will be added to the report to assist in implementing this property:</IncidentReportDialog.Snapshot>
 
+	<DifferencesDialog.Title>Differences</DifferencesDialog.Title>
+	<DifferencesDialog.Empty>&lt;missing&gt;</DifferencesDialog.Empty>
+	<DifferencesDialog.LeftMissing.TT>Show nodes missing on left side</DifferencesDialog.LeftMissing.TT>
+	<DifferencesDialog.Different.TT>Show nodes with differences</DifferencesDialog.Different.TT>
+	<DifferencesDialog.RightMissing.TT>Show nodes missing on right side</DifferencesDialog.RightMissing.TT>
+
 	<ImageControl.Label>Bitmap of size {0}x{1} with {2} color channels</ImageControl.Label>
 	<ImageControl.Button>Show ...</ImageControl.Button>
 
@@ -292,7 +298,7 @@ Note that this will take quite a while with big savegames.</Action.Export.Dialog
 
 {0}</Action.Export.Done>
 
-	<Action.Validate.Name>_Validate ...</Action.Validate.Name>
+	<Action.Validate.Name>Validate ...</Action.Validate.Name>
 	<Action.Validate.Description>Validate loaded savegames</Action.Validate.Description>
 	<Action.Validate.Title>Validation</Action.Validate.Title>
 	<Action.Validate.Progress.Statusbar>Validating {0} ...</Action.Validate.Progress.Statusbar>
@@ -302,5 +308,18 @@ Note that this will take quite a while with big savegames.</Action.Export.Dialog
 	<Action.Validate.NoErrors>No errors found.</Action.Validate.NoErrors>
 	<Action.Validate.HasErrors>Found a {0:#,#0} elements with errors!\n\nWould you like to see the report?</Action.Validate.HasErrors>
 	<Action.Validate.Report>Generating report ...</Action.Validate.Report>
+
+	<Action.Compare.Name>Compare ...</Action.Compare.Name>
+	<Action.Compare.Description>Compare two savegames</Action.Compare.Description>
+	<Action.Compare.Load2ndGamefile.Title>Select savegame to compare against</Action.Compare.Load2ndGamefile.Title>
+	<Action.Compare.Load2ndGamefile.Filter>Savegames (*.sav)|*.sav|All files (*.*)|*.*</Action.Compare.Load2ndGamefile.Filter>
+	<Action.Compare.Load2ndGamefile.Progress.Title>Loading savegame ...</Action.Compare.Load2ndGamefile.Progress.Title>
+	<Action.Compare.Load2ndGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} bytes</Action.Compare.Load2ndGamefile.Progress.CounterFormat>
+	<Action.Compare.ErrorLoading>Error loading savegame!</Action.Compare.ErrorLoading>
+	<Action.Compare.Progress.Title>Comparing ...</Action.Compare.Progress.Title>
+	<Action.Compare.Progress>Comparing elements ...</Action.Compare.Progress>
+	<Action.Compare.Progress.CounterFormat>{0:#,#0} elements</Action.Compare.Progress.CounterFormat>
+	<Action.Compare.NoDifferences>No differences found.</Action.Compare.NoDifferences>
+	<Action.Compare.HasDifferences>One or more differences found!\n\nWould you like to see those differences?</Action.Compare.HasDifferences>
 
 </translation>

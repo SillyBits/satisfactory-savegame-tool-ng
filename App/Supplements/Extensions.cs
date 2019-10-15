@@ -262,13 +262,13 @@ namespace SatisfactorySavegameTool.Supplements
 
 
 		// Check float for being with range of value given
-		public static bool IsNear(this float val, float near, float range = float.Epsilon)
+		public static bool IsNear(this float val, float near, float range = 100.0f * float.Epsilon)
 		{
 			return (near - range <= val) && (val <= near + range);
 		}
 
 		// Check float for being near 0
-		public static bool IsNearZero(this float val, float range = 10 * float.Epsilon)
+		public static bool IsNearZero(this float val, float range = 100.0f * float.Epsilon)
 		{
 			return (-range <= val) && (val <= +range);
 		}

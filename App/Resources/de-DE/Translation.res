@@ -233,6 +233,12 @@ Um diesen Spielstand laden zu können muss der Helfer erst entsprechend erweiter
 	<IncidentReportDialog.Hint>In den Optionen kannst Du einstellen ob solche Vorkommnisse als Bericht versendet werden sollen.</IncidentReportDialog.Hint>
 	<IncidentReportDialog.Snapshot>Nachfolgend ein kleiner Ausschnitt Deiner Spieldatei, dieser wird dem Bericht angehängt um bei der Analyse dieser unbekannten Struktur zu helfen:</IncidentReportDialog.Snapshot>
 
+	<DifferencesDialog.Title>Unterschiede</DifferencesDialog.Title>
+	<DifferencesDialog.Empty>&lt;fehlt&gt;</DifferencesDialog.Empty>
+	<DifferencesDialog.LeftMissing.TT>Zeige Knoten die auf der linken Seite fehlen</DifferencesDialog.LeftMissing.TT>
+	<DifferencesDialog.Different.TT>Zeige Knoten mit Unterschieden</DifferencesDialog.Different.TT>
+	<DifferencesDialog.RightMissing.TT>Zeige Knoten die auf der rechten Seite fehlen</DifferencesDialog.RightMissing.TT>
+
 	<ImageControl.Label>Bild der Größe {0}x{1} mit {2} Farbkanälen</ImageControl.Label>
 	<ImageControl.Button>Anzeigen ...</ImageControl.Button>
 
@@ -293,7 +299,7 @@ Beachte aber das dies, gerade bei großen Spielständen, etwas länger dauern wi
 
 {0}</Action.Export.Done>
 
-	<Action.Validate.Name>_Validieren ...</Action.Validate.Name>
+	<Action.Validate.Name>Validieren ...</Action.Validate.Name>
 	<Action.Validate.Description>Validiert geladenen Spielstand</Action.Validate.Description>
 	<Action.Validate.Title>Validierung</Action.Validate.Title>
 	<Action.Validate.Progress.Statusbar>Validiere {0} ...</Action.Validate.Progress.Statusbar>
@@ -303,5 +309,18 @@ Beachte aber das dies, gerade bei großen Spielständen, etwas länger dauern wi
 	<Action.Validate.NoErrors>Keine Fehler gefunden.</Action.Validate.NoErrors>
 	<Action.Validate.HasErrors>Es wurden {0:#,#0} fehlerhafte Elemente gefunden!\n\nMöchtest Du den Bericht jetzt einsehen?</Action.Validate.HasErrors>
 	<Action.Validate.Report>Erzeuge Bericht ...</Action.Validate.Report>
+
+	<Action.Compare.Name>Vergleich ...</Action.Compare.Name>
+	<Action.Compare.Description>Vergleicht zwei Spielstände</Action.Compare.Description>
+	<Action.Compare.Load2ndGamefile.Title>2. Spielstand zum vergleichen auswählen</Action.Compare.Load2ndGamefile.Title>
+	<Action.Compare.Load2ndGamefile.Filter>Spielstände (*.sav)|*.sav|Alle Dateien (*.*)|*.*</Action.Compare.Load2ndGamefile.Filter>
+	<Action.Compare.Load2ndGamefile.Progress.Title>Lade Spielstand ...</Action.Compare.Load2ndGamefile.Progress.Title>
+	<Action.Compare.Load2ndGamefile.Progress.CounterFormat>{0:#,#0} / {1:#,#0} Bytes</Action.Compare.Load2ndGamefile.Progress.CounterFormat>
+	<Action.Compare.ErrorLoading>Fehler beim laden des Spielstands!</Action.Compare.ErrorLoading>
+	<Action.Compare.Progress.Title>Vergleiche ...</Action.Compare.Progress.Title>
+	<Action.Compare.Progress>Vergleiche Elemente ...</Action.Compare.Progress>
+	<Action.Compare.Progress.CounterFormat>{0:#,#0} Elemente</Action.Compare.Progress.CounterFormat>
+	<Action.Compare.NoDifferences>Keine Unterschiede gefunden.</Action.Compare.NoDifferences>
+	<Action.Compare.HasDifferences>Es wurden Unterschiede gefunden!\n\nMöchtest Du Dir diese jetzt ansehen?</Action.Compare.HasDifferences>
 
 </translation>

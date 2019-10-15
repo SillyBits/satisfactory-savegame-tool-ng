@@ -44,6 +44,9 @@ copy %ROOTDIR%\App\bin\x64\Release\CoreLib.dll .
 copy %ROOTDIR%\App\bin\x64\Release\FileHandler.dll .
 copy %ROOTDIR%\App\bin\x64\Release\SavegameHandler.dll .
 
+rem 3rd party libs
+copy %ROOTDIR%\App\bin\x64\Release\ICSharpCode.TreeView.dll .
+
 mkdir Resources
 
 mkdir Resources\en-US

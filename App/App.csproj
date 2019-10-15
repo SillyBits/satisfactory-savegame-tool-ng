@@ -56,6 +56,10 @@
     <ApplicationIcon>Resources\Logo-128x128.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ICSharpCode.TreeView, Version=5.2.0.0, Culture=neutral, PublicKeyToken=f829da5c02be14ee, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>3rdparty\SharpDevelop\ICSharpCode.TreeView.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationFramework.Classic" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -81,6 +85,10 @@
     <Compile Include="Actions\Export.xaml.cs">
       <DependentUpon>Export.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Actions\CompareSavegames.cs" />
+    <Compile Include="Dialogs\DifferencesDialog.xaml.cs">
+      <DependentUpon>DifferencesDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\IncidentReportDialog.xaml.cs">
       <DependentUpon>IncidentReportDialog.xaml</DependentUpon>
     </Compile>
@@ -105,6 +113,10 @@
     </Compile>
     <Compile Include="Supplements\VersionTable.cs" />
     <Page Include="Actions\Export.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\DifferencesDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -238,6 +250,9 @@
     <Resource Include="Resources\Logo-128x128.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\Button.Diff.Different.png" />
+    <Resource Include="Resources\Button.Diff.LeftMissing.png" />
+    <Resource Include="Resources\Button.Diff.RightMissing.png" />
     <Content Include="Resources\ColorTable.xml" />
     <Content Include="Resources\de-DE\About.res" />
     <Content Include="Resources\de-DE\Changelog.res" />
