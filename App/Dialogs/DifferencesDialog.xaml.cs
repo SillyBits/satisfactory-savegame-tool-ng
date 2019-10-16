@@ -10,6 +10,8 @@ using P = Savegame.Properties;
 
 using SatisfactorySavegameTool.Actions.Compare;
 
+using ICSharpCode.TreeView;
+
 
 namespace SatisfactorySavegameTool.Dialogs
 {
@@ -18,14 +20,14 @@ namespace SatisfactorySavegameTool.Dialogs
 	/// </summary>
 	public partial class DifferencesDialog : Window
 	{
-		public static void Show(DifferenceModel diff)
+		public static void Show(Difference.DifferenceModel diff)
 		{
 			var dlg = new DifferencesDialog(diff);
 			dlg.ShowDialog();
 		}
 
 
-		public DifferencesDialog(DifferenceModel diff)
+		public DifferencesDialog(Difference.DifferenceModel diff)
 		{
 			InitializeComponent();
 
@@ -59,19 +61,19 @@ namespace SatisfactorySavegameTool.Dialogs
 		private void LeftMissing_Click(object sender, RoutedEventArgs e)
 		{
 			bool flag = !LeftMissingBtn.IsChecked.GetValueOrDefault(false);
-			_RecursExecuter(view.Root as DifferenceNode, (node) => { if (node.Left == null) node.IsHidden = flag; } );
+			_RecursExecuter(view.Root as Difference.DifferenceNode, (node) => { if (node.Left == null) node.IsHidden = flag; } );
 		}
 
 		private void Different_Click(object sender, RoutedEventArgs e)
 		{
 			bool flag = !DifferentBtn.IsChecked.GetValueOrDefault(false);
-			_RecursExecuter(view.Root as DifferenceNode, (node) => { if (node.Left != null && node.Right != null) node.IsHidden = flag; } );
+			_RecursExecuter(view.Root as Difference.DifferenceNode, (node) => { if (node.Left != null && node.Right != null) node.IsHidden = flag; } );
 		}
 
 		private void RightMissing_Click(object sender, RoutedEventArgs e)
 		{
 			bool flag = !RightMissingBtn.IsChecked.GetValueOrDefault(false);
-			_RecursExecuter(view.Root as DifferenceNode, (node) => { if (node.Right == null) node.IsHidden = flag; } );
+			_RecursExecuter(view.Root as Difference.DifferenceNode, (node) => { if (node.Right == null) node.IsHidden = flag; } );
 		}
 
 		//TODO: Add those center buttons for migrating nodes into opposite save
@@ -82,9 +84,9 @@ namespace SatisfactorySavegameTool.Dialogs
 		}
 
 		
-		protected void _RecursExecuter(DifferenceNode node, Action<DifferenceNode> action)
+		protected void _RecursExecuter(Difference.DifferenceNode node, Action<Difference.DifferenceNode> action)
 		{
-			foreach(DifferenceNode child in node.Children)
+			foreach(Difference.DifferenceNode child in node.Children)
 				_RecursExecuter(child, action);
 			action(node);
 		}
@@ -121,6 +123,73 @@ namespace SatisfactorySavegameTool.Dialogs
 
 namespace SatisfactorySavegameTool.Dialogs.Difference
 {
+	public class DifferenceModel
+	{
+		public DifferenceNode    Root          { get; set; }
+		public Savegame.Savegame LeftSavegame  { get; private set; }
+		public Savegame.Savegame RightSavegame { get; private set; }
+
+		public DifferenceModel(Savegame.Savegame left, Savegame.Savegame right)
+		{
+			Root          = new DifferenceNode(@"\", "", "");
+			LeftSavegame  = left;
+			RightSavegame = right;
+		}
+
+		public DifferenceNode Add(DifferenceNode node)
+		{
+			Root.Add(node);
+			return node;
+		}
+	}
+
+	public class DifferenceNode : SharpTreeNode
+	{
+		public override object Text
+		{
+			get
+			{
+				string t = Title;
+				if (t != null && Children.Count > 0)
+					t += string.Format(" [{0}]", Children.Count);
+				return t;
+			}
+		}
+
+		public override bool CanCopy(SharpTreeNode[] nodes) { return false; }
+		public override bool CanPaste(IDataObject data) { return false; }
+		public override bool CanDelete(SharpTreeNode[] nodes) { return false; }
+		public override bool IsCheckable { get { return false; } }
+
+		public string        Title { get; set; }
+		public object        Left { get; private set; }
+		public object        Right { get; private set; }
+		public int           ChildCount { get { return (Children != null) ? Children.Count : 0; } }
+
+
+		public DifferenceNode(string title, object left, object right)
+			: base()
+		{
+			Title     = title;
+			Left      = left;
+			Right     = right;
+
+			LazyLoading = false;
+			IsHidden = false;
+		}
+
+		public DifferenceNode Add(string title, object left, object right)
+		{
+			return Add(new DifferenceNode(title, left, right));
+		}
+
+		public DifferenceNode Add(DifferenceNode node)
+		{
+			Children.Add(node);
+			return node;
+		}
+	}
+
 
 	// Converter for node values
 	public class DiffNodeValueConverter : IValueConverter

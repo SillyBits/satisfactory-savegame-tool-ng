@@ -12,9 +12,8 @@ using P = Savegame.Properties;
 
 using SatisfactorySavegameTool.Supplements;
 using SatisfactorySavegameTool.Dialogs;
+using D = SatisfactorySavegameTool.Dialogs.Difference;
 using A = SatisfactorySavegameTool.Actions.Attributes;
-
-using ICSharpCode.TreeView;
 
 
 namespace SatisfactorySavegameTool.Actions.Compare
@@ -99,7 +98,8 @@ namespace SatisfactorySavegameTool.Actions.Compare
 				if (_right_save == null)
 					return (bool?)null;
 
-				_differences = new DifferenceModel(_left_save, _right_save);
+				_differences = new D.DifferenceModel(_left_save, _right_save);
+				_classes = new Dictionary<string, Dialogs.Difference.DifferenceNode>();
 
 				_progress.CounterFormat = Translate._("Action.Compare.Progress.CounterFormat");
 				_progress.Interval = 1000;// -1;
@@ -150,16 +150,16 @@ namespace SatisfactorySavegameTool.Actions.Compare
 			Log.Info("Comparing a ~{0} elements ...", total);
 			_cbStart(total, Translate._("Action.Compare.Progress"), "");
 
-			DifferenceNode node;
-			DifferenceNode sub;
-			List<DifferenceNode> nodes = new List<DifferenceNode>();
+			D.DifferenceNode node;
+			D.DifferenceNode sub;
+			List<D.DifferenceNode> nodes = new List<D.DifferenceNode>();
 			int differences = 0;
 
 
 			node = _Compare(_left_save.Header, _right_save.Header);
 			if (node != null)
 			{
-				node.SetTitle("Header");
+				node.Title = "Header";
 				_differences.Add(node);
 				++differences;
 			}
@@ -176,7 +176,7 @@ namespace SatisfactorySavegameTool.Actions.Compare
 
 				P.Property right = _FindMatch(left, right_objects);
 				if (right == null)
-					sub = new DifferenceNode(left.ToString(), left, null);
+					sub = new D.DifferenceNode(left.ToString(), left, null);
 				else
 				{
 					right_objects.Remove(right);
@@ -184,22 +184,21 @@ namespace SatisfactorySavegameTool.Actions.Compare
 				}
 				if (sub != null)
 				{
-					sub.SetTitle(left.ToString());
+					sub.Title = left.ToString();
 					nodes.Add(sub);
 				}
 			}
 			foreach (P.Property right in right_objects)
-				nodes.Add(new DifferenceNode(right.ToString(), null, right));
+				nodes.Add(new D.DifferenceNode(right.ToString(), null, right));
 			if (nodes.Count > 0)
 			{
 				differences += nodes.Count;
-				foreach (DifferenceNode child in nodes)
-					_differences.Add(child);
+				foreach (D.DifferenceNode child in nodes)
+					AddDifference(child);
 				nodes.Clear();
 			}
 
 
-			DifferenceNode collected = new DifferenceNode("Collected", "", "");
 			List<P.Property> left_coll  = new List<P.Property>(_left_save.Collected);
 			List<P.Property> right_coll = new List<P.Property>(_right_save.Collected);
 			while (left_coll.Count > 0)
@@ -211,7 +210,7 @@ namespace SatisfactorySavegameTool.Actions.Compare
 
 				P.Property right = _FindMatch(left, right_coll);
 				if (right == null)
-					sub = new DifferenceNode(left.ToString(), left, null);
+					sub = new D.DifferenceNode(left.ToString(), left, null);
 				else
 				{
 					right_coll.Remove(right);
@@ -219,17 +218,17 @@ namespace SatisfactorySavegameTool.Actions.Compare
 				}
 				if (sub != null)
 				{
-					sub.SetTitle(left.ToString());
-					collected.Add(sub);
+					sub.Title = left.ToString();
+					nodes.Add(sub);
 				}
 			}
 			foreach (P.Property right in right_coll)
-				collected.Add(right.ToString(), null, right);
-			if (collected.ChildCount > 0)
+				nodes.Add(new D.DifferenceNode(right.ToString(), null, right));
+			if (nodes.Count > 0)
 			{
-				differences += collected.ChildCount;
-				foreach (DifferenceNode child in collected.Children)
-					_differences.Add(child);
+				differences += nodes.Count;
+				foreach (D.DifferenceNode child in nodes)
+					AddDifference(child);
 			}
 
 
@@ -261,10 +260,10 @@ namespace SatisfactorySavegameTool.Actions.Compare
 			return null;
 		}
 
-		internal DifferenceNode _Compare(P.Property left, P.Property right)
+		internal D.DifferenceNode _Compare(P.Property left, P.Property right)
 		{
-			DifferenceNode node = new DifferenceNode(left.ToString(), left, right);
-			DifferenceNode sub;
+			D.DifferenceNode node = new D.DifferenceNode(left.ToString(), left, right);
+			D.DifferenceNode sub;
 
 			if ((left == null || right == null) && (left != right))
 				return node;
@@ -290,14 +289,14 @@ namespace SatisfactorySavegameTool.Actions.Compare
 					continue;
 
 				if (right_sub == null && left_sub != null)
-					sub = new DifferenceNode(null, left_sub, null);
+					sub = new D.DifferenceNode(null, left_sub, null);
 				else if (left_sub is P.Property)
 					sub = _Compare(left_sub as P.Property, right_sub as P.Property);
 				else 
 					sub = _CompareObject(left_sub, right_sub);
 				if (sub != null)
 				{
-					sub.SetTitle(pair.Key);
+					sub.Title = pair.Key;
 					node.Add(sub);
 				}
 			}
@@ -335,16 +334,16 @@ namespace SatisfactorySavegameTool.Actions.Compare
 		internal ProgressDialog _progress;
 		internal ICallback _callback;
 		internal long _count;
-		internal DifferenceModel _differences;
+		internal D.DifferenceModel _differences;
 		private static string[] _blacklisted = { "Private" };
 
 
 		#region Comparison helpers
 
-		internal DifferenceNode _CompareObject(object left, object right)
+		internal D.DifferenceNode _CompareObject(object left, object right)
 		{
-			Func<bool,DifferenceNode> state = (b) => {
-				return b ? null : new DifferenceNode(null, left, right);
+			Func<bool,D.DifferenceNode> state = (b) => {
+				return b ? null : new D.DifferenceNode(null, left, right);
 			};
 
 			if (left == null || right == null)
@@ -365,8 +364,8 @@ namespace SatisfactorySavegameTool.Actions.Compare
 
 			if (left is IDictionary)
 			{
-				DifferenceNode node = new DifferenceNode(null, left, right);
-				DifferenceNode sub;
+				D.DifferenceNode node = new D.DifferenceNode(null, left, right);
+				D.DifferenceNode sub;
 
 				Func<IDictionary,IDictionary> clone = (src) => {
 					Dictionary<object,object> dst = new Dictionary<object, object>();
@@ -388,14 +387,14 @@ namespace SatisfactorySavegameTool.Actions.Compare
 					}
 
 					if (right_sub == null && left_sub != null)
-						sub = new DifferenceNode(null, left_sub, null);
+						sub = new D.DifferenceNode(null, left_sub, null);
 					else if (left_sub is P.Property)
 						sub = _Compare(left_sub as P.Property, right_sub as P.Property);
 					else
 						sub = _CompareObject(left_sub, right_sub);
 					if (sub != null)
 					{
-						sub.SetTitle(key.ToString());
+						sub.Title = key.ToString();
 						node.Add(sub);
 					}
 				}
@@ -407,8 +406,8 @@ namespace SatisfactorySavegameTool.Actions.Compare
 
 			if (left is ICollection)
 			{
-				DifferenceNode node = new DifferenceNode(null, left, right);
-				DifferenceNode sub;
+				D.DifferenceNode node = new D.DifferenceNode(null, left, right);
+				D.DifferenceNode sub;
 
 				Func<ICollection,List<object>> clone = (src) => {
 					List<object> dst = new List<object>();
@@ -430,14 +429,14 @@ namespace SatisfactorySavegameTool.Actions.Compare
 					}
 
 					if (right_sub == null && left_sub != null)
-						sub = new DifferenceNode(null, left_sub, null);
+						sub = new D.DifferenceNode(null, left_sub, null);
 					else if (left_sub is P.Property)
 						sub = _Compare(left_sub as P.Property, right_sub as P.Property);
 					else
 						sub = _CompareObject(left_sub, right_sub);
 					if (sub != null)
 					{
-						sub.SetTitle(index.ToString());
+						sub.Title = index.ToString();
 						node.Add(sub);
 					}
 				}
@@ -456,45 +455,30 @@ namespace SatisfactorySavegameTool.Actions.Compare
 
 		#endregion
 
-	}
-
-
-	public class DifferenceModel
-	{
-		public DifferenceNode    Root          { get; set; }
-		public Savegame.Savegame LeftSavegame  { get; private set; }
-		public Savegame.Savegame RightSavegame { get; private set; }
-
-		public DifferenceModel(Savegame.Savegame left, Savegame.Savegame right)
-		{
-			Root          = new DifferenceNode(@"\", "", "");
-			LeftSavegame  = left;
-			RightSavegame = right;
-
-			_classes      = new Dictionary<string,DifferenceNode>();
-		}
-
-		public void Add(DifferenceNode node)
+		public void AddDifference(D.DifferenceNode node)
 		{
 			P.Property prop = ((node.Left != null) ? node.Left : node.Right) as P.Property;
 			if (prop != null)
 			{
-				DifferenceNode class_node = _AddClassRecurs(Root, "/", prop);
+				string label = null;
+				D.DifferenceNode class_node = _AddClassRecurs(null, "/", prop, out label);
 				if (class_node != null)
 				{
-					class_node.Add(node);
+					if (!string.IsNullOrEmpty(label))
+						node.Title = label;
+					_AddSorted(class_node, node);
 					return;
 				}
 			}
 
-			Root.Add(node);
+			_differences.Add(node);
 		}
 
 		//HINT: Methods following are copied from TreePanel.cs, ensure to update those if TreePanel.cs changes!
-		private DifferenceNode _AddClassRecurs(DifferenceNode parent, string path, P.Property prop)
+		private D.DifferenceNode _AddClassRecurs(D.DifferenceNode parent, string path, P.Property prop, out string out_title)
 		{
 			string classname, fullname, label;
-			DifferenceNode class_item;
+			D.DifferenceNode class_item;
 
 			string ClassName, PathName;
 			if (prop is P.Actor)
@@ -511,6 +495,7 @@ namespace SatisfactorySavegameTool.Actions.Compare
 			}
 			else
 			{
+				out_title = null;
 				return null;
 			}
 
@@ -520,7 +505,7 @@ namespace SatisfactorySavegameTool.Actions.Compare
 				classname = remain.Split('/')[0];
 				fullname = path + classname + "/";
 				class_item = _AddOrGetClass(parent, fullname, classname);
-				return _AddClassRecurs(class_item, fullname, prop);
+				return _AddClassRecurs(class_item, fullname, prop, out out_title);
 			}
 			if (remain.Contains('.'))
 			{
@@ -565,87 +550,51 @@ namespace SatisfactorySavegameTool.Actions.Compare
 					}
 
 					//return _AddItem(class_item, label, null, null);
+					out_title = label;
 					return class_item;
 				}
 				Log.Warning("AddClassRecurs: What to do with '{0}'?", ClassName);
 			}
 
 			// At the end of our path, add property
-			//label = PathName;
-			//label = label.Substring(label.IndexOf('.') + 1);
+			label = PathName;
+			label = label.Substring(label.IndexOf('.') + 1);
 			//return _AddItem(parent, label, null, null);
+			out_title = label;
 			return parent;
 		}
 
-		private DifferenceNode _AddOrGetClass(DifferenceNode parent, string fullname, string classname)
+		private D.DifferenceNode _AddOrGetClass(D.DifferenceNode parent, string fullname, string classname)
 		{
 			if (_classes.ContainsKey(fullname))
 				return _classes[fullname];
-			DifferenceNode class_item;
+			D.DifferenceNode class_item = new D.DifferenceNode(classname, "", "");
 			if (parent == null)
-				class_item = Root.Add(classname, "", "");
+				_differences.Root.Add(class_item);
 			else
-				class_item = parent.Add(classname, "", "");
+				_AddSorted(parent, class_item);
 			_classes.Add(fullname, class_item);
 			return class_item;
 		}
 
-		private Dictionary<string,DifferenceNode> _classes;
-	}
-
-	public class DifferenceNode : SharpTreeNode
-	{
-		public override object Text
+		private void _AddSorted(D.DifferenceNode dest, D.DifferenceNode node)
 		{
-			get
+			int index = 0;
+			while (index < dest.Children.Count)
 			{
-				string t = _title;
-				if (t != null && Children.Count > 0)
-					t += string.Format(" [{0}]", Children.Count);
-				return t;
+				if ((dest.Children[index] as D.DifferenceNode).Title.CompareTo(node.Title) > 0)
+					break;
+				++index;
 			}
+
+			if (index < dest.Children.Count)
+				dest.Children.Insert(index, node);
+			else
+				dest.Children.Add(node);
 		}
 
-		public override bool CanCopy(SharpTreeNode[] nodes) { return false; }
-		public override bool CanPaste(IDataObject data) { return false; }
-		public override bool CanDelete(SharpTreeNode[] nodes) { return false; }
-		public override bool IsCheckable { get { return false; } }
+		private Dictionary<string,D.DifferenceNode> _classes;
 
-		public object        Left { get; private set; }
-		public object        Right { get; private set; }
-		public int           ChildCount { get { return (Children != null) ? Children.Count : 0; } }
-
-
-		public DifferenceNode(string title, object left, object right)
-			: base()
-		{
-			_title    = title;
-			Left      = left;
-			Right     = right;
-
-			LazyLoading = false;
-			IsHidden = false;
-		}
-
-		public void SetTitle(string title)
-		{
-			_title = title;
-		}
-
-		public DifferenceNode Add(string title, object left, object right)
-		{
-			return Add(new DifferenceNode(title, left, right));
-		}
-
-		public DifferenceNode Add(DifferenceNode node)
-		{
-			Children.Add(node);
-			return node;
-		}
-
-
-		private string _title;
 	}
-
 
 }

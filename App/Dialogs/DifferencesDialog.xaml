@@ -6,7 +6,6 @@
         xmlns:local="clr-namespace:SatisfactorySavegameTool.Dialogs"
 		xmlns:lang="clr-namespace:CoreLib.Language.XAML;assembly=CoreLib"
         xmlns:diff="clr-namespace:SatisfactorySavegameTool.Dialogs.Difference"
-		xmlns:compare="clr-namespace:SatisfactorySavegameTool.Actions.Compare"
 		xmlns:icsd="http://icsharpcode.net/sharpdevelop/treeview"
         mc:Ignorable="d"
         Title="{lang:Translate Key=DifferencesDialog.Title}"
