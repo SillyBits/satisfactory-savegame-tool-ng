@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using Microsoft.Win32;
 
 using CoreLib;
+
+using F = FileHandler;
 
 using P = Savegame.Properties;
 
@@ -361,6 +365,17 @@ namespace SatisfactorySavegameTool.Actions.Compare
 				return state(((float)left - (float)right).IsNearZero(1e-10f));
 			//if (left is double)
 			//	return state(((double)left - (double)right).IsNearZero(1e-10));
+			if (left is string)
+				return state(((string)left).CompareTo((string)right) == 0);
+
+			if (left is F.str)
+			{
+				string left_str  = (left  as F.str).ToString();
+				string right_str = (right as F.str).ToString();
+				//if (string.IsNullOrEmpty(left_str) || string.IsNullOrEmpty(right_str))
+				//	return state(false);
+				return state(left_str.CompareTo(right_str) == 0);
+			}
 
 			if (left is IDictionary)
 			{
@@ -436,7 +451,10 @@ namespace SatisfactorySavegameTool.Actions.Compare
 						sub = _CompareObject(left_sub, right_sub);
 					if (sub != null)
 					{
-						sub.Title = index.ToString();
+						string title = left_sub.PrettyName();
+						if (string.IsNullOrEmpty(title))
+							title = index.ToString();
+						sub.Title = title;
 						node.Add(sub);
 					}
 				}
@@ -444,7 +462,12 @@ namespace SatisfactorySavegameTool.Actions.Compare
 				{
 					object right_sub = right_coll[index];
 					if (right_sub != null)
-						node.Add(index.ToString(), null, right_sub);
+					{
+						string title = right_sub.PrettyName();
+						if (string.IsNullOrEmpty(title))
+							title = index.ToString();
+						node.Add(title, null, right_sub);
+					}
 				}
 
 				return node.ChildCount > 0 ? node : null;

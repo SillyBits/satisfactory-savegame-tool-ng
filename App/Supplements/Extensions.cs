@@ -261,6 +261,34 @@ namespace SatisfactorySavegameTool.Supplements
 		}
 
 
+		// Tries to get a pretty name from property passed in, or null if none found
+		public static string PrettyName(this object val)
+		{
+			string name = null;
+			if (val is P.ValueProperty)
+			{
+				P.ValueProperty val_prop = val as P.ValueProperty;
+				if (val_prop.Name != null)
+					name = val_prop.Name.ToString();
+			}
+			if (string.IsNullOrEmpty(name) && val is P.Property)
+			{
+				P.Property prop = val as P.Property;
+				name = prop.GetPathName();
+				if (!string.IsNullOrEmpty(name))
+					name = name.LastName();
+				else if (prop.Parent != null)
+				{
+					name = prop.Parent.GetChilds().FindName(prop);
+					//TODO: Could add further checking by traversing parent properties
+					//      and checking Properties- resp. PropertyList-related childs
+					//if (string.IsNullOrEmpty(name)) ...
+				}
+			}
+			return name;
+		}
+
+
 		// Check float for being with range of value given
 		public static bool IsNear(this float val, float near, float range = 100.0f * float.Epsilon)
 		{

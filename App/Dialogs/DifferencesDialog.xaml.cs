@@ -156,6 +156,8 @@ namespace SatisfactorySavegameTool.Dialogs.Difference
 			}
 		}
 
+		public override object ToolTip { get { return Title; } }
+
 		public override bool CanCopy(SharpTreeNode[] nodes) { return false; }
 		public override bool CanPaste(IDataObject data) { return false; }
 		public override bool CanDelete(SharpTreeNode[] nodes) { return false; }

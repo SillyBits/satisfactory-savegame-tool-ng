@@ -64,7 +64,8 @@
 							<GridViewColumn.CellTemplate>
 								<DataTemplate>
 									<TextBlock Text="{Binding Left, Converter={StaticResource diffnodeValueConverter}}"
-											   Foreground="{Binding Left, Converter={StaticResource diffnodeColorConverter}}" />
+											   Foreground="{Binding Left, Converter={StaticResource diffnodeColorConverter}}"
+											   ToolTip="{Binding Left, Converter={StaticResource diffnodeValueConverter}}" />
 								</DataTemplate>
 							</GridViewColumn.CellTemplate>
 						</GridViewColumn>
@@ -84,7 +85,8 @@
 							<GridViewColumn.CellTemplate>
 								<DataTemplate>
 									<TextBlock Text="{Binding Right, Converter={StaticResource diffnodeValueConverter}}"
-											   Foreground="{Binding Right, Converter={StaticResource diffnodeColorConverter}}" />
+											   Foreground="{Binding Right, Converter={StaticResource diffnodeColorConverter}}" 
+											   ToolTip="{Binding Right, Converter={StaticResource diffnodeValueConverter}}" />
 								</DataTemplate>
 							</GridViewColumn.CellTemplate>
 						</GridViewColumn>
