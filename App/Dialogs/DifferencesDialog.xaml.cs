@@ -134,6 +134,8 @@ namespace SatisfactorySavegameTool.Dialogs.Difference
 			Root          = new DifferenceNode(@"\", "", "");
 			LeftSavegame  = left;
 			RightSavegame = right;
+
+			Root.IsExpanded = true;
 		}
 
 		public DifferenceNode Add(DifferenceNode node)
@@ -190,6 +192,63 @@ namespace SatisfactorySavegameTool.Dialogs.Difference
 			Children.Add(node);
 			return node;
 		}
+
+		public override void ShowContextMenu(ContextMenuEventArgs e)
+		{
+			if (_context_menu == null)
+			{
+				Func<string,RoutedEventHandler,MenuItem> add = (lang_id,handler) =>
+				{
+					lang_id = "DifferencesDialog.Context." + lang_id;
+
+					MenuItem item = new MenuItem() {
+						Header = Translate._(lang_id),
+					};
+
+					lang_id += ".Tooltip";
+					if (Translate.Has(lang_id))
+						item.ToolTip = Translate._(lang_id);
+
+					item.Click += handler;
+
+					_context_menu.Items.Add(item);
+
+					return item;
+				};
+
+				_context_menu = new ContextMenu();
+				add("ExpandAll", Contextmenu_ExpandAll_Click);
+				add("CollapseAll", Contextmenu_CollapseAll_Click);
+			}
+
+			if (Children.Count > 0)
+			{
+				_context_menu.PlacementRectangle = new Rect(e.CursorLeft, e.CursorTop, 0, 0);
+				_context_menu.IsOpen = true;
+			}
+		}
+
+		private void Contextmenu_ExpandAll_Click(object sender, RoutedEventArgs e)
+		{
+			IsExpanded = false;
+			foreach (var child in Descendants())
+			{
+				if (child.Children.Count > 0)
+					child.IsExpanded = true;
+			}
+			IsExpanded = true;
+		}
+
+		private void Contextmenu_CollapseAll_Click(object sender, RoutedEventArgs e)
+		{
+			foreach (var child in DescendantsAndSelf())
+			{
+				if (child.Children.Count > 0)
+					child.IsExpanded = false;
+			}
+		}
+
+		private ContextMenu _context_menu;
 	}
 
 

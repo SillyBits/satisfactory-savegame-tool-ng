@@ -49,7 +49,7 @@
 
 		<icsd:SharpTreeView x:Name="view" Grid.Row="2" Grid.Column="0"
 							HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0"
-                            AllowDrop="False" ShowAlternation="True">
+                            AllowDrop="False" ShowAlternation="True" ShowLines="True" ShowRootExpander="True">
 			<ListView.View>
 				<icsd:SharpGridView>
 					<GridView.Columns>
