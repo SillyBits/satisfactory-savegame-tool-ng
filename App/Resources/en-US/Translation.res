@@ -237,6 +237,10 @@ This property needs to be dealt with to allow this tool to load this savegame.</
 	<DifferencesDialog.LeftMissing.TT>Show nodes missing on left side</DifferencesDialog.LeftMissing.TT>
 	<DifferencesDialog.Different.TT>Show nodes with differences</DifferencesDialog.Different.TT>
 	<DifferencesDialog.RightMissing.TT>Show nodes missing on right side</DifferencesDialog.RightMissing.TT>
+	<DifferencesDialog.Context.ExpandAll>Expand all</DifferencesDialog.Context.ExpandAll>
+	<DifferencesDialog.Context.ExpandAll.Tooltip>Expands all nodes</DifferencesDialog.Context.ExpandAll.Tooltip>
+	<DifferencesDialog.Context.CollapseAll>Collapse all</DifferencesDialog.Context.CollapseAll>
+	<DifferencesDialog.Context.CollapseAll.Tooltip>Collapses all nodes</DifferencesDialog.Context.CollapseAll.Tooltip>
 
 	<ImageControl.Label>Bitmap of size {0}x{1} with {2} color channels</ImageControl.Label>
 	<ImageControl.Button>Show ...</ImageControl.Button>

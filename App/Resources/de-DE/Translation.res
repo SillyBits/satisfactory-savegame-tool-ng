@@ -238,6 +238,10 @@ Um diesen Spielstand laden zu können muss der Helfer erst entsprechend erweiter
 	<DifferencesDialog.LeftMissing.TT>Zeige Knoten die auf der linken Seite fehlen</DifferencesDialog.LeftMissing.TT>
 	<DifferencesDialog.Different.TT>Zeige Knoten mit Unterschieden</DifferencesDialog.Different.TT>
 	<DifferencesDialog.RightMissing.TT>Zeige Knoten die auf der rechten Seite fehlen</DifferencesDialog.RightMissing.TT>
+	<DifferencesDialog.Context.ExpandAll>Alles aufklappen</DifferencesDialog.Context.ExpandAll>
+	<DifferencesDialog.Context.ExpandAll.Tooltip>Klappt alle Knoten auf</DifferencesDialog.Context.ExpandAll.Tooltip>
+	<DifferencesDialog.Context.CollapseAll>Alles zuklappen</DifferencesDialog.Context.CollapseAll>
+	<DifferencesDialog.Context.CollapseAll.Tooltip>Klappt alle Knoten zu</DifferencesDialog.Context.CollapseAll.Tooltip>
 
 	<ImageControl.Label>Bild der Größe {0}x{1} mit {2} Farbkanälen</ImageControl.Label>
 	<ImageControl.Button>Anzeigen ...</ImageControl.Button>
