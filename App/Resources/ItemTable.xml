@@ -1,106 +1,106 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <items>
   <!-- Added 2019-09-03T23:14:31 -->
-  <item name="Desc_WAT1" path="/Game/FactoryGame/Prototype/WAT/Desc_WAT1" type="item" />
-  <item name="Desc_WAT2" path="/Game/FactoryGame/Prototype/WAT/Desc_WAT2" type="item" />
-  <item name="Desc_HardDrive" path="/Game/FactoryGame/Resource/Environment/CrashSites/Desc_HardDrive" type="item" />
-  <item name="Desc_ServerRack" path="/Game/FactoryGame/Resource/Environment/CrashSites/Desc_ServerRack" blocked="True" type="item" />
-  <item name="Desc_Crystal" path="/Game/FactoryGame/Resource/Environment/Crystal/Desc_Crystal" type="item" />
-  <item name="Desc_CrystalShard" path="/Game/FactoryGame/Resource/Environment/Crystal/Desc_CrystalShard" type="item" />
-  <item name="Desc_Crystal_mk2" path="/Game/FactoryGame/Resource/Environment/Crystal/Desc_Crystal_mk2" type="item" />
-  <item name="Desc_Crystal_mk3" path="/Game/FactoryGame/Resource/Environment/Crystal/Desc_Crystal_mk3" type="item" />
-  <item name="Desc_AluminumIngot" path="/Game/FactoryGame/Resource/Parts/AluminumIngot/Desc_AluminumIngot" type="item" />
-  <item name="Desc_AluminumPlate" path="/Game/FactoryGame/Resource/Parts/AluminumPlate/Desc_AluminumPlate" type="item" />
-  <item name="Desc_AluminumPlateReinforced" path="/Game/FactoryGame/Resource/Parts/AluminumPlateReinforced/Desc_AluminumPlateReinforced" type="item" />
-  <item name="Desc_Battery" path="/Game/FactoryGame/Resource/Parts/Battery/Desc_Battery" type="item" />
-  <item name="Desc_Cable" path="/Game/FactoryGame/Resource/Parts/Cable/Desc_Cable" type="item" />
-  <item name="Desc_CartridgeStandard" path="/Game/FactoryGame/Resource/Parts/CartridgeStandard/Desc_CartridgeStandard" type="item" />
-  <item name="Desc_Cement" path="/Game/FactoryGame/Resource/Parts/Cement/Desc_Cement" type="item" />
-  <item name="Desc_CircuitBoard" path="/Game/FactoryGame/Resource/Parts/CircuitBoard/Desc_CircuitBoard" type="item" />
-  <item name="Desc_CircuitBoardHighSpeed" path="/Game/FactoryGame/Resource/Parts/CircuitBoardHighSpeed/Desc_CircuitBoardHighSpeed" type="item" />
-  <item name="Desc_ColorCartridge" path="/Game/FactoryGame/Resource/Parts/ColorCartridge/Desc_ColorCartridge" type="item" />
-  <item name="Desc_Computer" path="/Game/FactoryGame/Resource/Parts/Computer/Desc_Computer" type="item" />
-  <item name="Desc_ComputerQuantum" path="/Game/FactoryGame/Resource/Parts/ComputerQuantum/Desc_ComputerQuantum" type="item" />
-  <item name="Desc_ComputerSuper" path="/Game/FactoryGame/Resource/Parts/ComputerSuper/Desc_ComputerSuper" type="item" />
-  <item name="Desc_CopperIngot" path="/Game/FactoryGame/Resource/Parts/CopperIngot/Desc_CopperIngot" type="item" />
-  <item name="Desc_CrystalOscillator" path="/Game/FactoryGame/Resource/Parts/CrystalOscillator/Desc_CrystalOscillator" type="item" />
-  <item name="Desc_ElectromagneticControlRod" path="/Game/FactoryGame/Resource/Parts/ElectromagneticControlRod/Desc_ElectromagneticControlRod" type="item" />
-  <item name="Desc_Filter" path="/Game/FactoryGame/Resource/Parts/Filter/Desc_Filter" type="item" />
-  <item name="Desc_Fuel" path="/Game/FactoryGame/Resource/Parts/Fuel/Desc_Fuel" type="item" />
-  <item name="Desc_GoldIngot" path="/Game/FactoryGame/Resource/Parts/GoldIngot/Desc_GoldIngot" type="item" />
-  <item name="Desc_Gunpowder" path="/Game/FactoryGame/Resource/Parts/GunPowder/Desc_Gunpowder" type="item" />
-  <item name="Desc_HighSpeedConnector" path="/Game/FactoryGame/Resource/Parts/HighSpeedConnector/Desc_HighSpeedConnector" type="item" />
-  <item name="Desc_HighSpeedWire" path="/Game/FactoryGame/Resource/Parts/HighSpeedWire/Desc_HighSpeedWire" type="item" />
-  <item name="Desc_HUBParts" path="/Game/FactoryGame/Resource/Parts/HUBParts/Desc_HUBParts" type="item" />
-  <item name="Desc_HazmatFilter" path="/Game/FactoryGame/Resource/Parts/IodineInfusedFilter/Desc_HazmatFilter" type="item" />
-  <item name="Desc_IronIngot" path="/Game/FactoryGame/Resource/Parts/IronIngot/Desc_IronIngot" type="item" />
-  <item name="Desc_IronPlate" path="/Game/FactoryGame/Resource/Parts/IronPlate/Desc_IronPlate" type="item" />
-  <item name="Desc_IronPlateReinforced" path="/Game/FactoryGame/Resource/Parts/IronPlateReinforced/Desc_IronPlateReinforced" type="item" />
-  <item name="Desc_IronRod" path="/Game/FactoryGame/Resource/Parts/IronRod/Desc_IronRod" type="item" />
-  <item name="Desc_IronScrew" path="/Game/FactoryGame/Resource/Parts/IronScrew/Desc_IronScrew" type="item" />
-  <item name="Desc_ModularFrame" path="/Game/FactoryGame/Resource/Parts/ModularFrame/Desc_ModularFrame" type="item" />
-  <item name="Desc_ModularFrameHeavy" path="/Game/FactoryGame/Resource/Parts/ModularFrameHeavy/Desc_ModularFrameHeavy" type="item" />
-  <item name="Desc_ModularFrameLightweight" path="/Game/FactoryGame/Resource/Parts/ModularFrameLightweight/Desc_ModularFrameLightweight" type="item" />
-  <item name="Desc_Motor" path="/Game/FactoryGame/Resource/Parts/Motor/Desc_Motor" type="item" />
-  <item name="Desc_MotorLightweight" path="/Game/FactoryGame/Resource/Parts/MotorLightweight/Desc_MotorLightweight" type="item" />
-  <item name="Desc_NobeliskExplosive" path="/Game/FactoryGame/Resource/Parts/NobeliskExplosive/Desc_NobeliskExplosive" type="item" />
-  <item name="Desc_NuclearWaste" path="/Game/FactoryGame/Resource/Parts/NuclearWaste/Desc_NuclearWaste" type="item" />
-  <item name="Desc_Plastic" path="/Game/FactoryGame/Resource/Parts/Plastic/Desc_Plastic" type="item" />
-  <item name="Desc_QuantumOscillator" path="/Game/FactoryGame/Resource/Parts/QuantumOscillator/Desc_QuantumOscillator" type="item" />
-  <item name="Desc_QuartzCrystal" path="/Game/FactoryGame/Resource/Parts/QuartzCrystal/Desc_QuartzCrystal" type="item" />
-  <item name="Desc_Rotor" path="/Game/FactoryGame/Resource/Parts/Rotor/Desc_Rotor" type="item" />
-  <item name="Desc_Rubber" path="/Game/FactoryGame/Resource/Parts/Rubber/Desc_Rubber" type="item" />
-  <item name="Desc_Silica" path="/Game/FactoryGame/Resource/Parts/Silica/Desc_Silica" type="item" />
-  <item name="Desc_SpaceElevatorBlocker" path="/Game/FactoryGame/Resource/Parts/SpaceElevatorBlocker/Desc_SpaceElevatorBlocker" blocked="True" type="item" />
-  <item name="Desc_SpikedRebar" path="/Game/FactoryGame/Resource/Parts/SpikedRebar/Desc_SpikedRebar" type="item" />
-  <item name="Desc_Stator" path="/Game/FactoryGame/Resource/Parts/Stator/Desc_Stator" type="item" />
-  <item name="Desc_SteelIngot" path="/Game/FactoryGame/Resource/Parts/SteelIngot/Desc_SteelIngot" type="item" />
-  <item name="Desc_SteelPipe" path="/Game/FactoryGame/Resource/Parts/SteelPipe/Desc_SteelPipe" type="item" />
-  <item name="Desc_SteelPlate" path="/Game/FactoryGame/Resource/Parts/SteelPlate/Desc_SteelPlate" type="item" />
-  <item name="Desc_SteelPlateReinforced" path="/Game/FactoryGame/Resource/Parts/SteelPlateReinforced/Desc_SteelPlateReinforced" type="item" />
-  <item name="Desc_TurboFuel" path="/Game/FactoryGame/Resource/Parts/Turbofuel/Desc_TurboFuel" type="item" />
-  <item name="Desc_Wire" path="/Game/FactoryGame/Resource/Parts/Wire/Desc_Wire" type="item" />
-  <item name="Desc_HogParts" path="/Game/FactoryGame/Resource/Parts/AnimalParts/Desc_HogParts" type="item" />
-  <item name="Desc_SpitterParts" path="/Game/FactoryGame/Resource/Parts/AnimalParts/Desc_SpitterParts" type="item" />
-  <item name="Desc_Biofuel" path="/Game/FactoryGame/Resource/Parts/BioFuel/Desc_Biofuel" type="item" />
-  <item name="Desc_Fabric" path="/Game/FactoryGame/Resource/Parts/GenericBiomass/Desc_Fabric" type="item" />
-  <item name="Desc_FlowerPetals" path="/Game/FactoryGame/Resource/Parts/GenericBiomass/Desc_FlowerPetals" type="item" />
-  <item name="Desc_GenericBiomass" path="/Game/FactoryGame/Resource/Parts/GenericBiomass/Desc_GenericBiomass" type="item" />
-  <item name="Desc_Leaves" path="/Game/FactoryGame/Resource/Parts/GenericBiomass/Desc_Leaves" type="item" />
-  <item name="Desc_Mycelia" path="/Game/FactoryGame/Resource/Parts/GenericBiomass/Desc_Mycelia" type="item" />
-  <item name="Desc_Vines" path="/Game/FactoryGame/Resource/Parts/GenericBiomass/Desc_Vines" type="item" />
-  <item name="Desc_Wood" path="/Game/FactoryGame/Resource/Parts/GenericBiomass/Desc_Wood" type="item" />
-  <item name="Desc_NuclearFuelRod" path="/Game/FactoryGame/Resource/Parts/NuclearFuelRod/Desc_NuclearFuelRod" type="item" />
-  <item name="Desc_Chainsaw" path="/Game/FactoryGame/Equipment/Chainsaw/Desc_Chainsaw" type="equipment" />
-  <item name="BP_EquipmentDescriptorColorGun" path="/Game/FactoryGame/Resource/Equipment/ColorGun/BP_EquipmentDescriptorColorGun" type="equipment" />
-  <item name="BP_EquipmentDescriptorGasmask" path="/Game/FactoryGame/Resource/Equipment/GasMask/BP_EquipmentDescriptorGasmask" type="equipment" />
-  <item name="BP_EquipmentDescriptorObjectScanner" path="/Game/FactoryGame/Resource/Equipment/GemstoneScanner/BP_EquipmentDescriptorObjectScanner" type="equipment" />
-  <item name="BP_EquipmentDescriptorHazmatSuit" path="/Game/FactoryGame/Resource/Equipment/HazmatSuit/BP_EquipmentDescriptorHazmatSuit" type="equipment" />
-  <item name="BP_EquipmentDescriptorJetPack" path="/Game/FactoryGame/Resource/Equipment/JetPack/BP_EquipmentDescriptorJetPack" type="equipment" />
-  <item name="BP_EquipmentDescriptorJumpingStilts" path="/Game/FactoryGame/Resource/Equipment/JumpingStilts/BP_EquipmentDescriptorJumpingStilts" type="equipment" />
-  <item name="Desc_RebarGunProjectile" path="/Game/FactoryGame/Resource/Equipment/NailGun/Desc_RebarGunProjectile" type="equipment" />
-  <item name="BP_EquipmentDescriptorNobeliskDetonator" path="/Game/FactoryGame/Resource/Equipment/NobeliskDetonator/BP_EquipmentDescriptorNobeliskDetonator" type="equipment" />
-  <item name="BP_ItemDescriptorPortableMiner" path="/Game/FactoryGame/Resource/Equipment/PortableMiner/BP_ItemDescriptorPortableMiner" type="equipment" />
-  <item name="BP_EquipmentDescriptorRifle" path="/Game/FactoryGame/Resource/Equipment/Rifle/BP_EquipmentDescriptorRifle" type="equipment" />
-  <item name="BP_EquipmentDescriptorShockShank" path="/Game/FactoryGame/Resource/Equipment/ShockShank/BP_EquipmentDescriptorShockShank" type="equipment" />
-  <item name="BP_EquipmentDescriptorStunSpear" path="/Game/FactoryGame/Resource/Equipment/StunSpear/BP_EquipmentDescriptorStunSpear" type="equipment" />
-  <item name="Desc_Berry" path="/Game/FactoryGame/Resource/Environment/Berry/Desc_Berry" type="equipment" />
-  <item name="Desc_Shroom" path="/Game/FactoryGame/Resource/Environment/DesertShroom/Desc_Shroom" type="equipment" />
-  <item name="Desc_Nut" path="/Game/FactoryGame/Resource/Environment/Nut/Desc_Nut" type="equipment" />
-  <item name="BP_EquipmentDescriptorBeacon" path="/Game/FactoryGame/Resource/Equipment/Beacon/BP_EquipmentDescriptorBeacon" type="equipment" />
-  <item name="Desc_Parachute" path="/Game/FactoryGame/Resource/Equipment/Beacon/Desc_Parachute" type="equipment" />
-  <item name="Desc_Medkit" path="/Game/FactoryGame/Resource/Equipment/Medkit/Desc_Medkit" type="equipment" />
-  <item name="Desc_CompactedCoal" path="/Game/FactoryGame/Resource/Parts/CompactedCoal/Desc_CompactedCoal" type="resource" />
-  <item name="Desc_UraniumCell" path="/Game/FactoryGame/Resource/Parts/UraniumCell/Desc_UraniumCell" type="resource" />
-  <item name="Desc_Coal" path="/Game/FactoryGame/Resource/RawResources/Coal/Desc_Coal" type="resource" />
-  <item name="Desc_CrudeOil" path="/Game/FactoryGame/Resource/RawResources/CrudeOil/Desc_CrudeOil" type="resource" />
-  <item name="Desc_OreBauxite" path="/Game/FactoryGame/Resource/RawResources/OreBauxite/Desc_OreBauxite" type="resource" />
-  <item name="Desc_OreCopper" path="/Game/FactoryGame/Resource/RawResources/OreCopper/Desc_OreCopper" type="resource" />
-  <item name="Desc_OreGold" path="/Game/FactoryGame/Resource/RawResources/OreGold/Desc_OreGold" type="resource" />
-  <item name="Desc_OreIron" path="/Game/FactoryGame/Resource/RawResources/OreIron/Desc_OreIron" type="resource" />
-  <item name="Desc_OreUranium" path="/Game/FactoryGame/Resource/RawResources/OreUranium/Desc_OreUranium" type="resource" />
-  <item name="Desc_RawQuartz" path="/Game/FactoryGame/Resource/RawResources/RawQuartz/Desc_RawQuartz" type="resource" />
-  <item name="Desc_SAM" path="/Game/FactoryGame/Resource/RawResources/SAM/Desc_SAM" type="resource" />
-  <item name="Desc_Stone" path="/Game/FactoryGame/Resource/RawResources/Stone/Desc_Stone" type="resource" />
-  <item name="Desc_Sulfur" path="/Game/FactoryGame/Resource/RawResources/Sulfur/Desc_Sulfur" type="resource" />
+  <item name="Desc_WAT1" path="Prototype/WAT/Desc_WAT1" type="Item" stacksize="SS_SMALL" />
+  <item name="Desc_WAT2" path="Prototype/WAT/Desc_WAT2" type="Item" stacksize="SS_SMALL" />
+  <item name="Desc_HardDrive" path="Resource/Environment/CrashSites/Desc_HardDrive" type="Item" stacksize="SS_SMALL" />
+  <item name="Desc_ServerRack" path="Resource/Environment/CrashSites/Desc_ServerRack" blocked="True" type="Item" stacksize="" />
+  <item name="Desc_Crystal" path="Resource/Environment/Crystal/Desc_Crystal" type="Item" stacksize="SS_SMALL" />
+  <item name="Desc_CrystalShard" path="Resource/Environment/Crystal/Desc_CrystalShard" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_Crystal_mk2" path="Resource/Environment/Crystal/Desc_Crystal_mk2" type="Item" stacksize="SS_SMALL" />
+  <item name="Desc_Crystal_mk3" path="Resource/Environment/Crystal/Desc_Crystal_mk3" type="Item" stacksize="SS_SMALL" />
+  <item name="Desc_AluminumIngot" path="Resource/Parts/AluminumIngot/Desc_AluminumIngot" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_AluminumPlate" path="Resource/Parts/AluminumPlate/Desc_AluminumPlate" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_AluminumPlateReinforced" path="Resource/Parts/AluminumPlateReinforced/Desc_AluminumPlateReinforced" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_Battery" path="Resource/Parts/Battery/Desc_Battery" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_Cable" path="Resource/Parts/Cable/Desc_Cable" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_CartridgeStandard" path="Resource/Parts/CartridgeStandard/Desc_CartridgeStandard" type="Item" stacksize="SS_SMALL" />
+  <item name="Desc_Cement" path="Resource/Parts/Cement/Desc_Cement" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_CircuitBoard" path="Resource/Parts/CircuitBoard/Desc_CircuitBoard" type="Item" stacksize="SS_BIG" />
+  <item name="Desc_CircuitBoardHighSpeed" path="Resource/Parts/CircuitBoardHighSpeed/Desc_CircuitBoardHighSpeed" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_ColorCartridge" path="Resource/Parts/ColorCartridge/Desc_ColorCartridge" type="Item" stacksize="SS_BIG" />
+  <item name="Desc_Computer" path="Resource/Parts/Computer/Desc_Computer" type="Item" stacksize="SS_SMALL" />
+  <item name="Desc_ComputerQuantum" path="Resource/Parts/ComputerQuantum/Desc_ComputerQuantum" blocked="True" type="Item" stacksize="" />
+  <item name="Desc_ComputerSuper" path="Resource/Parts/ComputerSuper/Desc_ComputerSuper" type="Item" stacksize="SS_SMALL" />
+  <item name="Desc_CopperIngot" path="Resource/Parts/CopperIngot/Desc_CopperIngot" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_CrystalOscillator" path="Resource/Parts/CrystalOscillator/Desc_CrystalOscillator" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_ElectromagneticControlRod" path="Resource/Parts/ElectromagneticControlRod/Desc_ElectromagneticControlRod" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_Filter" path="Resource/Parts/Filter/Desc_Filter" type="Item" stacksize="SS_SMALL" />
+  <item name="Desc_Fuel" path="Resource/Parts/Fuel/Desc_Fuel" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_GoldIngot" path="Resource/Parts/GoldIngot/Desc_GoldIngot" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_Gunpowder" path="Resource/Parts/GunPowder/Desc_Gunpowder" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_HighSpeedConnector" path="Resource/Parts/HighSpeedConnector/Desc_HighSpeedConnector" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_HighSpeedWire" path="Resource/Parts/HighSpeedWire/Desc_HighSpeedWire" type="Item" stacksize="SS_HUGE" />
+  <item name="Desc_HUBParts" path="Resource/Parts/HUBParts/Desc_HUBParts" type="Item" stacksize="SS_ONE" />
+  <item name="Desc_HazmatFilter" path="Resource/Parts/IodineInfusedFilter/Desc_HazmatFilter" type="Item" stacksize="SS_SMALL" />
+  <item name="Desc_IronIngot" path="Resource/Parts/IronIngot/Desc_IronIngot" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_IronPlate" path="Resource/Parts/IronPlate/Desc_IronPlate" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_IronPlateReinforced" path="Resource/Parts/IronPlateReinforced/Desc_IronPlateReinforced" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_IronRod" path="Resource/Parts/IronRod/Desc_IronRod" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_IronScrew" path="Resource/Parts/IronScrew/Desc_IronScrew" type="Item" stacksize="SS_HUGE" />
+  <item name="Desc_ModularFrame" path="Resource/Parts/ModularFrame/Desc_ModularFrame" type="Item" stacksize="SS_SMALL" />
+  <item name="Desc_ModularFrameHeavy" path="Resource/Parts/ModularFrameHeavy/Desc_ModularFrameHeavy" type="Item" stacksize="SS_SMALL" />
+  <item name="Desc_ModularFrameLightweight" path="Resource/Parts/ModularFrameLightweight/Desc_ModularFrameLightweight" type="Item" stacksize="SS_SMALL" />
+  <item name="Desc_Motor" path="Resource/Parts/Motor/Desc_Motor" type="Item" stacksize="SS_SMALL" />
+  <item name="Desc_MotorLightweight" path="Resource/Parts/MotorLightweight/Desc_MotorLightweight" type="Item" stacksize="SS_SMALL" />
+  <item name="Desc_NobeliskExplosive" path="Resource/Parts/NobeliskExplosive/Desc_NobeliskExplosive" type="Item" stacksize="SS_SMALL" />
+  <item name="Desc_NuclearWaste" path="Resource/Parts/NuclearWaste/Desc_NuclearWaste" type="Item" stacksize="SS_HUGE" />
+  <item name="Desc_Plastic" path="Resource/Parts/Plastic/Desc_Plastic" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_QuantumOscillator" path="Resource/Parts/QuantumOscillator/Desc_QuantumOscillator" blocked="True" type="Item" stacksize="" />
+  <item name="Desc_QuartzCrystal" path="Resource/Parts/QuartzCrystal/Desc_QuartzCrystal" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_Rotor" path="Resource/Parts/Rotor/Desc_Rotor" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_Rubber" path="Resource/Parts/Rubber/Desc_Rubber" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_Silica" path="Resource/Parts/Silica/Desc_Silica" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_SpaceElevatorBlocker" path="Resource/Parts/SpaceElevatorBlocker/Desc_SpaceElevatorBlocker" blocked="True" type="Item" stacksize="" />
+  <item name="Desc_SpikedRebar" path="Resource/Parts/SpikedRebar/Desc_SpikedRebar" type="Item" stacksize="SS_SMALL" />
+  <item name="Desc_Stator" path="Resource/Parts/Stator/Desc_Stator" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_SteelIngot" path="Resource/Parts/SteelIngot/Desc_SteelIngot" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_SteelPipe" path="Resource/Parts/SteelPipe/Desc_SteelPipe" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_SteelPlate" path="Resource/Parts/SteelPlate/Desc_SteelPlate" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_SteelPlateReinforced" path="Resource/Parts/SteelPlateReinforced/Desc_SteelPlateReinforced" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_TurboFuel" path="Resource/Parts/Turbofuel/Desc_TurboFuel" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_Wire" path="Resource/Parts/Wire/Desc_Wire" type="Item" stacksize="SS_HUGE" />
+  <item name="Desc_HogParts" path="Resource/Parts/AnimalParts/Desc_HogParts" type="Item" stacksize="SS_SMALL" />
+  <item name="Desc_SpitterParts" path="Resource/Parts/AnimalParts/Desc_SpitterParts" type="Item" stacksize="SS_SMALL" />
+  <item name="Desc_Biofuel" path="Resource/Parts/BioFuel/Desc_Biofuel" type="Item" stacksize="SS_BIG" />
+  <item name="Desc_Fabric" path="Resource/Parts/GenericBiomass/Desc_Fabric" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_FlowerPetals" path="Resource/Parts/GenericBiomass/Desc_FlowerPetals" type="Item" stacksize="SS_BIG" />
+  <item name="Desc_GenericBiomass" path="Resource/Parts/GenericBiomass/Desc_GenericBiomass" type="Item" stacksize="SS_BIG" />
+  <item name="Desc_Leaves" path="Resource/Parts/GenericBiomass/Desc_Leaves" type="Item" stacksize="SS_HUGE" />
+  <item name="Desc_Mycelia" path="Resource/Parts/GenericBiomass/Desc_Mycelia" type="Item" stacksize="SS_BIG" />
+  <item name="Desc_Vines" path="Resource/Parts/GenericBiomass/Desc_Vines" type="Item" stacksize="SS_BIG" />
+  <item name="Desc_Wood" path="Resource/Parts/GenericBiomass/Desc_Wood" type="Item" stacksize="SS_MEDIUM" />
+  <item name="Desc_NuclearFuelRod" path="Resource/Parts/NuclearFuelRod/Desc_NuclearFuelRod" type="Item" stacksize="SS_SMALL" />
+  <item name="Desc_Chainsaw" path="Equipment/Chainsaw/Desc_Chainsaw" type="Equipment" />
+  <item name="BP_EquipmentDescriptorColorGun" path="Resource/Equipment/ColorGun/BP_EquipmentDescriptorColorGun" type="Equipment" />
+  <item name="BP_EquipmentDescriptorGasmask" path="Resource/Equipment/GasMask/BP_EquipmentDescriptorGasmask" type="Equipment" />
+  <item name="BP_EquipmentDescriptorObjectScanner" path="Resource/Equipment/GemstoneScanner/BP_EquipmentDescriptorObjectScanner" type="Equipment" />
+  <item name="BP_EquipmentDescriptorHazmatSuit" path="Resource/Equipment/HazmatSuit/BP_EquipmentDescriptorHazmatSuit" type="Equipment" />
+  <item name="BP_EquipmentDescriptorJetPack" path="Resource/Equipment/JetPack/BP_EquipmentDescriptorJetPack" type="Equipment" />
+  <item name="BP_EquipmentDescriptorJumpingStilts" path="Resource/Equipment/JumpingStilts/BP_EquipmentDescriptorJumpingStilts" type="Equipment" />
+  <item name="Desc_RebarGunProjectile" path="Resource/Equipment/NailGun/Desc_RebarGunProjectile" type="Equipment" />
+  <item name="BP_EquipmentDescriptorNobeliskDetonator" path="Resource/Equipment/NobeliskDetonator/BP_EquipmentDescriptorNobeliskDetonator" type="Equipment" />
+  <item name="BP_ItemDescriptorPortableMiner" path="Resource/Equipment/PortableMiner/BP_ItemDescriptorPortableMiner" type="Equipment" />
+  <item name="BP_EquipmentDescriptorRifle" path="Resource/Equipment/Rifle/BP_EquipmentDescriptorRifle" type="Equipment" />
+  <item name="BP_EquipmentDescriptorShockShank" path="Resource/Equipment/ShockShank/BP_EquipmentDescriptorShockShank" type="Equipment" />
+  <item name="BP_EquipmentDescriptorStunSpear" path="Resource/Equipment/StunSpear/BP_EquipmentDescriptorStunSpear" type="Equipment" />
+  <item name="Desc_Berry" path="Resource/Environment/Berry/Desc_Berry" type="Equipment" stacksize="SS_SMALL" />
+  <item name="Desc_Shroom" path="Resource/Environment/DesertShroom/Desc_Shroom" type="Equipment" stacksize="SS_SMALL" />
+  <item name="Desc_Nut" path="Resource/Environment/Nut/Desc_Nut" type="Equipment" stacksize="SS_MEDIUM" />
+  <item name="BP_EquipmentDescriptorBeacon" path="Resource/Equipment/Beacon/BP_EquipmentDescriptorBeacon" type="Equipment" stacksize="SS_MEDIUM" />
+  <item name="Desc_Parachute" path="Resource/Equipment/Beacon/Desc_Parachute" type="Equipment" stacksize="SS_SMALL" />
+  <item name="Desc_Medkit" path="Resource/Equipment/Medkit/Desc_Medkit" type="Equipment" stacksize="SS_SMALL" />
+  <item name="Desc_CompactedCoal" path="Resource/Parts/CompactedCoal/Desc_CompactedCoal" type="Resource" stacksize="SS_MEDIUM" />
+  <item name="Desc_UraniumCell" path="Resource/Parts/UraniumCell/Desc_UraniumCell" type="Resource" stacksize="SS_BIG" />
+  <item name="Desc_Coal" path="Resource/RawResources/Coal/Desc_Coal" type="Resource" stacksize="SS_MEDIUM" />
+  <item name="Desc_CrudeOil" path="Resource/RawResources/CrudeOil/Desc_CrudeOil" type="Resource" stacksize="SS_MEDIUM" />
+  <item name="Desc_OreBauxite" path="Resource/RawResources/OreBauxite/Desc_OreBauxite" type="Resource" stacksize="SS_MEDIUM" />
+  <item name="Desc_OreCopper" path="Resource/RawResources/OreCopper/Desc_OreCopper" type="Resource" stacksize="SS_MEDIUM" />
+  <item name="Desc_OreGold" path="Resource/RawResources/OreGold/Desc_OreGold" type="Resource" stacksize="SS_MEDIUM" />
+  <item name="Desc_OreIron" path="Resource/RawResources/OreIron/Desc_OreIron" type="Resource" stacksize="SS_MEDIUM" />
+  <item name="Desc_OreUranium" path="Resource/RawResources/OreUranium/Desc_OreUranium" type="Resource" stacksize="SS_MEDIUM" />
+  <item name="Desc_RawQuartz" path="Resource/RawResources/RawQuartz/Desc_RawQuartz" type="Resource" stacksize="SS_MEDIUM" />
+  <item name="Desc_SAM" path="Resource/RawResources/SAM/Desc_SAM" type="Resource" stacksize="SS_SMALL" />
+  <item name="Desc_Stone" path="Resource/RawResources/Stone/Desc_Stone" type="Resource" stacksize="SS_MEDIUM" />
+  <item name="Desc_Sulfur" path="Resource/RawResources/Sulfur/Desc_Sulfur" type="Resource" stacksize="SS_MEDIUM" />
 </items>

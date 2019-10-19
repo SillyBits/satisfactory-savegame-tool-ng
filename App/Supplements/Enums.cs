@@ -27,4 +27,14 @@ namespace SatisfactorySavegameTool.Supplements
 		Right = 2
 	}
 
+	// Stack sizes
+	public enum EStackSize
+	{
+		SS_ONE     = 1,
+		SS_SMALL   = 50,
+		SS_MEDIUM  = 100,
+		SS_BIG     = 200,
+		SS_HUGE    = 500,
+	}
+
 }
