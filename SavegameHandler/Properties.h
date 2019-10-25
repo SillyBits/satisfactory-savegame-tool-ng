@@ -1124,6 +1124,22 @@ namespace Savegame
 	CLS_END
 	#pragma endregion
 
+	CLS(Guid)
+		PUB_ab(Value)
+		SIZE
+			ADD(16)
+		SIZE_END
+		LENGTH
+			ADD(16)
+		LENGTH_END
+		READ
+			Value = reader->ReadBytes(16);
+		READ_END
+		WRITE
+			writer->Write(Value);
+		WRITE_END
+	CLS_END
+
 	#pragma region InventoryItem
 	CLS(InventoryItem)
 		PUB_s(Unknown)
