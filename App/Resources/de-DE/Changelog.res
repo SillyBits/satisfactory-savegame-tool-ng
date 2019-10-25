@@ -23,6 +23,12 @@ td { vertical-align:center; }
 <br/>
 
 <p><u>v0.3 alpha</u><ul>
+	<li>Neu: Vergleich-Aktion um die Unterschiede zwischen zwei Spielständen anzuzeigen.</li>
+	<li>Bugfix: Wurde beim ersten Start eine nicht unterstützte Sprache selektiert gab es beim öffnen des Ladedialogs einen Crash (#6).</li>
+	<li>Bugfix: Fehlende Typen zugefügt: TrainSimulationData (#5), ProjectileData &amp; Guid.</li>
+	<li>Bugfix: Berichte über Vorkommnisse enthalten bei Cloudsaves nun korrekte 'Data.bin' (#4).</li>
+	<li>Änderung: Ausweichlösung zugefügt für den Fall das Absturzbericht nicht angezeigt werden kann.</li>
+	<li>Änderung: Gebäude-Baum wurde um die Anzeige von Gebäuden aus Mods erweitert.</li>
 </ul></p>
 
 <p><u>v0.2 alpha</u><ul>

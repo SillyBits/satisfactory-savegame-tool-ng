@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <version-info>
-	<latest title="Satisfactory Savegame Tool" version="0.2 alpha">
-		https://github.com/SillyBits/satisfactory-savegame-tool-ng/releases/download/v0.2-alpha/Setup-SatisfactorySavegameTool-v0.2alpha.exe
+	<latest title="Satisfactory Savegame Tool" version="0.3 alpha">
+		https://github.com/SillyBits/satisfactory-savegame-tool-ng/releases/download/v0.3-alpha/Setup-SatisfactorySavegameTool-v0.3alpha.exe
 	</latest>
-	<changelog>
+	<changelog lang="en-US">
 		<![CDATA[
 <!DOCTYPE html>
 <html>
@@ -19,7 +19,7 @@ td { vertical-align:center; }
 <table width='100%'><tr>
 <td width='40'><img src='[[IMG:Logo-128x128.png]]' alt='Logo' width='32' height='32'/></td>
 <td>
-<b>Satisfactory Savegame Tool</b> - v0.2 alpha<br/>
+<b>Satisfactory Savegame Tool</b> - v0.3 alpha<br/>
 <b>&copy;2019 SillyBits</b>
 </td>
 </tr></table>
@@ -29,18 +29,53 @@ td { vertical-align:center; }
 <b>Changelog</b><br/>
 <br/>
 
-<p><u>v0.2 alpha</u><ul>
-	<li>Support for savegames up to current v0.2.1.17 (Build 106504).</li>
-	<li>Bugfix: Fixed crash when editing within one of those specialized viewers (#2).</li>
-	<li>Bugfix: Extended 'ArrayProperty' to also handle inner types 'EnumProperty' and 'StrProperty' (#3).</li>
+<p><u>v0.3 alpha</u><ul>
+	<li>New: Compare action to allow for showing differences between two savegames.</li>
+	<li>Bugfix: Fixed picking an unsupported language id on first start which caused load dialog to crash (#6).</li>
+	<li>Bugfix: Added types missing: TrainSimulationData (#5), ProjectileData &amp; Guid.</li>
 	<li>Bugfix: Fixed missing 'Data.bin' with incident reports on cloud saves (#4).</li>
-	<li>Bugfix: Added type missing: TimeTableStop.</li>
-	<li>Bugfix: Added visualizers missing: InventoryStack, InventoryItem, TimeTableStop &amp; RailroadTrackPosition.</li>
-	<li>Change: Enabled specialized trees to show modification state.</li>
-	<li>Change: Unknown inner types with 'ArrayProperty' will raise an 'UnknownPropertyException' instead.</li>
+	<li>Change: Fallback added in case error reporting dialog can't be shown.</li>
+	<li>Change: Enabled buildings tree to show buildings coming from mods.</li>
 </ul></p>
 
 </body>
 </html>
 ]]></changelog>
+	<changelog lang="de-DE">
+		<![CDATA[
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<head>
+<style type='text/css'>
+html { overflow:auto; }
+body { font-size:11pt; font:Arial; }
+td { vertical-align:center; }
+</style>
+</head>
+<body>
+<table width='100%'><tr>
+<td width='40'><img src='[[IMG:Logo-128x128.png]]' alt='Logo' width='32' height='32'/></td>
+<td>
+<b>Satisfactory Spielstand Helfer</b> - v0.3 alpha<br/>
+<b>&copy;2019 SillyBits</b>
+</td>
+</tr></table>
+<br/>
+<br/>
+<br/>
+<b>Änderungsprotokoll</b><br/>
+<br/>
+
+<p><u>v0.3 alpha</u><ul>
+	<li>Neu: Vergleich-Aktion um die Unterschiede zwischen zwei Spielständen anzuzeigen.</li>
+	<li>Bugfix: Wurde beim ersten Start eine nicht unterstützte Sprache selektiert gab es beim öffnen des Ladedialogs einen Crash (#6).</li>
+	<li>Bugfix: Fehlende Typen zugefügt: TrainSimulationData (#5), ProjectileData &amp; Guid.</li>
+	<li>Bugfix: Berichte über Vorkommnisse enthalten bei Cloudsaves nun korrekte 'Data.bin' (#4).</li>
+	<li>Änderung: Ausweichlösung zugefügt für den Fall das Absturzbericht nicht angezeigt werden kann.</li>
+	<li>Änderung: Gebäude-Baum wurde um die Anzeige von Gebäuden aus Mods erweitert.</li>
+</ul></p>
+
+</body>
+</html>]]></changelog>
 </version-info>
