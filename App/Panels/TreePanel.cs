@@ -1059,6 +1059,7 @@ namespace SatisfactorySavegameTool.Panels
 				return 1 // Root
 					+ (1 + 50 + _factories.Count) // 50 different factory classes
 					+ (1 + 10 + _buildings.Count) // 10 different building classes
+					+ (1 + (2 * _modded.Count))   // Lets just double the amount for modded stuff
 					;
 			}
 		}
@@ -1072,16 +1073,31 @@ namespace SatisfactorySavegameTool.Panels
 				;
 			_factories = new List<P.Actor>();
 			_buildings = new List<P.Actor>();
+			_modded    = new List<P.Actor>();
 			foreach (P.Actor actor in actors)
 			{
 				string classname = actor.ClassName.ToString();
 				if (classname.StartsWith(magic))
 				{
+					// Built-in stuff
 					classname = classname.Substring(magic.Length);
 					if (classname.StartsWith("Factory/"))
 						_factories.Add(actor);
 					else if (classname.StartsWith("Building/"))
 						_buildings.Add(actor);
+				}
+				else if (actor.EntityObj is P.NamedEntity)
+				{
+					// Modded stuff
+					P.NamedEntity named = actor.EntityObj as P.NamedEntity;
+					if (!FileHandler.str.IsNullOrEmpty(named.PathName))
+					{
+						string pathname = named.PathName.ToString();
+						if (pathname.EndsWith(".BuildableSubsystem"))
+						{
+							_modded.Add(actor);
+						}
+					}
 				}
 			}
 		}
@@ -1094,16 +1110,24 @@ namespace SatisfactorySavegameTool.Panels
 			foreach (P.Actor prop in _factories)
 				_AddFactory(factories, prop);
 			factories.Sort();
+			factories.IsExpanded = true;
 
 			TreeNode buildings = _AddItem(root, Translate._("TreePanel.Tree.Buildings"));
 			foreach (P.Actor prop in _buildings)
 				_AddBuilding(buildings, prop);
 			buildings.Sort();
-
-			factories.IsExpanded = true;
 			buildings.IsExpanded = true;
 
-			_factories = _buildings = null;
+			if (_modded.Count > 0)
+			{
+				TreeNode modded = _AddItem(root, "Modded"/*Translate._("TreePanel.Tree.Buildings")*/);
+				foreach (P.Actor prop in _modded)
+					_AddModded(modded, prop);
+				modded.Sort();
+				modded.IsExpanded    = true;
+			}
+
+			_factories = _buildings = _modded = null;
 		}
 
 		internal void _AddFactory(TreeNode parent, P.Actor actor)
@@ -1327,6 +1351,48 @@ namespace SatisfactorySavegameTool.Panels
 			_AddItem(group, short_title, building);
 		}
 
+		internal void _AddModded(TreeNode parent, P.Actor actor)
+		{
+			// Just present modded content 'as is', with some parts skipped in its path
+			string classname = actor.ClassName.ToString();
+			if (classname[0] == '/')
+				classname = classname.Substring(1);
+			List<string> classes = classname.Split('/').ToList();
+			string last = classes.Last();
+			if (last.Contains('.'))
+			{
+				last = last.Split('.')[0];
+				classes[classes.Count - 1] = last;
+			}
+
+			TreeNode group = parent;
+			while (classes.Count > 0)
+			{
+				string clazz = classes.First();
+				classes.RemoveAt(0);
+
+				if (!_skip.Contains(clazz))
+					group = _AddOrGetClass(group, clazz);
+			}
+
+			string objname = actor.PathName.LastName();
+			var names = objname
+				.Split('_')
+				.Where(s => !_excludes.Contains(s))
+				.ToList()
+				;
+			string id = names.Last();
+			names.Remove(id);
+			string name = string.Join("_", names);
+			string short_title = string.Format("{0} #{1}", name, id);
+			string title = short_title + string.Format(" ({0})", objname);
+
+			// For now, just buildings, no factories
+			Building building = new Building(title, actor, false);
+
+			_AddItem(group, short_title, building);
+		}
+
 		//TODO: Add icon capability?
 		internal TreeNode _AddOrGetClass(TreeNode parent, string name)
 		{
@@ -1371,8 +1437,10 @@ namespace SatisfactorySavegameTool.Panels
 
 		private List<P.Actor> _factories;
 		private List<P.Actor> _buildings;
+		private List<P.Actor> _modded;
 		private Dictionary<string, TreeNode> _classes;
 		private static string[] _excludes = new string[] { "Build", "BP", "C" };
+		private static string[] _skip = new string[] { "Game", "FactoryGame", "Buildable" };
 		private static RegexOptions _default_options = RegexOptions.Compiled | RegexOptions.CultureInvariant;
 		private static Regex _regex_mk = new Regex(@"^(?<group>.+)(?<tier>Mk\d)(?<name>.*)$", _default_options);
 		private static string[] _trading_post = new string[] { "mStorage", "mMAM", "mHubTerminal", "mWorkBench"	};
