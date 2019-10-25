@@ -1737,6 +1737,33 @@ namespace SatisfactorySavegameTool.Panels.Details
 		internal P.Quat _prop;
 	}
 
+	internal class Guid : StringControl
+	{
+		public Guid(IElement parent, string label, object obj)
+			: base(DetailsPanel.EMPTY)
+		{
+			_guid = obj as P.Guid;
+			if (_guid != null && _guid.Value is byte[])
+			{
+				byte[] b_arr = _guid.Value as byte[];
+				if (b_arr.Length == 16)
+				{
+					StringBuilder sb = new StringBuilder(64);
+					for (int i=0; i<4; ++i)
+					{
+						if (i > 0)
+							sb.Append('-');
+						sb.Append(BitConverter.ToUInt32(b_arr, i*4).ToString("X8"));
+					}
+					Value = sb.ToString();
+					IsReadOnly = true;
+				}
+			}
+		}
+
+		private P.Guid _guid;
+	}
+
 	internal class RemovedInstanceArray : PropertyList
 	{
 		public RemovedInstanceArray(IElement parent, string label, object obj)
