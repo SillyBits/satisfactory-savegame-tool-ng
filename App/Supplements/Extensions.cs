@@ -260,6 +260,19 @@ namespace SatisfactorySavegameTool.Supplements
 			return null;
 		}
 
+		// Tries to get .Name from property passed, or null if property has no such value
+		public static string GetName(this P.Property prop)
+		{
+			if (prop is P.ValueProperty)
+			{
+				str s = (prop as P.ValueProperty).Name;
+				if (s != null)
+					return s.ToString();
+			}
+
+			return null;
+		}
+
 
 		// Tries to get a pretty name from property passed in, or null if none found
 		public static string PrettyName(this object val)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -266,6 +267,8 @@ namespace SatisfactorySavegameTool.Dialogs.Difference
 				return _empty;
 			if (value is P.Property)
 				return string.Format("[{0}]", (value as P.Property).TypeName);
+			if (value is P.Properties)
+				return "[Properties]";
 			return value.ToString();
 		}
 
@@ -273,6 +276,37 @@ namespace SatisfactorySavegameTool.Dialogs.Difference
 		{
 			throw new Exception("Not allowed");
 		}
+	}
+
+	// Tooltip converter for node values
+	public class DiffNodeTooltipConverter : IValueConverter
+	{
+		private static string _empty = null;
+
+		public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+		{
+			if (_empty == null)
+				_empty = Translate._("DifferencesDialog.Empty");
+
+			if (value == null)
+				return _empty;
+			if (value is P.Property)
+			{
+				P.Dumper.Dump(value as P.Property, _DumpWriter);
+				string s = _sb.ToString();
+				_sb.Clear();
+				return s;
+			}
+			return value.ToString();
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+		{
+			throw new Exception("Not allowed");
+		}
+
+		private static StringBuilder _sb = new StringBuilder();
+		private static void _DumpWriter(string s) { _sb.Append(s); }
 	}
 
 	// Converter for node colors

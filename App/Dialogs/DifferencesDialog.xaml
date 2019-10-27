@@ -14,6 +14,7 @@
 
 	<Window.Resources>
 		<diff:DiffNodeValueConverter x:Key="diffnodeValueConverter" />
+		<diff:DiffNodeTooltipConverter x:Key="diffnodeTooltipConverter" />
 		<diff:DiffNodeColorConverter x:Key="diffnodeColorConverter" />
 	</Window.Resources>
 
@@ -65,7 +66,7 @@
 								<DataTemplate>
 									<TextBlock Text="{Binding Left, Converter={StaticResource diffnodeValueConverter}}"
 											   Foreground="{Binding Left, Converter={StaticResource diffnodeColorConverter}}"
-											   ToolTip="{Binding Left, Converter={StaticResource diffnodeValueConverter}}" />
+											   ToolTip="{Binding Left, Converter={StaticResource diffnodeTooltipConverter}}" />
 								</DataTemplate>
 							</GridViewColumn.CellTemplate>
 						</GridViewColumn>
@@ -86,7 +87,7 @@
 								<DataTemplate>
 									<TextBlock Text="{Binding Right, Converter={StaticResource diffnodeValueConverter}}"
 											   Foreground="{Binding Right, Converter={StaticResource diffnodeColorConverter}}" 
-											   ToolTip="{Binding Right, Converter={StaticResource diffnodeValueConverter}}" />
+											   ToolTip="{Binding Right, Converter={StaticResource diffnodeTooltipConverter}}" />
 								</DataTemplate>
 							</GridViewColumn.CellTemplate>
 						</GridViewColumn>

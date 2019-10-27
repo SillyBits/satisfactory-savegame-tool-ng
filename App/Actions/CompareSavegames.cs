@@ -95,9 +95,6 @@ namespace SatisfactorySavegameTool.Actions.Compare
 			return await Task.Run(() => {
 				//_progress.CounterFormat = Translate._("Action.Validate.Compare.CounterFormat");
 				_progress.Interval = 1024*1024;//1024 * 128;
-				//var load_task = Task.Run(async() => await _LoadSave(filename_2nd));
-				//load_task.WaitWithDispatch(Application.Current.Dispatcher);
-				//_right_save = load_task.Result;
 				_right_save = _LoadSave(filename_2nd);
 				if (_right_save == null)
 					return (bool?)null;
@@ -107,9 +104,6 @@ namespace SatisfactorySavegameTool.Actions.Compare
 
 				_progress.CounterFormat = Translate._("Action.Compare.Progress.CounterFormat");
 				_progress.Interval = 1000;// -1;
-				//var task = Task.Run(async() => await RunAsync());
-				//task.Wait();//WithDispatch(Application.Current.Dispatcher);
-				//bool outcome = task.Result;
 				Log.Info("Starting up comparison ...");
 				DateTime start_time = DateTime.Now;
 
@@ -126,7 +120,7 @@ namespace SatisfactorySavegameTool.Actions.Compare
 
 		internal Savegame.Savegame _LoadSave(string filename)
 		{
-			Log.Info("Loading 2nd savegame ...");
+			Log.Info("Loading 2nd savegame '{0}' ...", filename);
 			DateTime start_time = DateTime.Now;
 
 			Savegame.Savegame savegame = new Savegame.Savegame(filename);
@@ -159,6 +153,13 @@ namespace SatisfactorySavegameTool.Actions.Compare
 			List<D.DifferenceNode> nodes = new List<D.DifferenceNode>();
 			int differences = 0;
 
+			Func<P.Properties,P.Properties> clone = (src) => {
+				P.Properties dst = new P.Properties();
+				foreach (P.Property prop in src)
+					dst.Add(prop);
+				return dst;
+			};
+
 
 			node = _Compare(_left_save.Header, _right_save.Header);
 			if (node != null)
@@ -169,8 +170,8 @@ namespace SatisfactorySavegameTool.Actions.Compare
 			}
 
 
-			List<P.Property> left_objects  = new List<P.Property>(_left_save.Objects);
-			List<P.Property> right_objects = new List<P.Property>(_right_save.Objects);
+			P.Properties left_objects  = clone(_left_save.Objects);
+			P.Properties right_objects = clone(_right_save.Objects);
 			while (left_objects.Count > 0)
 			{
 				P.Property left = left_objects[0];
@@ -178,7 +179,7 @@ namespace SatisfactorySavegameTool.Actions.Compare
 
 				_cbUpdate(null, left.ToString());
 
-				P.Property right = _FindMatch(left, right_objects);
+				P.Property right = _FindMatchByPath(left, right_objects);
 				if (right == null)
 					sub = new D.DifferenceNode(left.ToString(), left, null);
 				else
@@ -203,8 +204,8 @@ namespace SatisfactorySavegameTool.Actions.Compare
 			}
 
 
-			List<P.Property> left_coll  = new List<P.Property>(_left_save.Collected);
-			List<P.Property> right_coll = new List<P.Property>(_right_save.Collected);
+			P.Properties left_coll  = clone(_left_save.Collected);
+			P.Properties right_coll = clone(_right_save.Collected);
 			while (left_coll.Count > 0)
 			{
 				P.Property left = left_coll[0];
@@ -212,7 +213,7 @@ namespace SatisfactorySavegameTool.Actions.Compare
 
 				_cbUpdate(null, left.ToString());
 
-				P.Property right = _FindMatch(left, right_coll);
+				P.Property right = _FindMatchByPath(left, right_coll);
 				if (right == null)
 					sub = new D.DifferenceNode(left.ToString(), left, null);
 				else
@@ -248,22 +249,6 @@ namespace SatisfactorySavegameTool.Actions.Compare
 			return (differences == 0);
 		}
 
-		internal P.Property _FindMatch(P.Property left, List<P.Property> right_coll)
-		{
-			string left_pathname = left.GetPathName();
-			if (string.IsNullOrEmpty(left_pathname))
-				return null;
-
-			foreach (P.Property right in right_coll)
-			{
-				string right_pathname = right.GetPathName();
-				if (left_pathname.Equals(right_pathname))
-					return right;
-			}
-
-			return null;
-		}
-
 		internal D.DifferenceNode _Compare(P.Property left, P.Property right)
 		{
 			D.DifferenceNode node = new D.DifferenceNode(left.ToString(), left, right);
@@ -271,6 +256,18 @@ namespace SatisfactorySavegameTool.Actions.Compare
 
 			if ((left == null || right == null) && (left != right))
 				return node;
+
+			// Do some by-name blacklisting to skips things like delta timestamps
+			if (left is P.ValueProperty)
+			{
+				P.ValueProperty val_prop = left as P.ValueProperty;
+				if (val_prop.Name != null)
+				{
+					string name = val_prop.Name.ToString();
+					if (_blacklisted.Contains(name))
+						return null;
+				}
+			}
 
 			Dictionary<string, object> left_childs  = new Dictionary<string, object>(left.GetChilds());
 			Dictionary<string, object> right_childs = new Dictionary<string, object>(right.GetChilds());
@@ -339,7 +336,55 @@ namespace SatisfactorySavegameTool.Actions.Compare
 		internal ICallback _callback;
 		internal long _count;
 		internal D.DifferenceModel _differences;
-		private static string[] _blacklisted = { "Private" };
+		private static string[] _blacklisted = { "Private", "mBuildTimeStamp", "mTimeSinceStartStopProducing", "mFogOfWarRawData" };
+
+
+		#region Find strategies
+		internal P.Property _FindMatchByPath(P.Property left, P.Properties right_coll)
+		{
+			string left_pathname = left.GetPathName();
+			if (!string.IsNullOrEmpty(left_pathname))
+			{
+				foreach (P.Property right in right_coll)
+				{
+					string right_pathname = right.GetPathName();
+					if (left_pathname.Equals(right_pathname))
+						return right;
+				}
+			}
+
+			return null;
+		}
+
+		internal P.Property _FindMatchByName(P.Property left, P.Properties right_coll)
+		{
+			string name = left.GetName();
+			if (!string.IsNullOrEmpty(name))
+			{
+				foreach (P.Property right in right_coll)
+				{
+					if (right.GetName() == name)
+						return right;
+				}
+			}
+
+			return null;
+		}
+
+		internal P.Property _FindMatch(P.Property left, P.Properties right_coll)
+		{
+			if (!string.IsNullOrEmpty(left.GetName()))
+				return _FindMatchByName(left, right_coll);
+
+			if (!string.IsNullOrEmpty(left.GetPathName()))
+				return _FindMatchByPath(left, right_coll);
+
+			if (right_coll.Count > 0)
+				return right_coll.First();
+
+			return null;
+		}
+		#endregion
 
 
 		#region Comparison helpers
@@ -362,9 +407,9 @@ namespace SatisfactorySavegameTool.Actions.Compare
 			if (left is long)
 				return state(((long)left - (long)right) == 0);
 			if (left is float)
-				return state(((float)left - (float)right).IsNearZero(1e-10f));
+				return state(((float)left - (float)right).IsNearZero(1e-5f));
 			//if (left is double)
-			//	return state(((double)left - (double)right).IsNearZero(1e-10));
+			//	return state(((double)left - (double)right).IsNearZero(1e-5));
 			if (left is string)
 				return state(((string)left).CompareTo((string)right) == 0);
 
@@ -372,9 +417,57 @@ namespace SatisfactorySavegameTool.Actions.Compare
 			{
 				string left_str  = (left  as F.str).ToString();
 				string right_str = (right as F.str).ToString();
-				//if (string.IsNullOrEmpty(left_str) || string.IsNullOrEmpty(right_str))
-				//	return state(false);
 				return state(left_str.CompareTo(right_str) == 0);
+			}
+
+			if (left is P.Properties)
+			{
+				D.DifferenceNode node = new D.DifferenceNode(null, left, right);
+				D.DifferenceNode sub;
+
+				Func<P.Properties,P.Properties> clone = (src) => {
+					P.Properties dst = new P.Properties();
+					foreach (P.Property prop in src)
+						dst.Add(prop);
+					return dst;
+				};
+				P.Properties left_coll  = clone(left as P.Properties);
+				P.Properties right_coll = clone(right as P.Properties);
+
+				for (int index = 0; index < left_coll.Count; ++index)
+				{
+					P.Property left_sub  = left_coll[index];
+					P.Property right_sub = _FindMatch(left_sub, right_coll);
+					if (right_sub != null)
+						right_coll.Remove(right_sub);
+
+					sub = _Compare(left_sub, right_sub);
+					if (sub != null)
+					{
+						string title = left_sub.PrettyName();
+						if (string.IsNullOrEmpty(title))
+							title = index.ToString();
+						sub.Title = title;
+						node.Add(sub);
+					}
+				}
+				for (int index = 0; index < right_coll.Count; ++index)
+				{
+					P.Property right_sub = right_coll[index];
+					if (right_sub != null)
+					{
+						string name = right_sub.GetName();
+						if (_blacklisted.Contains(name))
+							continue;
+
+						string title = right_sub.PrettyName();
+						if (string.IsNullOrEmpty(title))
+							title = index.ToString();
+						node.Add(title, null, right_sub);
+					}
+				}
+
+				return node.ChildCount > 0 ? node : null;
 			}
 
 			if (left is IDictionary)
