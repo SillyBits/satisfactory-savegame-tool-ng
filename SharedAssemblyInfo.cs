@@ -23,9 +23,9 @@ using System.Windows;
 //	ResourceDictionaryLocation.SourceAssembly
 //)]
 
-[assembly: AssemblyVersion("0.3.*")]
-//[assembly: AssemblyFileVersion("0.3.*")]
-[assembly: AssemblyInformationalVersion("0.3 alpha")]
+[assembly: AssemblyVersion("0.4.*")]
+//[assembly: AssemblyFileVersion("0.4.*")]
+[assembly: AssemblyInformationalVersion("0.4 alpha")]
 
 //#if DEBUG
 //[assembly: AssemblyConfiguration("Debug")]

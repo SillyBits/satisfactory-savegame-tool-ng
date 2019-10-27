@@ -1,4 +1,4 @@
-'Satisfactory Savegame Tool' v0.3 alpha
+'Satisfactory Savegame Tool' v0.4 alpha
 (c) 2019 SillyBits
 
 

@@ -9,8 +9,8 @@ Unicode true
 ; Application specific settings
 !define APPNAME           "Satisfactory Savegame Tool"
 !define APPNAMESHORT      "SatisfactorySavegameTool"
-!define APPVERSION        "0.3 alpha"
-!define APPVERSIONSHORT   "0.3alpha"
+!define APPVERSION        "0.4 alpha"
+!define APPVERSIONSHORT   "0.4alpha"
 !define APPICON           "..\App\Resources\Logo-128x128.ico"
 
 LangString APPNAMEDESKTOP 1033 "Satisfactory Savegame Tool"
