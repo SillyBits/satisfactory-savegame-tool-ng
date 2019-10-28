@@ -1515,11 +1515,18 @@ namespace Savegame
 					ADD_i(pair->Key)
 				else if (*KeyType == "ObjectProperty")
 					ADD(safe_cast<ObjectProperty^>(pair->Key)->GetSize(false))
+				else if (*KeyType == "StrProperty")
+					ADD_s(safe_cast<str^>(pair->Key))
 				else
 					throw gcnew Exception(String::Format("Unknown key type '{0}'", KeyType->ToString()));
 
 				if (*ValueType == "ByteProperty")
-					ADD_b(pair->Value)
+				{
+					if (_handle_byte_as_str)
+						ADD_s(safe_cast<str^>(pair->Value))
+					else
+						ADD_b(pair->Value)
+				}
 				else if (*ValueType == "StructProperty")
 					ADD(safe_cast<PropertyList^>(pair->Value)->GetSize())
 				else
@@ -1529,6 +1536,10 @@ namespace Savegame
 		READ
 			KeyType = reader->ReadString();
 			ValueType = reader->ReadString();
+
+			// Handle special case TMap<StrProp,ByteProp> with 'ByteProp' actually being an "enum as string"
+			_handle_byte_as_str = (*KeyType == "StrProperty") && (*ValueType == "ByteProperty");
+
 			// Seems like only a single null byte here, remain might be an int32 -> Investigate why resp. what the real origin for those
 			CheckNullByte(reader); 
 			CheckNullByte(reader); CheckNullByte(reader); CheckNullByte(reader); CheckNullByte(reader);
@@ -1541,12 +1552,19 @@ namespace Savegame
 					key = reader->ReadInt();
 				else if (*KeyType == "ObjectProperty")
 					key = (gcnew ObjectProperty(this, false))->Read(reader, false);
+				else if (*KeyType == "StrProperty")
+					key = reader->ReadString();
 				else
 					throw gcnew ReadException(reader, String::Format("Unknown key type '{0}'", KeyType->ToString()));
 
 				Object^ value;
 				if (*ValueType == "ByteProperty")
-					value = reader->ReadByte();
+				{
+					if (_handle_byte_as_str)
+						value = reader->ReadString();
+					else
+						value = reader->ReadByte();
+				}
 				else if (*ValueType == "StructProperty")
 					value = (gcnew PropertyList(this))->Read(reader);
 				else
@@ -1570,17 +1588,26 @@ namespace Savegame
 					writer->Write((int)pair->Key);
 				else if (*KeyType == "ObjectProperty")
 					safe_cast<ObjectProperty^>(pair->Key)->Write(writer, false);
+				else if (*KeyType == "StrProperty")
+					writer->Write(safe_cast<str^>(pair->Key));
 				else
 					throw gcnew WriteException(writer, String::Format("Unknown key type '{0}'", KeyType->ToString()));
 
 				if (*ValueType == "ByteProperty")
-					writer->Write((byte)(pair->Value));
+				{
+					if (_handle_byte_as_str)
+						writer->Write(safe_cast<str^>(pair->Value));
+					else
+						writer->Write((byte)(pair->Value));
+				}
 				else if (*ValueType == "StructProperty")
 					safe_cast<PropertyList^>(pair->Value)->Write(writer);
 				else
 					throw gcnew WriteException(writer, String::Format("Unknown value type '{0}'", ValueType->ToString()));
 			}
 		WRITE_END
+	protected:
+		bool _handle_byte_as_str;
 	CLS_END
 	#pragma endregion
 
