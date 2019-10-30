@@ -361,27 +361,27 @@
 	<Build_Workshop_C>Workshop</Build_Workshop_C>
 
 	<!-- Recipes, research, schematics -->
-	<Recipe_AILimiter_C>[Recipe] AILimiter</Recipe_AILimiter_C>
+	<Recipe_AILimiter_C>[Recipe] A.I. Limiter</Recipe_AILimiter_C>
 	<Recipe_Alternate_Beacon_1_C>[Recipe][Alt] Beacon</Recipe_Alternate_Beacon_1_C>
-	<Recipe_Alternate_Cable_1_C>[Recipe][Alt] Cable 1</Recipe_Alternate_Cable_1_C>
-	<Recipe_Alternate_Cable_2_C>[Recipe][Alt] Cable 2</Recipe_Alternate_Cable_2_C>
-	<Recipe_Alternate_CircuitBoard_1_C>[Recipe][Alt] Circuit Board 1</Recipe_Alternate_CircuitBoard_1_C>
-	<Recipe_Alternate_CircuitBoard_2_C>[Recipe][Alt] Circuit Board 2</Recipe_Alternate_CircuitBoard_2_C>
-	<Recipe_Alternate_Coal_1_C>[Recipe][Alt] Coal 1</Recipe_Alternate_Coal_1_C>
-	<Recipe_Alternate_Coal_2_C>[Recipe][Alt] Coal 2</Recipe_Alternate_Coal_2_C>
-	<Recipe_Alternate_Computer_1_C>[Recipe][Alt] Computer 1</Recipe_Alternate_Computer_1_C>
-	<Recipe_Alternate_Computer_2_C>[Recipe][Alt] Computer 2</Recipe_Alternate_Computer_2_C>
+	<Recipe_Alternate_Cable_1_C>[Recipe][Alt] Cable</Recipe_Alternate_Cable_1_C>
+	<Recipe_Alternate_Cable_2_C>[Recipe][Alt] Quickwire Cable</Recipe_Alternate_Cable_2_C>
+	<Recipe_Alternate_CircuitBoard_1_C>[Recipe][Alt] Circuit Board</Recipe_Alternate_CircuitBoard_1_C>
+	<Recipe_Alternate_CircuitBoard_2_C>[Recipe][Alt] Quickwire Circuit Board</Recipe_Alternate_CircuitBoard_2_C>
+	<Recipe_Alternate_Coal_1_C>[Recipe][Alt] Wood Coal</Recipe_Alternate_Coal_1_C>
+	<Recipe_Alternate_Coal_2_C>[Recipe][Alt] Biomass Coal</Recipe_Alternate_Coal_2_C>
+	<Recipe_Alternate_Computer_1_C>[Recipe][Alt] Quickwire Computer</Recipe_Alternate_Computer_1_C>
+	<Recipe_Alternate_Computer_2_C>[Recipe][Alt] Crystal Computer</Recipe_Alternate_Computer_2_C>
 	<Recipe_Alternate_Concrete_C>[Recipe][Alt] Concrete</Recipe_Alternate_Concrete_C>
 	<Recipe_Alternate_CrystalOscillator_C>[Recipe][Alt] Crystal Oscillator</Recipe_Alternate_CrystalOscillator_C>
-	<Recipe_Alternate_ElectromagneticControlRod_1_C>[Recipe][Alt] Electromagnetic ControlRod</Recipe_Alternate_ElectromagneticControlRod_1_C>
+	<Recipe_Alternate_ElectromagneticControlRod_1_C>[Recipe][Alt] Electromagnetic Control Rod</Recipe_Alternate_ElectromagneticControlRod_1_C>
 	<Recipe_Alternate_EncasedIndustrialBeam_C>[Recipe][Alt] Encased Industrial Beam</Recipe_Alternate_EncasedIndustrialBeam_C>
 	<Recipe_Alternate_EnrichedCoal_C>[Recipe][Alt] Enriched Coal</Recipe_Alternate_EnrichedCoal_C>
-	<Recipe_Alternate_Gunpowder_1_C>[Recipe][Alt] Gunpowder</Recipe_Alternate_Gunpowder_1_C>
+	<Recipe_Alternate_Gunpowder_1_C>[Recipe][Alt] Black Powder</Recipe_Alternate_Gunpowder_1_C>
 	<Recipe_Alternate_HeatSink_1_C>[Recipe][Alt] Heat Sink</Recipe_Alternate_HeatSink_1_C>
-	<Recipe_Alternate_HighSpeedConnector_C>[Recipe][Alt] HighSpeedConnector</Recipe_Alternate_HighSpeedConnector_C>
-	<Recipe_Alternate_IngotIron_C>[Recipe][Alt] IngotIron</Recipe_Alternate_IngotIron_C>
-	<Recipe_Alternate_IngotSteel_1_C>[Recipe][Alt] Steel Ingot 1</Recipe_Alternate_IngotSteel_1_C>
-	<Recipe_Alternate_IngotSteel_2_C>[Recipe][Alt] Steel Ingot 2</Recipe_Alternate_IngotSteel_2_C>
+	<Recipe_Alternate_HighSpeedConnector_C>[Recipe][Alt] High-Speed Connector</Recipe_Alternate_HighSpeedConnector_C>
+	<Recipe_Alternate_IngotIron_C>[Recipe][Alt] Iron Ingot Alloy</Recipe_Alternate_IngotIron_C>
+	<Recipe_Alternate_IngotSteel_1_C>[Recipe][Alt] Steel Ingot</Recipe_Alternate_IngotSteel_1_C>
+	<Recipe_Alternate_IngotSteel_2_C>[Recipe][Alt] Enriched Steel Ingot</Recipe_Alternate_IngotSteel_2_C>
 	<Recipe_Alternate_ModularFrame_C>[Recipe][Alt] Modular Frame</Recipe_Alternate_ModularFrame_C>
 	<Recipe_Alternate_ModularFrameHeavy_C>[Recipe][Alt] Heavy Modular Frame</Recipe_Alternate_ModularFrameHeavy_C>
 	<Recipe_Alternate_Motor_1_C>[Recipe][Alt] Motor</Recipe_Alternate_Motor_1_C>
@@ -391,18 +391,18 @@
 	<Recipe_Alternate_Quickwire_C>[Recipe][Alt] Quickwire</Recipe_Alternate_Quickwire_C>
 	<Recipe_Alternate_RadioControlUnit_1_C>[Recipe][Alt] Radio Control Unit</Recipe_Alternate_RadioControlUnit_1_C>
 	<Recipe_Alternate_ReinforcedIronPlate_1_C>[Recipe][Alt] Reinforced Iron Plate</Recipe_Alternate_ReinforcedIronPlate_1_C>
-	<Recipe_Alternate_ReinforcedIronPlate_2_C>[Recipe][Alt] Reinforced Iron Plate</Recipe_Alternate_ReinforcedIronPlate_2_C>
+	<Recipe_Alternate_ReinforcedIronPlate_2_C>[Recipe][Alt] Stitched Iron Plate</Recipe_Alternate_ReinforcedIronPlate_2_C>
 	<Recipe_Alternate_Rotor_C>[Recipe][Alt] Rotor</Recipe_Alternate_Rotor_C>
-	<Recipe_Alternate_Screw_C>[Recipe][Alt] Screw 1</Recipe_Alternate_Screw_C>
-	<Recipe_Alternate_Screw_2_C>[Recipe][Alt] Screw 2</Recipe_Alternate_Screw_2_C>
+	<Recipe_Alternate_Screw_C>[Recipe][Alt] Screw</Recipe_Alternate_Screw_C>
+	<Recipe_Alternate_Screw_2_C>[Recipe][Alt] Steel Screw</Recipe_Alternate_Screw_2_C>
 	<Recipe_Alternate_Silica_C>[Recipe][Alt] Silica</Recipe_Alternate_Silica_C>
 	<Recipe_Alternate_Stator_C>[Recipe][Alt] Stator</Recipe_Alternate_Stator_C>
 	<Recipe_Alternate_TurboMotor_1_C>[Recipe][Alt] Turbo Motor</Recipe_Alternate_TurboMotor_1_C>
-	<Recipe_Alternate_Turbofuel_C>[Recipe][Alt] Turbo Fuel</Recipe_Alternate_Turbofuel_C>
+	<Recipe_Alternate_Turbofuel_C>[Recipe][Alt] Turbofuel</Recipe_Alternate_Turbofuel_C>
 	<Recipe_Alternate_UraniumCell_1_C>[Recipe][Alt] Uranium Cell</Recipe_Alternate_UraniumCell_1_C>
-	<Recipe_Alternate_Wire_1_C>[Recipe][Alt] Wire 1</Recipe_Alternate_Wire_1_C>
-	<Recipe_Alternate_Wire_2_C>[Recipe][Alt] Wire 2</Recipe_Alternate_Wire_2_C>
-	<Recipe_AluminumSheet_C>[Recipe] Aluminum Sheet</Recipe_AluminumSheet_C>
+	<Recipe_Alternate_Wire_1_C>[Recipe][Alt] Iron Wire</Recipe_Alternate_Wire_1_C>
+	<Recipe_Alternate_Wire_2_C>[Recipe][Alt] Caterium Wire</Recipe_Alternate_Wire_2_C>
+	<Recipe_AluminumSheet_C>[Recipe] Alclad Aluminum Sheet</Recipe_AluminumSheet_C>
 	<Recipe_AssemblerMk1_C>[Recipe] Assembler Mk1</Recipe_AssemblerMk1_C>
 	<Recipe_Battery_C>[Recipe] Battery</Recipe_Battery_C>
 	<Recipe_Beacon_C>[Recipe] Beacon</Recipe_Beacon_C>
@@ -420,11 +420,11 @@
 	<Recipe_ColorCartridge_C>[Recipe] Color Cartridge</Recipe_ColorCartridge_C>
 	<Recipe_ColorGun_C>[Recipe] Color Gun</Recipe_ColorGun_C>
 	<Recipe_Computer_C>[Recipe] Computer</Recipe_Computer_C>
-	<Recipe_ComputerSuper_C>[Recipe] Super Computer</Recipe_ComputerSuper_C>
+	<Recipe_ComputerSuper_C>[Recipe] Super^computer</Recipe_ComputerSuper_C>
 	<Recipe_Concrete_C>[Recipe] Concrete</Recipe_Concrete_C>
 	<Recipe_ConstructorMk1_C>[Recipe] Constructor Mk1</Recipe_ConstructorMk1_C>
-	<Recipe_ConveyorAttachmentMerger_C>[Recipe] Merger</Recipe_ConveyorAttachmentMerger_C>
-	<Recipe_ConveyorAttachmentSplitter_C>[Recipe] Splitter</Recipe_ConveyorAttachmentSplitter_C>
+	<Recipe_ConveyorAttachmentMerger_C>[Recipe] Conveyor Merger</Recipe_ConveyorAttachmentMerger_C>
+	<Recipe_ConveyorAttachmentSplitter_C>[Recipe] Conveyor Splitter</Recipe_ConveyorAttachmentSplitter_C>
 	<Recipe_ConveyorAttachmentSplitterProgrammable_C>[Recipe] Programmable Splitter</Recipe_ConveyorAttachmentSplitterProgrammable_C>
 	<Recipe_ConveyorAttachmentSplitterSmart_C>[Recipe] Smart Splitter</Recipe_ConveyorAttachmentSplitterSmart_C>
 	<Recipe_ConveyorBeltMk1_C>[Recipe] Conveyor Belt Mk1</Recipe_ConveyorBeltMk1_C>
@@ -445,43 +445,43 @@
 	<Recipe_EncasedIndustrialBeam_C>[Recipe] Encased Industrial Beam</Recipe_EncasedIndustrialBeam_C>
 	<Recipe_Explorer_C>[Recipe] Explorer</Recipe_Explorer_C>
 	<Recipe_Fabric_C>[Recipe] Fabric</Recipe_Fabric_C>
-	<Recipe_FilterGasMask_C>[Recipe] Filter Gas Mask</Recipe_FilterGasMask_C>
-	<Recipe_FilterHazmat_C>[Recipe] Filter Hazmat</Recipe_FilterHazmat_C>
+	<Recipe_FilterGasMask_C>[Recipe] Filter</Recipe_FilterGasMask_C>
+	<Recipe_FilterHazmat_C>[Recipe] Iodine Infused Filter</Recipe_FilterHazmat_C>
 	<Recipe_Foundation_8x1_01_C>[Recipe] Foundation 8x1</Recipe_Foundation_8x1_01_C>
 	<Recipe_Foundation_8x2_01_C>[Recipe] Foundation 8x2</Recipe_Foundation_8x2_01_C>
 	<Recipe_Foundation_8x4_01_C>[Recipe] Foundation 8x4</Recipe_Foundation_8x4_01_C>
-	<Recipe_FreightWagon_C>[Recipe] Freight Wagon</Recipe_FreightWagon_C>
+	<Recipe_FreightWagon_C>[Recipe] Freight Car</Recipe_FreightWagon_C>
 	<Recipe_Fuel_C>[Recipe] Fuel</Recipe_Fuel_C>
-	<Recipe_Gasmask_C>[Recipe] Gasmask</Recipe_Gasmask_C>
-	<Recipe_GeneratorBiomass_C>[Recipe] Biomass Generator</Recipe_GeneratorBiomass_C>
+	<Recipe_Gasmask_C>[Recipe] Gas Mask</Recipe_Gasmask_C>
+	<Recipe_GeneratorBiomass_C>[Recipe] Biomass Burner</Recipe_GeneratorBiomass_C>
 	<Recipe_GeneratorCoal_C>[Recipe] Coal Generator</Recipe_GeneratorCoal_C>
 	<Recipe_GeneratorFuel_C>[Recipe] Fuel Generator</Recipe_GeneratorFuel_C>
-	<Recipe_GeneratorGeoThermal_C>[Recipe] Geothermal Generator</Recipe_GeneratorGeoThermal_C>
+	<Recipe_GeneratorGeoThermal_C>[Recipe] Geo Thermal Generator</Recipe_GeneratorGeoThermal_C>
 	<Recipe_GeneratorIntegratedBiomass_C>[Recipe] Biomass Generator Integrated</Recipe_GeneratorIntegratedBiomass_C>
-	<Recipe_GeneratorNuclear_C>[Recipe] Nuclear Generator</Recipe_GeneratorNuclear_C>
-	<Recipe_Gunpowder_C>[Recipe] Gunpowder</Recipe_Gunpowder_C>
+	<Recipe_GeneratorNuclear_C>[Recipe] Nuclear Power Plant</Recipe_GeneratorNuclear_C>
+	<Recipe_Gunpowder_C>[Recipe] Black Powder</Recipe_Gunpowder_C>
 	<Recipe_HazmatSuit_C>[Recipe] Hazmat Suit</Recipe_HazmatSuit_C>
 	<Recipe_HeatSink_C>[Recipe] Heat Sink</Recipe_HeatSink_C>
 	<Recipe_HighSpeedConnector_C>[Recipe] High-Speed Connector</Recipe_HighSpeedConnector_C>
 	<Recipe_HubTerminal_C>[Recipe] Hub Terminal</Recipe_HubTerminal_C>
-	<Recipe_IngotAluminum_C>[Recipe] Ingot Aluminum</Recipe_IngotAluminum_C>
-	<Recipe_IngotCaterium_C>[Recipe] Ingot Caterium</Recipe_IngotCaterium_C>
-	<Recipe_IngotCopper_C>[Recipe] Ingot Copper</Recipe_IngotCopper_C>
-	<Recipe_IngotIron_C>[Recipe] Ingot Iron</Recipe_IngotIron_C>
-	<Recipe_IngotSteel_C>[Recipe] Ingot Steel</Recipe_IngotSteel_C>
+	<Recipe_IngotAluminum_C>[Recipe] Aluminum Ingot</Recipe_IngotAluminum_C>
+	<Recipe_IngotCaterium_C>[Recipe] Caterium Ingot</Recipe_IngotCaterium_C>
+	<Recipe_IngotCopper_C>[Recipe] Copper Ingot</Recipe_IngotCopper_C>
+	<Recipe_IngotIron_C>[Recipe] Iron Ingot</Recipe_IngotIron_C>
+	<Recipe_IngotSteel_C>[Recipe] Steel Ingot</Recipe_IngotSteel_C>
 	<Recipe_IronPlate_C>[Recipe] Iron Plate</Recipe_IronPlate_C>
 	<Recipe_IronPlateReinforced_C>[Recipe] Reinforced Iron Plate</Recipe_IronPlateReinforced_C>
 	<Recipe_IronRod_C>[Recipe] Iron Rod</Recipe_IronRod_C>
 	<Recipe_JetPack_C>[Recipe] Jet Pack</Recipe_JetPack_C>
 	<Recipe_JumpPad_C>[Recipe] Jump Pad</Recipe_JumpPad_C>
-	<Recipe_JumpPadTilted_C>[Recipe] Jump Pad Tilted</Recipe_JumpPadTilted_C>
+	<Recipe_JumpPadTilted_C>[Recipe] Tilted Jump Pad</Recipe_JumpPadTilted_C>
 	<Recipe_Limestone_C>[Recipe] Limestone</Recipe_Limestone_C>
-	<Recipe_Locomotive_C>[Recipe] Locomotive</Recipe_Locomotive_C>
+	<Recipe_Locomotive_C>[Recipe] Electric Locomotive</Recipe_Locomotive_C>
 	<Recipe_LookoutTower_C>[Recipe] Lookout Tower</Recipe_LookoutTower_C>
 	<Recipe_MamIntegrated_C>[Recipe] Mam Integrated</Recipe_MamIntegrated_C>
 	<Recipe_ManufacturerMk1_C>[Recipe] Manufacturer Mk1</Recipe_ManufacturerMk1_C>
 	<Recipe_MedicinalInhaler_C>[Recipe] Medicinal Inhaler</Recipe_MedicinalInhaler_C>
-	<Recipe_MedicinalInhalerAlienOrgans_C>[Recipe] Medicinal Inhaler (Alien Organs)</Recipe_MedicinalInhalerAlienOrgans_C>
+	<Recipe_MedicinalInhalerAlienOrgans_C>[Recipe] Medicinal Inhaler: Alien Organs</Recipe_MedicinalInhalerAlienOrgans_C>
 	<Recipe_MinerMk1_C>[Recipe] Miner Mk1</Recipe_MinerMk1_C>
 	<Recipe_MinerMk2_C>[Recipe] Miner Mk2</Recipe_MinerMk2_C>
 	<Recipe_MinerMk3_C>[Recipe] Miner Mk3</Recipe_MinerMk3_C>
@@ -495,17 +495,17 @@
 	<Recipe_ObjectScanner_C>[Recipe] Object Scanner</Recipe_ObjectScanner_C>
 	<Recipe_OilPump_C>[Recipe] Oil Pump</Recipe_OilPump_C>
 	<Recipe_OilRefinery_C>[Recipe] Oil Refinery</Recipe_OilRefinery_C>
-	<Recipe_OreBauxite_C>[Recipe] Ore Bauxite</Recipe_OreBauxite_C>
-	<Recipe_OreCaterium_C>[Recipe] Ore Caterium</Recipe_OreCaterium_C>
-	<Recipe_OreCopper_C>[Recipe] Ore Copper</Recipe_OreCopper_C>
-	<Recipe_OreIron_C>[Recipe] Ore Iron</Recipe_OreIron_C>
-	<Recipe_OreUranium_C>[Recipe] Ore Uranium</Recipe_OreUranium_C>
+	<Recipe_OreBauxite_C>[Recipe] Bauxite</Recipe_OreBauxite_C>
+	<Recipe_OreCaterium_C>[Recipe] Caterium Ore</Recipe_OreCaterium_C>
+	<Recipe_OreCopper_C>[Recipe] Copper Ore</Recipe_OreCopper_C>
+	<Recipe_OreIron_C>[Recipe] Iron Ore</Recipe_OreIron_C>
+	<Recipe_OreUranium_C>[Recipe] Uranium</Recipe_OreUranium_C>
 	<Recipe_Parachute_C>[Recipe] Parachute</Recipe_Parachute_C>
 	<Recipe_Plastic_C>[Recipe] Plastic</Recipe_Plastic_C>
 	<Recipe_PortableMiner_C>[Recipe] Portable Miner</Recipe_PortableMiner_C>
-	<Recipe_PowerCrystalShard_1_C>[Recipe] Power Crystal Shard 1</Recipe_PowerCrystalShard_1_C>
-	<Recipe_PowerCrystalShard_2_C>[Recipe] Power Crystal Shard 2</Recipe_PowerCrystalShard_2_C>
-	<Recipe_PowerCrystalShard_3_C>[Recipe] Power Crystal Shard 3</Recipe_PowerCrystalShard_3_C>
+	<Recipe_PowerCrystalShard_1_C>[Recipe] Power Shard (1)</Recipe_PowerCrystalShard_1_C>
+	<Recipe_PowerCrystalShard_2_C>[Recipe] Power Shard (2)</Recipe_PowerCrystalShard_2_C>
+	<Recipe_PowerCrystalShard_3_C>[Recipe] Power Shard (5)</Recipe_PowerCrystalShard_3_C>
 	<Recipe_PowerLine_C>[Recipe] Power Line</Recipe_PowerLine_C>
 	<Recipe_PowerPoleMk1_C>[Recipe] Power Pole Mk1</Recipe_PowerPoleMk1_C>
 	<Recipe_PowerPoleMk2_C>[Recipe] Power Pole Mk2</Recipe_PowerPoleMk2_C>
@@ -514,7 +514,7 @@
 	<Recipe_Quickwire_C>[Recipe] Quickwire</Recipe_Quickwire_C>
 	<Recipe_RadarTower_C>[Recipe] Radar Tower</Recipe_RadarTower_C>
 	<Recipe_RadioControlUnit_C>[Recipe] Radio Control Unit</Recipe_RadioControlUnit_C>
-	<Recipe_RailroadTrack_C>[Recipe] Railroad Track</Recipe_RailroadTrack_C>
+	<Recipe_RailroadTrack_C>[Recipe] Railway</Recipe_RailroadTrack_C>
 	<Recipe_RailroadTrackIntegrated_C>[Recipe] Railroad Track Integrated</Recipe_RailroadTrackIntegrated_C>
 	<Recipe_Ramp_8x1_01_C>[Recipe] Ramp 8x1</Recipe_Ramp_8x1_01_C>
 	<Recipe_Ramp_8x2_01_C>[Recipe] Ramp 8x2</Recipe_Ramp_8x2_01_C>
@@ -525,9 +525,10 @@
 	<Recipe_Rubber_C>[Recipe] Rubber</Recipe_Rubber_C>
 	<Recipe_Screw_C>[Recipe] Screw</Recipe_Screw_C>
 	<Recipe_Silica_C>[Recipe] Silica</Recipe_Silica_C>
-	<Recipe_SmelterMk1_C>[Recipe] Smelter Mk1</Recipe_SmelterMk1_C>
+	<Recipe_SmelterBasicMk1_C>[Recipe] Smelter</Recipe_SmelterBasicMk1_C>
+	<Recipe_SmelterMk1_C>[Recipe] Foundry</Recipe_SmelterMk1_C>
 	<Recipe_SpaceElevator_C>[Recipe] Space Elevator</Recipe_SpaceElevator_C>
-	<Recipe_SpaceRifleMk1_C>[Recipe] Space Rifle Mk1</Recipe_SpaceRifleMk1_C>
+	<Recipe_SpaceRifleMk1_C>[Recipe] Rifle</Recipe_SpaceRifleMk1_C>
 	<Recipe_SpikedRebar_C>[Recipe] Spiked Rebar</Recipe_SpikedRebar_C>
 	<!--Recipe_Stair_1b_C>[Recipe] Stair_1b</Recipe_Stair_1b_C-->
 	<Recipe_Stairs_Left_01_C>[Recipe] Stairs Left</Recipe_Stairs_Left_01_C>
@@ -538,18 +539,21 @@
 	<Recipe_StorageContainerMk1_C>[Recipe] Storage Container Mk1</Recipe_StorageContainerMk1_C>
 	<Recipe_StorageContainerMk2_C>[Recipe] Storage Container Mk2</Recipe_StorageContainerMk2_C>
 	<Recipe_StorageIntegrated_C>[Recipe] Storage Integrated</Recipe_StorageIntegrated_C>
-	<Recipe_StoragePlayer_C>[Recipe] Player Storage</Recipe_StoragePlayer_C>
+	<Recipe_StoragePlayer_C>[Recipe] Personal Storage Box</Recipe_StoragePlayer_C>
 	<Recipe_Sulfur_C>[Recipe] Sulfur</Recipe_Sulfur_C>
 	<Recipe_Tractor_C>[Recipe] Tractor</Recipe_Tractor_C>
-	<Recipe_TradingPost_C>[Recipe] Trading Post</Recipe_TradingPost_C>
+	<Recipe_TradingPost_C>[Recipe] The HUB</Recipe_TradingPost_C>
+	<Recipe_TrainDockingStation_C>[Recipe] Freight Platform</Recipe_TrainDockingStation_C>
+	<Recipe_TrainPlatformEmpty_C>[Recipe] Empty Platform</Recipe_TrainPlatformEmpty_C>
+	<Recipe_TrainStation_C>[Recipe] Train Station</Recipe_TrainStation_C>
 	<Recipe_Truck_C>[Recipe] Truck</Recipe_Truck_C>
 	<Recipe_TruckStation_C>[Recipe] Truck Station</Recipe_TruckStation_C>
-	<Recipe_UJellyLandingPad_C>[Recipe] UJelly Landing Pad</Recipe_UJellyLandingPad_C>
+	<Recipe_UJellyLandingPad_C>[Recipe] U-Jelly Landing Pad</Recipe_UJellyLandingPad_C>
 	<Recipe_UraniumCell_C>[Recipe] Uranium Cell</Recipe_UraniumCell_C>
-	<Recipe_Walkway_Cross_C>[Recipe] Walkway Cross</Recipe_Walkway_Cross_C>
+	<Recipe_Walkway_Cross_C>[Recipe] Walkway Crossing</Recipe_Walkway_Cross_C>
 	<Recipe_Walkway_Ramp_C>[Recipe] Walkway Ramp</Recipe_Walkway_Ramp_C>
 	<Recipe_Walkway_Straight_C>[Recipe] Walkway Straight</Recipe_Walkway_Straight_C>
-	<Recipe_Walkway_T_C>[Recipe] Walkway T-Intersection</Recipe_Walkway_T_C>
+	<Recipe_Walkway_T_C>[Recipe] Walkway T-Turn</Recipe_Walkway_T_C>
 	<Recipe_Walkway_Turn_C>[Recipe] Walkway Turn</Recipe_Walkway_Turn_C>
 	<Recipe_Wall_8x4_01_C>[Recipe] Wall 8x4</Recipe_Wall_8x4_01_C>
 	<Recipe_Wall_8x4_02_C>[Recipe] Wall 8x4</Recipe_Wall_8x4_02_C>
@@ -569,9 +573,9 @@
 	<Recipe_Wall_Door_8x4_03_Steel_C>[Recipe] Wall Door Right 8x4 Steel</Recipe_Wall_Door_8x4_03_Steel_C>
 	<Recipe_Wall_Gate_8x4_01_C>[Recipe] Wall Gate 8x4</Recipe_Wall_Gate_8x4_01_C>
 	<Recipe_Wire_C>[Recipe] Wire</Recipe_Wire_C>
-	<Recipe_WorkBench_C>[Recipe] Work Bench</Recipe_WorkBench_C>
+	<Recipe_WorkBench_C>[Recipe] Craft Bench</Recipe_WorkBench_C>
 	<Recipe_WorkBenchIntegrated_C>[Recipe] Work Bench Integrated</Recipe_WorkBenchIntegrated_C>
-	<Recipe_Workshop_C>[Recipe] Workshop</Recipe_Workshop_C>
+	<Recipe_Workshop_C>[Recipe] Equipment Workshop</Recipe_Workshop_C>
 	<Recipe_XenoBasher_C>[Recipe] Xeno Basher</Recipe_XenoBasher_C>
 	<Recipe_XenoZapper_C>[Recipe] Xeno Zapper</Recipe_XenoZapper_C>
 	
@@ -597,49 +601,49 @@
 	<ResearchRecipe_Sulfur1_C>[Research] Sulfur 1</ResearchRecipe_Sulfur1_C>
 	<ResearchRecipe_Sulfur2_C>[Research] Sulfur 2</ResearchRecipe_Sulfur2_C>
 	
-	<Schematic_1-1_C>Schematic_1-1</Schematic_1-1_C>
-	<Schematic_1-2_C>Schematic_1-2</Schematic_1-2_C>
-	<Schematic_1-3_C>Schematic_1-3</Schematic_1-3_C>
-	<Schematic_1-5_C>Schematic_1-5</Schematic_1-5_C>
-	<Schematic_2-1_C>Schematic_2-1</Schematic_2-1_C>
-	<Schematic_2-2_C>Schematic_2-2</Schematic_2-2_C>
-	<Schematic_2-3_C>Schematic_2-3</Schematic_2-3_C>
-	<Schematic_2-4_C>Schematic_2-4</Schematic_2-4_C>
-	<Schematic_3-1_C>Schematic_3-1</Schematic_3-1_C>
-	<Schematic_3-2_C>Schematic_3-2</Schematic_3-2_C>
-	<Schematic_4-1_C>Schematic_4-1</Schematic_4-1_C>
-	<Schematic_4-2_C>Schematic_4-2</Schematic_4-2_C>
-	<Schematic_5-1_C>Schematic_5-1</Schematic_5-1_C>
-	<Schematic_5-2_C>Schematic_5-2</Schematic_5-2_C>
-	<Schematic_5-3_C>Schematic_5-3</Schematic_5-3_C>
-	<Schematic_6-1_C>Schematic_6-1</Schematic_6-1_C>
-	<Schematic_6-2_C>Schematic_6-2</Schematic_6-2_C>
-	<Schematic_6-3_C>Schematic_6-3</Schematic_6-3_C>
-	<Schematic_6-4_C>Schematic_6-4</Schematic_6-4_C>
-	<Schematic_7-1_C>Schematic_7-1</Schematic_7-1_C>
-	<Schematic_7-2_C>Schematic_7-2</Schematic_7-2_C>
+	<Schematic_1-1_C>[Schematic] Utility</Schematic_1-1_C>
+	<Schematic_1-2_C>[Schematic] Logistics</Schematic_1-2_C>
+	<Schematic_1-3_C>[Schematic] Personal Storage</Schematic_1-3_C>
+	<Schematic_1-5_C>[Schematic] Conveyor Walls</Schematic_1-5_C>
+	<Schematic_2-1_C>[Schematic] Part Assembly</Schematic_2-1_C>
+	<Schematic_2-2_C>[Schematic] Obstacle Clearing</Schematic_2-2_C>
+	<Schematic_2-3_C>[Schematic] Jump Pads</Schematic_2-3_C>
+	<Schematic_2-4_C>[Schematic] Walkways</Schematic_2-4_C>
+	<Schematic_3-1_C>[Schematic] Coal Power</Schematic_3-1_C>
+	<Schematic_3-2_C>[Schematic] Logistics Mk.2</Schematic_3-2_C>
+	<Schematic_4-1_C>[Schematic] Steel Production</Schematic_4-1_C>
+	<Schematic_4-2_C>[Schematic] Improved Melee Combat</Schematic_4-2_C>
+	<Schematic_5-1_C>[Schematic] Oil Processing</Schematic_5-1_C>
+	<Schematic_5-2_C>[Schematic] Industrial Manufacturing</Schematic_5-2_C>
+	<Schematic_5-3_C>[Schematic] Logistics Mk.3</Schematic_5-3_C>
+	<Schematic_6-1_C>[Schematic] Expanded Power Infrastructure</Schematic_6-1_C>
+	<Schematic_6-2_C>[Schematic] Jetpack</Schematic_6-2_C>
+	<Schematic_6-3_C>[Schematic] Monorail Train Technology</Schematic_6-3_C>
+	<Schematic_6-4_C>[Schematic] Gas Mask</Schematic_6-4_C>
+	<Schematic_7-1_C>[Schematic] Nuclear Power</Schematic_7-1_C>
+	<Schematic_7-2_C>[Schematic] Bayer Process</Schematic_7-2_C>
 	<Schematic_Alternate_Beacon1_C>[Schematic][Alt] Beacon</Schematic_Alternate_Beacon1_C>
-	<Schematic_Alternate_Cable1_C>[Schematic][Alt] Cable 1</Schematic_Alternate_Cable1_C>
-	<Schematic_Alternate_Cable2_C>[Schematic][Alt] Cable 2</Schematic_Alternate_Cable2_C>
-	<Schematic_Alternate_CircuitBoard1_C>[Schematic][Alt] Circuit Board 1</Schematic_Alternate_CircuitBoard1_C>
-	<Schematic_Alternate_CircuitBoard2_C>[Schematic][Alt] Circuit Board 2</Schematic_Alternate_CircuitBoard2_C>
-	<Schematic_Alternate_Coal1_C>[Schematic][Alt] Coal 1</Schematic_Alternate_Coal1_C>
-	<Schematic_Alternate_Coal2_C>[Schematic][Alt] Coal 2</Schematic_Alternate_Coal2_C>
-	<Schematic_Alternate_Computer1_C>[Schematic][Alt] Computer 1</Schematic_Alternate_Computer1_C>
-	<Schematic_Alternate_Computer2_C>[Schematic][Alt] Computer 2</Schematic_Alternate_Computer2_C>
+	<Schematic_Alternate_Cable1_C>[Schematic][Alt] Rubber Cable</Schematic_Alternate_Cable1_C>
+	<Schematic_Alternate_Cable2_C>[Schematic][Alt] Quickwire Cable</Schematic_Alternate_Cable2_C>
+	<Schematic_Alternate_CircuitBoard1_C>[Schematic][Alt] Circuit Board</Schematic_Alternate_CircuitBoard1_C>
+	<Schematic_Alternate_CircuitBoard2_C>[Schematic][Alt] Caterium Circuit Board</Schematic_Alternate_CircuitBoard2_C>
+	<Schematic_Alternate_Coal1_C>[Schematic][Alt] Wood Coal</Schematic_Alternate_Coal1_C>
+	<Schematic_Alternate_Coal2_C>[Schematic][Alt] Biomass Coal</Schematic_Alternate_Coal2_C>
+	<Schematic_Alternate_Computer1_C>[Schematic][Alt] Caterium Computer</Schematic_Alternate_Computer1_C>
+	<Schematic_Alternate_Computer2_C>[Schematic][Alt] Computer</Schematic_Alternate_Computer2_C>
 	<Schematic_Alternate_Concrete_C>[Schematic][Alt] Concrete</Schematic_Alternate_Concrete_C>
 	<Schematic_Alternate_CrystalOscillator_C>[Schematic][Alt] Crystal Oscillator</Schematic_Alternate_CrystalOscillator_C>
 	<Schematic_Alternate_ElectromagneticControlRod1_C>[Schematic][Alt] Electromagnetic Control Rod</Schematic_Alternate_ElectromagneticControlRod1_C>
 	<Schematic_Alternate_EnrichedCoal_C>[Schematic][Alt] Enriched Coal</Schematic_Alternate_EnrichedCoal_C>
-	<Schematic_Alternate_Gunpowder1_C>[Schematic][Alt] Gunpowder</Schematic_Alternate_Gunpowder1_C>
+	<Schematic_Alternate_Gunpowder1_C>[Schematic][Alt] Black Powder</Schematic_Alternate_Gunpowder1_C>
 	<Schematic_Alternate_HeatSink1_C>[Schematic][Alt] Heat Sink</Schematic_Alternate_HeatSink1_C>
 	<Schematic_Alternate_HeavyModularFrame_C>[Schematic][Alt] Heavy Modular Frame</Schematic_Alternate_HeavyModularFrame_C>
 	<Schematic_Alternate_HighSpeedConnector_C>[Schematic][Alt] High-Speed Connector</Schematic_Alternate_HighSpeedConnector_C>
-	<Schematic_Alternate_IngotIron_C>[Schematic][Alt] Ingot Iron</Schematic_Alternate_IngotIron_C>
-	<Schematic_Alternate_IngotSteel1_C>[Schematic][Alt] Ingot Steel 1</Schematic_Alternate_IngotSteel1_C>
-	<Schematic_Alternate_IngotSteel2_C>[Schematic][Alt] Ingot Steel 2</Schematic_Alternate_IngotSteel2_C>
-	<Schematic_Alternate_InventorySlots1_C>[Schematic][Alt] Inventory Slots 1</Schematic_Alternate_InventorySlots1_C>
-	<Schematic_Alternate_InventorySlots2_C>[Schematic][Alt] Inventory Slots 2</Schematic_Alternate_InventorySlots2_C>
+	<Schematic_Alternate_IngotIron_C>[Schematic][Alt] Iron Ingot</Schematic_Alternate_IngotIron_C>
+	<Schematic_Alternate_IngotSteel1_C>[Schematic][Alt] Steel Ingot</Schematic_Alternate_IngotSteel1_C>
+	<Schematic_Alternate_IngotSteel2_C>[Schematic][Alt] Enriched Steel Ingot</Schematic_Alternate_IngotSteel2_C>
+	<Schematic_Alternate_InventorySlots1_C>[Schematic][Alt] Expanded Pocket Dimension</Schematic_Alternate_InventorySlots1_C>
+	<Schematic_Alternate_InventorySlots2_C>[Schematic][Alt] Inflated Pocket Dimension</Schematic_Alternate_InventorySlots2_C>
 	<Schematic_Alternate_ModularFrame_C>[Schematic][Alt] Modular Frame</Schematic_Alternate_ModularFrame_C>
 	<Schematic_Alternate_Motor1_C>[Schematic][Alt] Motor</Schematic_Alternate_Motor1_C>
 	<Schematic_Alternate_Nobelisk1_C>[Schematic][Alt] Nobelisk</Schematic_Alternate_Nobelisk1_C>
@@ -647,44 +651,44 @@
 	<Schematic_Alternate_Plastic1_C>[Schematic][Alt] Plastic</Schematic_Alternate_Plastic1_C>
 	<Schematic_Alternate_Quickwire_C>[Schematic][Alt] Quickwire</Schematic_Alternate_Quickwire_C>
 	<Schematic_Alternate_RadioControlUnit1_C>[Schematic][Alt] Radio Control Unit</Schematic_Alternate_RadioControlUnit1_C>
-	<Schematic_Alternate_ReinforcedIronPlate1_C>[Schematic][Alt] Reinforced Iron Plate 1</Schematic_Alternate_ReinforcedIronPlate1_C>
-	<Schematic_Alternate_ReinforcedIronPlate2_C>[Schematic][Alt] Reinforced Iron Plate 2</Schematic_Alternate_ReinforcedIronPlate2_C>
-	<Schematic_Alternate_ReinforcedSteelPlate_C>[Schematic][Alt] Reinforced Steel Plate</Schematic_Alternate_ReinforcedSteelPlate_C>
+	<Schematic_Alternate_ReinforcedIronPlate1_C>[Schematic][Alt] Reinforced Iron Plate</Schematic_Alternate_ReinforcedIronPlate1_C>
+	<Schematic_Alternate_ReinforcedIronPlate2_C>[Schematic][Alt] Stitched Iron Plate</Schematic_Alternate_ReinforcedIronPlate2_C>
+	<Schematic_Alternate_ReinforcedSteelPlate_C>[Schematic][Alt] Encased Industrial Beam</Schematic_Alternate_ReinforcedSteelPlate_C>
 	<Schematic_Alternate_Rotor_C>[Schematic][Alt] Rotor</Schematic_Alternate_Rotor_C>
-	<Schematic_Alternate_Screw_C>[Schematic][Alt] Screw 1</Schematic_Alternate_Screw_C>
-	<Schematic_Alternate_Screw2_C>[Schematic][Alt] Screw 2</Schematic_Alternate_Screw2_C>
+	<Schematic_Alternate_Screw_C>[Schematic][Alt] Screw</Schematic_Alternate_Screw_C>
+	<Schematic_Alternate_Screw2_C>[Schematic][Alt] Steel Screw</Schematic_Alternate_Screw2_C>
 	<Schematic_Alternate_Silica_C>[Schematic][Alt] Silica</Schematic_Alternate_Silica_C>
 	<Schematic_Alternate_Stator_C>[Schematic][Alt] Stator</Schematic_Alternate_Stator_C>
-	<Schematic_Alternate_TurboFuel_C>[Schematic][Alt] Turbo Fuel</Schematic_Alternate_TurboFuel_C>
+	<Schematic_Alternate_TurboFuel_C>[Schematic][Alt] Turbofuel</Schematic_Alternate_TurboFuel_C>
 	<Schematic_Alternate_TurboMotor1_C>[Schematic][Alt] Turbo Motor</Schematic_Alternate_TurboMotor1_C>
 	<Schematic_Alternate_UraniumCell1_C>[Schematic][Alt] Uranium Cell</Schematic_Alternate_UraniumCell1_C>
-	<Schematic_Alternate_Wire1_C>[Schematic][Alt] Wire 1</Schematic_Alternate_Wire1_C>
-	<Schematic_Alternate_Wire2_C>[Schematic][Alt] Wire 2</Schematic_Alternate_Wire2_C>
-	<Schematic_Exploration_Berry_C>[Schematic] Berry</Schematic_Exploration_Berry_C>
-	<Schematic_Exploration_Caterium1_C>[Schematic] Caterium 1</Schematic_Exploration_Caterium1_C>
-	<Schematic_Exploration_Caterium2_C>[Schematic] Caterium 2</Schematic_Exploration_Caterium2_C>
-	<Schematic_Exploration_Caterium3_C>[Schematic] Caterium 3</Schematic_Exploration_Caterium3_C>
+	<Schematic_Alternate_Wire1_C>[Schematic][Alt] Iron Wire</Schematic_Alternate_Wire1_C>
+	<Schematic_Alternate_Wire2_C>[Schematic][Alt] Caterium Wire</Schematic_Alternate_Wire2_C>
+	<Schematic_Exploration_Berry_C>[Schematic] Object Scanner: Berry</Schematic_Exploration_Berry_C>
+	<Schematic_Exploration_Caterium1_C>[Schematic] Caterium Technology</Schematic_Exploration_Caterium1_C>
+	<Schematic_Exploration_Caterium2_C>[Schematic] Caterium Electronics</Schematic_Exploration_Caterium2_C>
+	<Schematic_Exploration_Caterium3_C>[Schematic] Advanced Caterium Electronics</Schematic_Exploration_Caterium3_C>
 	<Schematic_Exploration_ColorGun_C>[Schematic] Color Gun</Schematic_Exploration_ColorGun_C>
 	<Schematic_Exploration_Fabric_C>[Schematic] Fabric</Schematic_Exploration_Fabric_C>
-	<Schematic_Exploration_MedicinalInhaler_C>[Schematic] Medicinal Inhaler 1</Schematic_Exploration_MedicinalInhaler_C>
-	<Schematic_Exploration_MedicinalInhaler2_C>[Schematic] Medicinal Inhaler 2</Schematic_Exploration_MedicinalInhaler2_C>
-	<Schematic_Exploration_Mushroom_C>[Schematic] Mushroom</Schematic_Exploration_Mushroom_C>
-	<Schematic_Exploration_Nut_C>[Schematic] Nut</Schematic_Exploration_Nut_C>
+	<Schematic_Exploration_MedicinalInhaler_C>[Schematic] Medicinal Inhaler</Schematic_Exploration_MedicinalInhaler_C>
+	<Schematic_Exploration_MedicinalInhaler2_C>[Schematic] Medicinal Inhaler: Alien Organs</Schematic_Exploration_MedicinalInhaler2_C>
+	<Schematic_Exploration_Mushroom_C>[Schematic] Object Scanner: Mushroom</Schematic_Exploration_Mushroom_C>
+	<Schematic_Exploration_Nut_C>[Schematic] Object Scanner: Nut</Schematic_Exploration_Nut_C>
 	<Schematic_Exploration_Parachute_C>[Schematic] Parachute</Schematic_Exploration_Parachute_C>
-	<Schematic_Exploration_Quartz1_C>[Schematic] Quartz 1</Schematic_Exploration_Quartz1_C>
-	<Schematic_Exploration_Quartz2_C>[Schematic] Quartz 2</Schematic_Exploration_Quartz2_C>
+	<Schematic_Exploration_Quartz1_C>[Schematic] Explorer</Schematic_Exploration_Quartz1_C>
+	<Schematic_Exploration_Quartz2_C>[Schematic] Radar Technology</Schematic_Exploration_Quartz2_C>
 	<Schematic_Exploration_RebarGun_C>[Schematic] Rebar Gun</Schematic_Exploration_RebarGun_C>
-	<Schematic_Exploration_Slug1_C>[Schematic] Slug 1</Schematic_Exploration_Slug1_C>
-	<Schematic_Exploration_Slug2_C>[Schematic] Slug 2</Schematic_Exploration_Slug2_C>
-	<Schematic_Exploration_Slug3_C>[Schematic] Slug 3</Schematic_Exploration_Slug3_C>
-	<Schematic_Exploration_Sulfur1_C>[Schematic] Sulfur 1</Schematic_Exploration_Sulfur1_C>
-	<Schematic_Exploration_Sulfur2_C>[Schematic] Sulfur 2</Schematic_Exploration_Sulfur2_C>
-	<Schematic_StartingRecipes_C>[Schematic]Starting Recipes</Schematic_StartingRecipes_C>
-	<Schematic_Tutorial1_C>[Schematic] Tutorial 1</Schematic_Tutorial1_C>
-	<Schematic_Tutorial2_C>[Schematic] Tutorial 2</Schematic_Tutorial2_C>
-	<Schematic_Tutorial3_C>[Schematic] Tutorial 3</Schematic_Tutorial3_C>
-	<Schematic_Tutorial4_C>[Schematic] Tutorial 4</Schematic_Tutorial4_C>
-	<Schematic_Tutorial5_C>[Schematic] Tutorial 5</Schematic_Tutorial5_C>
+	<Schematic_Exploration_Slug1_C>[Schematic] Overclock Production</Schematic_Exploration_Slug1_C>
+	<Schematic_Exploration_Slug2_C>[Schematic] Yellow Shards</Schematic_Exploration_Slug2_C>
+	<Schematic_Exploration_Slug3_C>[Schematic] Purple Shards</Schematic_Exploration_Slug3_C>
+	<Schematic_Exploration_Sulfur1_C>[Schematic] Explosives</Schematic_Exploration_Sulfur1_C>
+	<Schematic_Exploration_Sulfur2_C>[Schematic] Rifle</Schematic_Exploration_Sulfur2_C>
+	<Schematic_StartingRecipes_C>[Schematic] Starting Blueprints</Schematic_StartingRecipes_C>
+	<Schematic_Tutorial1_C>[Schematic] Hub Upgrade 1</Schematic_Tutorial1_C>
+	<Schematic_Tutorial2_C>[Schematic] Hub Upgrade 2</Schematic_Tutorial2_C>
+	<Schematic_Tutorial3_C>[Schematic] Hub Upgrade 3</Schematic_Tutorial3_C>
+	<Schematic_Tutorial4_C>[Schematic] Hub Upgrade 4</Schematic_Tutorial4_C>
+	<Schematic_Tutorial5_C>[Schematic] Hub Upgrade 5</Schematic_Tutorial5_C>
 
 	<!-- Random -->
 	<FGWildCardDescriptor>Any</FGWildCardDescriptor>

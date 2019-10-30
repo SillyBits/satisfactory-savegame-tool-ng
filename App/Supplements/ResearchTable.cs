@@ -110,7 +110,7 @@ namespace SatisfactorySavegameTool.Supplements
 				bool exp_only, bool blocked)
 			{
 				Name         = name;
-				PathName     = path + "." + (clazz == null ? name + "_C" : clazz);
+				PathName     = "/Game/FactoryGame/" + path + "." + (clazz == null ? name + "_C" : clazz);
 				Blueprint    = blueprint;
 				Native       = native;
 				Experimental = exp_only;
