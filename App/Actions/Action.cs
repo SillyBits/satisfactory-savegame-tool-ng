@@ -156,7 +156,7 @@ namespace SatisfactorySavegameTool.Actions
 					foreach (var group in groups)
 					{
 						MenuItem plugin = add_plugin(menu, group.Key);
-						foreach (var pair in plugins)
+						foreach (var pair in group)
 							add_action(plugin, pair.Key, pair.Value);
 					}
 				}

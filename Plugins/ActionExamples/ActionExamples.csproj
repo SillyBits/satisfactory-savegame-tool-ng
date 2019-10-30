@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F9EC50BC-78D7-4D20-B0FB-E26BBD70BB19}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ActionExamples</RootNamespace>
+    <AssemblyName>ActionExamples</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Windows" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ExportChildClasses.cs" />
+    <Compile Include="ExportClassNames.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\App\App.csproj">
+      <Project>{880c53c6-cdd1-4d17-ad14-b6ece784d9a9}</Project>
+      <Name>App</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\CoreLib\CoreLib.csproj">
+      <Project>{0dede00f-7e56-49f3-8a28-ddbb1f83a8b8}</Project>
+      <Name>CoreLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\FileHandler\FileHandler.vcxproj">
+      <Project>{d9c82451-5129-4f70-9d78-f292d3f2b9ab}</Project>
+      <Name>FileHandler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\PakHandler\PakHandler.vcxproj">
+      <Project>{80df7a33-aaf6-4967-a7fd-35cc1f01a2c4}</Project>
+      <Name>PakHandler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SavegameHandler\SavegameHandler.vcxproj">
+      <Project>{096f67ea-d61b-4950-8b21-65dda14ee113}</Project>
+      <Name>SavegameHandler</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y $(TargetDir)$(TargetName).dll $(SolutionDir)App\plugins
+copy /Y $(TargetDir)$(TargetName).pdb $(SolutionDir)App\plugins</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
