@@ -138,6 +138,71 @@ public:
 	}
 
 
+	str^ operator = (str^ s)
+	{
+		if (!s)
+			throw gcnew ArgumentNullException();
+		if (s->_ascii)
+			_Set(s->_ascii);
+		else if (s->_unicode)
+			_Set(s->_unicode);
+		else
+			_Free();
+		return this;
+	}
+
+	str^ operator = (String^ s)
+	{
+		_Set(s);
+		return this;
+	}
+
+	str^ operator = (char *s)
+	{
+		_Set(s);
+		return this;
+	}
+
+	str^ operator = (wchar_t *s)
+	{
+		_Set(s);
+		return this;
+	}
+
+
+	bool ToAscii()
+	{
+		if (!_ascii)
+		{
+			if (!_unicode)
+				return false;//throw gcnew Exception("Can't convert empty string!");
+
+			int len = (int)wcslen(_unicode) + 1;
+			char *_new = new char[len];
+			for (int i = 0; i < len; ++i)
+			{
+				unsigned short ch = (unsigned short)_unicode[i];
+				if (ch > 0x7f)
+				{
+					delete[] _new;
+					return false;//throw gcnew Exception("Can't convert non-ASCII string!");
+				}
+				_new[i] = (char)(ch & 0x7F);
+			}
+
+			delete[] _unicode;
+			_unicode = nullptr;
+
+			delete[] _ascii;
+			_ascii = _new;
+		}
+
+		return true;
+	}
+
+	//bool ToWide(): TODO
+
+
 	bool operator == (char *s)
 	{
 		if (!_ascii)
@@ -203,13 +268,24 @@ protected:
 
 	void _Set(String^ s)
 	{
+		//_Free();
+		//
+		//int len = s->Length;
+		//pin_ptr<const wchar_t> p = PtrToStringChars(s);
+		//_unicode = new wchar_t[len + 1];
+		//memcpy(_unicode, p, len * 2);
+		//_unicode[len] = 0;
+		pin_ptr<const wchar_t> p = PtrToStringChars(s);
+		_Set((wchar_t*)p);
+	}
+
+	void _Set(wchar_t *s)
+	{
 		_Free();
 
-		int len = s->Length;
-		pin_ptr<const wchar_t> p = PtrToStringChars(s);
-		_unicode = new wchar_t[len + 1];
-		memcpy(_unicode, p, len);
-		_unicode[len] = 0;
+		int len = (int)wcslen(s) + 1;
+		_unicode = new wchar_t[len];
+		memcpy(_unicode, s, len * 2);
 	}
 	
 	void _Reserve(const int length, int type)
