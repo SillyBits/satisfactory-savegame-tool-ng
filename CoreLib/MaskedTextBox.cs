@@ -6,7 +6,10 @@ using System.Reflection;//TEMP
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 
 
 namespace CoreLib
@@ -43,29 +46,53 @@ namespace CoreLib
 				{
 					_mask = value;
 					// Replace any placeholder with actual chars from current UI culture (and escape any special regex-char)
+					string eff_mask;
 					if (_mask.Contains("<S>") || _mask.Contains("<T>") || _mask.Contains("<D>"))
-						_mask = _mask.Replace("<S>", _signs).Replace("<T>", _thousands).Replace("<D>", _decimalpt).Replace(".", "\\.");
-					_regex = new Regex(_mask, RegexOptions.CultureInvariant|RegexOptions.IgnoreCase|RegexOptions.IgnorePatternWhitespace);
+						eff_mask = _mask.Replace("<S>", _signs).Replace("<T>", _thousands).Replace("<D>", _decimalpt).Replace(".", "\\.");
+					else
+						eff_mask = _mask;
+					_regex = new Regex(eff_mask, RegexOptions.CultureInvariant|RegexOptions.IgnoreCase|RegexOptions.IgnorePatternWhitespace);
 				}
 			}
 		}
 
 
+		public _ValueType? LowerLimit       { get; set; }
+		public _ValueType? UpperLimit       { get; set; }
+		public Brush       OutOfLimitsColor { get; set; }
+
+
 		public MaskedTextBox()
 		{
+			OutOfLimitsColor = Brushes.LightYellow;
+
 			LostFocus        += _LostFocus;
 			PreviewTextInput += _PreviewTextInput;
+			TextChanged      += _TextChanged;
 		}
 
-		private void _LostFocus(object sender, System.Windows.RoutedEventArgs e)
+		private void _LostFocus(object sender, RoutedEventArgs e)
 		{
 			// Trigger formatting
 			Value = Value;
 		}
 
-		private void _PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+		private void _PreviewTextInput(object sender, TextCompositionEventArgs e)
 		{
 			e.Handled = !_IsValidInput(e.Text);
+		}
+
+		private void _TextChanged(object sender, TextChangedEventArgs e)
+		{
+			if (LowerLimit.HasValue && UpperLimit.HasValue)
+			{
+				// Validate against limits
+				_ValueType val;
+				if (_parse(Text, out val) && !_within(val, LowerLimit.Value, UpperLimit.Value))
+					Background = OutOfLimitsColor;
+				else
+					Background = Brushes.Transparent;// SystemColors.WindowBrush;
+			}
 		}
 
 		private bool _IsValidInput(string text)
@@ -75,18 +102,15 @@ namespace CoreLib
 			if (_regex != null)
 			{
 				// also validate resulting string
-				string result = Text.Substring(0, CaretIndex) + text + Text.Substring(CaretIndex);
+				string result = null;
+				if (string.IsNullOrEmpty(SelectedText))
+					result = Text.Substring(0, CaretIndex) + text + Text.Substring(CaretIndex);
+				else
+					result = Text.Replace(SelectedText, text);
 				if (!_regex.IsMatch(result))
 					return false;
 			}
 			return true;
-		}
-
-		private bool _IsValid()
-		{
-			if (_regex == null)
-				return false;
-			return _regex.IsMatch(Text);
 		}
 
 		private static string              _signs;
@@ -95,6 +119,7 @@ namespace CoreLib
 		private static Regex               _allowed;
 		private static Formatters.Delegate _format;
 		private static Parsers.Delegate    _parse;
+		private static Limits.Delegate     _within;
 		private string                     _mask;
 		private Regex                      _regex;
 
@@ -137,6 +162,11 @@ namespace CoreLib
 			if (mi == null)
 				throw new InvalidOperationException(string.Format("No matching parser for type '{0}'", type.Name));
 			_parse = (Parsers.Delegate) mi.CreateDelegate(typeof(Parsers.Delegate));
+
+			mi = Helpers.PickStaticMethod(typeof(Limits), "Within", new Type[] { type, type, type });
+			if (mi == null)
+				throw new InvalidOperationException(string.Format("No matching limit check for type '{0}'", type.Name));
+			_within = (Limits.Delegate) mi.CreateDelegate(typeof(Limits.Delegate));
 		}
 
 
@@ -205,6 +235,42 @@ namespace CoreLib
 			{
 				value = default(_ValueType);
 				return false;
+			}
+		}
+
+		internal static class Limits
+		{
+			internal delegate bool Delegate(_ValueType value, _ValueType min, _ValueType max);
+
+			internal static bool Within(float value, float min, float max)
+			{
+				return (min <= value) && (value <= max);
+			}
+
+			internal static bool Within(double value, double min, double max)
+			{
+				return (min <= value) && (value <= max);
+			}
+
+			internal static bool Within(byte value, byte min, byte max)
+			{
+				return (min <= value) && (value <= max);
+			}
+
+			internal static bool Within(int value, int min, int max)
+			{
+				return (min <= value) && (value <= max);
+			}
+
+			internal static bool Within(long value, long min, long max)
+			{
+				return (min <= value) && (value <= max);
+			}
+
+			internal static bool Within(_ValueType value, _ValueType min, _ValueType max)
+			{
+				return true;
+				//return (min.CompareTo(value) <= 0) && (value.CompareTo(max) <= 0);
 			}
 		}
 
