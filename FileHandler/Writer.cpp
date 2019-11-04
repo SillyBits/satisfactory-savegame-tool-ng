@@ -74,14 +74,19 @@ namespace Writer
 		__int64 last = _prev_pos = _pos;
 
 		int len = length ? length : val->GetRawLength();
-		if (val->Wchar() != nullptr)
+		if (len == 0)
+		{
+			Write(len);
+		}
+		else if (val->Wchar() != nullptr)
 		{
 			// Unicode string
 			// (length returned by GetRawLength already accounts for double-char)
-			Write(-len / 2);
+			len *= -1;
+			Write(len / 2);
 			Write((byte*)val->Wchar(), len);
 		}
-		else if (len > 0)
+		else
 		{
 			// ASCII string
 			Write(len);
