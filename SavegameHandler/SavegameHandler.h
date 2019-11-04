@@ -62,15 +62,27 @@ namespace Savegame {
 
 		void Load(ICallback^ callback)
 		{
-			_callback = callback;
+			try
+			{
+				_callback = callback;
 
-			if (!Header)
-				_PeekHeader();
+				if (!Header)
+					_PeekHeader();
 
-			if (Header->SaveVersion <= 20)
-				_Load(_reader);
-			else
-				_LoadCloudsave();
+				if (Header->SaveVersion <= 20)
+					_Load(_reader);
+				else
+					_LoadCloudsave();
+			}
+			finally
+			{
+				if (_reader)
+				{
+					_reader->Close();
+					_reader = nullptr;
+				}
+				_callback = nullptr;
+			}
 		}
 
 		void Save(ICallback^ callback)
@@ -145,8 +157,17 @@ namespace Savegame {
 
 		void _LoadCloudsave()
 		{
-			CloudsaveReader^ cs_reader = gcnew CloudsaveReader(_reader, nullptr);
-			_Load(cs_reader);
+			CloudsaveReader^ cs_reader = nullptr;
+			try
+			{
+				cs_reader = gcnew CloudsaveReader(_reader, nullptr);
+				_Load(cs_reader);
+			}
+			finally
+			{
+				if (cs_reader)
+					cs_reader->Close();
+			}
 		}
 
 		void _Load(IReader^ reader)
@@ -249,43 +270,65 @@ namespace Savegame {
 
 		void _Save(String^ filename)
 		{
-			FileWriter^ writer = gcnew FileWriter(filename, nullptr);
-			Header->Write(writer);
-			_Save(writer);
+			FileWriter^ writer = nullptr;
+			try
+			{
+				writer = gcnew FileWriter(filename, nullptr);
+				Header->Write(writer);
+				_Save(writer);
+			}
+			finally
+			{
+				if (writer)
+					writer->Close();
+			}
 		}
 
 		void _SaveCloudsave(String^ filename)
 		{
-			FileWriter^ writer = gcnew FileWriter(filename, nullptr);
-
-			_cbStart(TotalElements, "Querying file ...", "");
-			int count = 0;
-
-			Header->Write(writer);
-
-			int total_size = 8;//count*2
-			for each (Properties::Property^ prop in Objects)
+			FileWriter^ writer = nullptr;
+			CloudsaveWriter^ cs_writer = nullptr;
+			try
 			{
-				total_size += prop->GetSize() + 4;//Type
-				_cbUpdate(++count, nullptr, prop->ToString());
-			}
-			total_size += 4;//count
-			for each (Properties::Property^ prop in Collected)
-			{
-				total_size += prop->GetSize();
-				_cbUpdate(++count, nullptr, prop->ToString());
-			}
-			if (Missing)
-			{
-				total_size += Missing->Length;
-				_cbUpdate(++count, nullptr, Missing->ToString());
-			}
+				writer = gcnew FileWriter(filename, nullptr);
 
-			CloudsaveWriter^ cs_writer = gcnew CloudsaveWriter(writer, nullptr);
-			cs_writer->Write(total_size);
-			_Save(cs_writer);
-			Log::Debug("... written a total of {0:#,#0} bytes, compressed down to {1:#,#0} bytes)", 
-				total_size, writer->Pos);
+				_cbStart(TotalElements, "Querying file ...", "");
+				int count = 0;
+
+				Header->Write(writer);
+
+				int total_size = 8;
+				for each (Properties::Property^ prop in Objects)
+				{
+					total_size += prop->GetSize() + 4;//Type
+					_cbUpdate(++count, nullptr, prop->ToString());
+				}
+				total_size += 4;//count
+				for each (Properties::Property^ prop in Collected)
+				{
+					total_size += prop->GetSize();
+					_cbUpdate(++count, nullptr, prop->ToString());
+				}
+				if (Missing)
+				{
+					total_size += Missing->Length;
+					_cbUpdate(++count, nullptr, Missing->ToString());
+				}
+
+				cs_writer = gcnew CloudsaveWriter(writer, nullptr);
+				cs_writer->Write(total_size);
+				_Save(cs_writer);
+
+				Log::Debug("... written a total of {0:#,#0} bytes, compressed down to {1:#,#0} bytes)", 
+					total_size, writer->Pos);
+			}
+			finally
+			{
+				if (cs_writer)
+					cs_writer->Close();
+				if (writer)
+					writer->Close();
+			}
 		}
 
 		void _Save(IWriter^ writer)
