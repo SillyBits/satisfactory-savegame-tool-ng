@@ -228,7 +228,7 @@ namespace SatisfactorySavegameTool
 		{
 			SaveFileDialog dlg = new SaveFileDialog();
 			dlg.Title = Translate._("MainWindow.SaveGamefile.Title");
-			dlg.InitialDirectory = Settings.EXPORTPATH;
+			dlg.InitialDirectory = Config.Root.core.defaultpath;
 			dlg.DefaultExt = Translate._("MainWindow.SaveGamefile.DefaultExt");
 			dlg.Filter = Translate._("MainWindow.SaveGamefile.Filter");
 			if (dlg.ShowDialog().GetValueOrDefault(false) == true)
