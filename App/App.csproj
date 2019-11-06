@@ -103,6 +103,7 @@
     <Compile Include="Supplements\Extensions.cs" />
     <Compile Include="Supplements\Helper.cs" />
     <Compile Include="Supplements\HierarchyRunner.cs" />
+    <Compile Include="Supplements\ImageCache.cs" />
     <Compile Include="Supplements\ItemTable.cs" />
     <Compile Include="Supplements\ColorTable.cs" />
     <Compile Include="Supplements\SchematicTable.cs" />
@@ -228,6 +229,10 @@
     <ProjectReference Include="..\FileHandler\FileHandler.vcxproj">
       <Project>{d9c82451-5129-4f70-9d78-f292d3f2b9ab}</Project>
       <Name>FileHandler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PakHandler\PakHandler.vcxproj">
+      <Project>{80df7a33-aaf6-4967-a7fd-35cc1f01a2c4}</Project>
+      <Name>PakHandler</Name>
     </ProjectReference>
     <ProjectReference Include="..\SavegameHandler\SavegameHandler.vcxproj">
       <Project>{096f67ea-d61b-4950-8b21-65dda14ee113}</Project>

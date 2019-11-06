@@ -43,6 +43,7 @@ copy %ROOTDIR%\App\bin\x64\Release\SatisfactorySavegameTool.exe.config .
 copy %ROOTDIR%\App\bin\x64\Release\CoreLib.dll .
 copy %ROOTDIR%\App\bin\x64\Release\FileHandler.dll .
 copy %ROOTDIR%\App\bin\x64\Release\SavegameHandler.dll .
+copy %ROOTDIR%\App\bin\x64\Release\PakHandler.dll .
 
 rem 3rd party libs
 copy %ROOTDIR%\App\bin\x64\Release\ICSharpCode.TreeView.dll .

@@ -60,8 +60,9 @@ namespace SatisfactorySavegameTool
 			Settings.Init();
 
 			// Stuff which can be run in parallel
+			Task init_pak_loader  = Task.Run(async() => await _InitPakLoader());
 			Task load_data_tables = Task.Run(async() => await _LoadDataTables());
-			Task.WaitAll(load_data_tables);
+			Task.WaitAll(init_pak_loader, load_data_tables);
 
 			base.OnStartup(e);
 		}
@@ -69,6 +70,8 @@ namespace SatisfactorySavegameTool
 		protected override void OnExit(ExitEventArgs e)
 		{
 			base.OnExit(e);
+
+			ImageCache.CloseCaches();
 
 			_languages = null;
 
@@ -173,6 +176,24 @@ namespace SatisfactorySavegameTool
 		}
 
 
+		private async Task _InitPakLoader()
+		{
+			await Task.Run(() => {
+				if (!Config.Root.HasSection("pak_loader"))
+				{
+					// Create default settings
+					Section pak = Config.Root.AddSection("pak_loader");
+					pak.AddItem("enabled", false);
+					pak.AddItem("ea_path");
+					pak.AddItem("exp_path");
+					pak.AddItem("cachepath", Path.Combine(Settings.APPPATH, Settings.CACHE));
+				}
+				Settings.CACHEPATH = Config.Root.pak_loader.cachepath;
+				if (Config.Root.pak_loader.enabled)
+					ImageCache.LoadCaches(Splashscreen.Callback);
+			});
+		}
+
 		private async Task _LoadDataTables()
 		{
 			Task[] loaders = new Task[] {
@@ -242,6 +263,10 @@ namespace SatisfactorySavegameTool
 		// Path to where exports are to be stored - configured by user
 		public const  string EXPORTS              = "exports";
 		public static string EXPORTPATH           = null;
+
+		// Path to where cached images are to be stored - configured by user
+		public const  string CACHE                = "cache";
+		public static string CACHEPATH            = null;
 
 
 		// Anonymous user id, used for reporting crashes and such and to allow for grouping such reports
