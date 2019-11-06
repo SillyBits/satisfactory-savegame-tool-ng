@@ -11,6 +11,7 @@ using CoreLib;
 using CoreLib.PubSub;
 //using CoreLib.Logger;
 
+using PakHandler;
 
 using Savegame;
 using Savegame.Properties;
@@ -421,6 +422,52 @@ namespace TestBed
 		}
 		#endregion
 
+		#region PAK
+		static void TestPAK()
+		{
+			PakLoader loader = new PakLoader(@"F:\Epic Games\SatisfactoryEarlyAccess\FactoryGame\Content\Paks\FactoryGame-WindowsNoEditor.pak");
+			if (!loader.Load(null))
+				return;
+
+
+		//	string asset_path = "Equipment/Medkit/Equip_MedKit";
+		//	string asset_path = "Resource/Equipment/Medkit/Desc_Medkit";
+		//	string asset_path = "Resource/BP_HealthGainDescriptor";
+		//	string asset_path = "Prototype/WAT/Desc_WAT2";
+		//	string asset_path = "Resource/Environment/CrashSites/Desc_HardDrive";
+		//	string asset_path = "Resource/Parts/HardDrive/FBX/HardDrive";
+		//	string asset_path = "World/Benefit/DropPod/BP_HardDriveSettings";
+		//	string asset_path = "Resource/Parts/NuclearWaste/Desc_NuclearWaste";
+		//	string asset_path = "Resource/Parts/GenericBiomass/Desc_Vines";
+		//	string asset_path = "Resource/RawResources/SAM/Desc_SAM";
+			string asset_path = "Resource/BP_ResourceSettings";
+		//	string asset_path = "";
+		//	string asset_path = "";
+		//	string asset_path = "";
+
+			var asset = loader.ReadObject("FactoryGame/Content/FactoryGame/" + asset_path);
+			if (asset != null)
+			{
+				string export = Path.Combine(@"E:\GitHub\satisfactory-savegame-tool-ng\__internal", asset_path.Split('/').Last()) + ".dump";
+				CoreLib.Dumper dumper = new CoreLib.Dumper(export);
+				asset.DumpTo(dumper);
+				dumper.Close();
+			}
+
+			var raw = loader.ReadAsset("FactoryGame/Content/FactoryGame/" + asset_path);
+			if (raw != null)
+			{
+				string export = Path.Combine(@"E:\GitHub\satisfactory-savegame-tool-ng\__internal", asset_path.Split('/').Last()) + ".raw";
+				using (FileStream strm = File.Create(export))
+				{
+					strm.Write(raw, 0, raw.Length);
+					strm.Flush();
+					strm.Close();
+				}
+			}
+		}
+		#endregion
+
 
 		static void TestBed(string[] args)
 		{
@@ -430,6 +477,7 @@ namespace TestBed
 			//TestSavegameLoader();
 			//TestConfigFile();
 			//TestRegex();
+			TestPAK();
 		}
 
 
