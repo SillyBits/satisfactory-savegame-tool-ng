@@ -70,5 +70,106 @@ namespace CoreLib
 
 			return bmp;
 		}
+
+		/// <summary>
+		/// Save image to file.
+		/// </summary>
+		/// <param name="bitmap">Image to save</param>
+		/// <param name="filename">Absolute path to where to store image, incl. extension</param>
+		/// <returns>Whether or not save operation was successful</returns>
+		public static bool SaveImageToFile(BitmapSource bitmap, string filename)
+		{
+			if (bitmap == null || filename == null)
+				return false;
+			if (!Directory.Exists(Path.GetDirectoryName(filename)))
+				return false;
+
+			string ext = Path.GetExtension(filename).ToLower();
+
+			BitmapEncoder enc = null;
+			switch (ext)
+			{
+				case ".bmp":  enc = new BmpBitmapEncoder(); break;
+				case ".gif":  enc = new GifBitmapEncoder(); break;
+				case ".jpeg": enc = new JpegBitmapEncoder(); break;
+				case ".jpg":  enc = new JpegBitmapEncoder(); break;
+				case ".png":  enc = new PngBitmapEncoder(); break;
+				case ".tiff": enc = new TiffBitmapEncoder(); break;
+			}
+			if (enc == null)
+			{
+				Log.Error("No suitable encoder found for file '{0}'", filename);
+				return false;
+			}
+
+			try
+			{
+				enc.Frames.Add(BitmapFrame.Create(bitmap));
+
+				using (Stream out_strm = File.Create(filename))
+				{
+					enc.Save(out_strm);
+					out_strm.Flush();
+				}
+			}
+			catch (Exception exc)
+			{
+				Log.Error("Error saving file '{0}': {1}", filename, exc);
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Load an image from file.
+		/// </summary>
+		/// <param name="filename">Absolute path to image to load, incl. extension</param>
+		/// <returns>Bitmap instance, or null if loading failed</returns>
+		public static BitmapSource LoadImageFromFile(string filename)
+		{
+			if (filename == null)
+				return null;
+			if (!File.Exists(filename))
+				return null;
+
+			string ext = Path.GetExtension(filename).ToLower();
+
+			BitmapSource bitmap = null;
+
+			try
+			{
+				using (Stream in_strm = File.OpenRead(filename))
+				{
+					BitmapCreateOptions cr_option = BitmapCreateOptions.PreservePixelFormat;
+					BitmapCacheOption   ca_option = BitmapCacheOption.OnLoad;
+					BitmapDecoder dec = null;
+					switch (ext)
+					{
+						case ".bmp":  dec = new BmpBitmapDecoder (in_strm, cr_option, ca_option); break;
+						case ".gif":  dec = new GifBitmapDecoder (in_strm, cr_option, ca_option); break;
+						case ".jpeg": dec = new JpegBitmapDecoder(in_strm, cr_option, ca_option); break;
+						case ".jpg":  dec = new JpegBitmapDecoder(in_strm, cr_option, ca_option); break;
+						case ".png":  dec = new PngBitmapDecoder (in_strm, cr_option, ca_option); break;
+						case ".tiff": dec = new TiffBitmapDecoder(in_strm, cr_option, ca_option); break;
+					}
+					if (dec == null)
+					{
+						Log.Error("No suitable encoder found for file '{0}'", filename);
+						return null;
+					}
+
+					bitmap = dec.Frames[0];
+				}
+			}
+			catch (Exception exc)
+			{
+				Log.Error("Error loading file '{0}': {1}", filename, exc);
+				bitmap = null;
+			}
+
+			return bitmap;
+		}
+
 	}
 }

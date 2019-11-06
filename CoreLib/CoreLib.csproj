@@ -37,6 +37,7 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
@@ -56,6 +57,7 @@
     <Compile Include="Compressor.cs" />
     <Compile Include="ConfigFile.cs" />
     <Compile Include="CoreLib.cs" />
+    <Compile Include="DumpToFileHelper.cs" />
     <Compile Include="FactoryHelpers.cs" />
     <Compile Include="Filters.cs" />
     <Compile Include="Helpers.cs" />
