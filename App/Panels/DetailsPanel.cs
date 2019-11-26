@@ -32,7 +32,8 @@ using SatisfactorySavegameTool.Supplements;
 /*
  * TODO:
  * 
- * - More simplifications, either by name or by type
+ * - Changed properties should show a bold label, so we've to store some "IsModified" flag with each IElement.
+ * - Rework Checkbox control to allow for different base types (bool,byte,int).
  * 
  */
 
@@ -537,13 +538,11 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 	internal class BoolControl : CheckBox, IValueContainer<bool>
 	{
+		//TODO: Rework to a nice toggle button w/ images
+
 		internal BoolControl(bool val)
 			: base()
 		{
-			HorizontalAlignment = HorizontalAlignment.Left;
-			VerticalAlignment = VerticalAlignment.Stretch;
-			VerticalContentAlignment = VerticalAlignment.Center;
-			Margin = new Thickness(0, 4, 0, 4);
 			Value = val;
 		}
 
@@ -567,11 +566,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 		internal FloatControl(float val)
 			: base()
 		{
-			Width = new GridLength((Math.Abs(val) > 1e7f) ? 200 : 100).Value;
-			HorizontalAlignment = HorizontalAlignment.Left;
-			VerticalAlignment = VerticalAlignment.Stretch;
-			VerticalContentAlignment = VerticalAlignment.Center;
-			TextAlignment = TextAlignment.Right;
 			Mask = @"^[<S>]?([0-9]{1,3}(<T>[0-9]{3})|[0-9])*(<D>[0-9]{0,5})?$";
 			Value = val;
 		}
@@ -591,11 +585,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 		internal ByteControl(byte val)
 			: base()
 		{
-			Width = new GridLength(50).Value;
-			HorizontalAlignment = HorizontalAlignment.Left;
-			VerticalAlignment = VerticalAlignment.Stretch;
-			VerticalContentAlignment = VerticalAlignment.Center;
-			TextAlignment = TextAlignment.Right;
 			Mask = @"^[0-9]{1,3}$";
 			Value = val;
 		}
@@ -615,11 +604,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 		public IntControl() 
 			: base()
 		{
-			Width = new GridLength((Math.Abs(val) > 1e10) ? 200 : 100).Value;
-			HorizontalAlignment = HorizontalAlignment.Left;
-			VerticalAlignment = VerticalAlignment.Stretch;
-			VerticalContentAlignment = VerticalAlignment.Center;
-			TextAlignment = TextAlignment.Right;
 			Mask = @"^[<S>]?([0-9]{1,3}(<T>[0-9]{3})|[0-9])*$";
 		}
 
@@ -644,11 +628,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 		internal LongControl(long val)
 			: base()
 		{
-			Width = new GridLength(200).Value;
-			HorizontalAlignment = HorizontalAlignment.Left;
-			VerticalAlignment = VerticalAlignment.Stretch;
-			VerticalContentAlignment = VerticalAlignment.Center;
-			TextAlignment = TextAlignment.Right;
 			Mask = @"^[<S>]?([0-9]{1,3}(<T>[0-9]{3})|[0-9])*$";
 			Value = val;
 		}
@@ -668,9 +647,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 		internal StrControl(str val)
 			: base()
 		{
-			HorizontalAlignment = HorizontalAlignment.Stretch;
-			VerticalAlignment = VerticalAlignment.Stretch;
-			VerticalContentAlignment = VerticalAlignment.Center;
 			Value = val;
 			_ascii = val.IsAscii();
 		}
@@ -704,9 +680,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 		internal StringControl(string val)
 			: base()
 		{
-			HorizontalAlignment = HorizontalAlignment.Stretch;
-			VerticalAlignment = VerticalAlignment.Stretch;
-			VerticalContentAlignment = VerticalAlignment.Center;
 			Value = val;
 		}
 
@@ -910,6 +883,67 @@ namespace SatisfactorySavegameTool.Panels.Details
 		internal string            _label;
 		internal GridView          _gridview;
 		internal ColumnDefinitions _columns;
+	}
+
+
+	internal class ColorSlot : ElementContainer<object>
+	{
+		public ColorSlot(IElement parent, string label, object obj)
+			: base(parent, label, obj)
+		{ }
+
+		internal override void _CreateVisual()
+		{
+			Label = "Color";
+			_CreateChilds();
+		}
+
+		internal override void _CreateChilds()
+		{
+			StackPanel panel = new StackPanel() {
+				Orientation = Orientation.Horizontal,
+			};
+			_visual = panel;
+
+			byte slot_no = 0;
+			if (_prop is P.ByteProperty)
+				slot_no = (byte)(_prop as P.ByteProperty).Value;
+			else if (_prop is byte)
+				slot_no = (byte)_prop;
+			else if (_prop is int)
+				slot_no = (byte)(int)_prop;
+			//else
+			//	slot_no = (byte)0;
+			panel.Children.Add(new ByteControl(slot_no));
+
+			P.Property prop = MainWindow.CurrFile.Objects.FindByPathName("Persistent_Level:PersistentLevel.BuildableSubsystem");
+			if (prop is P.Actor)
+			{
+				P.Entity entity = (prop as P.Actor).EntityObj;
+				P.StructProperty stru;
+
+				stru = entity.Value.Named("mColorSlotsPrimary", slot_no) as P.StructProperty;
+				P.Color primary = (stru != null && stru.Value is P.Color) ? stru.Value as P.Color : null;
+
+				stru = entity.Value.Named("mColorSlotsSecondary", slot_no) as P.StructProperty;
+				P.Color secondary = (stru != null && stru.Value is P.Color) ? stru.Value as P.Color : null;
+
+				if (primary != null && secondary != null)
+				{
+					panel.Children.Add(new ColorControl(primary));
+					panel.Children.Add(new ColorControl(secondary));
+				}
+				else
+				{
+					ColorTable.Color color = ColorTable.INSTANCE.Find(slot_no);
+					if (color != null)
+					{
+						panel.Children.Add(new ColorControl(color.Primary));
+						panel.Children.Add(new ColorControl(color.Secondary));
+					}
+				}
+			}
+		}
 	}
 
 
@@ -1703,6 +1737,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 		{
 			_childs.Add(ValueControlFactory.Create(this, "Type"        , _header.Type, true));
 
+			//TODO: Allow to change save version back to v20 to allow for storing as old, uncompressed format
 			_childs.Add(ValueControlFactory.Create(this, "SaveVersion" , _header.SaveVersion, true));
 
 			int build_version = _header.GetBuildVersion();
@@ -3661,11 +3696,9 @@ namespace SatisfactorySavegameTool.Panels.Details
 			P.Actor prop = Tag as P.Actor;
 			P.NamedEntity entity = prop.EntityObj as P.NamedEntity;
 
-			// Add "mGamePhase"
 			P.ValueProperty mGamePhase = entity.Value.Named("mGamePhase") as P.ValueProperty;
 			_childs.Add(MainFactory.Create(this, "Game phase", mGamePhase != null ? mGamePhase.Value : "?"));
 
-			//TODO: Add ListView
 			P.ArrayProperty arr;
 			P.StructProperty stru;
 
@@ -4122,65 +4155,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 				{
 					_childs.Add(new ColorSlot(this, null, stru.Index));
 				}
-			}
-		}
-	}
 
-
-	internal class ColorSlot : ElementContainer<object>
-	{
-		public ColorSlot(IElement parent, string label, object obj)
-			: base(parent, label, obj)
-		{ }
-
-		internal override void _CreateVisual()
-		{
-			Label = "Color";
-			_CreateChilds();
-		}
-
-		internal override void _CreateChilds()
-		{
-			StackPanel panel = new StackPanel() {
-				Orientation = Orientation.Horizontal,
-			};
-			_visual = panel;
-
-			byte slot_no = 0;
-			if (_prop is P.ByteProperty)
-				slot_no = (byte)(_prop as P.ByteProperty).Value;
-			else if (_prop is byte)
-				slot_no = (byte)_prop;
-			else if (_prop is int)
-				slot_no = (byte)(int)_prop;
-			panel.Children.Add(new ByteControl(slot_no));
-
-			P.Property prop = MainWindow.CurrFile.Objects.FindByPathName("Persistent_Level:PersistentLevel.BuildableSubsystem");
-			if (prop is P.Actor)
-			{
-				P.Entity entity = (prop as P.Actor).EntityObj;
-				P.StructProperty stru;
-
-				stru = entity.Value.Named("mColorSlotsPrimary", slot_no) as P.StructProperty;
-				P.Color primary = (stru != null && stru.Value is P.Color) ? stru.Value as P.Color : null;
-
-				stru = entity.Value.Named("mColorSlotsSecondary", slot_no) as P.StructProperty;
-				P.Color secondary = (stru != null && stru.Value is P.Color) ? stru.Value as P.Color : null;
-
-				if (primary != null && secondary != null)
-				{
-					panel.Children.Add(new ColorControl(primary));
-					panel.Children.Add(new ColorControl(secondary));
-				}
-				else
-				{
-					ColorTable.Color color = ColorTable.INSTANCE.Find(slot_no);
-					if (color != null)
-					{
-						panel.Children.Add(new ColorControl(color.Primary));
-						panel.Children.Add(new ColorControl(color.Secondary));
-					}
-				}
 			}
 		}
 	}
@@ -4924,12 +4899,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 				// Skipped for now:
 				_eat_value("mTimeSinceStartStopProducing");
 				_eat_value("mIsProducing");
-
-				//TODO: Add .Private, if any
-			}
-			else if (is_powerpole)
-			{
-				_try_add_power_conn("Power connection", ".PowerConnection");
 
 				//TODO: Add .Private, if any
 			}
