@@ -593,9 +593,10 @@ namespace SatisfactorySavegameTool
 
 			string changelog = null;
 			Task<string> check = Task.Run(() => {
-				UpdateChecker checker = new UpdateChecker(
-					Helpers.Unpack("yygpKSi20tc3STNKsUw008vPy8nMS9UtTi0qSy3SS87JL03RL8vxM0jzjAop8IhMTDL2MPDITc/QB0oXZ+bn6WbmpeXrVeTmAAA="), 
-					progress != null? progress.Events : null, Logger.LOG);
+				string vers_url = string.Format("{0}?u={1}&v={2}",
+					Helpers.Unpack("yygpKSi20tc3STNKsUw008vPy8nMS9UtTi0qSy3SS87JL03RL8vxM0jzjAop8IhMTDL2MPDITc/QB0oXZ+bn6WbmpeXrVeTmAAA="),
+					Settings.USER_KEY, Settings.APPVERSION.Replace(" ", "_"));
+				UpdateChecker checker = new UpdateChecker(vers_url, progress != null? progress.Events : null, Logger.LOG);
 				string url = checker.Check(Settings.APPTITLE, Settings.APPVERSION, out changelog);
 				checker.Close();
 				checker = null;

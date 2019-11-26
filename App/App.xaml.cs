@@ -220,7 +220,7 @@ namespace SatisfactorySavegameTool
 #else
 			// Gather relevant data
 			Dictionary<string,byte[]> content = new Dictionary<string, byte[]>();
-			content.Add(type + "-" + Settings.USER_ID + ".txt", Encoding.ASCII.GetBytes(report));
+			content.Add(type + "-" + Settings.USER_KEY + ".txt", Encoding.ASCII.GetBytes(report));
 			if (type == "Crash" || type == "Incident")
 				content.Add("Latest.log", _logger.GetSnapshot(false));
 			if (type == "Crash")
