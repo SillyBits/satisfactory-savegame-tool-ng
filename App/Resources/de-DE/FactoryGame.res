@@ -58,9 +58,9 @@
 	<AlienArtifact_02_C>Alien Artefakt 02</AlienArtifact_02_C>
 	<AlienArtifact_03_C>Alien Artefakt 03</AlienArtifact_03_C>
 	<BP_BerryBush_C>Paläobeerenpflanze</BP_BerryBush_C>
-	<BP_Crystal_C>Kristall Mk1</BP_Crystal_C>
-	<BP_Crystal_mk3_C>Kristall Mk3</BP_Crystal_mk3_C>
-	<BP_Crystal_mk2_C>Kristall Mk2</BP_Crystal_mk2_C>
+	<BP_Crystal_C>Elektroschnecke (Grün)</BP_Crystal_C>
+	<BP_Crystal_mk2_C>Elektroschnecke (Gelb)</BP_Crystal_mk2_C>
+	<BP_Crystal_mk3_C>Elektroschnecke (Violett)</BP_Crystal_mk3_C>
 	<BP_DestructibleLargeRock_C>Große zerstörbare Felsen</BP_DestructibleLargeRock_C>
 	<BP_DestructibleSmallRock_C>Kleine zerstörbare Felsen</BP_DestructibleSmallRock_C>
 	<BP_ItemPickup_Spawnable_C>ItemPickup_Spawnable</BP_ItemPickup_Spawnable_C>
@@ -70,17 +70,22 @@
 	<BP_ResourceNodeGeyser_C>Rohstoffknoten Geysir</BP_ResourceNodeGeyser_C>
 	<BP_Shroom_01_C>Pilz</BP_Shroom_01_C>
 	<BP_VineLadder_C>Rankenleiter</BP_VineLadder_C>
-	<BP_WAT1_C>WAT 1</BP_WAT1_C>
-	<BP_WAT2_C>WAT 2</BP_WAT2_C>
+	<BP_WAT1_C>Somersloop (WIP)</BP_WAT1_C>
+	<BP_WAT2_C>Mercer Sphere (WIP)</BP_WAT2_C>
 	<Deposit_Bauxite_C>[Ablagerung] Bauxit</Deposit_Bauxite_C>
 	<Deposit_Coal_C>[Ablagerung] Kohle</Deposit_Coal_C>
 	<Deposit_Copper_C>[Ablagerung] Kupfer</Deposit_Copper_C>
 	<Deposit_Gold_C>[Ablagerung] Gold</Deposit_Gold_C>
 	<Deposit_Iron_C>[Ablagerung] Eisen</Deposit_Iron_C>
-	<Deposit_Stone_C>[Ablagerung] Stein</Deposit_Stone_C>
+	<Deposit_Stone_C>[Ablagerung] Kalkstein</Deposit_Stone_C>
 	<Deposit_Sulfur_C>[Ablagerung] Schwefel</Deposit_Sulfur_C>
 	<Deposit_Uranium_C>[Ablagerung] Uran</Deposit_Uranium_C>
+	<Desc_Crystal_C>Elektroschnecke (Grün)</Desc_Crystal_C>
+	<Desc_Crystal_mk2_C>Elektroschnecke (Gelb)</Desc_Crystal_mk2_C>
+	<Desc_Crystal_mk3_C>Elektroschnecke (Violett)</Desc_Crystal_mk3_C>
 	<Desc_Geyser_C>Geysir</Desc_Geyser_C>
+	<Desc_WAT1_C>Somersloop (WIP)</Desc_WAT1_C>
+	<Desc_WAT2_C>Mercer Sphere (WIP)</Desc_WAT2_C>
 	<ResourceNode_Middle_Quartz01_C>Quarz</ResourceNode_Middle_Quartz01_C>
 	
 	<!-- Mobs, dangers, and "remains" -->
@@ -140,7 +145,7 @@
 	<BP_ItemDescriptorPortableMiner_C>Tragbarer Minator</BP_ItemDescriptorPortableMiner_C>
 	<BP_ResourceScanner_C>Rohstoffscanner</BP_ResourceScanner_C>
 	<Desc_Chainsaw_C>Kettensäge</Desc_Chainsaw_C>
-	<Desc_Parachute>Fallschirm</Desc_Parachute>
+	<Desc_Parachute_C>Fallschirm</Desc_Parachute_C>
 	<Equip_Chainsaw_C>Kettensäge</Equip_Chainsaw_C>
 	<Equip_ColorGun_C>Farbpistole</Equip_ColorGun_C>
 	<Equip_GasMask_C>Gasmaske</Equip_GasMask_C>
@@ -207,7 +212,7 @@
 	<Desc_Medkit_C>Medizinischer Inhalierer</Desc_Medkit_C>
 	<Desc_ModularFrame_C>Modularer Rahmen</Desc_ModularFrame_C>
 	<Desc_ModularFrameHeavy_C>Schwerer Modularer Rahmen</Desc_ModularFrameHeavy_C>
-	<Desc_ModularFrameLightweight>Leichter Modularer Rahmen</Desc_ModularFrameLightweight>
+	<Desc_ModularFrameLightweight_C>Leichter Modularer Rahmen</Desc_ModularFrameLightweight_C>
 	<Desc_Motor_C>Motor</Desc_Motor_C>
 	<Desc_MotorLightweight_C>Leichter Motor</Desc_MotorLightweight_C>
 	<Desc_Mycelia_C>Myzelium</Desc_Mycelia_C>
@@ -215,11 +220,11 @@
 	<Desc_NuclearFuelRod_C>Nuklearer Brennstab</Desc_NuclearFuelRod_C>
 	<Desc_NuclearWaste_C>Nuklearer Abfall</Desc_NuclearWaste_C>
 	<Desc_Nut_C>Beryllnuss</Desc_Nut_C>
-	<Desc_OreBauxite_C>[Erz] Bauxit</Desc_OreBauxite_C>
-	<Desc_OreCopper_C>[Erz] Kupfer</Desc_OreCopper_C>
-	<Desc_OreGold_C>[Erz] Gold</Desc_OreGold_C>
-	<Desc_OreIron_C>[Erz] Eisen</Desc_OreIron_C>
-	<Desc_OreUranium_C>[Erz] Uran</Desc_OreUranium_C>
+	<Desc_OreBauxite_C>Bauxit</Desc_OreBauxite_C>
+	<Desc_OreCopper_C>Kupfererz</Desc_OreCopper_C>
+	<Desc_OreGold_C>Caterium-Erz</Desc_OreGold_C>
+	<Desc_OreIron_C>Eisenerz</Desc_OreIron_C>
+	<Desc_OreUranium_C>Uran</Desc_OreUranium_C>
 	<Desc_Plastic_C>Plastik</Desc_Plastic_C>
 	<Desc_QuantumOscillator_C>Quantenoszillator</Desc_QuantumOscillator_C>
 	<Desc_QuartzCrystal_C>Quarzkristall</Desc_QuartzCrystal_C>
@@ -227,7 +232,7 @@
 	<Desc_RebarGunProjectile_C>Armierpistolenprojektil</Desc_RebarGunProjectile_C>
 	<Desc_Rotor_C>Rotor</Desc_Rotor_C>
 	<Desc_Rubber_C>Gummi</Desc_Rubber_C>
-	<Desc_SAM_C>SAM</Desc_SAM_C>
+	<Desc_SAM_C>S.A.M.-Erz</Desc_SAM_C>
 	<Desc_Shroom_C>Pilz</Desc_Shroom_C>
 	<Desc_Silica_C>Silizium</Desc_Silica_C>
 	<!--<Desc_SpaceElevatorBlocker_C>Space Elevator Blocker</Desc_SpaceElevatorBlocker_C>-->
@@ -237,8 +242,8 @@
 	<Desc_SteelIngot_C>Stahlbarren</Desc_SteelIngot_C>
 	<Desc_SteelPipe_C>Stahlrohr</Desc_SteelPipe_C>
 	<Desc_SteelPlate_C>Stahlplatte</Desc_SteelPlate_C>
-	<Desc_SteelPlateReinforced_C>Verstärkte Stahlplatte</Desc_SteelPlateReinforced_C>
-	<Desc_Stone_C>Stein</Desc_Stone_C>
+	<Desc_SteelPlateReinforced_C>Stahlbetonträger</Desc_SteelPlateReinforced_C>
+	<Desc_Stone_C>Kalkstein</Desc_Stone_C>
 	<Desc_Sulfur_C>Schwefel</Desc_Sulfur_C>
 	<Desc_TurboFuel_C>Turbotreibstoff</Desc_TurboFuel_C>
 	<Desc_UraniumCell_C>Uranzelle</Desc_UraniumCell_C>
@@ -575,9 +580,10 @@
 	<Recipe_XenoBasher_C>[Rezept] Xeno-Basher</Recipe_XenoBasher_C>
 	<Recipe_XenoZapper_C>[Rezept] Xeno-Zapper</Recipe_XenoZapper_C>
 	
-	<ResearchRecipe_AlienCarapace1_C>[Erforschung] Alienpanzer</ResearchRecipe_AlienCarapace1_C>
+	<ResearchRecipe_AlienCarapace1_C>[Erforschung] Alienpanzer 1</ResearchRecipe_AlienCarapace1_C>
 	<ResearchRecipe_AlienCarapace2_C>[Erforschung] Alienpanzer 2</ResearchRecipe_AlienCarapace2_C>
-	<ResearchRecipe_AlienOrgans1_C>[Erforschung] Alienorgane</ResearchRecipe_AlienOrgans1_C>
+	<ResearchRecipe_AlienOrgans1_C>[Erforschung] Alienorgane 1</ResearchRecipe_AlienOrgans1_C>
+	<ResearchRecipe_AlienOrgans2_C>[Erforschung] Alienorgane 2</ResearchRecipe_AlienOrgans2_C>
 	<ResearchRecipe_Berry_C>[Erforschung] Beere</ResearchRecipe_Berry_C>
 	<ResearchRecipe_Caterium1_C>[Erforschung] Caterium 1</ResearchRecipe_Caterium1_C>
 	<ResearchRecipe_Caterium2_C>[Erforschung] Caterium 2</ResearchRecipe_Caterium2_C>
@@ -591,9 +597,9 @@
 	<ResearchRecipe_Nut_C>[Erforschung] Nuss</ResearchRecipe_Nut_C>
 	<ResearchRecipe_Quartz1_C>[Erforschung] Quarz 1</ResearchRecipe_Quartz1_C>
 	<ResearchRecipe_Quartz2_C>[Erforschung] Quarz 2</ResearchRecipe_Quartz2_C>
-	<ResearchRecipe_Slug1_C>[Erforschung] Schnecke 1</ResearchRecipe_Slug1_C>
-	<ResearchRecipe_Slug2_C>[Erforschung] Schnecke 2</ResearchRecipe_Slug2_C>
-	<ResearchRecipe_Slug3_C>[Erforschung] Schnecke 3</ResearchRecipe_Slug3_C>
+	<ResearchRecipe_Slug1_C>[Erforschung] Elektroschnecke (Grün)</ResearchRecipe_Slug1_C>
+	<ResearchRecipe_Slug2_C>[Erforschung] Elektroschnecke (Gelb)</ResearchRecipe_Slug2_C>
+	<ResearchRecipe_Slug3_C>[Erforschung] Elektroschnecke (Violett)</ResearchRecipe_Slug3_C>
 	<ResearchRecipe_Sulfur1_C>[Erforschung] Schwefel 1</ResearchRecipe_Sulfur1_C>
 	<ResearchRecipe_Sulfur2_C>[Erforschung] Schwefel 2</ResearchRecipe_Sulfur2_C>
 

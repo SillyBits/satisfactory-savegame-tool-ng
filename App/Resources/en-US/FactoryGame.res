@@ -58,9 +58,9 @@
 	<AlienArtifact_02_C>Alien Artifact 02</AlienArtifact_02_C>
 	<AlienArtifact_03_C>Alien Artifact 03</AlienArtifact_03_C>
 	<BP_BerryBush_C>Berry Bush</BP_BerryBush_C>
-	<BP_Crystal_C>Crystal Mk1</BP_Crystal_C>
-	<BP_Crystal_mk3_C>Crystal Mk3</BP_Crystal_mk3_C>
-	<BP_Crystal_mk2_C>Crystal Mk2</BP_Crystal_mk2_C>
+	<BP_Crystal_C>Power slug (Green)</BP_Crystal_C>
+	<BP_Crystal_mk2_C>Power slug (Yellow)</BP_Crystal_mk2_C>
+	<BP_Crystal_mk3_C>Power slug (Purple)</BP_Crystal_mk3_C>
 	<BP_DestructibleLargeRock_C>Destructible Large Rock</BP_DestructibleLargeRock_C>
 	<BP_DestructibleSmallRock_C>Destructible Small Rock</BP_DestructibleSmallRock_C>
 	<BP_ItemPickup_Spawnable_C>ItemPickup_Spawnable</BP_ItemPickup_Spawnable_C>
@@ -70,17 +70,22 @@
 	<BP_ResourceNodeGeyser_C>Resource Node Geyser</BP_ResourceNodeGeyser_C>
 	<BP_Shroom_01_C>Shroom</BP_Shroom_01_C>
 	<BP_VineLadder_C>Vine Ladder</BP_VineLadder_C>
-	<BP_WAT1_C>WAT 1</BP_WAT1_C>
-	<BP_WAT2_C>WAT 2</BP_WAT2_C>
+	<BP_WAT1_C>Somersloop (WIP)</BP_WAT1_C>
+	<BP_WAT2_C>Mercer Sphere (WIP)</BP_WAT2_C>
 	<Deposit_Bauxite_C>[Deposit] Bauxite</Deposit_Bauxite_C>
 	<Deposit_Coal_C>[Deposit] Coal</Deposit_Coal_C>
 	<Deposit_Copper_C>[Deposit] Copper</Deposit_Copper_C>
 	<Deposit_Gold_C>[Deposit] Gold</Deposit_Gold_C>
 	<Deposit_Iron_C>[Deposit] Iron</Deposit_Iron_C>
-	<Deposit_Stone_C>[Deposit] Stone</Deposit_Stone_C>
+	<Deposit_Stone_C>[Deposit] Limestone</Deposit_Stone_C>
 	<Deposit_Sulfur_C>[Deposit] Sulfur</Deposit_Sulfur_C>
 	<Deposit_Uranium_C>[Deposit] Uranium</Deposit_Uranium_C>
+	<Desc_Crystal_C>Power slug (Green)</Desc_Crystal_C>
+	<Desc_Crystal_mk2_C>Power slug (Yellow)</Desc_Crystal_mk2_C>
+	<Desc_Crystal_mk3_C>Power slug (Purple)</Desc_Crystal_mk3_C>
 	<Desc_Geyser_C>Geyser</Desc_Geyser_C>
+	<Desc_WAT1_C>Somersloop (WIP)</Desc_WAT1_C>
+	<Desc_WAT2_C>Mercer Sphere (WIP)</Desc_WAT2_C>
 	<ResourceNode_Middle_Quartz01_C>Quartz</ResourceNode_Middle_Quartz01_C>
 	
 	<!-- Mobs, dangers, and "remains" -->
@@ -140,7 +145,7 @@
 	<BP_ItemDescriptorPortableMiner_C>Portable Miner</BP_ItemDescriptorPortableMiner_C>
 	<BP_ResourceScanner_C>Resource Scanner</BP_ResourceScanner_C>
 	<Desc_Chainsaw_C>Chainsaw</Desc_Chainsaw_C>
-	<Desc_Parachute>Parachute</Desc_Parachute>
+	<Desc_Parachute_C>Parachute</Desc_Parachute_C>
 	<Equip_Chainsaw_C>Chainsaw</Equip_Chainsaw_C>
 	<Equip_ColorGun_C>Color Gun</Equip_ColorGun_C>
 	<Equip_GasMask_C>Gas Mask</Equip_GasMask_C>
@@ -163,11 +168,11 @@
 	<Biomass_C>Biomass</Biomass_C>
 	<Biomass_Flower_C>Biomass (Flower)</Biomass_Flower_C>
 	<Biomass_Vines_C>Biomass (Vines)</Biomass_Vines_C>
-	<Desc_AluminumIngot_C>AluminumIngot</Desc_AluminumIngot_C>
-	<Desc_AluminumPlate_C>AluminumPlate</Desc_AluminumPlate_C>
-	<Desc_AluminumPlateReinforced_C>Aluminum Plate Reinforced</Desc_AluminumPlateReinforced_C>
+	<Desc_AluminumIngot_C>Aluminum Ingot</Desc_AluminumIngot_C>
+	<Desc_AluminumPlate_C>Aluminum Plate</Desc_AluminumPlate_C>
+	<Desc_AluminumPlateReinforced_C>Alclad Aluminum Sheet</Desc_AluminumPlateReinforced_C>
 	<Desc_Battery_C>Battery</Desc_Battery_C>
-	<Desc_Berry_C>Berry</Desc_Berry_C>
+	<Desc_Berry_C>Paleberry</Desc_Berry_C>
 	<Desc_Biofuel_C>Biofuel</Desc_Biofuel_C>
 	<Desc_Cable_C>Cable</Desc_Cable_C>
 	<Desc_CartridgeStandard_C>Cartridge Standard</Desc_CartridgeStandard_C>
@@ -207,19 +212,19 @@
 	<Desc_Medkit_C>Medkit</Desc_Medkit_C>
 	<Desc_ModularFrame_C>Modular Frame</Desc_ModularFrame_C>
 	<Desc_ModularFrameHeavy_C>Heavy Modular Frame</Desc_ModularFrameHeavy_C>
-	<Desc_ModularFrameLightweight>Light Modular Frame</Desc_ModularFrameLightweight>
+	<Desc_ModularFrameLightweight_C>Light Modular Frame</Desc_ModularFrameLightweight_C>
 	<Desc_Motor_C>Motor</Desc_Motor_C>
 	<Desc_MotorLightweight_C>Lightweight Motor</Desc_MotorLightweight_C>
 	<Desc_Mycelia_C>Mycelia</Desc_Mycelia_C>
 	<Desc_NobeliskExplosive_C>Nobelisk Explosive</Desc_NobeliskExplosive_C>
 	<Desc_NuclearFuelRod_C>Nuclear Fuel Rod</Desc_NuclearFuelRod_C>
 	<Desc_NuclearWaste_C>Nuclear Waste</Desc_NuclearWaste_C>
-	<Desc_Nut_C>Nut</Desc_Nut_C>
-	<Desc_OreBauxite_C>[Ore] Bauxite</Desc_OreBauxite_C>
-	<Desc_OreCopper_C>[Ore] Copper</Desc_OreCopper_C>
-	<Desc_OreGold_C>[Ore] Gold</Desc_OreGold_C>
-	<Desc_OreIron_C>[Ore] Iron</Desc_OreIron_C>
-	<Desc_OreUranium_C>[Ore] Uranium</Desc_OreUranium_C>
+	<Desc_Nut_C>Beryl Nut</Desc_Nut_C>
+	<Desc_OreBauxite_C>Bauxite</Desc_OreBauxite_C>
+	<Desc_OreCopper_C>Copper Ore</Desc_OreCopper_C>
+	<Desc_OreGold_C>Caterium Ore</Desc_OreGold_C>
+	<Desc_OreIron_C>Iron Ore</Desc_OreIron_C>
+	<Desc_OreUranium_C>Uranium Ore</Desc_OreUranium_C>
 	<Desc_Plastic_C>Plastic</Desc_Plastic_C>
 	<Desc_QuantumOscillator_C>Quantum Oscillator</Desc_QuantumOscillator_C>
 	<Desc_QuartzCrystal_C>Quartz Crystal</Desc_QuartzCrystal_C>
@@ -227,18 +232,18 @@
 	<Desc_RebarGunProjectile_C>Rebar Gun Projectile</Desc_RebarGunProjectile_C>
 	<Desc_Rotor_C>Rotor</Desc_Rotor_C>
 	<Desc_Rubber_C>Rubber</Desc_Rubber_C>
-	<Desc_SAM_C>SAM</Desc_SAM_C>
+	<Desc_SAM_C>S.A.M. Ore</Desc_SAM_C>
 	<Desc_Shroom_C>Shroom</Desc_Shroom_C>
 	<Desc_Silica_C>Silica</Desc_Silica_C>
-	<!--<Desc_SpaceElevatorBlocker_C>Space Elevator Blocker</Desc_SpaceElevatorBlocker_C>-->
+	<Desc_SpaceElevatorBlocker_C>Space Elevator Blocker</Desc_SpaceElevatorBlocker_C>
 	<Desc_SpikedRebar_C>Spiked Rebar</Desc_SpikedRebar_C>
 	<Desc_SpitterParts_C>Spitter Parts</Desc_SpitterParts_C>
 	<Desc_Stator_C>Stator</Desc_Stator_C>
 	<Desc_SteelIngot_C>Steel Ingot</Desc_SteelIngot_C>
 	<Desc_SteelPipe_C>Steel Pipe</Desc_SteelPipe_C>
 	<Desc_SteelPlate_C>Steel Plate</Desc_SteelPlate_C>
-	<Desc_SteelPlateReinforced_C>Reinforced Steel Plate</Desc_SteelPlateReinforced_C>
-	<Desc_Stone_C>Stone</Desc_Stone_C>
+	<Desc_SteelPlateReinforced_C>Encased Industrial Beam</Desc_SteelPlateReinforced_C>
+	<Desc_Stone_C>Limestone</Desc_Stone_C>
 	<Desc_Sulfur_C>Sulfur</Desc_Sulfur_C>
 	<Desc_TurboFuel_C>Turbo Fuel</Desc_TurboFuel_C>
 	<Desc_UraniumCell_C>Uranium Cell</Desc_UraniumCell_C>
@@ -581,25 +586,26 @@
 	
 	<ResearchRecipe_AlienCarapace1_C>[Research] Alien Carapace 1</ResearchRecipe_AlienCarapace1_C>
 	<ResearchRecipe_AlienCarapace2_C>[Research] Alien Carapace 2</ResearchRecipe_AlienCarapace2_C>
-	<ResearchRecipe_AlienOrgans1_C>[Research] Alien Organs</ResearchRecipe_AlienOrgans1_C>
-	<ResearchRecipe_Berry_C>[Research] Berry</ResearchRecipe_Berry_C>
-	<ResearchRecipe_Caterium1_C>[Research] Caterium 1</ResearchRecipe_Caterium1_C>
-	<ResearchRecipe_Caterium2_C>[Research] Caterium 2</ResearchRecipe_Caterium2_C>
-	<ResearchRecipe_Caterium3_C>[Research] Caterium 3</ResearchRecipe_Caterium3_C>
+	<ResearchRecipe_AlienOrgans1_C>[Research] Alien Organs 1</ResearchRecipe_AlienOrgans1_C>
+	<ResearchRecipe_AlienOrgans2_C>[Research] Alien Organs 2</ResearchRecipe_AlienOrgans2_C>
+	<ResearchRecipe_Berry_C>[Research] Paleberry</ResearchRecipe_Berry_C>
+	<ResearchRecipe_Caterium1_C>[Research] Caterium Ore</ResearchRecipe_Caterium1_C>
+	<ResearchRecipe_Caterium2_C>[Research] Quickwire</ResearchRecipe_Caterium2_C>
+	<ResearchRecipe_Caterium3_C>[Research] Supercomputer</ResearchRecipe_Caterium3_C>
 	<ResearchRecipe_Fabric_C>[Research] Fabric</ResearchRecipe_Fabric_C>
-	<ResearchRecipe_FlowerPetal_C>[Research] Flower Petal</ResearchRecipe_FlowerPetal_C>
-	<ResearchRecipe_HardDrive_Repeatable_C>[Research] Hard Drive </ResearchRecipe_HardDrive_Repeatable_C>
-	<ResearchRecipe_Mushroom_C>[Research] Mushroom</ResearchRecipe_Mushroom_C>
+	<ResearchRecipe_FlowerPetal_C>[Research] Flower Petals</ResearchRecipe_FlowerPetal_C>
+	<ResearchRecipe_HardDrive_Repeatable_C>[Research] Hard Drive</ResearchRecipe_HardDrive_Repeatable_C>
+	<ResearchRecipe_Mushroom_C>[Research] Bacon Agaric</ResearchRecipe_Mushroom_C>
 	<ResearchRecipe_Mycelia_C>[Research] Mycelia 1</ResearchRecipe_Mycelia_C>
 	<ResearchRecipe_Mycelia2_C>[Research] Mycelia 2</ResearchRecipe_Mycelia2_C>
-	<ResearchRecipe_Nut_C>[Research] Nut</ResearchRecipe_Nut_C>
-	<ResearchRecipe_Quartz1_C>[Research] Quartz 1</ResearchRecipe_Quartz1_C>
-	<ResearchRecipe_Quartz2_C>[Research] Quartz 2</ResearchRecipe_Quartz2_C>
-	<ResearchRecipe_Slug1_C>[Research] Slug 1</ResearchRecipe_Slug1_C>
-	<ResearchRecipe_Slug2_C>[Research] Slug 2</ResearchRecipe_Slug2_C>
-	<ResearchRecipe_Slug3_C>[Research] Slug 3</ResearchRecipe_Slug3_C>
-	<ResearchRecipe_Sulfur1_C>[Research] Sulfur 1</ResearchRecipe_Sulfur1_C>
-	<ResearchRecipe_Sulfur2_C>[Research] Sulfur 2</ResearchRecipe_Sulfur2_C>
+	<ResearchRecipe_Nut_C>[Research] Beryl Nut</ResearchRecipe_Nut_C>
+	<ResearchRecipe_Quartz1_C>[Research] Raw Quartz</ResearchRecipe_Quartz1_C>
+	<ResearchRecipe_Quartz2_C>[Research] Crystal Oscillator</ResearchRecipe_Quartz2_C>
+	<ResearchRecipe_Slug1_C>[Research] Green Power Slug</ResearchRecipe_Slug1_C>
+	<ResearchRecipe_Slug2_C>[Research] Yellow Power Slug</ResearchRecipe_Slug2_C>
+	<ResearchRecipe_Slug3_C>[Research] Purple Power Slug</ResearchRecipe_Slug3_C>
+	<ResearchRecipe_Sulfur1_C>[Research] Sulfur</ResearchRecipe_Sulfur1_C>
+	<ResearchRecipe_Sulfur2_C>[Research] Nobelisk</ResearchRecipe_Sulfur2_C>
 	
 	<Schematic_1-1_C>[Schematic] Utility</Schematic_1-1_C>
 	<Schematic_1-2_C>[Schematic] Logistics</Schematic_1-2_C>
