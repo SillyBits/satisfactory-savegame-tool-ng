@@ -45,4 +45,6 @@
 	<version build="106402" type="0" version="0.2.1.16" />						<!-- Early Access (EXPERIMENTAL) - v0.2.1.16 - Build 106402 -->
 <!-- version build="106504" type="0" version="0.2.1.17" remarks="Moved to stable"    Early Access (EXPERIMENTAL) - v0.2.1.17 - Build 106504 -->
 	<version build="106504" type="1" version="0.2.1.17" />						<!-- Early Access - v0.2.1.17 - Build 106504 -->
+	<version build="109075" type="1" version="0.2.1.18" />						<!-- Early Access - v0.2.1.18 - Build 109075 -->
+	<version build="109370" type="0" version="0.2.1.19" />						<!-- Early Access (EXPERIMENTAL) - v0.2.1.19 - Build 109370 -->
 </versions>
