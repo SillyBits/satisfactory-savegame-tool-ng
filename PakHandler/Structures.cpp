@@ -72,7 +72,7 @@ void Footer::DumpTo(DumpToFileHelper^ d)
 	d->AddLine("[Footer]");
 	d->AddLine("- Magic      : " + Magic);
 	d->AddLine("- Version    : " + ((int)Version).ToString());
-	d->AddLine("- IndexOffset: " + IndexOffset.ToString("X16"));
+	d->AddLine("- IndexOffset: 0x" + IndexOffset.ToString("X16"));
 	d->AddLine("- IndexSize  : " + IndexSize);
 	d->AddLine("- Sha1       : <skipped>");// + String::Join(", ", Sha1));
 }
@@ -536,9 +536,9 @@ void FObjectExport::DumpTo(DumpToFileHelper^ d)
 		d->AddLine("<NULL>");
 	d->Pop();
 //	d->AddLine("- Architecture                                : " + Architecture);
-	d->AddLine("- ObjectFlags                                 : " + ObjectFlags.ToString("X8"));
+	d->AddLine("- ObjectFlags                                 : 0x" + ObjectFlags.ToString("X8"));
 	d->AddLine("- SerialSize                                  : " + SerialSize);
-	d->AddLine("- SerialOffset                                : " + SerialOffset.ToString("X8"));
+	d->AddLine("- SerialOffset                                : 0x" + SerialOffset.ToString("X8"));
 	d->AddLine("- ForcedExport                                : " + ForcedExport);
 	d->AddLine("- NotForClients                               : " + NotForClients);
 	d->AddLine("- NotForServers                               : " + NotForServers);
@@ -547,7 +547,7 @@ void FObjectExport::DumpTo(DumpToFileHelper^ d)
 	d->Push();
 	Guid->DumpTo(d);
 	d->Pop();
-	d->AddLine("- PackageFlags                                : " + PackageFlags.ToString("X8"));
+	d->AddLine("- PackageFlags                                : 0x" + PackageFlags.ToString("X8"));
 	d->AddLine("- NotForEditorGame                            : " + NotForEditorGame);
 	d->AddLine("- IsAsset                                     : " + IsAsset);
 	d->AddLine("- FirstExportDependency                       : " + FirstExportDependency);
@@ -618,6 +618,27 @@ void FObjectDepends::DumpTo(DumpToFileHelper^ d)
 }
 
 
+//TODO:
+// 
+//
+
+FPreloadDepends::FPreloadDepends()
+	: base()
+//	, Dependencies(nullptr)
+{ }
+
+bool FPreloadDepends::Read(IReader^ reader, array<String^>^ names)
+{
+	//TODO:
+	return true;
+}
+
+void FPreloadDepends::DumpTo(DumpToFileHelper^ d)
+{
+	d->AddLine("[FPreloadDepends]: TODO!");
+}
+
+
 // 
 //
 
@@ -630,10 +651,14 @@ FPackageFileSummary::FPackageFileSummary()
 	, EngineVersion(nullptr)
 	, CompatibleEngineVersion(nullptr)
 	, CompressedChunks(nullptr)
+	, ChunkIDs(nullptr)
 	, Names(nullptr)
 	, Exports(nullptr)
 	, Imports(nullptr)
 	, Depends(nullptr)
+//	, AssetRegistryData(nullptr)
+	, PreloadDependencyIndices(nullptr)
+	, PreloadDependencies(nullptr)
 { }
 
 bool FPackageFileSummary::Read(IReader^ reader)
@@ -769,7 +794,16 @@ bool FPackageFileSummary::Read(IReader^ reader)
 
 	BulkDataStartOffset = reader->ReadULong();
 
-	// ... more data, but no info yet on how to handle
+	WorldTileInfoDataOffset = reader->ReadInt();
+
+	ChunkIDsCount = reader->ReadInt();
+	if (ChunkIDsCount > 0)
+		ChunkIDs = reader->ReadInts(ChunkIDsCount);
+
+	PreloadDependencyCount = reader->ReadInt();
+	PreloadDependencyOffset = reader->ReadInt();
+
+	// ... there might be more data, but no info yet on how to handle
 	// so we do check end magic now and go back afterwards
 	__int64 last_pos = reader->Pos;
 
@@ -882,8 +916,64 @@ bool FPackageFileSummary::Read(IReader^ reader)
 		}
 	}
 
-	//TODO: DependsOffset
+	//TODO: DependsOffset -> DependsMap
+
 	//TODO: AssetRegistryDataOffset
+	//if (AssetRegistryDataOffset > 0)
+	//{
+	//	if (reader->Seek(AssetRegistryDataOffset, IReader::Positioning::Start) != AssetRegistryDataOffset)
+	//	{
+	//		Log::Error("Package: Failed to seek to AssetRegistryDataOffset at {0:#,#0}", AssetRegistryDataOffset);
+	//		return false;
+	//	}
+	//
+	//	count = reader->ReadInt();
+	//	if (count > 0)
+	//	{
+	//		Log::Warning("Package: Asset registry handling needed!");
+	//		return false;
+	//
+	//		//AssetRegistryData = gcnew array< ? >(count);
+	//		//...
+	//	}
+	//}
+
+	//TODO: PreloadDependencies
+	if (PreloadDependencyCount > 0)
+	{
+		if (PreloadDependencyOffset <= 0)
+		{
+			Log::Error("Package: Invalid PreloadDependencyOffset {0:#,#0}", PreloadDependencyOffset);
+			return false;
+		}
+	
+		if (reader->Seek(PreloadDependencyOffset, IReader::Positioning::Start) != PreloadDependencyOffset)
+		{
+			Log::Error("Package: Failed to seek to PreloadDependencyOffset at {0:#,#0}", PreloadDependencyOffset);
+			return false;
+		}
+
+		__int64 last_pos = reader->Pos;
+		PreloadDependencyIndices = reader->ReadInts(PreloadDependencyCount);
+		if (PreloadDependencyIndices == nullptr)
+		{
+			Log::Error("Package: Failed to read preload dependency indices at {0:#,#0}", last_pos);
+			return false;
+		}
+
+		//PreloadDependencies = gcnew array<FPreloadDepends^>(PreloadDependencyCount);
+		//for (int i = 0; i < PreloadDependencyCount; ++i)
+		//{
+		//	__int64 last_pos = reader->Pos;
+		//	FPreloadDepends^ instance = FPreloadDepends::Create(reader, Names);
+		//	if (instance == nullptr)
+		//	{
+		//		Log::Error("Package: Failed to read preload dependency #{0} at {1:#,#0}", i, last_pos);
+		//		return false;
+		//	}
+		//	PreloadDependencies[i] = instance;
+		//}
+	}
 
 
 	return true;
@@ -894,7 +984,7 @@ void FPackageFileSummary::DumpTo(DumpToFileHelper^ d)
 	int index = 0;
 
 	d->AddLine("[FPackageFileSummary]");
-	d->AddLine(" - Magic: " + Magic.ToString("X8"));
+	d->AddLine(" - Magic                      : 0x" + Magic.ToString("X8"));
 	d->AddLine(" - LegacyVersion              : " + LegacyVersion);
 	d->AddLine(" - Engine                     : " + ((int)Engine).ToString());
 	d->AddLine(" - VersionUE3                 : " + VersionUE3);
@@ -903,20 +993,20 @@ void FPackageFileSummary::DumpTo(DumpToFileHelper^ d)
 //	d->AddLine(" - CustomVersions             : " + CustomVersions);
 	d->AddLine(" - HeaderSize                 : " + HeaderSize);
 	d->AddLine(" - Group                      : " + Group);
-	d->AddLine(" - Flags                      : " + Flags);
+	d->AddLine(" - Flags                      : 0x" + Flags.ToString("X8"));
 	d->AddLine(" - NamesCount                 : " + NamesCount);
-	d->AddLine(" - NamesOffset                : " + NamesOffset);
+	d->AddLine(" - NamesOffset                : 0x" + NamesOffset.ToString("X8"));
 	d->AddLine(" - GatherableTextDataCount    : " + GatherableTextDataCount);
-	d->AddLine(" - GatherableTextDataOffset   : " + GatherableTextDataOffset);
+	d->AddLine(" - GatherableTextDataOffset   : 0x" + GatherableTextDataOffset.ToString("X8"));
 	d->AddLine(" - ExportCount                : " + ExportCount);
-	d->AddLine(" - ExportOffset               : " + ExportOffset);
+	d->AddLine(" - ExportOffset               : 0x" + ExportOffset.ToString("X8"));
 	d->AddLine(" - ImportCount                : " + ImportCount);
-	d->AddLine(" - ImportOffset               : " + ImportOffset);
-	d->AddLine(" - DependsOffset              : " + DependsOffset);
+	d->AddLine(" - ImportOffset               : 0x" + ImportOffset.ToString("X8"));
+	d->AddLine(" - DependsOffset              : 0x" + DependsOffset.ToString("X8"));
 	d->AddLine(" - StringAssetReferencesCount : " + StringAssetReferencesCount);
-	d->AddLine(" - StringAssetReferencesOffset: " + StringAssetReferencesOffset);
-	d->AddLine(" - SearchableNamesOffset      : " + SearchableNamesOffset);
-	d->AddLine(" - ThumbnailTableOffset       : " + ThumbnailTableOffset);
+	d->AddLine(" - StringAssetReferencesOffset: 0x" + StringAssetReferencesOffset.ToString("X8"));
+	d->AddLine(" - SearchableNamesOffset      : 0x" + SearchableNamesOffset.ToString("X8"));
+	d->AddLine(" - ThumbnailTableOffset       : 0x" + ThumbnailTableOffset.ToString("X8"));
 	d->AddLine(" - Guid                       : "); 
 	d->Push();
 	Guid->DumpTo(d);
@@ -943,7 +1033,7 @@ void FPackageFileSummary::DumpTo(DumpToFileHelper^ d)
 	d->Push();
 	CompatibleEngineVersion->DumpTo(d);
 	d->Pop();
-	d->AddLine(" - CompressionFlags           : " + CompressionFlags.ToString("X8"));
+	d->AddLine(" - CompressionFlags           : 0x" + CompressionFlags.ToString("X8"));
 	d->AddLine(" - CompressedChunks           : " + (CompressedChunks != nullptr ? CompressedChunks->Length.ToString() : "-"));
 	if (CompressedChunks != nullptr)
 	{
@@ -957,9 +1047,23 @@ void FPackageFileSummary::DumpTo(DumpToFileHelper^ d)
 		}
 		d->Pop();
 	}
-	d->AddLine(" - PackageSource              : " + PackageSource.ToString("X8"));
-	d->AddLine(" - AssetRegistryDataOffset    : " + AssetRegistryDataOffset.ToString("X8"));
-	d->AddLine(" - BulkDataStartOffset        : " + BulkDataStartOffset.ToString("X16"));
+	d->AddLine(" - PackageSource              : 0x" + PackageSource.ToString("X8"));
+	d->AddLine(" - AssetRegistryDataOffset    : 0x" + AssetRegistryDataOffset.ToString("X8"));
+	d->AddLine(" - BulkDataStartOffset        : 0x" + BulkDataStartOffset.ToString("X16"));
+	d->AddLine(" - WorldTileInfoDataOffset    : 0x" + WorldTileInfoDataOffset.ToString("X8"));
+	d->AddLine(" - ChunkIDsCount              : " + ChunkIDsCount);
+	d->AddLine(" - ChunkIDs                   : <skipped>");
+	//if (ChunkIDs != nullptr) //TODO:
+	//{
+	//	d->Push();
+	//	...
+	//	d->Pop();
+	//}
+	d->AddLine(" - PreloadDependencyCount     : " + PreloadDependencyCount);
+	d->AddLine(" - PreloadDependencyOffset    : 0x" + PreloadDependencyOffset.ToString("X8"));
+
+	d->AddLine(" ---");
+
 	d->AddLine(" - Names                      : " + (Names != nullptr ? Names->Length.ToString() : "-"));
 	if (Names != nullptr)
 	{
@@ -1011,6 +1115,19 @@ void FPackageFileSummary::DumpTo(DumpToFileHelper^ d)
 		}
 		d->Pop();
 	}
+	//d->AddLine(" - PreloadDependencies        : " + (PreloadDependencies != nullptr ? PreloadDependencies->Length.ToString() : "-"));
+	//if (PreloadDependencies != nullptr)
+	//{
+	//	d->Push();
+	//	index = 0;
+	//	for each (?^ dep in PreloadDependencies)
+	//	{
+	//		d->AddLine("#" + index + ": ");
+	//		++index;
+	//		dep->DumpTo(d);
+	//	}
+	//	d->Pop();
+	//}
 }
 
 
@@ -1254,8 +1371,8 @@ void FObject::DumpTo(DumpToFileHelper^ d)
 		SerializedGuid->DumpTo(d);
 		d->Pop();
 	}
-	d->AddLine("- Length           : " + Length.ToString("X16"));
-	d->AddLine("- Offset           : " + Offset.ToString("X16"));
+	d->AddLine("- Length           : 0x" + Length.ToString("X16"));
+	d->AddLine("- Offset           : 0x" + Offset.ToString("X16"));
 }
 
 
@@ -1295,7 +1412,7 @@ void FPlatformData::DumpTo(DumpToFileHelper^ d)
 		PixelFormat->DumpTo(d);
 		d->Pop();
 	}
-	d->AddLine("- SkippedOffset    : " + SkippedOffset.ToString("X16"));
+	d->AddLine("- SkippedOffset    : 0x" + SkippedOffset.ToString("X16"));
 	d->AddLine("- SizeX            : " + SizeX);
 	d->AddLine("- SizeY            : " + SizeY);
 	d->AddLine("- NumSlices        : " + NumSlices);
@@ -1335,10 +1452,10 @@ bool FBulkData::Read(IReader^ reader)
 void FBulkData::DumpTo(DumpToFileHelper^ d)
 {
 	d->AddLine("[FBulkData]");
-	d->AddLine("- BulkDataFlags: " + BulkDataFlags.ToString("X8"));
-	d->AddLine("- ElementCount : " + ElementCount.ToString("X16"));
-	d->AddLine("- SizeOnDisk   : " + SizeOnDisk.ToString("X16"));
-	d->AddLine("- OffsetInFile : " + OffsetInFile.ToString("X16"));
+	d->AddLine("- BulkDataFlags: 0x" + BulkDataFlags.ToString("X8"));
+	d->AddLine("- ElementCount : 0x" + ElementCount.ToString("X16"));
+	d->AddLine("- SizeOnDisk   : 0x" + SizeOnDisk.ToString("X16"));
+	d->AddLine("- OffsetInFile : 0x" + OffsetInFile.ToString("X16"));
 	d->AddLine("- Data         : " + (Data != nullptr ? Data->Length.ToString() : "-"));
 }
 
@@ -1750,7 +1867,7 @@ void FAssetData::DumpTo(DumpToFileHelper^ d)
 		d->Add(id.ToString() + ",", false);
 	d->AddLine("");
 
-	d->AddLine(" - PackageFlags: " + PackageFlags.ToString("X8"));
+	d->AddLine(" - PackageFlags: 0x" + PackageFlags.ToString("X8"));
 }
 
 

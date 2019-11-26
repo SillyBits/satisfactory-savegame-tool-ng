@@ -500,6 +500,20 @@ namespace PakHandler
 	};
 
 
+	public ref class FPreloadDepends : public ObjectBaseParamT<FPreloadDepends, array<String^>^> //TODO: Rename to fit UE
+	{
+	public:
+	//	array<__int32>^ Dependencies;
+
+
+		FPreloadDepends();
+
+		bool Read(IReader^ reader, array<String^>^ names) override;
+
+		void DumpTo(DumpToFileHelper^ d) override;
+	};
+
+
 	public ref class FPackageFileSummary : public ObjectBaseT<FPackageFileSummary>
 	{
 	public:
@@ -537,10 +551,19 @@ namespace PakHandler
 		dword                     PackageSource; // A 32bit hash? => FHash class?
 		__int32                   AssetRegistryDataOffset;
 		qword                     BulkDataStartOffset; // Offset to end magic
+		__int32                   WorldTileInfoDataOffset;
+		__int32                   ChunkIDsCount;
+		array<__int32>^           ChunkIDs;
+		__int32                   PreloadDependencyCount;
+		__int32                   PreloadDependencyOffset;
+		//^^^^^ end of serialized data
 		array<String^>^           Names;
 		array<FObjectExport^>^    Exports;
 		array<FObjectImport^>^    Imports;
 		array<FObjectDepends^>^   Depends;
+	//	array<?>^                 AssetRegistryData;
+		array<__int32>^           PreloadDependencyIndices; // <0: Import map, >0: Export map
+		array<FPreloadDepends^>^  PreloadDependencies;
 
 
 		property bool IsUnversioned { bool get() { return Version == 0 && LicenseeVersion == 0; } }
