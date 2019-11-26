@@ -625,7 +625,7 @@ namespace SatisfactorySavegameTool.Actions
 		internal bool _v_Rotator(Property obj)
 		{
 			Rotator rot = obj as Rotator;
-			return _v_3(obj, rot.X, rot.Y, rot.Z);
+			return _v_3(obj, rot.Pitch, rot.Yaw, rot.Roll);
 		}
 
 		internal bool _v_Scale(Property obj)
@@ -671,9 +671,9 @@ namespace SatisfactorySavegameTool.Actions
 		internal bool _v_Quat(Property obj)
 		{
 			Quat quat = obj as Quat;
-			if (float.IsInfinity(quat.D) || float.IsNaN(quat.D))
-				return _v_3(obj, quat.A, quat.B, quat.C);
-			return _v_4(obj, quat.A, quat.B, quat.C, quat.D);
+			if (float.IsInfinity(quat.W) || float.IsNaN(quat.W))
+				return _v_3(obj, quat.X, quat.Y, quat.Z);
+			return _v_4(obj, quat.X, quat.Y, quat.Z, quat.W);
 		}
 
 	}

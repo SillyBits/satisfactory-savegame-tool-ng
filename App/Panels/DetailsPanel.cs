@@ -1858,11 +1858,26 @@ namespace SatisfactorySavegameTool.Panels.Details
 		internal P.Vector _prop;
 	}
 
-	internal class Rotator : Vector
+	internal class Rotator : MultiValueControl<float> //ValueControl<P.Vector>
 	{
 		public Rotator(IElement parent, string label, object obj)
-			: base(parent, label, obj)
-		{ }
+			: base(parent, label, null)
+		{
+			_prop = obj as P.Rotator;
+			_value = new float[] { _prop.Pitch, _prop.Yaw, _prop.Roll };
+		}
+
+		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			float[] vals = Value;
+			_prop.Pitch = vals[0];
+			_prop.Yaw   = vals[1];
+			_prop.Roll  = vals[2];
+
+			base._PropertyChanged(_prop, e);
+		}
+
+		internal P.Rotator _prop;
 	}
 
 	internal class Scale : Vector
@@ -2053,16 +2068,16 @@ namespace SatisfactorySavegameTool.Panels.Details
 			: base(parent, label, null)
 		{
 			_prop = obj as P.Quat;
-			_value = new float[] { _prop.A, _prop.B, _prop.C, _prop.D };
+			_value = new float[] { _prop.X, _prop.Y, _prop.Z, _prop.W };
 		}
 
 		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			float[] vals = Value;
-			_prop.A = vals[0];
-			_prop.B = vals[1];
-			_prop.C = vals[2];
-			_prop.D = vals[3];
+			_prop.X = vals[0];
+			_prop.Y = vals[1];
+			_prop.Z = vals[2];
+			_prop.W = vals[3];
 
 			base._PropertyChanged(_prop, e);
 		}

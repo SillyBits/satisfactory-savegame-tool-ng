@@ -963,7 +963,27 @@ namespace Savegame
 	#pragma endregion
 
 	#pragma region Rotator
-	CLS_(Rotator,Vector)
+	CLS(Rotator)
+		PUB_f(Pitch)
+		PUB_f(Yaw)
+		PUB_f(Roll)
+		SIZE
+			ADD(Rotator::GetLength())
+			SIZE_CHECK
+		SIZE_END
+		LENGTH
+			ADD(sizeof(float)*3)
+		LENGTH_END
+		READ
+			Pitch = reader->ReadFloat();
+			Yaw   = reader->ReadFloat();
+			Roll  = reader->ReadFloat();
+		READ_END
+		WRITE
+			writer->Write(Pitch);
+			writer->Write(Yaw);
+			writer->Write(Roll);
+		WRITE_END
 	CLS_END
 	#pragma endregion
 
@@ -1098,10 +1118,10 @@ namespace Savegame
 
 	#pragma region Quat
 	CLS(Quat)
-		PUB_f(A)
-		PUB_f(B)
-		PUB_f(C)
-		PUB_f(D)
+		PUB_f(X)
+		PUB_f(Y)
+		PUB_f(Z)
+		PUB_f(W)
 		SIZE
 			ADD(Quat::GetLength())
 			SIZE_CHECK
@@ -1110,20 +1130,21 @@ namespace Savegame
 			ADD(sizeof(float)*4)
 		LENGTH_END
 		READ
-			A = reader->ReadFloat();
-			B = reader->ReadFloat();
-			C = reader->ReadFloat();
-			D = reader->ReadFloat();
+			X = reader->ReadFloat();
+			Y = reader->ReadFloat();
+			Z = reader->ReadFloat();
+			W = reader->ReadFloat();
 		READ_END
 		WRITE
-			writer->Write(A);
-			writer->Write(B);
-			writer->Write(C);
-			writer->Write(D);
+			writer->Write(X);
+			writer->Write(Y);
+			writer->Write(Z);
+			writer->Write(W);
 		WRITE_END
 	CLS_END
 	#pragma endregion
 
+	#pragma region Guid
 	CLS(Guid)
 		PUB_ab(Value)
 		SIZE
@@ -1139,6 +1160,7 @@ namespace Savegame
 			writer->Write(Value);
 		WRITE_END
 	CLS_END
+	#pragma endregion
 
 	#pragma region InventoryItem
 	CLS(InventoryItem)
