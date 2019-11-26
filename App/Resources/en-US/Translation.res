@@ -161,6 +161,12 @@ unrecoverable damage to your save!</MainWindow.LoadGamefile.PeekHeader.Warn>
 	<TreePanel.Tree.Ramp>Ramp</TreePanel.Tree.Ramp>
 
 	<DetailsPanel.Empty>&lt;empty&gt;</DetailsPanel.Empty>
+	<DetailsPanel.ItemTable.Type.Item>Item</DetailsPanel.ItemTable.Type.Item>
+	<DetailsPanel.ItemTable.Type.Items>Items</DetailsPanel.ItemTable.Type.Items>
+	<DetailsPanel.ItemTable.Type.Equipment>Equipment</DetailsPanel.ItemTable.Type.Equipment>
+	<DetailsPanel.ItemTable.Type.Equipments>Equipment</DetailsPanel.ItemTable.Type.Equipments>
+	<DetailsPanel.ItemTable.Type.Resource>Resource</DetailsPanel.ItemTable.Type.Resource>
+	<DetailsPanel.ItemTable.Type.Resources>Resources</DetailsPanel.ItemTable.Type.Resources>
 
 	<OptionsDialog.Title>Options</OptionsDialog.Title>
 	<OptionsDialog.Save>Save</OptionsDialog.Save>

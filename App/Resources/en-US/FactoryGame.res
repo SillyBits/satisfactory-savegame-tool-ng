@@ -693,5 +693,7 @@
 	<!-- Random -->
 	<FGWildCardDescriptor>Any</FGWildCardDescriptor>
 	<FGNoneDescriptor>None (closed output)</FGNoneDescriptor>
+	<FGAnyUndefinedDescriptor>Any undefined</FGAnyUndefinedDescriptor>
+	<ItemList>Item list</ItemList>
 
 </translation>

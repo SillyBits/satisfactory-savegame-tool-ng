@@ -188,6 +188,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Themes\DetailsPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -258,6 +262,8 @@
     <Resource Include="Resources\Button.Diff.Different.png" />
     <Resource Include="Resources\Button.Diff.LeftMissing.png" />
     <Resource Include="Resources\Button.Diff.RightMissing.png" />
+    <Resource Include="Resources\Button.Add.png" />
+    <Resource Include="Resources\Button.Delete.png" />
     <Content Include="Resources\ColorTable.xml" />
     <Content Include="Resources\de-DE\About.res" />
     <Content Include="Resources\de-DE\Changelog.res" />

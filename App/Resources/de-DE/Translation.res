@@ -161,6 +161,12 @@ könnte den Spielstand unter Umständen komplett unbrauchbar machen!</MainWindow
 	<TreePanel.Tree.Ramp>Rampe</TreePanel.Tree.Ramp>
 
 	<DetailsPanel.Empty>&lt;leer&gt;</DetailsPanel.Empty>
+	<DetailsPanel.ItemTable.Type.Item>Gegenstand</DetailsPanel.ItemTable.Type.Item>
+	<DetailsPanel.ItemTable.Type.Items>Gegenstände</DetailsPanel.ItemTable.Type.Items>
+	<DetailsPanel.ItemTable.Type.Equipment>Ausrüstung</DetailsPanel.ItemTable.Type.Equipment>
+	<DetailsPanel.ItemTable.Type.Equipments>Ausrüstungen</DetailsPanel.ItemTable.Type.Equipments>
+	<DetailsPanel.ItemTable.Type.Resource>Rohstoff</DetailsPanel.ItemTable.Type.Resource>
+	<DetailsPanel.ItemTable.Type.Resources>Rohstoffe</DetailsPanel.ItemTable.Type.Resources>
 
 	<OptionsDialog.Title>Optionen</OptionsDialog.Title>
 	<OptionsDialog.Save>Speichern</OptionsDialog.Save>

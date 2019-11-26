@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
@@ -8,7 +10,10 @@ using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 using M = System.Windows.Media;
@@ -175,7 +180,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 	// Basic visual element (with or without a label)
 	//
 
-	internal interface IElement : INotifyPropertyChanged
+	public interface IElement : INotifyPropertyChanged
 	{
 		// Constructor required: IElement parent, string label, object obj
 
@@ -192,7 +197,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 	// More specific, typed element
 	//
-	internal interface IElement<_ValueType> : IElement
+	public interface IElement<_ValueType> : IElement
 	{
 		// Constructor required: IElement parent, string label, object obj
 
@@ -318,7 +323,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 		// IElementContainer
 		public int Count { get { return _grid.RowDefinitions.Count; } }
-		public List<IElement> Childs { get; }
+		public List<IElement> Childs { get { return _childs; } }
 
 		public virtual void Add(IElement element)
 		{
@@ -336,6 +341,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			FrameworkElement value = element.Visual as FrameworkElement;
 			if (value == null)
 				throw new Exception("Detected element with empty visual!");
+			value.Margin = new Thickness(0,2,0,2);//LTRB
 			Grid.SetRow(value, row);
 
 			if (element.HasLabel)
@@ -604,9 +610,9 @@ namespace SatisfactorySavegameTool.Panels.Details
 		}
 	}
 
-	internal class IntControl : MaskedTextBox<int>, IValueContainer<int> // Might change to wx.SpinCtrl later
+	public class IntControl : MaskedTextBox<int>, IValueContainer<int> // Might change to wx.SpinCtrl later
 	{
-		internal IntControl(int val)
+		public IntControl() 
 			: base()
 		{
 			Width = new GridLength((Math.Abs(val) > 1e10) ? 200 : 100).Value;
@@ -615,6 +621,11 @@ namespace SatisfactorySavegameTool.Panels.Details
 			VerticalContentAlignment = VerticalAlignment.Center;
 			TextAlignment = TextAlignment.Right;
 			Mask = @"^[<S>]?([0-9]{1,3}(<T>[0-9]{3})|[0-9])*$";
+		}
+
+		internal IntControl(int val)
+			: base()
+		{
 			Value = val;
 		}
 
@@ -745,7 +756,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 				Background = new M.SolidColorBrush(c);
 			}
 		}
-#pragma warning disable CS0067 // The event 'ListViewControl.PropertyChanged' is never used
+#pragma warning disable CS0067 // The event 'ColorControl.PropertyChanged' is never used
 		public event PropertyChangedEventHandler PropertyChanged;
 #pragma warning restore CS0067
 
@@ -793,82 +804,112 @@ namespace SatisfactorySavegameTool.Panels.Details
 	}
 
 
-	internal class ListViewControl : ListView, IElement<List<object[]>>
+	internal class ListViewControl<_RowType> : ListView, IElement<ListViewControl<_RowType>.Collection>
 	{
 		//TODO: Add dedicated Value class which allows for more control 
 		//      on how to display value, e.g. coloring
 		//TODO: Also allow for adding framework elements like buttons,
 		//      checkboxes, dropdowns and alike
 		//TODO: Allow for changing elements (edit/add/remove)
-		internal ListViewControl(ColumnDefinition[] columns = null)
+		internal ListViewControl()
 		{
-			_columns = columns != null ? columns.ToList() : null;
-
 			_gridview = new GridView() {
 				AllowsColumnReorder = false,
 			};
 
-			foreach (ColumnDefinition coldef in _columns)
-			{
-				GridViewColumn col = new GridViewColumn() {
-					Header = coldef._header,
-					Width = coldef._width,
-					//TODO: Alignment
-				};
-				if (coldef._template == null)
-					col.DisplayMemberBinding = new Binding("[" + _gridview.Columns.Count + "]");
-				else
-					col.CellTemplate = coldef._template;
-				_gridview.Columns.Add(col);
-			}
-
 			HorizontalContentAlignment = HorizontalAlignment.Stretch;
 			VerticalContentAlignment = VerticalAlignment.Stretch;
-			
+			ItemContainerStyle = FindResource("listviewitemStretch") as Style;
 			MaxHeight = 400;
 			View = _gridview;
 		}
 
-		public FrameworkElement Visual { get { return this; } }
+		internal ListViewControl(ColumnDefinitions columns = null)
+			: this()
+		{
+			Columns = columns;
+		}
+
+		public virtual FrameworkElement Visual { get { return this; } }
 
 		public bool HasLabel { get { return (_label != null); } }
 		public string Label { get { return _label; } set { _label = value; } }
 		public VerticalAlignment LabelVerticalAlign { get { return VerticalAlignment.Top; } }
 
 		public bool HasValue { get { return true; } }
-		public List<object[]> Value
+		public Collection Value
 		{
-			get { return ItemsSource as List<object[]>; }
+			get { return ItemsSource as Collection; }
 			set	{ ItemsSource = value; }
 		}
 #pragma warning disable CS0067 // The event 'ListViewControl.PropertyChanged' is never used
 		public event PropertyChangedEventHandler PropertyChanged;
 #pragma warning restore CS0067
 
-		internal string _label;
-		internal List<ColumnDefinition> _columns;
-		internal GridView _gridview;
 
+		public class Collection : ObservableCollection<_RowType>
+		{
+			internal void RefreshRow(int index)
+			{
+				_RowType val = this[index];
+				this[index] = default(_RowType);
+				this[index] = val;
+			}
+		}
+
+
+		public ColumnDefinitions Columns
+		{
+			get { return _columns; }
+			set
+			{
+				_columns = value;
+
+				_gridview.Columns.Clear();
+
+				foreach (ColumnDefinition coldef in _columns)
+				{
+					GridViewColumn col = new GridViewColumn()
+					{
+						Header = coldef._header,
+						Width = coldef._width,
+						DisplayMemberBinding = coldef._binding,
+						CellTemplate = coldef._template,
+					};
+					//TODO: Alignment
+					//col.SetValue(HorizontalAlignmentProperty, coldef._align);
+					//col.SetValue(HorizontalContentAlignmentProperty, coldef._align);
+
+					_gridview.Columns.Add(col);
+				}
+			}
+		}
+
+		public class ColumnDefinitions : List<ColumnDefinition> { }
 
 		internal class ColumnDefinition
 		{
-			internal ColumnDefinition(string header, double width, HorizontalAlignment align = HorizontalAlignment.Left)
-				: this(header, width, align, null)
-			{ }
-
-			internal ColumnDefinition(string header, double width, HorizontalAlignment align, DataTemplate template)
+			internal ColumnDefinition(string header, double width, Binding binding, DataTemplate template = null, 
+				HorizontalAlignment align = HorizontalAlignment.Left)
 			{
 				_header = header;
 				_width = width;
-				_align = align;
+				_binding = binding;
 				_template = template;
+				_align = align;
 			}
 
 			internal string _header;
 			internal double _width;
-			internal HorizontalAlignment _align;
+			internal Binding _binding;
 			internal DataTemplate _template;
+			internal HorizontalAlignment _align;
 		}
+
+
+		internal string            _label;
+		internal GridView          _gridview;
+		internal ColumnDefinitions _columns;
 	}
 
 
@@ -913,7 +954,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 		}
 	}
 
-	internal abstract class ValueControl<_ValueType> : IElement<_ValueType>
+	public abstract class ValueControl<_ValueType> : IElement<_ValueType>
 	{
 		public ValueControl(IElement parent, string label, object obj) 
 		{
@@ -1183,6 +1224,298 @@ namespace SatisfactorySavegameTool.Panels.Details
 				_childs.Add(element);
 			}
 		}
+	}
+
+
+	internal class TextWithIconDisplay : StackPanel
+	{
+		public TextWithIconDisplay()
+		{ }
+		public TextWithIconDisplay(P.InventoryItem inv_item)
+		{
+			_Setup(ItemTable.Find(inv_item));
+		}
+		public TextWithIconDisplay(ItemTable.Item tbl_item)
+		{
+			_Setup(tbl_item.Icon[MainWindow.CurrFile.Header.GetVersion()], tbl_item.DisplayName);
+		}
+		public TextWithIconDisplay(BitmapSource icon, string text)
+		{
+			_Setup(icon, text);
+		}
+
+		internal void _Setup(P.InventoryItem inv_item)
+		{
+			_Setup(ItemTable.Find(inv_item));
+		}
+		internal void _Setup(ItemTable.Item tbl_item)
+		{
+			_Setup(tbl_item.Icon[MainWindow.CurrFile.Header.GetVersion()], tbl_item.DisplayName);
+		}
+		internal void _Setup(BitmapSource icon, string text)
+		{
+			Orientation = Orientation.Horizontal;
+			Width = double.NaN;
+			Height = 20;
+			HorizontalAlignment = HorizontalAlignment.Stretch;
+			VerticalAlignment = VerticalAlignment.Center;
+			Margin = new Thickness(0, 2, 0, 2);
+
+			Image img = new Image() {
+				Source = icon,
+				Width = 20,
+				Height = 20,
+				Margin = new Thickness(0, 0, 5, 0),
+			};
+			Children.Add(img);
+
+			TextBlock txt = new TextBlock() {
+				Text = text,
+				Width = double.NaN,
+				Height = 20,
+				VerticalAlignment = VerticalAlignment.Stretch,
+			};
+			Children.Add(txt);
+		}
+	}
+
+
+	public class ItemCombobox : ComboBox, IValueContainer<str[]>
+	{
+		internal enum Parameter : int { Item=0, Instance=1 };
+
+		internal ItemCombobox(str item, str instance, Collection coll)
+			: this(new str[] { item, instance }, coll)
+		{ }
+
+		internal ItemCombobox(str[] item, Collection coll)
+		{
+			_version = MainWindow.CurrFile.Header.GetVersion();
+			ItemsSource = _collection = coll;
+			Value = item;
+			SelectionChanged += _SelectionChanged;
+		}
+
+		public Collection AvailableItems
+		{
+			get
+			{
+				return _collection;
+			}
+			set
+			{
+				SelectionChanged -= _SelectionChanged;
+				ItemsSource = _collection = value;
+				Value = _item;
+				SelectionChanged += _SelectionChanged;
+			}
+		}
+
+		public str[] Value
+		{
+			get
+			{
+				return _item;
+			}
+			set
+			{
+				_item = value;
+				if (_item != null && _item.Length == 2)
+				{
+					_selected = ItemTable.Find(_item[(int)Parameter.Item]);
+					if (_selected != null)
+					{
+						ItemEntry entry = _collection.FirstOrDefault(e => e.Item == _selected);
+						if (entry != null)
+						{
+							SelectedItem = entry;
+							return;
+						}
+					}
+				}
+				SelectedIndex = 0;// Select '<empty>'
+			}
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		private void _SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			ItemEntry item = SelectedItem as ItemEntry;
+			_selected = (item != null) ? item.Item : null;
+			if (_selected != null)
+			{
+				str item_name = new str(_selected.PathName);
+				item_name.ToAscii();
+				_item[(int)Parameter.Item]     = item_name;
+				_item[(int)Parameter.Instance] = item.Instance;
+			}
+			else
+			{
+				_item[(int)Parameter.Item]     = _empty_str;
+				_item[(int)Parameter.Instance] = _empty_str;
+			}
+
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Value"));
+		}
+
+		private str[]                       _item;
+		private ItemTable.Item              _selected;
+		private static VersionTable.Version _version;
+		private Collection                  _collection;
+		private static str                  _empty_str = new str(true);
+		
+		public class Collection : ObservableCollection<ItemEntry>
+		{
+			public Collection()
+				: base()
+			{ }
+
+			public Collection(IEnumerable<ItemEntry> coll)
+				: base(coll)
+			{ }
+
+			public static Collection FromItemTable(IEnumerable<ItemTable.Item> tbl)
+			{
+				Collection coll = new Collection();
+				coll.Add(new ItemEntry(DetailsPanel.EMPTY));
+
+				if (tbl != null && tbl.Count() > 0)
+				{
+					var grouped = tbl.GroupBy(i => i.Type);
+					foreach (var group in grouped)
+					{
+						string type = group.Key.ToString();
+						string tr = "DetailsPanel.ItemTable.Type." + type + "s";
+						if (Translate.Has(tr))
+							type = Translate._(tr);
+						coll.Add(new ItemEntry(type));
+
+						foreach (var grouped_item in group.OrderBy(i => i.DisplayName))
+							if (!grouped_item.Blocked)
+								coll.Add(new ItemEntry(grouped_item, _empty_str));
+					}
+				}
+
+				return coll;
+			}
+
+			public static Collection FromSingleItem(ItemTable.Item item)
+			{
+				Collection coll = new Collection();
+				coll.Add(new ItemEntry(DetailsPanel.EMPTY));
+
+				string type = item.Type.ToString();
+				string tr = "DetailsPanel.ItemTable.Type." + type + "s";
+				if (Translate.Has(tr))
+					type = Translate._(tr);
+				coll.Add(new ItemEntry(type));
+
+				coll.Add(new ItemEntry(item, _empty_str));
+
+				return coll;
+			}
+
+			public static Collection FromInventoryStacks(P.Properties inv)
+			{
+				Collection coll = new Collection();
+				coll.Add(new ItemEntry(DetailsPanel.EMPTY));
+
+				if (inv != null)
+				{
+					// Normally, only called for equipment, so no grouping required
+					var items = inv
+						.ListOf<P.InventoryStack>()
+						.Where(stack => (stack.Value != null) && (stack.Value.Count == 1))
+						.Select(stack => (stack.Value[0] as P.StructProperty).Value as P.InventoryItem)
+						;
+					foreach (var i in items)
+					{
+						ItemTable.Item tbl_item = ItemTable.Find(i);
+						if (tbl_item != null)
+							coll.Add(new ItemEntry(tbl_item, i.PathName));
+					}
+				}
+
+				return coll;
+			}
+		}
+
+		public class ItemEntry
+		{
+			public string         Label     { get; set; }
+			public ItemTable.Item Item      { get; set; }
+			public str            Instance  { get; set; }
+			public bool           HasIcon   { get { return (Item != null) || IsEmpty; } }
+			public BitmapSource   Icon      { get { return (Item != null) ? Item.Icon[_version] : null; } }
+			public bool           IsEnabled { get { return (Item != null) || IsEmpty; } }
+			public bool           IsEmpty   { get { return (Label == DetailsPanel.EMPTY); } }
+
+			public ItemEntry(ItemTable.Item item, str instance)
+				: this(item.DisplayName, item, instance)
+			{ }
+
+			public ItemEntry(string label, ItemTable.Item item = null, str instance = null)
+			{
+				Label    = label;
+				Item     = item;
+				Instance = instance;
+			}
+		}
+	}
+
+	public class ItemControl : ValueControl<str[]>
+	{
+		public ItemControl(IElement parent, string label, object obj, ItemCombobox.Collection coll = null)
+			: base(parent, label, obj)
+		{
+			_collection = coll;
+			_no_change_event = false;
+		}
+
+		public ItemCombobox.Collection AvailableItems
+		{
+			get { return _collection; }
+			set
+			{
+				_no_change_event = true;
+				_cmb.AvailableItems = _collection = value;
+				_no_change_event = true;
+			}
+		}
+
+		internal override void _CreateVisual()
+		{
+			Border border = new Border() {
+				Background = Brushes.Transparent,
+				BorderThickness = new Thickness(1),
+				BorderBrush = Brushes.DarkGray,
+				Padding = new Thickness(0,0,1,0),
+				HorizontalAlignment = HorizontalAlignment.Stretch,
+				VerticalAlignment = VerticalAlignment.Stretch,
+			};
+
+			Grid grid = new Grid() {
+				HorizontalAlignment = HorizontalAlignment.Stretch,
+				VerticalAlignment = VerticalAlignment.Stretch,
+			};
+			border.Child = grid;
+
+			_cmb = new ItemCombobox(_value, _collection);
+			grid.Children.Add(_cmb);
+
+			_visual = border;
+		}
+
+		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			if (!_no_change_event)
+				base._PropertyChanged(sender, e);
+		}
+
+		private ItemCombobox.Collection _collection;
+		private ItemCombobox            _cmb;
+		private bool                    _no_change_event;
 	}
 
 
@@ -2341,6 +2674,189 @@ namespace SatisfactorySavegameTool.Panels.Details
 	}
 
 
+	// Re-usable visualizers
+
+	internal class ItemAmountList : ListViewControl<int?>
+	{
+		public ItemAmountList(List<P.ItemAmount> amounts)
+			: base()
+		{
+			_amounts = amounts;
+		}
+
+
+		public override FrameworkElement Visual
+		{
+			get
+			{
+				if (Columns == null)
+					_CreateColumns();
+				if (Value == null)
+					_CreateRows();
+				return base.Visual;
+			}
+		}
+
+
+		protected virtual RowConverter RowConv
+		{
+			get
+			{
+				if (_converter == null)
+					_converter = new RowConverter(_amounts);
+				return _converter;
+			}
+		}
+
+		protected List<P.ItemAmount> _amounts;
+		protected RowConverter       _converter;
+
+
+		protected virtual void _CreateColumns()
+		{
+			Func<RowConverter.Parameter, Binding> binder = (param) => {
+				return new Binding() {
+					Converter = RowConv,
+					ConverterParameter = param,
+					Mode = BindingMode.OneWay,
+				};
+			};
+
+			// Note that FrameworkElementFactory is somewhat dangerous, better use XamlLoader on a string value.
+			//TODO: Convert to using TextWithIconDisplay
+			FrameworkElementFactory factory = new FrameworkElementFactory(typeof(Image));
+			factory.SetBinding(Image.SourceProperty, binder(RowConverter.Parameter.Icon));
+			DataTemplate icon_tmpl = new DataTemplate() {
+				VisualTree = factory,
+			};
+			factory = new FrameworkElementFactory(typeof(TextBlock));
+			factory.SetBinding(TextBlock.TextProperty, binder(RowConverter.Parameter.Item));
+			DataTemplate item_tmpl = new DataTemplate() {
+				VisualTree = factory,
+			};
+			factory = new FrameworkElementFactory(typeof(TextBlock));
+			factory.SetBinding(TextBlock.TextProperty, binder(RowConverter.Parameter.Amount));
+			DataTemplate amount_tmpl = new DataTemplate() {
+				VisualTree = factory,
+			};
+			//=> Move into Supplements.Helper ... or even CoreLib.Helpers?
+
+			Columns = new ColumnDefinitions() {
+				new ColumnDefinition("Slot", 30, binder(RowConverter.Parameter.Index), null, HorizontalAlignment.Right),
+				new ColumnDefinition("", 32, null, icon_tmpl),
+				new ColumnDefinition("Item", 200, null, item_tmpl),
+				new ColumnDefinition("Amount", double.NaN, null, amount_tmpl, HorizontalAlignment.Right),
+			};
+		}
+
+		protected virtual void _CreateRows()
+		{
+			Collection rows = new Collection();
+			for (int i = 0; i < RowConv.RowCount; ++i)
+				rows.Add(i);
+			Value = rows;
+		}
+
+
+		protected class RowConverter : IValueConverter
+		{
+			internal enum Parameter { Index, Icon, Item, Amount };
+
+			internal RowConverter(List<P.ItemAmount> items)
+			{
+				_Setup(items);
+			}
+
+
+			internal int RowCount { get { return _items.Count; } }
+
+
+			public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+			{
+				_last_index = (int)value;
+				switch ((Parameter)parameter)
+				{
+					case Parameter.Index:  return _GetIndex(_last_index);
+					case Parameter.Icon:   return _GetIcon(_last_index);
+					case Parameter.Item:   return _GetItem(_last_index);
+					case Parameter.Amount: return _GetAmount(_last_index);
+				}
+				return null;
+			}
+
+			public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+			{
+				return Binding.DoNothing;
+			}
+
+
+			private void _Setup(List<P.ItemAmount> items)
+			{
+				_items = items;
+				if (_items == null)
+					throw new Exception("ItemAmountList: No items!");
+
+				_last_index = -1;
+
+				_version = MainWindow.CurrFile.Header.GetVersion();
+			}
+
+
+			#region Getter
+			private object _GetIndex(int index)
+			{
+				return index.ToString();
+			}
+
+			private object _GetIcon(int index)
+			{
+				P.ItemAmount item = _items[index];
+				string name = DetailsPanel.EMPTY;
+				P.ObjectProperty itemclass = item.Value.Named("ItemClass") as P.ObjectProperty;
+				if (itemclass != null && !str.IsNullOrEmpty(itemclass.PathName))
+				{
+					ItemTable.Item tbl_item = ItemTable.Find(itemclass.PathName);
+					if (tbl_item != null)
+						return tbl_item.Icon[_version];
+				}
+				return null;
+			}
+
+			private object _GetItem(int index)
+			{
+				P.ItemAmount item = _items[index];
+				string name = DetailsPanel.EMPTY;
+				P.ObjectProperty itemclass = item.Value.Named("ItemClass") as P.ObjectProperty;
+				if (itemclass != null && !str.IsNullOrEmpty(itemclass.PathName))
+				{
+					ItemTable.Item tbl_item = ItemTable.Find(itemclass.PathName);
+					if (tbl_item != null)
+						name = tbl_item.DisplayName;
+				}
+				return name;
+			}
+
+			private object _GetAmount(int index)
+			{
+				P.ItemAmount item = _items[index];
+				if (item.Value != null)
+				{
+					P.ValueProperty amount = item.Value.Named("amount") as P.ValueProperty;
+					if (amount != null && amount.Value != null)
+						return amount.Value.ToString();
+				}
+				return "";
+			}
+			#endregion
+
+
+			private List<P.ItemAmount>   _items;
+			private int                  _last_index;
+			private VersionTable.Version _version;
+		}
+	}
+
+
 	// Highly specialized visualizers
 	//
 	// Those will "condense" complex hierachies into a more readable form,
@@ -2375,7 +2891,10 @@ namespace SatisfactorySavegameTool.Panels.Details
 			: base(parent, label, obj)
 		{
 			_excluded.Add("EntityObj");
+			Items = ItemTable.All;
 		}
+
+		internal ItemTable.Collection Items { get; set; }
 
 		internal override void _CreateChilds()
 		{
@@ -2394,163 +2913,324 @@ namespace SatisfactorySavegameTool.Panels.Details
 			if (inv_size != null)
 				_childs.Add(MainFactory.Create(this, "Extra slots", inv_size.Value));
 
-			P.ArrayProperty arr;
-			P.StructProperty stru;
-
-			/*
-				|-> [ArrayProperty] mInventoryStacks
-				|  .InnerType = str:'StructProperty'
-				|  .Value =
-				|	-> [StructProperty] mInventoryStacks
-				|	  .Value =
-				|		/ List with 55 elements:
-				|		|-> [InventoryStack].Value[0-0]
-			*/
-			arr = entity.Value.Named("mInventoryStacks") as P.ArrayProperty;
-			if (arr == null)
-				return;//TODO:
-			stru = arr.Value as P.StructProperty;
-			if (stru == null || stru.Value == null)
-				return;//TODO:
-			List<P.InventoryStack> stacks = stru.Value.ListOf<P.InventoryStack>();
-
 			/*
 				|-> [ArrayProperty] mArbitrarySlotSizes
 				|  .InnerType = str:'IntProperty'
 				|  .Value = list<Int32>(55):[0,]
 			*/
-			arr = entity.Value.Named("mArbitrarySlotSizes") as P.ArrayProperty;
+			P.ArrayProperty arr = entity.Value.Named("mArbitrarySlotSizes") as P.ArrayProperty;
 			if (arr == null)
 				return;//TODO:
-			int[] sizes = arr.Value as int[];
+			LVC.Collection rows = new LVC.Collection();
+			for (int i = 0; i < (arr.Value as int[]).Length; ++i)
+				rows.Add(i);
 
-			/*
-				|-> [ArrayProperty] mAllowedItemDescriptors
-				|  .InnerType = str:'ObjectProperty'
-				|  .Value =
-				|	/ List with 55 elements:
-				|	|-> [ObjectProperty] 
-				|	|  .LevelName = <empty>
-				|	|  .PathName = <empty>
-				|	|  .Length = Int32:0
-				|	|  .Index = Int32:0
-			*/
-			arr = entity.Value.Named("mAllowedItemDescriptors") as P.ArrayProperty;
-			if (arr == null)
-				return;//TODO:
-			List<P.ObjectProperty> allowed = arr.Value.ListOf<P.ObjectProperty>();
+			RowConverter converter = new RowConverter(this, prop);
+			Func<RowConverter.Parameter, Binding> binder = (param) => {
+				return new Binding() {
+					Converter = converter,
+					ConverterParameter = param,
+				};
+			};
 
-			if (stacks.Count != sizes.Length || sizes.Length != allowed.Count)
-				throw new Exception("FGInventoryComponent: Mismatch in collection sizes!");
+			// Note that FrameworkElementFactory is somewhat dangerous, better use XamlLoader on a string value.
+			FrameworkElementFactory factory = new FrameworkElementFactory(typeof(ContentControl));
+			factory.SetBinding(ContentProperty, binder(RowConverter.Parameter.Item));
+			DataTemplate item_tmpl = new DataTemplate() {
+				VisualTree = factory,
+			};
+			factory = new FrameworkElementFactory(typeof(ContentControl));
+			factory.SetBinding(ContentProperty, binder(RowConverter.Parameter.Count));
+			DataTemplate count_tmpl = new DataTemplate() {
+				VisualTree = factory,
+			};
+			//=> Move into Supplements.Helper ... or even CoreLib.Helpers?
 
-			bool add_stacklimit = false;
-			bool add_allowed = false;
-			List<object[]> rows = new List<object[]>();
-			for (int i = 0; i < stacks.Count(); ++i)
+			LVC.ColumnDefinitions columns = new LVC.ColumnDefinitions() {
+				new LVC.ColumnDefinition("Slot", 30, binder(RowConverter.Parameter.Index), null, HorizontalAlignment.Right),
+				new LVC.ColumnDefinition("Item", 200, null, item_tmpl),
+				new LVC.ColumnDefinition("Count", double.NaN, null, count_tmpl, HorizontalAlignment.Right),
+				new LVC.ColumnDefinition("Limit", 35, binder(RowConverter.Parameter.Limit), null, HorizontalAlignment.Right),
+				new LVC.ColumnDefinition("Allowed", 200, binder(RowConverter.Parameter.Allowed)),
+			};
+
+			_lvc = new LVC() {
+				Columns = columns,
+				Value = rows,
+			};
+
+			_childs.Add(_lvc);
+		}
+
+		private ItemCombobox.Collection ComboboxItems
+		{
+			get
 			{
-				/*
-				|		|-> [InventoryStack].Value[0-0]
-				|		|  .Value =
-				|		|	/ List with 1 elements:
-				|		|	|-> [StructProperty] Item
-				|		|	|  .Unknown = list<Byte>(17):[0,]
-				|		|	|  .Name = str:'Item'
-				|		|	|  .Length = Int32:120
-				|		|	|  .Index = Int32:0
-				|		|	|  .Value =
-				|		|	|	-> [InventoryItem] /Game/FactoryGame/Resource/Equipment/Beacon/BP_EquipmentDescriptorBeacon.BP_EquipmentDescriptorBeacon_C
-				|		|	|	  .Unknown = <empty>
-				|		|	|	  .ItemName = str:'/Game/FactoryGame/Resource/Equipment/Beacon/BP_EquipmentDescriptorBeacon.BP_EquipmentDescriptorBeacon_C'
-				|		|	|	  .LevelName = <empty>
-				|		|	|	  .PathName = <empty>
-				|		|	|	  .Value =
-				|		|	|		-> [IntProperty] NumItems
-				|		|	|		  .Name = str:'NumItems'
-				|		|	|		  .Length = Int32:4
-				|		|	|		  .Index = Int32:0
-				|		|	|		  .Value = Int32:34
-				|		|	\ end of list
-				*/
-				string item_name = "?", item_count = "?";
-				List<P.StructProperty> vals = stacks[i].Value.ListOf<P.StructProperty>();
-				if (vals.Count == 1)
-				{
-					stru = vals[0];
-					if (stru.Name != null && stru.Name.ToString() == "Item")
-					{
-						P.InventoryItem item = stru.Value as P.InventoryItem;
-						if (item != null)
-						{
-							if (str.IsNullOrEmpty(item.ItemName))
-								item_name = DetailsPanel.EMPTY;
-							else
-							{
-								item_name = item.ItemName.LastName();
-								if (item_name != null && Translate.Has(item_name))
-									item_name = Translate._(item_name);
-							}
+				if (_items == null)
+					_items = ItemCombobox.Collection.FromItemTable(Items);
+				return _items;
+			}
+		}
+		private ItemCombobox.Collection _items;
 
-							if (item.Value != null && item.Value is P.IntProperty)
+		protected class LVC : ListViewControl<int?> { }
+		protected LVC _lvc;
+
+		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			if (sender is int)
+			{
+				// Coming from RowConverter
+				_lvc.Value.RefreshRow((int)sender);
+			}
+
+			base._PropertyChanged(sender, e);
+		}
+
+		internal class RowConverter : IValueConverter
+		{
+			internal enum Parameter { Index, Item, Count, Limit, Allowed };
+
+			internal RowConverter(FGInventoryComponent owner, P.Object prop)
+			{
+				_owner = owner;
+				_Setup(prop);
+			}
+
+
+			public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+			{
+				_last_index = (int)value;
+				switch ((Parameter)parameter)
+				{
+					case Parameter.Index:   return _GetIndex(_last_index);
+					case Parameter.Item:    return _GetItem(_last_index);
+					case Parameter.Count:   return _GetCount(_last_index);
+					case Parameter.Limit:   return _GetLimit(_last_index);
+					case Parameter.Allowed: return _GetAllowed(_last_index);
+				}
+				return null;
+			}
+
+			public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+			{
+				// Done by monitoring change events, writing any change into InventoryItem directly
+				return Binding.DoNothing;
+			}
+
+
+			private void _Setup(P.Object prop)
+			{
+				P.Entity entity = prop.EntityObj as P.Entity;
+
+				P.ArrayProperty arr;
+				P.StructProperty stru;
+
+				/*
+					|-> [ArrayProperty] mInventoryStacks
+					|  .InnerType = str:'StructProperty'
+					|  .Value =
+					|	-> [StructProperty] mInventoryStacks
+					|	  .Value =
+					|		/ List with 55 elements:
+					|		|-> [InventoryStack].Value[0-0]
+				*/
+				arr = entity.Value.Named("mInventoryStacks") as P.ArrayProperty;
+				if (arr == null)
+					throw new Exception("FGInventoryComponent: No inventory stack!");
+				stru = arr.Value as P.StructProperty;
+				if (stru == null || stru.Value == null)
+					throw new Exception("FGInventoryComponent: Invalid inventory stack!");
+				_stacks = stru.Value as P.Properties;
+
+				/*
+					|-> [ArrayProperty] mArbitrarySlotSizes
+					|  .InnerType = str:'IntProperty'
+					|  .Value = list<Int32>(55):[0,]
+				*/
+				arr = entity.Value.Named("mArbitrarySlotSizes") as P.ArrayProperty;
+				if (arr == null)
+					throw new Exception("FGInventoryComponent: No slot sizes!");
+				_limits = arr.Value as int[];
+
+				/*
+					|-> [ArrayProperty] mAllowedItemDescriptors
+					|  .InnerType = str:'ObjectProperty'
+					|  .Value =
+					|	/ List with 55 elements:
+					|	|-> [ObjectProperty] 
+					|	|  .LevelName = <empty>
+					|	|  .PathName = <empty>
+					|	|  .Length = Int32:0
+					|	|  .Index = Int32:0
+				*/
+				arr = entity.Value.Named("mAllowedItemDescriptors") as P.ArrayProperty;
+				if (arr == null)
+					throw new Exception("FGInventoryComponent: No allowed item descriptors!");
+				_allowed = arr.Value as P.Properties;
+
+				if (_stacks.Count != _limits.Length || _limits.Length != _allowed.Count)
+					throw new Exception("FGInventoryComponent: Mismatch in collection sizes!");
+
+				_version = MainWindow.CurrFile.Header.GetVersion();
+
+				_cache = new List<P.InventoryItem>(_limits.Length);
+				for (int i = 0; i < _limits.Length; ++i)
+					_cache.Add(null);
+
+				_last_index = -1;
+			}
+
+			private P.InventoryItem _GetInventoryItem(int index)
+			{
+				if (index < 0 || index >= _cache.Count)
+					return null;
+				if (_cache[index] == null)
+				{
+					P.Properties vals = (_stacks[index] as P.InventoryStack).Value as P.Properties;
+					if (vals.Count == 1)
+					{
+						P.StructProperty stru = vals[0] as P.StructProperty;
+						if (stru.Name != null && stru.Name.ToString() == "Item")
+							_cache[index] = stru.Value as P.InventoryItem;
+					}
+				}
+				return _cache[index];
+			}
+
+			#region Getter
+			private object _GetIndex(int index)
+			{
+				return index.ToString();
+			}
+
+			private object _GetItem(int index)
+			{
+				P.InventoryItem item = _GetInventoryItem(index);
+				if (item != null)
+				{
+					ItemCombobox.Collection items = null;
+					P.ObjectProperty limit = _allowed[index] as P.ObjectProperty;
+					if (limit != null)
+					{
+						if (!str.IsNullOrEmpty(limit.PathName)
+							&& limit.PathName.ToString() != "/Script/FactoryGame.FGItemDescriptor") // Placeholder?
+						{
+							ItemTable.Item limit_item = ItemTable.Find(limit.PathName);
+							if (limit_item != null)
 							{
-								P.IntProperty int_prop = item.Value as P.IntProperty;
-								if (int_prop != null && int_prop.Value != null)
-									item_count = int_prop.Value.ToString();
+								// Allow only the item listed ... or <empty>
+								items = ItemCombobox.Collection.FromSingleItem(limit_item);
 							}
 						}
 					}
+					if (items == null)
+						items = _owner.ComboboxItems;
+
+					ItemCombobox ctrl = new ItemCombobox(item.ItemName, item.PathName, items) {
+						Tag = index,
+					};
+					ctrl.PropertyChanged += Item_Changed;
+
+					return ctrl;
 				}
+				return null;
+			}
+			private void Item_Changed(object sender, PropertyChangedEventArgs e)
+			{
+				ItemCombobox ctrl = sender as ItemCombobox;
+				int index = (int)ctrl.Tag;
 
-				if (sizes[i] != 0)
-					add_stacklimit = true;
-				string size_limit = sizes[i].ToString();
+				_owner._PropertyChanged(index, null);
+			}
 
-				/*
-				|	|-> [ObjectProperty] 
-				|	|  .LevelName = <empty>
-				|	|  .PathName = <empty>
-				|	|  .Length = Int32:0
-				|	|  .Index = Int32:0
-				*/
-				string item_limit = "?";
-				P.ObjectProperty limit = allowed[i] as P.ObjectProperty;
+			private object _GetCount(int index)
+			{
+				P.InventoryItem item = _GetInventoryItem(index);
+				if (item != null && item.Value != null && item.Value is P.IntProperty)
+				{
+					P.IntProperty int_prop = item.Value as P.IntProperty;
+					if (int_prop != null && int_prop.Value != null)
+					{
+						int? upper = (int?)_GetLimit(index);
+						IntControl ctrl = new IntControl() {
+							Width = 50,
+							Margin = new Thickness(0),
+							HorizontalAlignment = HorizontalAlignment.Right,
+							Tag = index,
+							LowerLimit = 1,
+							UpperLimit = upper,
+						};
+						ctrl.Value = (int)int_prop.Value;
+						ctrl.PropertyChanged += Count_Changed;
+						return ctrl;
+					}
+				}
+				return null;
+			}
+			private void Count_Changed(object sender, PropertyChangedEventArgs e)
+			{
+				IntControl ctrl = sender as IntControl;
+				int count = ctrl.Value;
+				int index = (int)ctrl.Tag;
+
+				P.InventoryItem item = _GetInventoryItem(index);
+				if (item != null && item.Value != null && item.Value is P.IntProperty)
+				{
+					P.IntProperty int_prop = item.Value as P.IntProperty;
+					if (int_prop != null && int_prop.Value != null && (int)int_prop.Value != count)
+					{
+						int_prop.Value = count;
+						_owner._PropertyChanged(null/*index*/, null);
+					}
+				}
+			}
+
+			private object _GetLimit(int index)
+			{
+				if (index < 0 || index >= _limits.Length)
+					return null;
+				int limit = _limits[index];
+				if (limit == 0)
+				{
+					P.InventoryItem item = _GetInventoryItem(index);
+					if (item != null && !str.IsNullOrEmpty(item.ItemName))
+					{
+						ItemTable.Item it_item = ItemTable.Find(item.ItemName);
+						if (it_item != null)
+							limit = (int)it_item.StackSize;
+					}
+				}
+				return (limit != 0) ? (object)limit : null;
+			}
+
+			private object _GetAllowed(int index)
+			{
+				if (index < 0 || index >= _allowed.Count)
+					return null;
+				string item_limit = DetailsPanel.EMPTY;
+				P.ObjectProperty limit = _allowed[index] as P.ObjectProperty;
 				if (limit != null)
 				{
-					if (str.IsNullOrEmpty(limit.PathName) 
-						|| limit.PathName.ToString() == "/Script/FactoryGame.FGItemDescriptor") // Placeholder?
-						item_limit = DetailsPanel.EMPTY;
-					else
+					if (!str.IsNullOrEmpty(limit.PathName)
+						&& limit.PathName.ToString() != "/Script/FactoryGame.FGItemDescriptor") // Placeholder?
 					{
-						add_allowed = true;
 						item_limit = limit.PathName.LastName();
 						if (item_limit != null && Translate.Has(item_limit))
 							item_limit = Translate._(item_limit);
 					}
 				}
-
-				rows.Add(new object[] {
-					i.ToString(),
-					item_name,
-					item_count,
-					size_limit,
-					item_limit
-				});
+				return item_limit;
 			}
+			#endregion
 
-			List<ListViewControl.ColumnDefinition> columns = new List<ListViewControl.ColumnDefinition>();
-			columns.Add(new ListViewControl.ColumnDefinition("#", 25));
-			columns.Add(new ListViewControl.ColumnDefinition("Item", 150));
-			columns.Add(new ListViewControl.ColumnDefinition("Count", 50));
-			if (add_stacklimit)
-				columns.Add(new ListViewControl.ColumnDefinition("Stack limit", 60));
-			else
-				columns.Add(new ListViewControl.ColumnDefinition("", 0));
-			if (add_allowed)
-				columns.Add(new ListViewControl.ColumnDefinition("Allowed", 150));
-			ListViewControl lvc = new ListViewControl(columns.ToArray());
-			//lvc.Label = "Items";
-			lvc.Value = rows;
-
-			_childs.Add(lvc);
+			private FGInventoryComponent    _owner;
+			private P.Properties            _stacks;
+			private int[]                   _limits;
+			private P.Properties            _allowed;
+			private VersionTable.Version    _version;
+			private List<P.InventoryItem>   _cache;
+			private int                     _last_index;
 		}
 	}
 
@@ -2558,67 +3238,108 @@ namespace SatisfactorySavegameTool.Panels.Details
 	{
 		public FGInventoryComponentTrash(IElement parent, string label, object obj)
 			: base(parent, label, obj)
-		{ }
+		{
+			Items = ItemTable.Empty;
+		}
 	}
 
 	internal class FGInventoryComponentEquipment : FGInventoryComponent
 	{
 		public FGInventoryComponentEquipment(IElement parent, string label, object obj)
 			: base(parent, label, obj)
-		{ }
+		{
+			// Distinguish between arms + back!
+			Items = ItemTable.Equipment;
+		}
 
 		internal override void _CreateChilds()
 		{
 			P.Object prop = Tag as P.Object;
 			P.Entity entity = prop.EntityObj as P.Entity;
 
-			// Add "mEquipmentInSlot"
-			P.ObjectProperty equipped = entity.Value.Named("mEquipmentInSlot") as P.ObjectProperty;
-			if (equipped != null)
-			{
-				// Select real instance from save using PathName
-				P.Actor equipment = MainWindow.CurrFile.Objects.FindByPathName(equipped.PathName) as P.Actor;
-				string item_name;
-				if (equipment == null)
-				{
-					item_name = "[NOT FOUND] " + equipped.PathName.ToString();
+			base._CreateChilds();
 
-					//=> Might be consumable like berries and such, 
-					//Solution: Get "mActiveEquipmentIndex" and try to find in "mInventoryStacks" by index
-					P.IntProperty index_prop = entity.Value.Named("mActiveEquipmentIndex") as P.IntProperty;
-					if (index_prop != null && index_prop.Value is int)
+			// Let 'mActiveEquipmentIndex' take precedence over 'mEquipmentInSlot'
+			bool handled = false;
+
+			ItemCombobox.Collection coll = null;
+			IEnumerable<P.InventoryItem> items = null;
+			P.ArrayProperty arr = entity.Value.Named("mInventoryStacks") as P.ArrayProperty;
+			if (arr != null && arr.Value != null && arr.Value is P.StructProperty)
+			{
+				P.StructProperty stru = arr.Value as P.StructProperty;
+				P.Properties inv = stru.Value as P.Properties;
+				coll = ItemCombobox.Collection.FromInventoryStacks(inv);
+				items = inv
+					.ListOf<P.InventoryStack>()
+					.Where(stack => (stack.Value != null) && (stack.Value.Count == 1))
+					.Select(stack => (stack.Value[0] as P.StructProperty).Value as P.InventoryItem)
+					;
+			}
+
+			//TODO: Show active control even when no value found, creating new value 'on the fly'
+
+			P.IntProperty index_prop = entity.Value.Named("mActiveEquipmentIndex") as P.IntProperty;
+			if (index_prop != null && index_prop.Value is int)
+			{
+				int index = (int) index_prop.Value;
+				if (items != null && items.Count() >= index)
+				{
+					P.InventoryItem item = items.ToList()[index];
+					if (item != null)
 					{
-						int index = (int) index_prop.Value;
-						P.ArrayProperty arr = entity.Value.Named("mInventoryStacks") as P.ArrayProperty;
-						if (arr != null && arr.Value != null && arr.Value is P.StructProperty)
+						handled = true;
+						_itemctrl = new ItemControl(this, "Active equipment", item, coll);
+						_childs.Insert(_childs.IndexOf(_lvc), _itemctrl);
+					}
+				}
+			}
+
+			if (!handled)
+			{
+				P.ObjectProperty equipped = entity.Value.Named("mEquipmentInSlot") as P.ObjectProperty;
+				if (equipped != null)
+				{
+					// Select real instance from save using PathName
+					P.Actor equipment = MainWindow.CurrFile.Objects.FindByPathName(equipped.PathName) as P.Actor;
+					if (equipment != null)
+					{
+						str class_name = equipment.ClassName;
+						P.InventoryItem item = items
+							.FirstOrDefault(inv_item => (inv_item.ItemName == class_name))
+							;
+						if (item != null)
 						{
-							P.StructProperty stru = arr.Value as P.StructProperty;
-							List<P.InventoryStack> inv = stru.Value.ListOf<P.InventoryStack>();
-							if (inv != null && inv.Count >= index && inv[index].Value != null)
-							{
-								stru = inv[index].Value[0] as P.StructProperty;
-								if (stru != null)
-								{
-									P.InventoryItem item = stru.Value as P.InventoryItem;
-									item_name = item.ItemName.LastName();
-									if (Translate.Has(item_name))
-										item_name = Translate._(item_name);
-								}
-							}
+							_itemctrl = new ItemControl(this, "Equipment in slot", item, coll);
+							_childs.Insert(_childs.IndexOf(_lvc), _itemctrl);
 						}
 					}
 				}
-				else
-				{
-					item_name = equipment.ClassName.LastName();
-					if (Translate.Has(item_name))
-						item_name = Translate._(item_name);
-				}
-				_childs.Add(MainFactory.Create(this, "Equipped", item_name));
 			}
-
-			base._CreateChilds();
 		}
+
+		protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			base._PropertyChanged(sender, e);
+
+			if (sender is int)
+			{
+				P.Object prop = Tag as P.Object;
+				P.Entity entity = prop.EntityObj as P.Entity;
+
+				ItemCombobox.Collection coll = null;
+				P.ArrayProperty arr = entity.Value.Named("mInventoryStacks") as P.ArrayProperty;
+				if (arr != null && arr.Value != null && arr.Value is P.StructProperty)
+				{
+					P.StructProperty stru = arr.Value as P.StructProperty;
+					P.Properties inv = stru.Value as P.Properties;
+					coll = ItemCombobox.Collection.FromInventoryStacks(inv);
+					_itemctrl.AvailableItems = coll;
+				}
+			}
+		}
+
+		private ItemControl _itemctrl;
 	}
 
 	internal class FGMapManager : SpecializedViewer
@@ -2679,12 +3400,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 			if (map_prop == null || str.IsNullOrEmpty(map_prop.Name) || map_prop.Name.ToString() != "mBuildings")
 				return;//TODO:
 
-			ListViewControl.ColumnDefinition[] columns = {
-				new ListViewControl.ColumnDefinition("#", 50),
-				new ListViewControl.ColumnDefinition("Building", 300),
-			};
-
-			foreach(KeyValuePair<object, object> pair in map_prop.Value)
+			foreach (KeyValuePair<object, object> pair in map_prop.Value)
 			{
 				P.PropertyList props = pair.Value as P.PropertyList;
 				List<P.ArrayProperty> entries = props.Value.ListOf<P.ArrayProperty>();
@@ -2693,21 +3409,31 @@ namespace SatisfactorySavegameTool.Panels.Details
 				P.ArrayProperty entry = entries[0];
 				if (entry == null || entry.Value == null || str.IsNullOrEmpty(entry.Name) || entry.Name.ToString() != "Buildables")
 					continue;//TODO:
-				List<P.ObjectProperty> objects = (entry.Value as List<P.Property>).ListOf<P.ObjectProperty>();
+				P.Properties objects = entry.Value as P.Properties;
 				if (objects == null)
 					continue;//TODO:
 
-				List<object[]> rows = new List<object[]>();
-				foreach (P.ObjectProperty obj_prop in objects)
-				{
-					rows.Add(new object[] {
-						rows.Count,
-						!str.IsNullOrEmpty(obj_prop.PathName) ? obj_prop.PathName.LastName() : DetailsPanel.EMPTY,
-					});
-				}
+				RowConverter converter = new RowConverter(this, objects);
+				Func<RowConverter.Parameter, Binding> binder = (param) => {
+					return new Binding() {
+						Converter = converter,
+						ConverterParameter = param,
+					};
+				};
 
-				ListViewControl lvc = new ListViewControl(columns);
-				lvc.Value = rows;
+				LVC.Collection rows = new LVC.Collection();
+				for (int i = 0; i < converter.RowCount; ++i)
+					rows.Add(i);
+
+				LVC.ColumnDefinitions columns = new LVC.ColumnDefinitions() {
+					new LVC.ColumnDefinition("#", 50, binder(RowConverter.Parameter.Index), null, HorizontalAlignment.Right),
+					new LVC.ColumnDefinition("Building", 300, binder(RowConverter.Parameter.Text)),//TODO: Make editable using template
+				};
+
+				LVC lvc = new LVC() {
+					Columns = columns,
+					Value = rows,
+				};
 
 				string label = string.Format("Chunk {0} ({1:#,#0} build{2})", 
 					pair.Key, rows.Count, rows.Count==1 ? "" : "s");
@@ -2716,6 +3442,65 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 				_childs.Add(expando);
 			}
+		}
+
+		private class LVC : ListViewControl<int?> { }
+
+		private class RowConverter : IValueConverter
+		{
+			internal enum Parameter { Index, Text };
+
+			internal RowConverter(FGFoundationSubsystem owner, P.Properties objects)
+			{
+				_owner = owner;
+				_Setup(objects);
+			}
+
+
+			internal int RowCount { get { return _objects.Count; } }
+
+
+			public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+			{
+				_last_index = (int)value;
+				switch ((Parameter)parameter)
+				{
+					case Parameter.Index: return _GetIndex(_last_index);
+					case Parameter.Text:  return _GetText(_last_index);
+				}
+				return null;
+			}
+
+			public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+			{
+				//TODO: Update 'PathName' and inform owner
+				return Binding.DoNothing;
+			}
+
+
+			private void _Setup(P.Properties objects)
+			{
+				_objects = objects.ListOf<P.ObjectProperty>();
+			}
+
+
+			#region Getter
+			private object _GetIndex(int index)
+			{
+				return index.ToString();
+			}
+
+			private object _GetText(int index)
+			{
+				P.ObjectProperty obj = _objects[index];
+				return !str.IsNullOrEmpty(obj.PathName) ? obj.PathName.LastName() : DetailsPanel.EMPTY;
+			}
+			#endregion
+
+
+			private FGFoundationSubsystem  _owner;
+			private List<P.ObjectProperty> _objects;
+			private int                    _last_index;
 		}
 	}
 
@@ -2745,36 +3530,99 @@ namespace SatisfactorySavegameTool.Panels.Details
 			if (arr == null || str.IsNullOrEmpty(arr.Name) || arr.Name.ToString() != "mAvailableRecipes")
 				return;//TODO:
 
-			List<P.ObjectProperty> objects = (arr.Value as List<P.Property>).ListOf<P.ObjectProperty>();
-			if (objects == null)
+			P.Properties recipes = arr.Value as P.Properties;
+			if (recipes == null)
 				return;//TODO:
 
-			List<object[]> rows = new List<object[]>();
-			foreach (P.ObjectProperty obj_prop in objects)
+			RowConverter converter = new RowConverter(this, recipes);
+			Func<RowConverter.Parameter, Binding> binder = (param) => {
+				return new Binding() {
+					Converter = converter,
+					ConverterParameter = param,
+				};
+			};
+
+			LVC.Collection rows = new LVC.Collection();
+			for (int i = 0; i < converter.RowCount; ++i)
+				rows.Add(i);
+
+			LVC.ColumnDefinitions columns = new LVC.ColumnDefinitions() {
+				new LVC.ColumnDefinition("#", 35, binder(RowConverter.Parameter.Index), null, HorizontalAlignment.Right),
+				new LVC.ColumnDefinition("Recipe", 300, binder(RowConverter.Parameter.Recipe)),//TODO: Make editable using template
+			};
+
+			LVC lvc = new LVC() {
+				Columns = columns,
+				Value = rows,
+			};
+
+			_childs.Add(lvc);
+		}
+
+		private class LVC : ListViewControl<int?> { }
+
+		private class RowConverter : IValueConverter
+		{
+			internal enum Parameter { Index, Recipe };
+
+			internal RowConverter(FGRecipeManager owner, P.Properties recipes)
 			{
-				string name = DetailsPanel.EMPTY;
-				if (!str.IsNullOrEmpty(obj_prop.PathName))
+				_owner = owner;
+				_Setup(recipes);
+			}
+
+
+			internal int RowCount { get { return _recipes.Count; } }
+
+
+			public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+			{
+				_last_index = (int)value;
+				switch ((Parameter)parameter)
 				{
-					name = obj_prop.PathName.LastName();
+					case Parameter.Index:  return _GetIndex(_last_index);
+					case Parameter.Recipe: return _GetRecipe(_last_index);
+				}
+				return null;
+			}
+
+			public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+			{
+				//TODO: Update 'PathName' and inform owner
+				return Binding.DoNothing;
+			}
+
+
+			private void _Setup(P.Properties recipes)
+			{
+				_recipes = recipes.ListOf<P.ObjectProperty>();
+			}
+
+
+			#region Getter
+			private object _GetIndex(int index)
+			{
+				return index.ToString();
+			}
+
+			private object _GetRecipe(int index)
+			{
+				P.ObjectProperty obj = _recipes[index];
+				string name = DetailsPanel.EMPTY;
+				if (!str.IsNullOrEmpty(obj.PathName))
+				{
+					name = obj.PathName.LastName();
 					if (Translate.Has(name))
 						name = Translate._(name);
 				}
-
-				rows.Add(new object[] {
-					rows.Count,
-					name,
-				});
+				return name;
 			}
+			#endregion
 
-			ListViewControl.ColumnDefinition[] columns = {
-				new ListViewControl.ColumnDefinition("#", 25),
-				new ListViewControl.ColumnDefinition("Recipe", 300),
-			};
-			ListViewControl lvc = new ListViewControl(columns);
-			//lvc.Label = "Recipes";
-			lvc.Value = rows;
 
-			_childs.Add(lvc);
+			private FGRecipeManager        _owner;
+			private List<P.ObjectProperty> _recipes;
+			private int                    _last_index;
 		}
 	}
 
@@ -2826,12 +3674,6 @@ namespace SatisfactorySavegameTool.Panels.Details
 				return;//TODO:
 			List<P.PhaseCost> costs = stru.Value.ListOf<P.PhaseCost>();
 
-			ListViewControl.ColumnDefinition[] columns = {
-				new ListViewControl.ColumnDefinition("#", 25),
-				new ListViewControl.ColumnDefinition("Item", 300),
-				new ListViewControl.ColumnDefinition("Count", 50),
-			};
-
 			//TODO: Re-order using same order as GamePhase enum
 			//TODO: Add missing "phases" (disabled expando?)
 			for (int i = 0; i < costs.Count(); ++i)
@@ -2875,64 +3717,128 @@ namespace SatisfactorySavegameTool.Panels.Details
 				P.StructProperty cost = arr.Value as P.StructProperty;
 				if (cost == null || cost.Value == null)
 					continue;//TODO:
-				List<P.ItemAmount> items = (cost.Value as List<P.Property>).ListOf<P.ItemAmount>();
+				List<P.ItemAmount> items = cost.Value.ListOf<P.ItemAmount>();
 				if (items == null)
 					continue;//TODO:
 
-				/*
-				|		|	|		/ List with 2 elements:
-				|		|	|		|-> [ItemAmount].Value[0-1]
-				|		|	|		|  .Value =
-				|		|	|		|	/ List with 2 elements:
-				|		|	|		|	|-> [ObjectProperty] /Game/FactoryGame/Resource/Parts/IronPlateReinforced/Desc_IronPlateReinforced.Desc_IronPlateReinforced_C
-				|		|	|		|	|  .LevelName = <empty>
-				|		|	|		|	|  .PathName = str:'/Game/FactoryGame/Resource/Parts/IronPlateReinforced/Desc_IronPlateReinforced.Desc_IronPlateReinforced_C'
-				|		|	|		|	|  .Name = str:'ItemClass'
-				|		|	|		|	|  .Length = Int32:113
-				|		|	|		|	|  .Index = Int32:0
-				|		|	|		|	|  .Value = <empty>
-				|		|	|		|	|-> [IntProperty] amount
-				|		|	|		|	|  .Name = str:'amount'
-				|		|	|		|	|  .Length = Int32:4
-				|		|	|		|	|  .Index = Int32:0
-				|		|	|		|	|  .Value = Int32:0
-				|		|	|		|	\ end of list
-				*/
-				List<object[]> rows = new List<object[]>();
-				foreach (P.ItemAmount item_amount in items)
-				{
-					if (item_amount.Value == null)
-						continue;//TODO:
-
-					P.ObjectProperty itemclass = item_amount.Value.Named("ItemClass") as P.ObjectProperty;
-					string name = DetailsPanel.EMPTY;
-					if (itemclass != null && !str.IsNullOrEmpty(itemclass.PathName))
-					{
-						name = itemclass.PathName.LastName();
-						if (Translate.Has(name))
-							name = Translate._(name);
-					}
-
-					P.ValueProperty amount = item_amount.Value.Named("amount") as P.ValueProperty;
-					
-					rows.Add(new object[] {
-						rows.Count,
-						name,
-						amount != null ? amount.Value : DetailsPanel.EMPTY,
-					});
-				}
-
-				ListViewControl lvc = new ListViewControl(columns);
-				//lvc.Label = "Items";
-				lvc.Value = rows;
+				ItemAmountList item_list = new ItemAmountList(items);
 
 				string label = string.Format("Phase: {0}", gamephase.Value);
 				Expando expando = new Expando(this, label, null);
-				expando._childs.Add(lvc);
+				expando._childs.Add(item_list);
 				expando.IsExpanded = true; // Ok to expand those
 
 				_childs.Add(expando);
 			}
+		}
+
+		private class LVC : ListViewControl<int?> { }
+
+		private class RowConverter : IValueConverter
+		{
+			internal enum Parameter { Index, Icon, Item, Amount };
+
+			internal RowConverter(P.PhaseCost phasecost)
+			{
+				_Setup(phasecost);
+			}
+
+
+			internal int RowCount { get { return _items.Count; } }
+
+
+			public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+			{
+				_last_index = (int)value;
+				switch ((Parameter)parameter)
+				{
+					case Parameter.Index:  return _GetIndex(_last_index);
+					case Parameter.Icon:   return _GetIcon(_last_index);
+					case Parameter.Item:   return _GetItem(_last_index);
+					case Parameter.Amount: return _GetAmount(_last_index);
+				}
+				return null;
+			}
+
+			public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+			{
+				return Binding.DoNothing;
+			}
+
+
+			private void _Setup(P.PhaseCost phasecost)
+			{
+				P.ValueProperty gamephase = phasecost.Value.Named("gamePhase") as P.ValueProperty;
+				if (gamephase == null || gamephase.Value == null)
+					throw new Exception("BP_GamePhaseManager_C: No game phase!");
+
+				P.ArrayProperty arr = phasecost.Value.Named("Cost") as P.ArrayProperty;
+				if (arr == null)
+					throw new Exception("BP_GamePhaseManager_C: No costs!");
+				P.StructProperty cost = arr.Value as P.StructProperty;
+				if (cost == null || cost.Value == null)
+					throw new Exception("BP_GamePhaseManager_C: Invalid costs structure!");
+				_items = (cost.Value as List<P.Property>).ListOf<P.ItemAmount>();
+				if (_items == null)
+					throw new Exception("BP_GamePhaseManager_C: No item amount!");
+
+				_last_index = -1;
+
+				_version = MainWindow.CurrFile.Header.GetVersion();
+			}
+
+
+			#region Getter
+			private object _GetIndex(int index)
+			{
+				return index.ToString();
+			}
+
+			private object _GetIcon(int index)
+			{
+				P.ItemAmount item = _items[index];
+				string name = DetailsPanel.EMPTY;
+				P.ObjectProperty itemclass = item.Value.Named("ItemClass") as P.ObjectProperty;
+				if (itemclass != null && !str.IsNullOrEmpty(itemclass.PathName))
+				{
+					ItemTable.Item tbl_item = ItemTable.Find(itemclass.PathName);
+					if (tbl_item != null)
+						return tbl_item.Icon[_version];
+				}
+				return null;
+			}
+
+			private object _GetItem(int index)
+			{
+				P.ItemAmount item = _items[index];
+				string name = DetailsPanel.EMPTY;
+				P.ObjectProperty itemclass = item.Value.Named("ItemClass") as P.ObjectProperty;
+				if (itemclass != null && !str.IsNullOrEmpty(itemclass.PathName))
+				{
+					ItemTable.Item tbl_item = ItemTable.Find(itemclass.PathName);
+					if (tbl_item != null)
+						name = tbl_item.DisplayName;
+				}
+				return name;
+			}
+
+			private object _GetAmount(int index)
+			{
+				P.ItemAmount item = _items[index];
+				if (item.Value != null)
+				{
+					P.ValueProperty amount = item.Value.Named("amount") as P.ValueProperty;
+					if (amount != null && amount.Value != null)
+						return (int)amount.Value;
+				}
+				return null;
+			}
+			#endregion
+
+
+			private List<P.ItemAmount>   _items;
+			private int                  _last_index;
+			private VersionTable.Version _version;
 		}
 	}
 
@@ -2982,114 +3888,48 @@ namespace SatisfactorySavegameTool.Panels.Details
 			stru = arr.Value as P.StructProperty;
 			if (stru == null || stru.Value == null)
 				return;//TODO:
-			List<P.ResearchCost> costs = stru.Value.ListOf<P.ResearchCost>();
 
-			ListViewControl.ColumnDefinition[] columns = {
-				new ListViewControl.ColumnDefinition("#", 25),
-				new ListViewControl.ColumnDefinition("Research", 150),
-				new ListViewControl.ColumnDefinition("Item", 150),
-				new ListViewControl.ColumnDefinition("Count", 50),
+			RowConverter converter = new RowConverter(stru.Value as P.Properties);
+			Func<RowConverter.Parameter, Binding> binder = (param) => {
+				return new Binding() {
+					Converter = converter,
+					ConverterParameter = param,
+				};
 			};
-			List<object[]> rows = new List<object[]>();
 
-			//TODO: Add missing "researches" from "TODO:ResearchTable" (as disabled rows?)
-			for (int i = 0; i < costs.Count(); ++i)
-			{
-				/*
-				|		|-> [ResearchCost].Value[0-1]
-				|		|  .Value =
-				|		|	/ List with 2 elements:
-				|		|	|-> [ObjectProperty] /Game/FactoryGame/Recipes/Research/ResearchRecipe_Slug1.ResearchRecipe_Slug1_C
-				|		|	|  .LevelName = <empty>
-				|		|	|  .PathName = str:'/Game/FactoryGame/Recipes/Research/ResearchRecipe_Slug1.ResearchRecipe_Slug1_C'
-				|		|	|  .Name = str:'researchRecipe'
-				|		|	|  .Length = Int32:87
-				|		|	|  .Index = Int32:0
-				|		|	|  .Value = <empty>
-				|		|	|-> [ArrayProperty] Cost
-				|		|	|  .InnerType = str:'StructProperty'
-				|		|	|  .Name = str:'Cost'
-				|		|	|  .Length = Int32:246
-				|		|	|  .Index = Int32:0
-				|		|	|  .Value =
-				|		|	|	-> [StructProperty] Cost
-				|		|	|	  .Unknown = list(17):[0,]
-				|		|	|	  .Name = str:'Cost'
-				|		|	|	  .Length = Int32:174
-				|		|	|	  .Index = Int32:0
-				|		|	|	  .Value =
-				|		|	|		/ List with 1 elements:
-				|		|	|		|-> [ItemAmount].Value[0-1]
-				|		|	|		|  .Value =
-				|		|	\ end of list
-				*/
-				P.ResearchCost researchcost = costs[i];
-				if (researchcost.Value == null)
-					continue;//TODO:
+			LVC.Collection rows = new LVC.Collection();
+			for (int i = 0; i < converter.RowCount; ++i)
+				rows.Add(i);
 
-				P.ObjectProperty recipe = researchcost.Value.Named("researchRecipe") as P.ObjectProperty;
-				if (recipe == null || str.IsNullOrEmpty(recipe.PathName))
-					continue;//TODO:
-				string recipe_name = recipe.PathName.LastName();
-				if (Translate.Has(recipe_name))
-					recipe_name = Translate._(recipe_name);
+			// Note that FrameworkElementFactory is somewhat dangerous, better use XamlLoader on a string value.
+			FrameworkElementFactory factory = new FrameworkElementFactory(typeof(TextBlock));
+			factory.SetBinding(TextBlock.TextProperty, binder(RowConverter.Parameter.Research));
+			DataTemplate research_tmpl = new DataTemplate() {
+				VisualTree = factory,
+			};
+			factory = new FrameworkElementFactory(typeof(ContentControl));
+			factory.SetBinding(ContentControl.ContentProperty, binder(RowConverter.Parameter.Item));
+			DataTemplate item_tmpl = new DataTemplate() {
+				VisualTree = factory,
+			};
+			factory = new FrameworkElementFactory(typeof(TextBlock));
+			factory.SetBinding(TextBlock.TextProperty, binder(RowConverter.Parameter.Amount));
+			DataTemplate amount_tmpl = new DataTemplate() {
+				VisualTree = factory,
+			};
+			//=> Move into Supplements.Helper ... or even CoreLib.Helpers?
 
-				arr = researchcost.Value.Named("Cost") as P.ArrayProperty;
-				if (arr == null)
-					continue;//TODO:
-				P.StructProperty cost = arr.Value as P.StructProperty;
-				if (cost == null || cost.Value == null)
-					continue;//TODO:
-				List<P.ItemAmount> items = (cost.Value as List<P.Property>).ListOf<P.ItemAmount>();
-				if (items == null || items.Count != 1) // There's only one item per research
-					continue;//TODO:
+			LVC.ColumnDefinitions columns = new LVC.ColumnDefinitions() {
+				new LVC.ColumnDefinition("#", 30, binder(RowConverter.Parameter.Index), null, HorizontalAlignment.Right),
+				new LVC.ColumnDefinition("Research", 200, null, research_tmpl),
+				new LVC.ColumnDefinition("Item", 200, null, item_tmpl),
+				new LVC.ColumnDefinition("Amount", double.NaN, null, amount_tmpl, HorizontalAlignment.Right),
+			};
 
-				/*
-				|		|	|		/ List with 1 elements:
-				|		|	|		|-> [ItemAmount].Value[0-1]
-				|		|	|		|  .Value =
-				|		|	|		|	/ List with 2 elements:
-				|		|	|		|	|-> [ObjectProperty] /Game/FactoryGame/Resource/Environment/Crystal/Desc_Crystal.Desc_Crystal_C
-				|		|	|		|	|  .LevelName = <empty>
-				|		|	|		|	|  .PathName = str:'/Game/FactoryGame/Resource/Environment/Crystal/Desc_Crystal.Desc_Crystal_C'
-				|		|	|		|	|  .Name = str:'ItemClass'
-				|		|	|		|	|  .Length = Int32:83
-				|		|	|		|	|  .Index = Int32:0
-				|		|	|		|	|  .Value = <empty>
-				|		|	|		|	|-> [IntProperty] amount
-				|		|	|		|	|  .Name = str:'amount'
-				|		|	|		|	|  .Length = Int32:4
-				|		|	|		|	|  .Index = Int32:0
-				|		|	|		|	|  .Value = Int32:1
-				|		|	|		|	\ end of list
-				|		|	|		\ end of list
-				*/
-				P.ItemAmount item_amount = items[0];
-				if (item_amount.Value == null)
-					continue;//TODO:
-
-				P.ObjectProperty itemclass = item_amount.Value.Named("ItemClass") as P.ObjectProperty;
-				string name = DetailsPanel.EMPTY;
-				if (itemclass != null && !str.IsNullOrEmpty(itemclass.PathName))
-				{
-					name = itemclass.PathName.LastName();
-					if (Translate.Has(name))
-						name = Translate._(name);
-				}
-
-				P.ValueProperty amount = item_amount.Value.Named("amount") as P.ValueProperty;
-					
-				rows.Add(new object[] {
-					rows.Count,
-					recipe_name,
-					name,
-					amount != null ? amount.Value : DetailsPanel.EMPTY,
-				});
-			}
-
-			ListViewControl lvc = new ListViewControl(columns);
-			//lvc.Label = "Researchs";
-			lvc.Value = rows;
+			LVC lvc = new LVC() {
+				Columns = columns,
+				Value = rows,
+			};
 
 			_childs.Add(lvc);
 			/*
@@ -3100,6 +3940,122 @@ namespace SatisfactorySavegameTool.Panels.Details
 			*/
 		}
 
+		private class LVC : ListViewControl<int?> { }
+
+		private class RowConverter : IValueConverter
+		{
+			internal enum Parameter { Index, Research, Item, Amount };
+
+			internal RowConverter(P.Properties research)
+			{
+				_Setup(research);
+			}
+
+
+			internal int RowCount { get { return _research.Count; } }
+
+
+			public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+			{
+				_last_index = (int)value;
+				switch ((Parameter)parameter)
+				{
+					case Parameter.Index:    return _GetIndex(_last_index);
+					case Parameter.Research: return _GetResearch(_last_index);
+					case Parameter.Item:     return _GetItem(_last_index);
+					case Parameter.Amount:   return _GetAmount(_last_index);
+				}
+				return null;
+			}
+
+			public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+			{
+				return Binding.DoNothing;
+			}
+
+
+			private void _Setup(P.Properties research)
+			{
+				_research = research.ListOf<P.ResearchCost>();
+
+				_last_index = -1;
+
+				_version = MainWindow.CurrFile.Header.GetVersion();
+			}
+
+			private P.ItemAmount _GetItemAmount(int index)
+			{
+				P.ResearchCost researchcost = _research[index];
+				string name = DetailsPanel.EMPTY;
+				P.ArrayProperty arr = researchcost.Value.Named("Cost") as P.ArrayProperty;
+				if (arr != null)
+				{
+					P.StructProperty cost = arr.Value as P.StructProperty;
+					if (cost != null && cost.Value != null)
+					{
+						List<P.ItemAmount> items = cost.Value.ListOf<P.ItemAmount>();
+						if (items != null && items.Count == 1) // There's only one item per research
+							return items[0];
+					}
+				}
+				return null;
+			}
+
+			#region Getter
+			private object _GetIndex(int index)
+			{
+				return index.ToString();
+			}
+
+			private object _GetResearch(int index)
+			{
+				P.ResearchCost researchcost = _research[index];
+				string name = DetailsPanel.EMPTY;
+				P.ObjectProperty recipe = researchcost.Value.Named("researchRecipe") as P.ObjectProperty;
+				//TODO: Access ResearchTable instance
+				if (recipe != null && !str.IsNullOrEmpty(recipe.PathName))
+				{
+					name = recipe.PathName.LastName();
+					if (Translate.Has(name))
+						name = Translate._(name);
+				}
+				return name;
+			}
+
+			private object _GetItem(int index)
+			{
+				P.ItemAmount item_amount = _GetItemAmount(index);
+				if (item_amount != null)
+				{
+					P.ObjectProperty itemclass = item_amount.Value.Named("ItemClass") as P.ObjectProperty;
+					if (itemclass != null && !str.IsNullOrEmpty(itemclass.PathName))
+					{
+						ItemTable.Item tbl_item = ItemTable.Find(itemclass.PathName);
+						if (tbl_item != null)
+							return new TextWithIconDisplay(tbl_item);
+					}
+				}
+				return null;
+			}
+
+			private object _GetAmount(int index)
+			{
+				P.ItemAmount item_amount = _GetItemAmount(index);
+				if (item_amount != null)
+				{
+					P.ValueProperty amount = item_amount.Value.Named("amount") as P.ValueProperty;
+					if (amount != null && amount.Value != null)
+						return amount.Value;
+				}
+				return null;
+			}
+			#endregion
+
+
+			private List<P.ResearchCost> _research;
+			private int                  _last_index;
+			private VersionTable.Version _version;
+		}
 	}
 
 	internal class BP_BuildableSubsystem_C : SpecializedViewer
@@ -4449,81 +5405,13 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 				_childs = new List<IElement>();
 				List<P.ItemAmount> coll = stru.Value.ListOf<P.ItemAmount>();
-				int index = 0;
 
 				Header = "Dismantle refund";
-				if (coll.Count == 0)
+				if (coll == null || coll.Count == 0)
 					IsEnabled = false;
 
-				//|	-> [StructProperty] mDismantleRefund
-				//|	  .Unknown = list<Byte>(17):[0,]
-				//|	  .Name = str:'mDismantleRefund'
-				//|	  .Length = Int32:366
-				//|	  .Index = Int32:0
-				//|	  .Value =
-				//|		/ List with 2 elements:
-				//|		|-> [ItemAmount].Value[2]
-				//|		|  .Value =
-				//|		|	/ List with 2 elements:
-				//|        |   ...
-				//|		|	\ end of list
-				//|		|-> [ItemAmount].Value[2]
-				//|		|	/ List with 2 elements:
-				//|        |   ...
-				//|		|	\ end of list
-				//|		\ end of list
-				List<object[]> rows = new List<object[]>();
-				foreach (P.ItemAmount amount in coll)
-				{
-					P.Properties props = amount.Value as P.Properties;
-
-					++index;
-					string label = index.ToString();
-
-					//|		|	/ List with 2 elements:
-					//|		|	|-> [ObjectProperty] /Game/FactoryGame/Resource/Parts/IronPlateReinforced/Desc_IronPlateReinforced.Desc_IronPlateReinforced_C
-					//|		|	|  .LevelName = str:''
-					//|		|	|  .PathName = str:'/Game/FactoryGame/Resource/Parts/IronPlateReinforced/Desc_IronPlateReinforced.Desc_IronPlateReinforced_C'
-					//|		|	|  .Name = str:'ItemClass'
-					//|		|	|  .Length = Int32:113
-					//|		|	|  .Index = Int32:0
-					//|		|	|  .Value = <empty>
-					//|        |   ...
-					P.ObjectProperty objprop = props.Named("ItemClass") as P.ObjectProperty;
-					string item_name = objprop.PathName.LastName();
-					if (!string.IsNullOrEmpty(item_name))
-					{
-						if (Translate.Has(item_name))
-							item_name = Translate._(item_name);
-					}
-
-					//|        |   ...
-					//|		|	|-> [IntProperty] amount
-					//|		|	|  .Name = str:'amount'
-					//|		|	|  .Length = Int32:4
-					//|		|	|  .Index = Int32:0
-					//|		|	|  .Value = Int32:3
-					//|		|	\ end of list
-					P.IntProperty count = props.Named("amount") as P.IntProperty;
-					string item_amount = ((int)count.Value).ToString();
-
-					rows.Add(new object[] {
-						label,
-						item_name,
-						item_amount
-					});
-				}
-
-				List<ListViewControl.ColumnDefinition> columns = new List<ListViewControl.ColumnDefinition>();
-				columns.Add(new ListViewControl.ColumnDefinition("#", 25));
-				columns.Add(new ListViewControl.ColumnDefinition("Item", 150));
-				columns.Add(new ListViewControl.ColumnDefinition("Count", 50));
-
-				ListViewControl lvc = new ListViewControl(columns.ToArray());
-				//lvc.Label = "Refunds";
-				lvc.Value = rows;
-
-				_childs.Add(lvc);
+				ItemAmountList items = new ItemAmountList(coll);
+				_childs.Add(items);
 			}
 
 		}
@@ -4677,7 +5565,7 @@ namespace SatisfactorySavegameTool.Panels.Details
 							// List
 
 							int index = 0;
-							List<object[]> rows = new List<object[]>();
+							LVC.Collection rows = new LVC.Collection();
 							foreach (P.ObjectProperty objprop in list)
 							{
 								++index;
@@ -4693,15 +5581,14 @@ namespace SatisfactorySavegameTool.Panels.Details
 								});
 							}
 
-							List<ListViewControl.ColumnDefinition> columns = new List<ListViewControl.ColumnDefinition>();
-							columns.Add(new ListViewControl.ColumnDefinition("#", 25));
-							columns.Add(new ListViewControl.ColumnDefinition("Power line", 300));
-
-							ListViewControl lvc = new ListViewControl(columns.ToArray());
-							//lvc.Label = "Power lines";
-							lvc.Value = rows;
-							if (rows.Count == 0)
-								lvc.IsEnabled = false;
+							LVC.ColumnDefinitions columns = new LVC.ColumnDefinitions() {
+								new LVC.ColumnDefinition("#", 25, new Binding(".[0]")),
+								new LVC.ColumnDefinition("Power line", 300, new Binding(".[1]")),
+							};
+							LVC lvc = new LVC() {
+								Columns = columns,
+								Value = rows,
+							};
 
 							_childs.Add(lvc);
 						}
@@ -4710,6 +5597,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 
 				//TODO: Check if lines are listed at all and in a valid "circuit group"
 			}
+
+			internal class LVC : ListViewControl<object[]> { }
 
 			private P.Object _object;
 		}
@@ -4746,104 +5635,259 @@ namespace SatisfactorySavegameTool.Panels.Details
 				if (rules.Count == 0)
 					IsEnabled = false;
 
-				Action<string, List<P.SplitterSortRule>> build_listview = (list_label, coll) => {
-					int index = 0;
-					List<object[]> rows = new List<object[]>();
-					foreach (P.SplitterSortRule rule in coll)
-					{
-						P.Properties props = rule.Value as P.Properties;
-
-						//|		|-> [SplitterSortRule].Value[2]
-						//|		|  .Value =
-						//|		|	/ List with 2 elements:
-						//|		|	|-> [ObjectProperty] /Script/FactoryGame.FGWildCardDescriptor
-						//|		|	 or [ObjectProperty] /Script/FactoryGame.FGNoneDescriptor
-						//|		|	 or [ObjectProperty] (empty .PathName)
-						//|		|	 or [ObjectProperty] /Game/FactoryGame/Resource/RawResources/OreBauxite/Desc_OreBauxite.Desc_OreBauxite_C
-						//|		|	|  .LevelName = str:''
-						//|		|	|  .PathName = str:'/Script/FactoryGame.FGWildCardDescriptor'
-						//|		|	|  .Name = str:'ItemClass'
-						//|		|	|  .Length = Int32:49
-						//|		|	|  .Index = Int32:0
-						//|		|	|  .Value = <empty>
-						//|		|	|-> [IntProperty] OutputIndex
-						//|		|	|  .Name = str:'OutputIndex'
-						//|		|	|  .Length = Int32:4
-						//|		|	|  .Index = Int32:0
-						//|		|	|  .Value = Int32:0
-						//|		|	\ end of list
-						P.ObjectProperty objprop = props.Named("ItemClass") as P.ObjectProperty;
-						string item_name = objprop.PathName.LastName();
-						if (!string.IsNullOrEmpty(item_name))
-						{
-							if (Translate.Has(item_name))
-								item_name = Translate._(item_name);
-						}
-						else
-						{
-							item_name = "None";
-						}
-
-						if (list_label == null)
-						{
-							P.IntProperty output = props.Named("OutputIndex") as P.IntProperty;
-							string item_output = ((OutputIndex)((int)output.Value)).ToString();
-
-							rows.Add(new object[] {
-								item_output,
-								item_name,
-							});
-						}
-						else
-						{
-							++index;
-							string label = index.ToString();
-
-							rows.Add(new object[] {
-								label,
-								item_name
-							});
-						}
-					}
-
-					List<ListViewControl.ColumnDefinition> columns = new List<ListViewControl.ColumnDefinition>();
-					if (list_label == null)
-						columns.Add(new ListViewControl.ColumnDefinition("Side", 50));
-					else
-						columns.Add(new ListViewControl.ColumnDefinition("#", 25));
-					columns.Add(new ListViewControl.ColumnDefinition("Item", 150));
-
-					ListViewControl lvc = new ListViewControl(columns.ToArray());
-					if (list_label != null)
-						lvc.Label = list_label;
-					lvc.Value = rows;
-
-					_childs.Add(lvc);
-				};
-
-				// Group by output index, and check if we do need to create 3 separate controls, one for each direction
-				// (as programmable splitters can have more than one rule per side)
-				var groups = rules.GroupBy(r => (int)(r.Value.Named("OutputIndex") as P.IntProperty).Value);
-				int multiple = groups.Count(g => g.Count() > 1);
-				if (multiple == 0)
+				// Group by output index, and create a 3 separate expandos, one for each direction
+				//
+				// Example rule:
+				//|		|-> [SplitterSortRule].Value[2]
+				//|		|  .Value =
+				//|		|	/ List with 2 elements:
+				//|		|	|-> [ObjectProperty] /Script/FactoryGame.FGWildCardDescriptor     -> Any item
+				//|		|	 or [ObjectProperty] /Script/FactoryGame.FGNoneDescriptor         -> Output closed
+				//|		|	 or [ObjectProperty] /Script/FactoryGame.FGAnyUndefinedDescriptor -> Any item not specified in filters
+				//|		|	 or [ObjectProperty] (empty .PathName)
+				//|		|	 or [ObjectProperty] /Game/FactoryGame/Resource/RawResources/OreBauxite/Desc_OreBauxite.Desc_OreBauxite_C
+				//|		|	|  .LevelName = str:''
+				//|		|	|  .PathName = str:'/Script/FactoryGame.FGWildCardDescriptor'
+				//|		|	|  .Name = str:'ItemClass'
+				//|		|	|  .Length = Int32:49
+				//|		|	|  .Index = Int32:0
+				//|		|	|  .Value = <empty>
+				//|		|	|-> [IntProperty] OutputIndex
+				//|		|	|  .Name = str:'OutputIndex'
+				//|		|	|  .Length = Int32:4
+				//|		|	|  .Index = Int32:0
+				//|		|	|  .Value = Int32:0
+				//|		|	\ end of list
+				_groups = rules.GroupBy(r => (int)(r.Value.Named("OutputIndex") as P.IntProperty).Value);
+				foreach (var group in _groups)
 				{
-					// At most one rule per direction, so put all rules into a single list
-					build_listview(null, rules);
-				}
-				else
-				{
-					// One listview per direction
-					foreach (var group in groups)
-					{
-						string label = ((OutputIndex)group.Key).ToString();
-						if (Translate.Has(label))
-							label = Translate._(label);
-						build_listview(label, group.ToList());
-					}
+					string label = ((OutputIndex)group.Key).ToString();
+					if (Translate.Has(label))
+						label = Translate._(label);
+					_AddView(label, group.Key, group.ToList());
 				}
 			}
 
+			internal void _AddView(string label, int output, List<P.SplitterSortRule> rules)
+			{
+				Expando expando = new Expando(this, label, null);
+
+				//TODO: Radio group: None, All, Items, with Items => LVC
+				Radiogroup grp = new Radiogroup(this, "Rule", rules);
+				expando.Childs.Add(grp);
+
+				RowConverter converter = new RowConverter(this, output, rules);
+				Func<RowConverter.Parameter, Binding> binder = (param) => {
+					return new Binding() {
+						Converter = converter,
+						ConverterParameter = param,
+					};
+				};
+
+				// Note that FrameworkElementFactory is somewhat dangerous, better use XamlLoader on a string value.
+				FrameworkElementFactory factory = new FrameworkElementFactory(typeof(ContentControl));
+				factory.SetBinding(ContentProperty, binder(RowConverter.Parameter.Item));
+				DataTemplate item_tmpl = new DataTemplate() {
+					VisualTree = factory,
+				};
+				factory = new FrameworkElementFactory(typeof(ContentControl));
+				factory.SetBinding(ContentProperty, binder(RowConverter.Parameter.Button));
+				DataTemplate btn_tmpl = new DataTemplate() {
+					VisualTree = factory,
+				};
+				//=> Move into Supplements.Helper ... or even CoreLib.Helpers?
+
+				LVC.Collection rows = new LVC.Collection();
+				for (int i = 0; i < converter.RowCount; ++i)
+					rows.Add(i);
+
+				LVC.ColumnDefinitions columns = new LVC.ColumnDefinitions() {
+					new LVC.ColumnDefinition("#", 25, binder(RowConverter.Parameter.Index)),
+					new LVC.ColumnDefinition("Item", 250, null, item_tmpl),
+					new LVC.ColumnDefinition("", 32, null, btn_tmpl),
+				};
+
+				LVC lvc = new LVC() {
+					Columns = columns,
+					Value = rows
+				};
+				expando.Childs.Add(lvc);
+
+				//TODO: Add 'Add rule' button
+
+				_childs.Add(expando);
+			}
+
+			internal void OnDeleteRule(int output, int rule)
+			{
+				//TODO:
+			}
+
+			internal class Radiogroup : MultiValueControl<bool>
+			{
+				public Radiogroup(IElement parent, string label, object obj)
+					: base(parent, label, null)
+				{
+					_value = new bool[4] { false, false, false, false };
+					List<P.SplitterSortRule> rules = obj as List<P.SplitterSortRule>;
+					if (rules != null && rules.Count > 0)
+					{
+						P.ObjectProperty obj_prop = rules[0].Value.Named("ItemClass") as P.ObjectProperty;
+						if (obj_prop != null && !str.IsNullOrEmpty(obj_prop.PathName))
+						{
+							string pathname = obj_prop.PathName.LastName();
+							_value[0] = (pathname == "FGNoneDescriptor");
+							_value[1] = (pathname == "FGWildCardDescriptor");
+							_value[2] = (pathname == "FGAnyUndefinedDescriptor");
+							_value[3] = !pathname.StartsWith("FG");
+						}
+					}
+				}
+
+				internal override void _CreateChilds()
+				{
+					Thickness margin = new Thickness(0, 1, 20, 1);
+					_childs.Add(new RadioButton() { Content = Translate._("FGNoneDescriptor"), IsChecked = _value[0], Margin = margin });
+					_childs.Add(new RadioButton() { Content = Translate._("FGWildCardDescriptor"), IsChecked = _value[1], Margin = margin });
+					_childs.Add(new RadioButton() { Content = Translate._("FGAnyUndefinedDescriptor"), IsChecked = _value[2], Margin = margin });
+					_childs.Add(new RadioButton() { Content = Translate._("ItemList"), IsChecked = _value[3], Margin = new Thickness(0, 1, 0, 1) });
+				}
+
+				protected override void _PropertyChanged(object sender, PropertyChangedEventArgs e)
+				{
+					for (int i = 0; i < _childs.Count; ++i)
+						_value[i] = (_childs[i] as RadioButton).IsChecked.GetValueOrDefault();
+					base._PropertyChanged(this, e);
+				}
+			}
+
+			internal class LVC : ListViewControl<int?> { }
+
+			private class RowConverter : IValueConverter
+			{
+				internal enum Parameter { Index, Item, Button };
+
+				internal RowConverter(SortRules owner, int output, List<P.SplitterSortRule> rules)
+				{
+					_owner = owner;
+					_output = output;
+					_Setup(rules);
+				}
+
+
+				internal int RowCount { get { return _rules.Count; } }
+
+
+				public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+				{
+					_last_index = (int)value;
+					switch ((Parameter)parameter)
+					{
+						case Parameter.Index:  return _GetIndex(_last_index);
+						case Parameter.Item:   return _GetItem(_last_index);
+						case Parameter.Button: return _GetButton(_last_index);
+					}
+					return null;
+				}
+
+				public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+				{
+					return Binding.DoNothing;
+				}
+
+
+				private void _Setup(List<P.SplitterSortRule> rules)
+				{
+					_rules = rules;
+
+					_last_index = -1;
+
+					_version = MainWindow.CurrFile.Header.GetVersion();
+
+					if (_all_items == null)
+						_all_items = ItemCombobox.Collection.FromItemTable(ItemTable.All);
+				}
+
+				#region Getter
+				private object _GetIndex(int index)
+				{
+					return index.ToString();
+				}
+
+				private object _GetItem(int index)
+				{
+					//|		|-> [SplitterSortRule].Value[2]
+					//|		|  .Value =
+					//|		|	/ List with 2 elements:
+					//|		|	|-> [ObjectProperty] /Script/FactoryGame.FGWildCardDescriptor
+					//|		|	 or [ObjectProperty] /Script/FactoryGame.FGNoneDescriptor
+					//|		|	 or [ObjectProperty] /Script/FactoryGame.FGAnyUndefinedDescriptor
+					//|		|	 or [ObjectProperty] (empty .PathName)
+					//|		|	 or [ObjectProperty] /Game/FactoryGame/Resource/RawResources/OreBauxite/Desc_OreBauxite.Desc_OreBauxite_C
+					//|		|	|  .LevelName = str:''
+					//|		|	|  .PathName = str:'/Script/FactoryGame.FGWildCardDescriptor'
+					//|		|	|  .Name = str:'ItemClass'
+					//|		|	|  .Length = Int32:49
+					//|		|	|  .Index = Int32:0
+					//|		|	|  .Value = <empty>
+					//|		|	|-> [IntProperty] OutputIndex
+					//|		|	|  .Name = str:'OutputIndex'
+					//|		|	|  .Length = Int32:4
+					//|		|	|  .Index = Int32:0
+					//|		|	|  .Value = Int32:0
+					//|		|	\ end of list
+					P.SplitterSortRule rule = _rules[index];
+					P.ObjectProperty itemclass = rule.Value.Named("ItemClass") as P.ObjectProperty;
+					if (itemclass != null)
+					{	
+						str pathname = itemclass.PathName;
+						//TODO: Always create a combobox here?
+						if (!str.IsNullOrEmpty(pathname) && !pathname.ToString().Contains(".FG"))
+						{
+							ItemCombobox cmb = new ItemCombobox(pathname, null, _all_items);
+							cmb.SelectionChanged += _ItemChanged;
+							return cmb;
+						}
+					}
+					return null;
+				}
+				private void _ItemChanged(object sender, SelectionChangedEventArgs e)
+				{
+					//throw new NotImplementedException();
+					//TODO:
+				}
+
+				private object _GetButton(int index)
+				{
+					Button btn = new Button() {
+						Content = new Image() { Source = new BitmapImage(Helpers.GetResourceUri("Button.Delete.png")) },
+						Width = 20,
+						Height = 20,
+						ToolTip = "Delete rule",//TODO: Translate._("?.Delete"),
+						Tag = index,
+					};
+					btn.Click += _DeleteClick;
+					return btn;
+				}
+				private void _DeleteClick(object sender, RoutedEventArgs e)
+				{
+					//throw new NotImplementedException();
+					if (sender is Button)
+						_owner.OnDeleteRule(_output, (int)((sender as Button).Tag));
+				}
+				#endregion
+
+
+				private SortRules                      _owner;
+				private int                            _output;
+				private List<P.SplitterSortRule>       _rules;
+				private int                            _last_index;
+				private VersionTable.Version           _version;
+				private static ItemCombobox.Collection _all_items;
+			}
+
 			private P.ArrayProperty _array;
+			private IEnumerable<IGrouping<int, P.SplitterSortRule>> _groups;
 		}
 
 		internal class PlatformConnection : Expando
@@ -5076,8 +6120,8 @@ namespace SatisfactorySavegameTool.Panels.Details
 				//|		...
 				//|		\ end of list
 				//
-				List<ListViewControl.ColumnDefinition> columns = new List<ListViewControl.ColumnDefinition>();
-				List<object[]> rows = new List<object[]>();
+				LVC.ColumnDefinitions columns = null;
+				LVC.Collection rows = new LVC.Collection();
 				P.Property prop;
 
 				if (MainWindow.CurrFile.Header.SaveVersion < 20)
@@ -5125,9 +6169,11 @@ namespace SatisfactorySavegameTool.Panels.Details
 						});
 					}
 
-					columns.Add(new ListViewControl.ColumnDefinition("Name", 100));
-					columns.Add(new ListViewControl.ColumnDefinition("Offset", 150, HorizontalAlignment.Right));
-					columns.Add(new ListViewControl.ColumnDefinition("Should show?", 100));
+					columns = new LVC.ColumnDefinitions() {
+						new LVC.ColumnDefinition("Name", 100, new Binding(".[0]")),
+						new LVC.ColumnDefinition("Offset", 150, new Binding(".[1]"), null, HorizontalAlignment.Right),
+						new LVC.ColumnDefinition("Should show?", 100, new Binding(".[2]")),
+					};
 				}
 				else
 				{
@@ -5164,19 +6210,23 @@ namespace SatisfactorySavegameTool.Panels.Details
 						});
 					}
 
-					columns.Add(new ListViewControl.ColumnDefinition("Index", 50));
-					columns.Add(new ListViewControl.ColumnDefinition("Offset", 150, HorizontalAlignment.Right));
+					columns = new LVC.ColumnDefinitions() {
+						new LVC.ColumnDefinition("Index", 50, new Binding(".[0]")),
+						new LVC.ColumnDefinition("Offset", 150, new Binding(".[1]"), null, HorizontalAlignment.Right),
+					};
 				}
 
-				ListViewControl lvc = new ListViewControl(columns.ToArray());
-				//lvc.Label = "Feet offsets";
-				lvc.Value = rows;
+				LVC lvc = new LVC() {
+					Columns = columns,
+					Value = rows,
+				};
 				if (rows.Count == 0)
 					lvc.IsEnabled = false;
 
 				_childs.Add(lvc);
-
 			}
+
+			internal class LVC : ListViewControl<object[]> { }
 		}
 
 		private static string[] _excluded_props = new string[] { "ClassName", "LevelName", "PathName", "OuterPathName" };

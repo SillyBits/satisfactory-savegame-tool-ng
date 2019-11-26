@@ -23,8 +23,17 @@ namespace SatisfactorySavegameTool.Supplements
 	public enum OutputIndex
 	{
 		Center = 0,
-		Left = 1,
-		Right = 2
+		Right = 1,
+		Left = 2,
+	}
+
+	// Splitter rules
+	public enum SplitterRule
+	{
+		None = 0,
+		Wildcard,
+		AnyUndefined,
+		ItemList,
 	}
 
 	// Stack sizes
@@ -35,6 +44,14 @@ namespace SatisfactorySavegameTool.Supplements
 		SS_MEDIUM  = 100,
 		SS_BIG     = 200,
 		SS_HUGE    = 500,
+	}
+
+	// Equipment slots avail
+	public enum EEquipmentSlot
+	{
+		ES_NONE = 0,
+		ES_ARMS = 1,
+		ES_BACK = 2,
 	}
 
 }

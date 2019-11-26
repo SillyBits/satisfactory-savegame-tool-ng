@@ -689,5 +689,7 @@
 	<!-- Random -->
 	<FGWildCardDescriptor>Beliebig</FGWildCardDescriptor>
 	<FGNoneDescriptor>Keine (geschlossen)</FGNoneDescriptor>
+	<FGAnyUndefinedDescriptor>Nicht definierte</FGAnyUndefinedDescriptor>
+	<ItemList>Liste</ItemList>
 
 </translation>

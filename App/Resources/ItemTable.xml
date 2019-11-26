@@ -71,25 +71,25 @@
   <item name="Desc_Vines" path="Resource/Parts/GenericBiomass/Desc_Vines" type="Item" stacksize="SS_BIG" />
   <item name="Desc_Wood" path="Resource/Parts/GenericBiomass/Desc_Wood" type="Item" stacksize="SS_MEDIUM" />
   <item name="Desc_NuclearFuelRod" path="Resource/Parts/NuclearFuelRod/Desc_NuclearFuelRod" type="Item" stacksize="SS_SMALL" />
-  <item name="Desc_Chainsaw" path="Equipment/Chainsaw/Desc_Chainsaw" type="Equipment" />
-  <item name="BP_EquipmentDescriptorColorGun" path="Resource/Equipment/ColorGun/BP_EquipmentDescriptorColorGun" type="Equipment" />
-  <item name="BP_EquipmentDescriptorGasmask" path="Resource/Equipment/GasMask/BP_EquipmentDescriptorGasmask" type="Equipment" />
-  <item name="BP_EquipmentDescriptorObjectScanner" path="Resource/Equipment/GemstoneScanner/BP_EquipmentDescriptorObjectScanner" type="Equipment" />
-  <item name="BP_EquipmentDescriptorHazmatSuit" path="Resource/Equipment/HazmatSuit/BP_EquipmentDescriptorHazmatSuit" type="Equipment" />
-  <item name="BP_EquipmentDescriptorJetPack" path="Resource/Equipment/JetPack/BP_EquipmentDescriptorJetPack" type="Equipment" />
-  <item name="BP_EquipmentDescriptorJumpingStilts" path="Resource/Equipment/JumpingStilts/BP_EquipmentDescriptorJumpingStilts" type="Equipment" />
-  <item name="Desc_RebarGunProjectile" path="Resource/Equipment/NailGun/Desc_RebarGunProjectile" type="Equipment" />
-  <item name="BP_EquipmentDescriptorNobeliskDetonator" path="Resource/Equipment/NobeliskDetonator/BP_EquipmentDescriptorNobeliskDetonator" type="Equipment" />
-  <item name="BP_ItemDescriptorPortableMiner" path="Resource/Equipment/PortableMiner/BP_ItemDescriptorPortableMiner" type="Equipment" />
-  <item name="BP_EquipmentDescriptorRifle" path="Resource/Equipment/Rifle/BP_EquipmentDescriptorRifle" type="Equipment" />
-  <item name="BP_EquipmentDescriptorShockShank" path="Resource/Equipment/ShockShank/BP_EquipmentDescriptorShockShank" type="Equipment" />
-  <item name="BP_EquipmentDescriptorStunSpear" path="Resource/Equipment/StunSpear/BP_EquipmentDescriptorStunSpear" type="Equipment" />
-  <item name="Desc_Berry" path="Resource/Environment/Berry/Desc_Berry" type="Equipment" stacksize="SS_SMALL" />
-  <item name="Desc_Shroom" path="Resource/Environment/DesertShroom/Desc_Shroom" type="Equipment" stacksize="SS_SMALL" />
-  <item name="Desc_Nut" path="Resource/Environment/Nut/Desc_Nut" type="Equipment" stacksize="SS_MEDIUM" />
-  <item name="BP_EquipmentDescriptorBeacon" path="Resource/Equipment/Beacon/BP_EquipmentDescriptorBeacon" type="Equipment" stacksize="SS_MEDIUM" />
-  <item name="Desc_Parachute" path="Resource/Equipment/Beacon/Desc_Parachute" type="Equipment" stacksize="SS_SMALL" />
-  <item name="Desc_Medkit" path="Resource/Equipment/Medkit/Desc_Medkit" type="Equipment" stacksize="SS_SMALL" />
+  <item name="Desc_Chainsaw" path="Equipment/Chainsaw/Desc_Chainsaw" type="Equipment" slot="ES_ARMS" />
+  <item name="BP_EquipmentDescriptorColorGun" path="Resource/Equipment/ColorGun/BP_EquipmentDescriptorColorGun" type="Equipment" slot="ES_ARMS" />
+  <item name="BP_EquipmentDescriptorGasmask" path="Resource/Equipment/GasMask/BP_EquipmentDescriptorGasmask" type="Equipment" slot="ES_BACK" />
+  <item name="BP_EquipmentDescriptorObjectScanner" path="Resource/Equipment/GemstoneScanner/BP_EquipmentDescriptorObjectScanner" type="Equipment" slot="ES_ARMS" />
+  <item name="BP_EquipmentDescriptorHazmatSuit" path="Resource/Equipment/HazmatSuit/BP_EquipmentDescriptorHazmatSuit" type="Equipment" slot="ES_BACK" />
+  <item name="BP_EquipmentDescriptorJetPack" path="Resource/Equipment/JetPack/BP_EquipmentDescriptorJetPack" type="Equipment" slot="ES_BACK" />
+  <item name="BP_EquipmentDescriptorJumpingStilts" path="Resource/Equipment/JumpingStilts/BP_EquipmentDescriptorJumpingStilts" type="Equipment" slot="ES_BACK" />
+  <item name="Desc_RebarGunProjectile" path="Resource/Equipment/NailGun/Desc_RebarGunProjectile" type="Equipment" slot="ES_ARMS" />
+  <item name="BP_EquipmentDescriptorNobeliskDetonator" path="Resource/Equipment/NobeliskDetonator/BP_EquipmentDescriptorNobeliskDetonator" type="Equipment" slot="ES_ARMS" />
+  <item name="BP_ItemDescriptorPortableMiner" path="Resource/Equipment/PortableMiner/BP_ItemDescriptorPortableMiner" type="Equipment" slot="ES_ARMS" />
+  <item name="BP_EquipmentDescriptorRifle" path="Resource/Equipment/Rifle/BP_EquipmentDescriptorRifle" type="Equipment" slot="ES_ARMS" />
+  <item name="BP_EquipmentDescriptorShockShank" path="Resource/Equipment/ShockShank/BP_EquipmentDescriptorShockShank" type="Equipment" slot="ES_ARMS" />
+  <item name="BP_EquipmentDescriptorStunSpear" path="Resource/Equipment/StunSpear/BP_EquipmentDescriptorStunSpear" type="Equipment" slot="ES_ARMS" />
+  <item name="Desc_Berry" path="Resource/Environment/Berry/Desc_Berry" type="Equipment" stacksize="SS_SMALL" slot="ES_ARMS" />
+  <item name="Desc_Shroom" path="Resource/Environment/DesertShroom/Desc_Shroom" type="Equipment" stacksize="SS_SMALL" slot="ES_ARMS" />
+  <item name="Desc_Nut" path="Resource/Environment/Nut/Desc_Nut" type="Equipment" stacksize="SS_MEDIUM" slot="ES_ARMS" />
+  <item name="BP_EquipmentDescriptorBeacon" path="Resource/Equipment/Beacon/BP_EquipmentDescriptorBeacon" type="Equipment" stacksize="SS_MEDIUM" slot="ES_ARMS" />
+  <item name="Desc_Parachute" path="Resource/Equipment/Beacon/Desc_Parachute" type="Equipment" stacksize="SS_SMALL" slot="ES_BACK" />
+  <item name="Desc_Medkit" path="Resource/Equipment/Medkit/Desc_Medkit" type="Equipment" stacksize="SS_SMALL" slot="ES_ARMS" />
   <item name="Desc_CompactedCoal" path="Resource/Parts/CompactedCoal/Desc_CompactedCoal" type="Resource" stacksize="SS_MEDIUM" />
   <item name="Desc_UraniumCell" path="Resource/Parts/UraniumCell/Desc_UraniumCell" type="Resource" stacksize="SS_BIG" />
   <item name="Desc_Coal" path="Resource/RawResources/Coal/Desc_Coal" type="Resource" stacksize="SS_MEDIUM" />
