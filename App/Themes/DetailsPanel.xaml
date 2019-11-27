@@ -217,4 +217,9 @@
 		</Setter>
 	</Style>
 
+
+	<Style x:Key="listviewitemStretch" TargetType="ListViewItem">
+		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+	</Style>
+
 </ResourceDictionary>
