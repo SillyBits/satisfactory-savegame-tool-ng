@@ -22,7 +22,7 @@ namespace PakHandler
 		V5   = 5, // Allows for relative chunk offsets (would guess related to compression)
 		V6   = 6, // Allows for deleting records
 		V7   = 7, // New encryption key strategies
-	//	V8   = 8, // Name-based compression methods -> Implemented when available/needed
+		V8   = 8, // Name-based compression methods // Used in 'Exp. CL#109370'
 		MAX
 	};
 
@@ -212,6 +212,10 @@ namespace PakHandler
 		bool Read(IReader^ reader) override;
 
 		void DumpTo(DumpToFileHelper^ d) override;
+
+	protected:
+		bool _TryReadUE421(IReader^ reader);
+		bool _TryReadUE422(IReader^ reader);
 	};
 
 

@@ -20,6 +20,19 @@ Footer::Footer()
 
 bool Footer::Read(IReader^ reader)
 {
+	// UE 4.21
+	if (_TryReadUE421(reader))
+		return true;
+	// UE 4.22
+	if (_TryReadUE422(reader))
+		return true;
+
+	Log::Error("PakFooter: Unknown PAK format");
+	return false;
+}
+
+bool Footer::_TryReadUE421(IReader^ reader)
+{
 	if (reader->Seek(-44, IReader::Positioning::End) < 0)
 	{
 		Log::Error("PakFooter: Failed to seek to END - 44");
@@ -51,6 +64,59 @@ bool Footer::Read(IReader^ reader)
 
 	Sha1 = reader->ReadBytes(20);
 	//Sha1 check skipped for now
+
+	if (reader->Pos != reader->Size)
+	{
+		Log::Error("PakFooter: Not all bytes read");
+		return false;
+	}
+
+	if (reader->Seek(0, IReader::Positioning::Start) < 0)
+	{
+		Log::Error("PakFooter: Failed to seek to START");
+		return false;
+	}
+
+	return true;
+}
+
+bool Footer::_TryReadUE422(IReader^ reader)
+{
+	if (reader->Seek(-172, IReader::Positioning::End) < 0)
+	{
+		Log::Error("PakFooter: Failed to seek to END - 44");
+		return false;
+	}
+
+	Magic = reader->ReadUInt();
+	if (Magic != MAGIC)
+	{
+		Log::Error("PakFooter: Invalid magic {0:X8}, expected {1:X8}", Magic, MAGIC);
+		return false;
+	}
+
+	int version = reader->ReadInt();
+	if (version < (int)PakVersion::V1 || version >= (int)PakVersion::MAX)
+	{
+		Log::Error("PakFooter: Version V{0} not supported", version);
+		return false;
+	}
+	Version = (PakVersion) version;
+
+	IndexOffset = reader->ReadLong();
+	IndexSize   = reader->ReadLong();
+	if (IndexOffset < 0 || IndexSize < 0 || IndexOffset + IndexSize > reader->Size)
+	{
+		Log::Error("PakFooter: Invalid index offset/size");
+		return false;
+	}
+
+	Sha1 = reader->ReadBytes(20);
+	//Sha1 check skipped for now
+
+	// A 4 compression names (each a 32 bytes) following
+	array<byte>^ methods = reader->ReadBytes(4*32);
+
 
 	if (reader->Pos != reader->Size)
 	{
@@ -111,7 +177,7 @@ bool IndexEntry::Read(IReader^ reader)
 	case PakVersion::V5: return ReadV5(reader);
 	case PakVersion::V6: return ReadV6(reader);
 	case PakVersion::V7: return ReadV7(reader);
-//	case Versions::V8: return ReadV8(reader); <= To be supported in future
+	case PakVersion::V8: return ReadV8(reader);
 	}
 
 	return false;
@@ -134,7 +200,15 @@ bool IndexEntry::ReadV2(IReader^ reader)
 	Offset            = reader->ReadLong();
 	CompressedSize    = reader->ReadLong();
 	UncompressedSize  = reader->ReadLong();
-	CompressionMethod = (PakCompression) reader->ReadInt();
+	if (Version < PakVersion::V8)
+		CompressionMethod = (PakCompression) reader->ReadInt();
+	else if (Version == PakVersion::V8)
+		CompressionMethod = (PakCompression) reader->ReadByte(); // Looks like CSS changed this size
+	else
+	{
+		Log::Error("IndexEntry: Unable to read entry");
+		return false;
+	}
 	Sha1              = reader->ReadBytes(20);
 
 	return true;
@@ -194,7 +268,10 @@ bool IndexEntry::ReadV7(IReader^ reader)
 
 bool IndexEntry::ReadV8(IReader^ reader)
 {
-	throw gcnew NotImplementedException();
+	if (!ReadV7(reader))
+		return false;
+
+	return true;
 }
 
 void IndexEntry::DumpTo(DumpToFileHelper^ d)
