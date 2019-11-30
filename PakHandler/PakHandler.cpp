@@ -56,21 +56,35 @@ array<byte>^ PakLoader::ReadAsset(String^ filename)
 	if (filename == nullptr)
 		return nullptr;
 
-	// Read both files from Pak
+	// Read all parts from Pak
 	array<byte>^ uasset = ReadRaw(filename + ".uasset");
 	if (uasset == nullptr || uasset->Length <= 0)
 		return nullptr;
 	array<byte>^ uexp   = ReadRaw(filename + ".uexp");
 	if (uexp == nullptr || uexp->Length <= 0)
 		return nullptr;
+	array<byte>^ ubulk  = ReadRaw(filename + ".ubulk");
+	//if (ubulk == nullptr || ubulk->Length <= 0)
+	//	return nullptr;
+	//=> Optional
 
 	// Combine into one blob
-	array<byte>^ asset = gcnew array<byte>(uasset->Length + uexp->Length);
+	int length = uasset->Length + uexp->Length;
+	if (ubulk != nullptr && ubulk->Length >= 0)
+		length += ubulk->Length;
+	array<byte>^ asset = gcnew array<byte>(length);
 	if (asset == nullptr)
 		return nullptr;
-	uasset->CopyTo(asset, 0);
-	uexp->CopyTo(asset, uasset->Length);
-	uasset = uexp = nullptr;
+
+	int offset = 0;
+	uasset->CopyTo(asset, offset);
+	offset += uasset->Length;
+	uexp->CopyTo(asset, offset);
+	offset += uexp->Length;
+	if (ubulk != nullptr && ubulk->Length >= 0)
+		ubulk->CopyTo(asset, offset);
+
+	uasset = uexp = ubulk = nullptr;
 
 	return asset;
 }

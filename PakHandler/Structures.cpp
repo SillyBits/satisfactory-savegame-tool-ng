@@ -1505,7 +1505,7 @@ FBulkData::FBulkData()
 	, Data(nullptr)
 { }
 
-bool FBulkData::Read(IReader^ reader)
+bool FBulkData::Read(IReader^ reader, __int64 offset)
 {
 	__int64 last_pos = reader->Pos;
 
@@ -1516,12 +1516,51 @@ bool FBulkData::Read(IReader^ reader)
 	SizeOnDisk   = is64 ? reader->ReadLong() : reader->ReadInt();
 
 	OffsetInFile = reader->ReadLong();
-	if (OffsetInFile > reader->Pos)
-		return Warning("BulkDataOffsetInFile > 0, needs to be handled");
 
-	Data = reader->ReadBytes((int)ElementCount);
-	if (Data == nullptr)
-		return Error("Error reading data blob");
+	if ((BulkDataFlags & (dword)EBulkDataFlags::PayloadAtEndOfFile) != 0)
+	{
+		__int64 curr_pos = reader->Pos;
+
+		if (OffsetInFile > 0x8000000000000000)
+		{
+			OffsetInFile = (~OffsetInFile) + 1;
+			if (OffsetInFile <= reader->Pos)
+				return Error("PayloadAtEnd: Invalid bulk offset");
+
+			if (reader->Seek(OffsetInFile, IReader::Positioning::Start) != OffsetInFile)
+				return Error("Error seeking to bulk data");
+
+			dword magic = reader->ReadUInt();
+			if (magic != FPackageFileSummary::MAGIC)
+				return Error("Expected package magic");
+		}
+		else
+		{
+			OffsetInFile += offset + 12; // FName(2 ints) + MAGIC(dword)
+			if (reader->Seek(OffsetInFile, IReader::Positioning::Start) != OffsetInFile)
+				return Error("Error seeking to bulk data");
+		}
+
+		Data = reader->ReadBytes((int)ElementCount);
+		if (Data == nullptr)
+			return Error("Error reading data blob");
+
+		if (reader->Seek(curr_pos, IReader::Positioning::Start) != curr_pos)
+			return Error("Error seeking back");
+	}
+	else if ((BulkDataFlags & (dword)EBulkDataFlags::ForceInlinePayload) != 0)
+	{
+		if (OffsetInFile != reader->Pos)
+			return Error("InlinePayload: Invalid bulk offset");
+
+		Data = reader->ReadBytes((int)ElementCount);
+		if (Data == nullptr)
+			return Error("Error reading data blob");
+	}
+	else
+	{
+		return Error("Unhandled bulk data flags 0x{0}", BulkDataFlags.ToString("X4"));
+	}
 
 	return true;
 }
@@ -1551,11 +1590,12 @@ FTexture2DMipMap::FTexture2DMipMap()
 	, Bitmap(nullptr)
 { }
 
-bool FTexture2DMipMap::Read(IReader^ reader, FPlatformData^ data)
+bool FTexture2DMipMap::Read(IReader^ reader, FTexture2D^ texture)
 {
 	IsCooked = reader->ReadInt() != 0;
 
-	BulkData = FBulkData::Create(reader);
+	__int64 bulk_offset = texture->Summary->BulkDataStartOffset + texture->PlatformData->SkippedOffset;
+	BulkData = FBulkData::Create(reader, bulk_offset);
 	if (BulkData == nullptr)
 		return Error("Error reading bulk data");
 
@@ -1566,7 +1606,7 @@ bool FTexture2DMipMap::Read(IReader^ reader, FPlatformData^ data)
 		return Error("Invalid z size {0}", SizeZ);
 
 	// Generate pixel data
-	if (!_CreateBitmap(data))
+	if (!_CreateBitmap(texture))
 		return Error("Unable to generated pixel data");
 
 	// Free bulk data after successful conversion
@@ -1592,15 +1632,15 @@ void FTexture2DMipMap::DumpTo(DumpToFileHelper^ d)
 	d->AddLine("- Bitmap  : " + (Bitmap != nullptr ? "valid" : "-"));
 }
 
-bool FTexture2DMipMap::_CreateBitmap(FPlatformData^ data)
+bool FTexture2DMipMap::_CreateBitmap(FTexture2D^ texture)
 {
 	array<byte>^ pixels = nullptr;
-	if (data->PixelFormatString == "PF_B8G8R8A8")
+	if (texture->PlatformData->PixelFormatString == "PF_B8G8R8A8")
 		pixels = _GetPixelsB8G8R8A8();
-	else if (data->PixelFormatString == "PF_DXT5")
+	else if (texture->PlatformData->PixelFormatString == "PF_DXT5")
 		pixels = _GetPixelsDXT5();
 	else
-		return Error("Unsupported pixel format '{0}'", data->PixelFormatString);
+		return Error("Unsupported pixel format '{0}'", texture->PlatformData->PixelFormatString);
 	if (pixels == nullptr)
 		return Error("Failed to get pixels");
 
@@ -1700,7 +1740,7 @@ bool FTexture2D::Read(IReader^ reader)
 	for (int i = 0; i < count; ++i)
 	{
 		__int64 last_pos = reader->Pos;
-		FTexture2DMipMap^ mip = FTexture2DMipMap::Create(reader, PlatformData);
+		FTexture2DMipMap^ mip = FTexture2DMipMap::Create(reader, this);
 		if (mip == nullptr)
 			return Error("Unable to read mip map #{0} at {1:#,#0}", i, last_pos);
 		Mips[i] = mip;

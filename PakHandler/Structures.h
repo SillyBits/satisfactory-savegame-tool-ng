@@ -647,7 +647,7 @@ namespace PakHandler
 	};
 
 
-	public ref class FBulkData : public ObjectBaseT<FBulkData>
+	public ref class FBulkData : public ObjectBaseParamT<FBulkData, __int64>
 	{
 	public:
 		dword	     BulkDataFlags;
@@ -659,7 +659,7 @@ namespace PakHandler
 
 		FBulkData();
 
-		bool Read(IReader^ reader) override;
+		bool Read(IReader^ reader, __int64 offset) override;
 
 		void DumpTo(DumpToFileHelper^ d) override;
 
@@ -667,7 +667,9 @@ namespace PakHandler
 	};
 
 
-	public ref class FTexture2DMipMap : public ObjectBaseParamT<FTexture2DMipMap, FPlatformData^>
+	ref class FTexture2D;
+
+	public ref class FTexture2DMipMap : public ObjectBaseParamT<FTexture2DMipMap, FTexture2D^>
 	{
 	public:
 		bool          IsCooked;
@@ -680,12 +682,12 @@ namespace PakHandler
 
 		FTexture2DMipMap();
 
-		bool Read(IReader^ reader, FPlatformData^ data) override;
+		bool Read(IReader^ reader, FTexture2D^ texture) override;
 
 		void DumpTo(DumpToFileHelper^ d) override;
 
 	protected:
-		bool _CreateBitmap(FPlatformData^ data);
+		bool _CreateBitmap(FTexture2D^ texture);
 
 		array<byte>^ _GetPixelsB8G8R8A8();
 		array<byte>^ _GetPixelsDXT5();
