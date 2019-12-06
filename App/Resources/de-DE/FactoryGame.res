@@ -75,7 +75,7 @@
 	<Deposit_Bauxite_C>[Ablagerung] Bauxit</Deposit_Bauxite_C>
 	<Deposit_Coal_C>[Ablagerung] Kohle</Deposit_Coal_C>
 	<Deposit_Copper_C>[Ablagerung] Kupfer</Deposit_Copper_C>
-	<Deposit_Gold_C>[Ablagerung] Gold</Deposit_Gold_C>
+	<Deposit_Gold_C>[Ablagerung] Caterium</Deposit_Gold_C>
 	<Deposit_Iron_C>[Ablagerung] Eisen</Deposit_Iron_C>
 	<Deposit_Stone_C>[Ablagerung] Kalkstein</Deposit_Stone_C>
 	<Deposit_Sulfur_C>[Ablagerung] Schwefel</Deposit_Sulfur_C>
@@ -164,13 +164,9 @@
 	<Equip_StunSpear_C>Xeno-Basher</Equip_StunSpear_C>
 
 	<!-- Items & parts -->
-	<AIlimiter_C>K.I. Begrenzer</AIlimiter_C>
-	<Biomass_C>Biomasse</Biomass_C>
-	<Biomass_Flower_C>Biomasse (Blume)</Biomass_Flower_C>
-	<Biomass_Vines_C>Biomasse (Lianen)</Biomass_Vines_C>
 	<Desc_AluminumIngot_C>Aluminumbarren</Desc_AluminumIngot_C>
-	<Desc_AluminumPlate_C>Aluminumplatte</Desc_AluminumPlate_C>
-	<Desc_AluminumPlateReinforced_C>Verstärkte Aluminiumplatte</Desc_AluminumPlateReinforced_C>
+	<Desc_AluminumPlate_C>Alclad Aluminumplatte</Desc_AluminumPlate_C>
+	<Desc_AluminumPlateReinforced_C>Kühlkörper</Desc_AluminumPlateReinforced_C>
 	<Desc_Battery_C>Batterie</Desc_Battery_C>
 	<Desc_Berry_C>Paläobeere</Desc_Berry_C>
 	<Desc_Biofuel_C>Biotreibstoff</Desc_Biofuel_C>
@@ -195,28 +191,28 @@
 	<Desc_FlowerPetals_C>Blumenblätter</Desc_FlowerPetals_C>
 	<Desc_Fuel_C>Treibstoff</Desc_Fuel_C>
 	<Desc_GenericBiomass_C>Generische Biomasse</Desc_GenericBiomass_C>
-	<Desc_GoldIngot_C>Goldbarren</Desc_GoldIngot_C>
+	<Desc_GoldIngot_C>Caterium-Barren</Desc_GoldIngot_C>
 	<Desc_Gunpowder_C>Schießpulver</Desc_Gunpowder_C>
 	<Desc_HUBParts_C>HUB Teile</Desc_HUBParts_C>
 	<Desc_HardDrive_C>Festplatte</Desc_HardDrive_C>
 	<Desc_HazmatFilter_C>Radioaktivitätsfilter</Desc_HazmatFilter_C>
 	<Desc_HighSpeedConnector_C>Hochgeschwindigkeitsverbindung</Desc_HighSpeedConnector_C>
-	<Desc_HighSpeedWire_C>Hochgeschwindigkeitskabel</Desc_HighSpeedWire_C>
+	<Desc_HighSpeedWire_C>Turbodraht</Desc_HighSpeedWire_C>
 	<Desc_HogParts_C>Hog Teile</Desc_HogParts_C>
 	<Desc_IronIngot_C>Eisenbarren</Desc_IronIngot_C>
 	<Desc_IronPlate_C>Eisenplatte</Desc_IronPlate_C>
 	<Desc_IronPlateReinforced_C>Verstärkte Eisenplatte</Desc_IronPlateReinforced_C>
 	<Desc_IronRod_C>Eisenstange</Desc_IronRod_C>
-	<Desc_IronScrew_C>Eisenschraube</Desc_IronScrew_C>
+	<Desc_IronScrew_C>Schraube</Desc_IronScrew_C>
 	<Desc_Leaves_C>Blätter</Desc_Leaves_C>
 	<Desc_Medkit_C>Medizinischer Inhalierer</Desc_Medkit_C>
 	<Desc_ModularFrame_C>Modularer Rahmen</Desc_ModularFrame_C>
 	<Desc_ModularFrameHeavy_C>Schwerer Modularer Rahmen</Desc_ModularFrameHeavy_C>
-	<Desc_ModularFrameLightweight_C>Leichter Modularer Rahmen</Desc_ModularFrameLightweight_C>
+	<Desc_ModularFrameLightweight_C>Funksteuerungseinheit</Desc_ModularFrameLightweight_C>
 	<Desc_Motor_C>Motor</Desc_Motor_C>
-	<Desc_MotorLightweight_C>Leichter Motor</Desc_MotorLightweight_C>
+	<Desc_MotorLightweight_C>Turbo Motor</Desc_MotorLightweight_C>
 	<Desc_Mycelia_C>Myzelium</Desc_Mycelia_C>
-	<Desc_NobeliskExplosive_C>Nobelisk Sprengstoff</Desc_NobeliskExplosive_C>
+	<Desc_NobeliskExplosive_C>Nobelisk</Desc_NobeliskExplosive_C>
 	<Desc_NuclearFuelRod_C>Nuklearer Brennstab</Desc_NuclearFuelRod_C>
 	<Desc_NuclearWaste_C>Nuklearer Abfall</Desc_NuclearWaste_C>
 	<Desc_Nut_C>Beryllnuss</Desc_Nut_C>
@@ -241,7 +237,7 @@
 	<Desc_Stator_C>Stator</Desc_Stator_C>
 	<Desc_SteelIngot_C>Stahlbarren</Desc_SteelIngot_C>
 	<Desc_SteelPipe_C>Stahlrohr</Desc_SteelPipe_C>
-	<Desc_SteelPlate_C>Stahlplatte</Desc_SteelPlate_C>
+	<Desc_SteelPlate_C>Stahlträger</Desc_SteelPlate_C>
 	<Desc_SteelPlateReinforced_C>Stahlbetonträger</Desc_SteelPlateReinforced_C>
 	<Desc_Stone_C>Kalkstein</Desc_Stone_C>
 	<Desc_Sulfur_C>Schwefel</Desc_Sulfur_C>
@@ -250,6 +246,12 @@
 	<Desc_Vines_C>Lianen</Desc_Vines_C>
 	<Desc_Wire_C>Draht</Desc_Wire_C>
 	<Desc_Wood_C>Holz</Desc_Wood_C>
+	<!-- Check the ones below -->
+	<!--
+	<AIlimiter_C>K.I. Begrenzer</AIlimiter_C>
+	<Biomass_C>Biomasse</Biomass_C>
+	<Biomass_Flower_C>Biomasse (Blume)</Biomass_Flower_C>
+	<Biomass_Vines_C>Biomasse (Lianen)</Biomass_Vines_C>
 	<EncasedIndustrialBeam_C>Betonierter Stahlträger</EncasedIndustrialBeam_C>
 	<Fabric_C>Gewebe</Fabric_C>
 	<HardDrive_C>Festplatte</HardDrive_C>
@@ -257,12 +259,12 @@
 	<IronCog_C>Eisenzahnrad</IronCog_C>
 	<Leaves_C>Blätter</Leaves_C>
 	<MI_HeatSink_C>Kühler</MI_HeatSink_C>
-	<MI_RadioControlUnit_C>Funksteuerungseinheit</MI_RadioControlUnit_C>
 	<PowerShard_C>Energiescherbe</PowerShard_C>
 	<QuickWire_C>Turbodraht</QuickWire_C>
 	<SteelBeam_C>Stahlträger</SteelBeam_C>
 	<biomass_wood_C>Biomasse (Holz)</biomass_wood_C>
 	<mycelia_C>Myzelium</mycelia_C>
+	-->
 
 	<!-- Vehicles -->
 	<BP_Explorer_C>Erkunder</BP_Explorer_C>

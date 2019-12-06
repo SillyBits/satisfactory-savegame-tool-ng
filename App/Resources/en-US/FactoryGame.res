@@ -75,7 +75,7 @@
 	<Deposit_Bauxite_C>[Deposit] Bauxite</Deposit_Bauxite_C>
 	<Deposit_Coal_C>[Deposit] Coal</Deposit_Coal_C>
 	<Deposit_Copper_C>[Deposit] Copper</Deposit_Copper_C>
-	<Deposit_Gold_C>[Deposit] Gold</Deposit_Gold_C>
+	<Deposit_Gold_C>[Deposit] Caterium</Deposit_Gold_C>
 	<Deposit_Iron_C>[Deposit] Iron</Deposit_Iron_C>
 	<Deposit_Stone_C>[Deposit] Limestone</Deposit_Stone_C>
 	<Deposit_Sulfur_C>[Deposit] Sulfur</Deposit_Sulfur_C>
@@ -133,10 +133,10 @@
 	<BP_BuildGun_C>Build Gun</BP_BuildGun_C>
 	<BP_EquipmentDescriptorBeacon_C>Beacon</BP_EquipmentDescriptorBeacon_C>
 	<BP_EquipmentDescriptorColorGun_C>Color Gun</BP_EquipmentDescriptorColorGun_C>
-	<BP_EquipmentDescriptorGasmask_C>Gasmask</BP_EquipmentDescriptorGasmask_C>
-	<BP_EquipmentDescriptorHazmatSuit_C>HazmatSuit</BP_EquipmentDescriptorHazmatSuit_C>
-	<BP_EquipmentDescriptorJetPack_C>Jet Pack</BP_EquipmentDescriptorJetPack_C>
-	<BP_EquipmentDescriptorJumpingStilts_C>Jumping Stilts</BP_EquipmentDescriptorJumpingStilts_C>
+	<BP_EquipmentDescriptorGasmask_C>Gas mask</BP_EquipmentDescriptorGasmask_C>
+	<BP_EquipmentDescriptorHazmatSuit_C>Hazmat Suit</BP_EquipmentDescriptorHazmatSuit_C>
+	<BP_EquipmentDescriptorJetPack_C>Jetpack</BP_EquipmentDescriptorJetPack_C>
+	<BP_EquipmentDescriptorJumpingStilts_C>Blade Runners</BP_EquipmentDescriptorJumpingStilts_C>
 	<BP_EquipmentDescriptorNobeliskDetonator_C>Nobelisk Detonator</BP_EquipmentDescriptorNobeliskDetonator_C>
 	<BP_EquipmentDescriptorObjectScanner_C>Object Scanner</BP_EquipmentDescriptorObjectScanner_C>
 	<BP_EquipmentDescriptorRifle_C>Rifle</BP_EquipmentDescriptorRifle_C>
@@ -148,10 +148,10 @@
 	<Desc_Parachute_C>Parachute</Desc_Parachute_C>
 	<Equip_Chainsaw_C>Chainsaw</Equip_Chainsaw_C>
 	<Equip_ColorGun_C>Color Gun</Equip_ColorGun_C>
-	<Equip_GasMask_C>Gas Mask</Equip_GasMask_C>
+	<Equip_GasMask_C>Gas mask</Equip_GasMask_C>
 	<Equip_HazmatSuit_C>Hazmat Suit</Equip_HazmatSuit_C>
-	<Equip_JetPack_C>Jet Pack</Equip_JetPack_C>
-	<Equip_JumpingStilts_C>Jumping Stilts</Equip_JumpingStilts_C>
+	<Equip_JetPack_C>Jetpack</Equip_JetPack_C>
+	<Equip_JumpingStilts_C>Blade Runners</Equip_JumpingStilts_C>
 	<Equip_MedKit_C>Med Kit</Equip_MedKit_C>
 	<Equip_NobeliskDetonator_C>Nobelisk Detonator</Equip_NobeliskDetonator_C>
 	<Equip_ObjectScanner_C>Object Scanner</Equip_ObjectScanner_C>
@@ -164,19 +164,15 @@
 	<Equip_StunSpear_C>Stun Spear</Equip_StunSpear_C>
 
 	<!-- Items & parts -->
-	<AIlimiter_C>A.I. Limiter</AIlimiter_C>
-	<Biomass_C>Biomass</Biomass_C>
-	<Biomass_Flower_C>Biomass (Flower)</Biomass_Flower_C>
-	<Biomass_Vines_C>Biomass (Vines)</Biomass_Vines_C>
 	<Desc_AluminumIngot_C>Aluminum Ingot</Desc_AluminumIngot_C>
-	<Desc_AluminumPlate_C>Aluminum Plate</Desc_AluminumPlate_C>
-	<Desc_AluminumPlateReinforced_C>Alclad Aluminum Sheet</Desc_AluminumPlateReinforced_C>
+	<Desc_AluminumPlate_C>Alclad Aluminum Sheet</Desc_AluminumPlate_C>
+	<Desc_AluminumPlateReinforced_C>Heat Sink</Desc_AluminumPlateReinforced_C>
 	<Desc_Battery_C>Battery</Desc_Battery_C>
 	<Desc_Berry_C>Paleberry</Desc_Berry_C>
 	<Desc_Biofuel_C>Biofuel</Desc_Biofuel_C>
 	<Desc_Cable_C>Cable</Desc_Cable_C>
-	<Desc_CartridgeStandard_C>Cartridge Standard</Desc_CartridgeStandard_C>
-	<Desc_Cement_C>Cement</Desc_Cement_C>
+	<Desc_CartridgeStandard_C>Cartridge</Desc_CartridgeStandard_C>
+	<Desc_Cement_C>Concrete</Desc_Cement_C>
 	<Desc_CircuitBoard_C>Circuit Board</Desc_CircuitBoard_C>
 	<Desc_CircuitBoardHighSpeed_C>A.I. Limiter</Desc_CircuitBoardHighSpeed_C>
 	<Desc_Coal_C>Coal</Desc_Coal_C>
@@ -184,39 +180,39 @@
 	<Desc_CompactedCoal_C>Compacted Coal</Desc_CompactedCoal_C>
 	<Desc_Computer_C>Computer</Desc_Computer_C>
 	<Desc_ComputerQuantum_C>Quantum Computer</Desc_ComputerQuantum_C>
-	<Desc_ComputerSuper_C>Super Computer</Desc_ComputerSuper_C>
+	<Desc_ComputerSuper_C>Supercomputer</Desc_ComputerSuper_C>
 	<Desc_CopperIngot_C>Copper Ingot</Desc_CopperIngot_C>
 	<Desc_CrudeOil_C>Crude Oil</Desc_CrudeOil_C>
 	<Desc_CrystalOscillator_C>Crystal Oscillator</Desc_CrystalOscillator_C>
-	<Desc_CrystalShard_C>Crystal Shard</Desc_CrystalShard_C>
+	<Desc_CrystalShard_C>Power Shard</Desc_CrystalShard_C>
 	<Desc_ElectromagneticControlRod_C>Electromagnetic Control Rod</Desc_ElectromagneticControlRod_C>
 	<Desc_Fabric_C>Fabric</Desc_Fabric_C>
 	<Desc_Filter_C>Filter</Desc_Filter_C>
 	<Desc_FlowerPetals_C>Flower Petals</Desc_FlowerPetals_C>
 	<Desc_Fuel_C>Fuel</Desc_Fuel_C>
-	<Desc_GenericBiomass_C>Generic Biomass</Desc_GenericBiomass_C>
-	<Desc_GoldIngot_C>Gold Ingot</Desc_GoldIngot_C>
-	<Desc_Gunpowder_C>Gunpowder</Desc_Gunpowder_C>
+	<Desc_GenericBiomass_C>Biomass</Desc_GenericBiomass_C>
+	<Desc_GoldIngot_C>Caterium Ingot</Desc_GoldIngot_C>
+	<Desc_Gunpowder_C>Black Powder</Desc_Gunpowder_C>
 	<Desc_HUBParts_C>HUB Parts</Desc_HUBParts_C>
 	<Desc_HardDrive_C>Hard Drive</Desc_HardDrive_C>
-	<Desc_HazmatFilter_C>Hazmat Filter</Desc_HazmatFilter_C>
+	<Desc_HazmatFilter_C>Iodine Infused Filter</Desc_HazmatFilter_C>
 	<Desc_HighSpeedConnector_C>High-Speed Connector</Desc_HighSpeedConnector_C>
-	<Desc_HighSpeedWire_C>High-Speed Wire</Desc_HighSpeedWire_C>
-	<Desc_HogParts_C>Hog Parts</Desc_HogParts_C>
+	<Desc_HighSpeedWire_C>Quickwire</Desc_HighSpeedWire_C>
+	<Desc_HogParts_C>Alien Carapace</Desc_HogParts_C>
 	<Desc_IronIngot_C>Iron Ingot</Desc_IronIngot_C>
 	<Desc_IronPlate_C>Iron Plate</Desc_IronPlate_C>
 	<Desc_IronPlateReinforced_C>Reinforced Iron Plate</Desc_IronPlateReinforced_C>
 	<Desc_IronRod_C>Iron Rod</Desc_IronRod_C>
-	<Desc_IronScrew_C>Iron Screw</Desc_IronScrew_C>
+	<Desc_IronScrew_C>Screw</Desc_IronScrew_C>
 	<Desc_Leaves_C>Leaves</Desc_Leaves_C>
-	<Desc_Medkit_C>Medkit</Desc_Medkit_C>
+	<Desc_Medkit_C>Medicinal Inhaler</Desc_Medkit_C>
 	<Desc_ModularFrame_C>Modular Frame</Desc_ModularFrame_C>
 	<Desc_ModularFrameHeavy_C>Heavy Modular Frame</Desc_ModularFrameHeavy_C>
-	<Desc_ModularFrameLightweight_C>Light Modular Frame</Desc_ModularFrameLightweight_C>
+	<Desc_ModularFrameLightweight_C>Radio Control Unit</Desc_ModularFrameLightweight_C>
 	<Desc_Motor_C>Motor</Desc_Motor_C>
-	<Desc_MotorLightweight_C>Lightweight Motor</Desc_MotorLightweight_C>
+	<Desc_MotorLightweight_C>Turbo Motor</Desc_MotorLightweight_C>
 	<Desc_Mycelia_C>Mycelia</Desc_Mycelia_C>
-	<Desc_NobeliskExplosive_C>Nobelisk Explosive</Desc_NobeliskExplosive_C>
+	<Desc_NobeliskExplosive_C>Nobelisk</Desc_NobeliskExplosive_C>
 	<Desc_NuclearFuelRod_C>Nuclear Fuel Rod</Desc_NuclearFuelRod_C>
 	<Desc_NuclearWaste_C>Nuclear Waste</Desc_NuclearWaste_C>
 	<Desc_Nut_C>Beryl Nut</Desc_Nut_C>
@@ -224,7 +220,7 @@
 	<Desc_OreCopper_C>Copper Ore</Desc_OreCopper_C>
 	<Desc_OreGold_C>Caterium Ore</Desc_OreGold_C>
 	<Desc_OreIron_C>Iron Ore</Desc_OreIron_C>
-	<Desc_OreUranium_C>Uranium Ore</Desc_OreUranium_C>
+	<Desc_OreUranium_C>Uranium</Desc_OreUranium_C>
 	<Desc_Plastic_C>Plastic</Desc_Plastic_C>
 	<Desc_QuantumOscillator_C>Quantum Oscillator</Desc_QuantumOscillator_C>
 	<Desc_QuartzCrystal_C>Quartz Crystal</Desc_QuartzCrystal_C>
@@ -233,15 +229,15 @@
 	<Desc_Rotor_C>Rotor</Desc_Rotor_C>
 	<Desc_Rubber_C>Rubber</Desc_Rubber_C>
 	<Desc_SAM_C>S.A.M. Ore</Desc_SAM_C>
-	<Desc_Shroom_C>Shroom</Desc_Shroom_C>
+	<Desc_Shroom_C>Bacon Agaric</Desc_Shroom_C>
 	<Desc_Silica_C>Silica</Desc_Silica_C>
 	<Desc_SpaceElevatorBlocker_C>Space Elevator Blocker</Desc_SpaceElevatorBlocker_C>
 	<Desc_SpikedRebar_C>Spiked Rebar</Desc_SpikedRebar_C>
-	<Desc_SpitterParts_C>Spitter Parts</Desc_SpitterParts_C>
+	<Desc_SpitterParts_C>Alien Organs</Desc_SpitterParts_C>
 	<Desc_Stator_C>Stator</Desc_Stator_C>
 	<Desc_SteelIngot_C>Steel Ingot</Desc_SteelIngot_C>
 	<Desc_SteelPipe_C>Steel Pipe</Desc_SteelPipe_C>
-	<Desc_SteelPlate_C>Steel Plate</Desc_SteelPlate_C>
+	<Desc_SteelPlate_C>Steel Beam</Desc_SteelPlate_C>
 	<Desc_SteelPlateReinforced_C>Encased Industrial Beam</Desc_SteelPlateReinforced_C>
 	<Desc_Stone_C>Limestone</Desc_Stone_C>
 	<Desc_Sulfur_C>Sulfur</Desc_Sulfur_C>
@@ -250,6 +246,12 @@
 	<Desc_Vines_C>Vines</Desc_Vines_C>
 	<Desc_Wire_C>Wire</Desc_Wire_C>
 	<Desc_Wood_C>Wood</Desc_Wood_C>
+	<!-- Check the ones below -->
+	<!--
+	<AIlimiter_C>A.I. Limiter</AIlimiter_C>
+	<Biomass_C>Biomass</Biomass_C>
+	<Biomass_Flower_C>Biomass (Flower)</Biomass_Flower_C>
+	<Biomass_Vines_C>Biomass (Vines)</Biomass_Vines_C>
 	<EncasedIndustrialBeam_C>Encased Industrial Beam</EncasedIndustrialBeam_C>
 	<Fabric_C>Fabric</Fabric_C>
 	<HardDrive_C>Hard Drive</HardDrive_C>
@@ -257,12 +259,12 @@
 	<IronCog_C>Iron Cog</IronCog_C>
 	<Leaves_C>Leaves</Leaves_C>
 	<MI_HeatSink_C>Heat Sink</MI_HeatSink_C>
-	<MI_RadioControlUnit_C>Radio Control Unit</MI_RadioControlUnit_C>
 	<PowerShard_C>Power Shard</PowerShard_C>
 	<QuickWire_C>Quick Wire</QuickWire_C>
 	<SteelBeam_C>Steel Beam</SteelBeam_C>
 	<biomass_wood_C>Biomass (Wood)</biomass_wood_C>
 	<mycelia_C>Mycelia</mycelia_C>
+	-->
 
 	<!-- Vehicles -->
 	<BP_Explorer_C>Explorer</BP_Explorer_C>
