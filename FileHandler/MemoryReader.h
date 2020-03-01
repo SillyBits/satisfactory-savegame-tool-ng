@@ -10,6 +10,7 @@ namespace Reader
 	{
 	public:
 		MemoryReader(byte* buff, const int length, ICallback^ callback);
+		MemoryReader(array<byte>^ buff, ICallback^ callback);
 
 		// Properties not handled by ReaderBase
 		virtual property const __int64 Size { const __int64 get() override; };
@@ -23,6 +24,7 @@ namespace Reader
 	protected:
 		byte* _buff;
 		__int64 _size;
+		bool _owned;
 
 		// Read N bytes from underlying 'data object', returning no. of bytes read
 		virtual int _Read(byte* buff, const int count) override;

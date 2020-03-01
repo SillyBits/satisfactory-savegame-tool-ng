@@ -10,8 +10,25 @@ namespace Reader
 		: ReaderBase(callback)
 		, _buff(buff)
 		, _size(length)
+		, _owned(false)
 	{
 		_pos = 0;
+
+		//__Start();
+	}
+
+	MemoryReader::MemoryReader(array<byte>^ buff, ICallback^ callback)
+		: ReaderBase(callback)
+	{
+		_pos = 0;
+
+		_size = buff->Length;
+
+		_buff = new byte[_size];
+		_owned = true;
+
+		pin_ptr<byte> pinned = &buff[0];
+		memcpy(_buff, pinned, _size);
 
 		//__Start();
 	}
@@ -23,6 +40,9 @@ namespace Reader
 
 	void MemoryReader::Close()
 	{
+		if (_owned && _buff)
+			delete[] _buff;
+		_owned = false;
 		_buff = nullptr;
 		_size = -1;
 		ReaderBase::Close();
