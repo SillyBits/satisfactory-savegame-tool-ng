@@ -384,6 +384,16 @@ namespace PakHandler
 		}
 	};
 
+	// Simple wrapper for C# as we can't use C++ templates easily
+	public ref class FNameCs : public FName<array<String^>> 
+	{
+	public:
+		static FNameCs^ Create(IReader^ reader, array<String^>^ names)
+		{
+			return static_cast<FNameCs^>(FName<array<String^>>::Create(reader, names));
+		}
+	};
+
 
 	public ref class FGenerationInfo : public ObjectBaseT<FGenerationInfo> //TODO: Rename to fit UE
 	{
@@ -591,9 +601,13 @@ namespace PakHandler
 		FName<array<String^>>^ StructName;
 		FGuid^                 StructGuid;
 		array<byte>^           StructValue;
+		FName<array<String^>>^ InnerStructName;
+		FGuid^                 InnerStructGuid;
+		array<byte>^           InnerStructValue;
 		FName<array<String^>>^ EnumName;
 		FName<array<String^>>^ EnumValue;
 		int                    BoolValue;
+		int                    IntValue;
 		bool                   HasPropertyGuid;
 		FGuid^                 PropertyGuid;
 
@@ -677,7 +691,9 @@ namespace PakHandler
 		__int32       SizeX;
 		__int32       SizeY;
 		__int32       SizeZ;
-		BitmapSource^ Bitmap;
+
+		property array<byte>^  Pixels { array<byte>^ get(); }
+		property BitmapSource^ Bitmap { BitmapSource^ get(); }
 
 
 		FTexture2DMipMap();
@@ -687,9 +703,15 @@ namespace PakHandler
 		void DumpTo(DumpToFileHelper^ d) override;
 
 	protected:
-		bool _CreateBitmap(FTexture2D^ texture);
+		FTexture2D^   _Parent;
+		array<byte>^  _Pixels;
+		BitmapSource^ _Bitmap;
+
+		bool _CreatePixels();
+		bool _CreateBitmap();
 
 		array<byte>^ _GetPixelsB8G8R8A8();
+		array<byte>^ _GetPixelsDXT1();
 		array<byte>^ _GetPixelsDXT5();
 	};
 

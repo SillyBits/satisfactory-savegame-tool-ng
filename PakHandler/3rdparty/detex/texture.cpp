@@ -26,7 +26,7 @@ typedef bool (*detexDecompressBlockFuncType)(const uint8_t *bitstring,
 
 static detexDecompressBlockFuncType decompress_function[] = {
 	NULL,
-	NULL, // detexDecompressBlockBC1,
+	detexDecompressBlockBC1,
 	NULL, // detexDecompressBlockBC1A,
 	NULL, // detexDecompressBlockBC2,
 	detexDecompressBlockBC3,
@@ -57,8 +57,15 @@ uint32_t mode_mask, uint32_t flags, uint8_t * DETEX_RESTRICT pixel_buffer,
 uint32_t pixel_format) {
 	uint8_t block_buffer[DETEX_MAX_BLOCK_SIZE];
 	uint32_t compressed_format = detexGetCompressedFormat(texture_format);
-	bool r = decompress_function[compressed_format](bitstring, mode_mask, flags,
-            block_buffer);
+	//bool r = decompress_function[compressed_format](bitstring, mode_mask, flags,
+	//	block_buffer);
+	detexDecompressBlockFuncType pfnDecompressFunc = decompress_function[compressed_format];
+	if (!pfnDecompressFunc) {
+		detexSetErrorMessage("detexDecompressBlock: No decompress function for format "
+			"0x%08X", texture_format);
+		return false;
+	}
+	bool r = pfnDecompressFunc(bitstring, mode_mask, flags, block_buffer);
 	if (!r) {
 		detexSetErrorMessage("detexDecompressBlock: Decompress function for format "
 			"0x%08X returned error", texture_format);

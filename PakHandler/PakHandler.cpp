@@ -53,38 +53,42 @@ array<byte>^ PakLoader::ReadRaw(Structures::IndexEntry^ index)
 
 array<byte>^ PakLoader::ReadAsset(String^ filename)
 {
+	if (_asset_extensions == nullptr)
+		_asset_extensions = gcnew array<String^> { "uasset", "uexp", "ubulk" };
+
+	return ReadAsset(filename, _asset_extensions);
+}
+
+array<byte>^ PakLoader::ReadAsset(String^ filename, ...array<String^>^ extensions)
+{
 	if (filename == nullptr)
 		return nullptr;
 
 	// Read all parts from Pak
-	array<byte>^ uasset = ReadRaw(filename + ".uasset");
-	if (uasset == nullptr || uasset->Length <= 0)
+	List<array<byte>^>^ parts = gcnew List<array<byte>^>();
+	int total = 0;
+	for each (String^ ext in extensions)
+	{
+		array<byte>^ blob = ReadRaw(filename + "." + ext);
+		if (blob != nullptr && blob->Length > 0)
+		{
+			parts->Add(blob);
+			total += blob->Length;
+		}
+	}
+	if (total == 0)
 		return nullptr;
-	array<byte>^ uexp   = ReadRaw(filename + ".uexp");
-	if (uexp == nullptr || uexp->Length <= 0)
-		return nullptr;
-	array<byte>^ ubulk  = ReadRaw(filename + ".ubulk");
-	//if (ubulk == nullptr || ubulk->Length <= 0)
-	//	return nullptr;
-	//=> Optional
 
 	// Combine into one blob
-	int length = uasset->Length + uexp->Length;
-	if (ubulk != nullptr && ubulk->Length >= 0)
-		length += ubulk->Length;
-	array<byte>^ asset = gcnew array<byte>(length);
+	array<byte>^ asset = gcnew array<byte>(total);
 	if (asset == nullptr)
 		return nullptr;
-
 	int offset = 0;
-	uasset->CopyTo(asset, offset);
-	offset += uasset->Length;
-	uexp->CopyTo(asset, offset);
-	offset += uexp->Length;
-	if (ubulk != nullptr && ubulk->Length >= 0)
-		ubulk->CopyTo(asset, offset);
-
-	uasset = uexp = ubulk = nullptr;
+	for each (array<byte>^ part in parts)
+	{
+		part->CopyTo(asset, offset);
+		offset += part->Length;
+	}
 
 	return asset;
 }
@@ -93,6 +97,18 @@ array<byte>^ PakLoader::ReadAsset(String^ filename)
 Structures::FObject^ PakLoader::ReadObject(String^ filename)
 {
 	array<byte>^ asset = ReadAsset(filename);
+	if (asset == nullptr)
+		return nullptr;
+	// ... and try to load as object
+	Structures::FObject^ object = Structures::FObject::Create(asset);
+	if (object == nullptr)
+		Log::Error("Unable to read object from " + filename);
+	return object;
+}
+
+Structures::FObject^ PakLoader::ReadObject(String^ filename, ...array<String^>^ extensions)
+{
+	array<byte>^ asset = ReadAsset(filename, extensions);
 	if (asset == nullptr)
 		return nullptr;
 	// ... and try to load as object

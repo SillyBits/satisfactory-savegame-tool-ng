@@ -20,8 +20,10 @@ namespace PakHandler {
 		array<byte>^ ReadRaw(Structures::IndexEntry^ index);
 		
 		array<byte>^ ReadAsset(String^ filename);
+		array<byte>^ ReadAsset(String^ filename, ...array<String^>^ extensions);
 
 		Structures::FObject^ ReadObject(String^ filename);
+		Structures::FObject^ ReadObject(String^ filename, ...array<String^>^ extensions);
 
 		Structures::FTexture2D^ ReadTexture(String^ filename);
 
@@ -30,6 +32,7 @@ namespace PakHandler {
 	protected:
 		ICallback^ _callback;
 		FileReader^ _reader;
+		array<String^>^ _asset_extensions;
 
 		virtual ~PakLoader();
 

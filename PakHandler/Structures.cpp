@@ -1218,6 +1218,9 @@ FPropertyTag::FPropertyTag()
 	, StructName(nullptr)
 	, StructGuid(nullptr)
 	, StructValue(nullptr)
+	, InnerStructName(nullptr)
+	, InnerStructGuid(nullptr)
+	, InnerStructValue(nullptr)
 	, EnumName(nullptr)
 	, EnumValue(nullptr)
 	, PropertyGuid(nullptr)
@@ -1242,10 +1245,10 @@ bool FPropertyTag::Read(IReader^ reader, array<String^>^ names)
 	{
 		StructName = FName<array<String^>>::Create(reader, names);
 		if (StructName == nullptr)
-			return Error("FPropertyTag: Unable to read StructName");
+			return Error("FPropertyTag: StructProperty: Unable to read StructName");
 		StructGuid = FGuid::Create(reader);
 		if (StructGuid == nullptr)
-			return Error("FPropertyTag: Unable to read StructGuid");
+			return Error("FPropertyTag: StructProperty: Unable to read StructGuid");
 	}
 	else if (PropType->Name == "ByteProperty")
 	{
@@ -1253,7 +1256,7 @@ bool FPropertyTag::Read(IReader^ reader, array<String^>^ names)
 		{
 			EnumName = FName<array<String^>>::Create(reader, names);
 			if (EnumName == nullptr)
-				return Error("PropertyTag: Unable to read EnumName");
+				return Error("PropertyTag: ByteProperty: Unable to read EnumName");
 		}
 		else
 		{
@@ -1263,6 +1266,25 @@ bool FPropertyTag::Read(IReader^ reader, array<String^>^ names)
 	}
 	else if (PropType->Name == "BoolProperty")
 	{
+	}
+	else if (PropType->Name == "IntProperty")
+	{
+		if (DataSize != 4)
+			return Warning("FPropertyTag: IntProperty of length {0} not handled yet", DataSize);
+	}
+	else if (PropType->Name == "ArrayProperty")
+	{
+		StructName = FName<array<String^>>::Create(reader, names);
+		if (StructName == nullptr)
+			return Error("FPropertyTag: ArrayProperty: Unable to read StructName");
+		if (StructName->Name == "ByteProperty")
+		{
+		}
+		else if (StructName->Name == "StructProperty")
+		{
+		}
+		else
+			return Error("FPropertyTag: ArrayProperty: Unable to read array of type {0}, pos={1}", StructName, reader->Pos);
 	}
 	else
 	{
@@ -1282,7 +1304,7 @@ bool FPropertyTag::Read(IReader^ reader, array<String^>^ names)
 	{
 		StructValue = reader->ReadBytes(DataSize);
 		if (StructValue == nullptr)
-			return Error("FPropertyTag: Unable to read StructValue");
+			return Error("FPropertyTag: StructProperty: Unable to read StructValue");
 	}
 	else if (PropType->Name == "BoolProperty")
 	{
@@ -1306,8 +1328,34 @@ bool FPropertyTag::Read(IReader^ reader, array<String^>^ names)
 		{
 			EnumValue = FName<array<String^>>::Create(reader, names);
 			if (EnumValue == nullptr)
-				return Error("FPropertyTag: Unable to read EnumValue");
+				return Error("FPropertyTag: ByteProperty: Unable to read EnumValue");
 		}
+	}
+	else if (PropType->Name == "IntProperty")
+	{
+		if (DataSize == 4)
+		{
+			IntValue = reader->ReadInt();
+		}
+		else
+		{
+			//TODO:
+			return Warning("FPropertyTag: IntProperty of length {0} not handled yet", DataSize);
+		}
+	}
+	else if (PropType->Name == "ArrayProperty")
+	{
+		if (StructName->Name == "ByteProperty")
+		{
+			StructValue = reader->ReadBytes(DataSize);
+		}
+		else if (StructName->Name == "StructProperty")
+		{
+			StructValue = reader->ReadBytes(DataSize);
+		}
+
+		if (StructValue == nullptr)
+			return Error("FPropertyTag: ArrayProperty: Unable to read StructValue");
 	}
 
 	return true;
@@ -1316,55 +1364,87 @@ bool FPropertyTag::Read(IReader^ reader, array<String^>^ names)
 void FPropertyTag::DumpTo(DumpToFileHelper^ d)
 {
 	d->AddLine("[FPropertyTag]");
-	d->AddLine("- FName^       Name           : " + (Name != nullptr ? "": "-")); 
+
+	d->AddLine("- FName^       Name            : " + (Name != nullptr ? "": "-")); 
 	if (Name != nullptr)
 	{
 		d->Push();
 		Name->DumpTo(d);
 		d->Pop();
 	}
-	d->AddLine("- FName^       PropType       : " + (PropType != nullptr ? "": "-")); 
+	d->AddLine("- FName^       PropType        : " + (PropType != nullptr ? "": "-")); 
 	if (PropType != nullptr)
 	{
 		d->Push();
 		PropType->DumpTo(d);
 		d->Pop();
 	}
-	d->AddLine("- __int32      DataSize       : " + DataSize       );
-	d->AddLine("- __int32      ArrayIndex     : " + ArrayIndex     );
-	d->AddLine("- FName^       StructName     : " + (StructName != nullptr ? "": "-")); 
+	d->AddLine("- __int32      DataSize        : " + DataSize       );
+	d->AddLine("- __int32      ArrayIndex      : " + ArrayIndex     );
+
+	d->AddLine("- FName^       StructName      : " + (StructName != nullptr ? "": "-")); 
 	if (StructName != nullptr) 
 	{
 		d->Push();
 		StructName->DumpTo(d);
 		d->Pop();
 	}
-	d->AddLine("- FGuid^       StructGuid     : " + (StructGuid != nullptr ? "": "-")); 
+	d->AddLine("- FGuid^       StructGuid      : " + (StructGuid != nullptr ? "": "-")); 
 	if (StructGuid != nullptr) 
 	{
 		d->Push();
 		StructGuid->DumpTo(d);
 		d->Pop();
 	}
-	d->AddLine("- array<byte>^ StructValue    : " + (StructValue != nullptr ? "": "-")); 
+	d->AddLine("- array<byte>^ StructValue     : " + (StructValue != nullptr ? "": "-")); 
 	if (StructValue != nullptr)
+	{
 		d->Add(Helpers::Hexdump(StructValue, 16, true, true, 1, 0), false);
-	d->AddLine("- FName^       EnumName       : " + (EnumName != nullptr ? "": "-")); 
+		d->AddLine("");
+	}
+
+	d->AddLine("- FName^       InnerStructName : " + (InnerStructName != nullptr ? "": "-")); 
+	if (InnerStructName != nullptr)
+	{
+		d->Push();
+		InnerStructName->DumpTo(d);
+		d->Pop();
+	}
+	d->AddLine("- FGuid^       InnerStructGuid : " + (InnerStructGuid != nullptr ? "": "-"));
+	if (InnerStructGuid != nullptr)
+	{
+		d->Push();
+		InnerStructGuid->DumpTo(d);
+		d->Pop();
+	}
+	d->AddLine("- array<byte>^ InnerStructValue: " + (InnerStructValue != nullptr ? "": "-"));
+	if (InnerStructValue != nullptr)
+	{
+		d->Add(Helpers::Hexdump(InnerStructValue, 16, true, true, 1, 0), false);
+		d->AddLine("");
+	}
+
+	d->AddLine("- FName^       EnumName        : " + (EnumName != nullptr ? "": "-")); 
 	if (EnumName != nullptr) 
 	{
 		d->Push();
 		EnumName->DumpTo(d);
 		d->Pop();
 	}
-	d->AddLine("- FName^       EnumValue      : " + (EnumValue != nullptr ? "": "-")); 
+	d->AddLine("- FName^       EnumValue       : " + (EnumValue != nullptr ? "": "-")); 
 	if (EnumValue != nullptr) 
 	{
 		d->Push();
 		EnumValue->DumpTo(d);
 		d->Pop();
 	}
-	d->AddLine("- bool         HasPropertyGuid: " + HasPropertyGuid);
-	d->AddLine("- FGuid^       PropertyGuid   : " + (PropertyGuid != nullptr ? "": "-")); 
+
+	d->AddLine("- __int32      BoolValue       : " + BoolValue);
+
+	d->AddLine("- __int32      IntValue        : " + IntValue);
+
+	d->AddLine("- bool         HasPropertyGuid : " + HasPropertyGuid);
+	d->AddLine("- FGuid^       PropertyGuid    : " + (PropertyGuid != nullptr ? "": "-")); 
 	if (PropertyGuid != nullptr) 
 	{
 		d->Push();
@@ -1587,11 +1667,31 @@ void FBulkData::ClearData()
 FTexture2DMipMap::FTexture2DMipMap()
 	: base()
 	, BulkData(nullptr)
-	, Bitmap(nullptr)
+	, _Parent(nullptr)
+	, _Pixels(nullptr)
+	, _Bitmap(nullptr)
 { }
+
+array<byte>^ FTexture2DMipMap::Pixels::get()
+{
+	if (!_Pixels)
+		_CreatePixels();
+
+	return _Pixels;
+}
+
+BitmapSource^ FTexture2DMipMap::Bitmap::get()
+{
+	if (!_Bitmap)
+		_CreateBitmap();
+
+	return _Bitmap;
+}
 
 bool FTexture2DMipMap::Read(IReader^ reader, FTexture2D^ texture)
 {
+	_Parent = texture;
+
 	IsCooked = reader->ReadInt() != 0;
 
 	__int64 bulk_offset = texture->Summary->BulkDataStartOffset + texture->PlatformData->SkippedOffset;
@@ -1605,9 +1705,10 @@ bool FTexture2DMipMap::Read(IReader^ reader, FTexture2D^ texture)
 	if (SizeZ != 1)
 		return Error("Invalid z size {0}", SizeZ);
 
-	// Generate pixel data
-	if (!_CreateBitmap(texture))
-		return Error("Unable to generated pixel data");
+	//// Generate pixel data
+	//if (!_CreateBitmap(texture))
+	//	return Error("Unable to generated pixel data");
+	//=> Delayed until requested
 
 	// Free bulk data after successful conversion
 	//TODO: BulkData->ClearData();
@@ -1629,25 +1730,44 @@ void FTexture2DMipMap::DumpTo(DumpToFileHelper^ d)
 	d->AddLine("- SizeX   : " + SizeX);
 	d->AddLine("- SizeY   : " + SizeY);
 	d->AddLine("- SizeZ   : " + SizeZ);
+	d->AddLine("- Pixels  : " + (Pixels != nullptr ? "valid" : "-"));
 	d->AddLine("- Bitmap  : " + (Bitmap != nullptr ? "valid" : "-"));
 }
 
-bool FTexture2DMipMap::_CreateBitmap(FTexture2D^ texture)
+bool FTexture2DMipMap::_CreatePixels()
 {
-	array<byte>^ pixels = nullptr;
-	if (texture->PlatformData->PixelFormatString == "PF_B8G8R8A8")
-		pixels = _GetPixelsB8G8R8A8();
-	else if (texture->PlatformData->PixelFormatString == "PF_DXT5")
-		pixels = _GetPixelsDXT5();
-	else
-		return Error("Unsupported pixel format '{0}'", texture->PlatformData->PixelFormatString);
-	if (pixels == nullptr)
-		return Error("Failed to get pixels");
+	if (_Pixels)
+		return true;
 
-	//Bitmap = ImageHandler::ImageFromBytes(pixels, SizeX, SizeY, 4);
+	if (_Parent->PlatformData->PixelFormatString == "PF_B8G8R8A8")
+		_Pixels = _GetPixelsB8G8R8A8();
+	else if (_Parent->PlatformData->PixelFormatString == "PF_DXT1")
+		_Pixels = _GetPixelsDXT1();
+	else if (_Parent->PlatformData->PixelFormatString == "PF_DXT5")
+		_Pixels = _GetPixelsDXT5();
+	else
+		return Error("Unsupported pixel format '{0}'", _Parent->PlatformData->PixelFormatString);
+
+	if (_Pixels == nullptr)
+		return Error("Failed to get pixels");
+	return true;
+}
+
+bool FTexture2DMipMap::_CreateBitmap()
+{
+	if (_Bitmap)
+		return true;
+
+	if (_Pixels == nullptr)
+		if (!_CreatePixels())
+			return false;
+	if (_Pixels == nullptr)
+		return Error("No pixels avail");
+
+	//_Bitmap = ImageHandler::ImageFromBytes(pixels, SizeX, SizeY, 4);
 	//=> Needs another specialisation
-	Bitmap = BitmapSource::Create(SizeX, SizeY, 96, 96, PixelFormats::Bgra32, nullptr, pixels, SizeX*4);
-	if (Bitmap == nullptr)
+	_Bitmap = BitmapSource::Create(SizeX, SizeY, 96, 96, PixelFormats::Bgra32, nullptr, Pixels, SizeX*4);
+	if (_Bitmap == nullptr)
 		return Error("Error creating bitmap object");
 
 	return true;
@@ -1662,6 +1782,37 @@ array<byte>^ FTexture2DMipMap::_GetPixelsB8G8R8A8()
 	}
 
 	return BulkData->Data;
+}
+
+array<byte>^ FTexture2DMipMap::_GetPixelsDXT1()
+{
+	// This is a 4bpp format, so element count is to be half of sizex*sizey
+	if (SizeX * SizeY / 2 != BulkData->ElementCount)
+	{
+		Error("DXT1: Dimension {0}x{1} does NOT match element count {2}", SizeX, SizeY, BulkData->ElementCount);
+		return nullptr;
+	}
+
+	pin_ptr<byte> in_pixels = &(BulkData->Data[0]);
+
+	// Decompressing using "detex"
+	array<byte>^ pixels = gcnew array<byte>(SizeX * SizeY * 4 * 4);//32bpp target BGRA
+	pin_ptr<byte> out_pixels = &(pixels[0]);
+
+	detex::detexTexture in_texture;
+	in_texture.format = detex::DETEX_TEXTURE_FORMAT_BC1;
+	in_texture.data = in_pixels;
+	in_texture.width = SizeX;
+	in_texture.height = SizeY;
+	in_texture.width_in_blocks = SizeX / 4;
+	in_texture.height_in_blocks = SizeY / 4;
+	if (!detex::detexDecompressTextureLinear(&in_texture, out_pixels, detex::DETEX_PIXEL_FORMAT_BGRX8))
+	{
+		Error("Failed to decompress: {0}", gcnew String(detex::detexGetErrorMessage()));
+		return nullptr;
+	}
+
+	return pixels;
 }
 
 array<byte>^ FTexture2DMipMap::_GetPixelsDXT5()
