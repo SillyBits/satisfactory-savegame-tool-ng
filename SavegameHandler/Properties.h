@@ -702,6 +702,25 @@ namespace Savegame
 		WRITE_END
 	CLS_END
 
+	CLS_(Int64Property, ValueProperty)
+		SIZE
+			ADD_b(NullByte)
+			ADD(Int64Property::GetLength())
+			SIZE_CHECK
+		SIZE_END
+		LENGTH
+			ADD_i(Value)// Always a 8 bytes
+		LENGTH_END
+		READ
+			CheckNullByte(reader);
+			Value = reader->ReadLong();
+		READ_END
+		WRITE
+			writer->Write((byte)0);
+			writer->Write((__int64)Value);
+		WRITE_END
+	CLS_END
+
 	CLS_(FloatProperty, ValueProperty)
 		SIZE
 			ADD_b(NullByte)
@@ -1306,6 +1325,19 @@ namespace Savegame
 	};
 	#pragma endregion
 
+	#pragma region InterfaceProperty
+	public ref class InterfaceProperty : ObjectProperty
+	{
+	public:
+		InterfaceProperty(Property^ parent)
+			: ObjectProperty(parent, false)
+		{ }
+		READ
+			Read(reader, false);
+		READ_END
+	};
+	#pragma endregion
+
 	#pragma region ArrayProperty
 	CLS_(ArrayProperty,ValueProperty)
 		PUB_s(InnerType)
@@ -1353,6 +1385,12 @@ namespace Savegame
 				ADD_i(count)
 				for each (str^ s in (List<str^>^)Value)
 					ADD_s(s);
+			}
+			else if (InnerType == "InterfaceProperty")
+			{
+				ADD_i(count)
+				for each (InterfaceProperty^ prop in (Properties^)Value)
+					ADD(prop->GetSize())
 			}
 			else
 				throw gcnew Exception(String::Format("Unknown inner array type '{0}'", InnerType));
@@ -1412,6 +1450,17 @@ namespace Savegame
 				for (int i = 0; i < count; ++i)
 					strings->Add(reader->ReadString());
 				Value = strings;
+			}
+			else if (InnerType == "InterfaceProperty")
+			{
+				int count = reader->ReadInt();
+				Properties^ objs = gcnew Properties;
+				for (int i = 0; i < count; ++i)
+				{
+					InterfaceProperty^ prop = gcnew InterfaceProperty(this);
+					objs->Add(prop->Read(reader));
+				}
+				Value = objs;
 			}
 			else
 			{
@@ -1477,6 +1526,13 @@ namespace Savegame
 				writer->Write((int)strings->Count);
 				for each (str^ s in strings)
 					writer->Write(s);
+			}
+			else if (InnerType == "InterfaceProperty")
+			{
+				Properties^ props = (Properties^)Value;
+				writer->Write((int)props->Count);
+				for each (Property^ prop in props)
+					prop->Write(writer);
 			}
 			else
 				throw gcnew WriteException(writer, String::Format("Unknown inner array type '{0}'", InnerType));
@@ -1689,6 +1745,25 @@ namespace Savegame
 	CLS_END
 	#pragma endregion
 
+	#pragma region FluidBox
+	CLS(FluidBox)
+		PUB_f(Value)
+		SIZE
+			ADD(FluidBox::GetLength())
+			SIZE_CHECK
+		SIZE_END
+		LENGTH
+			ADD_f(Value)
+		LENGTH_END
+		READ
+			Value = reader->ReadFloat();
+		READ_END
+		WRITE
+			writer->Write((float)Value);
+		WRITE_END
+	CLS_END
+	#pragma endregion
+
 	#pragma region Simple derived types
 
 	CLS_(NameProperty,StrProperty)
@@ -1710,6 +1785,9 @@ namespace Savegame
 	CLS_END
 
 	CLS_(ResearchTime,PropertyList)
+	CLS_END
+
+	CLS_(ResearchData,PropertyList)
 	CLS_END
 
 	CLS_(ResearchCost, PropertyList)
