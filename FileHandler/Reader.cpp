@@ -65,7 +65,8 @@ namespace Reader
 	str^ ReaderBase::ReadString() { return ReadString(0); }
 	str^ ReaderBase::ReadString(const int length)
 	{
-		__int64 last = _prev_pos = _pos;
+		_prev_pos = _pos;
+		__int64 last = _pos;
 
 		int len = length ? length : ReadInt();
 

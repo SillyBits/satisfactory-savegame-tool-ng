@@ -170,12 +170,12 @@ public:
 	}
 
 
-	bool ToAscii()
+	str^ ToAscii()
 	{
 		if (!_ascii)
 		{
 			if (!_unicode)
-				return false;//throw gcnew Exception("Can't convert empty string!");
+				return nullptr;//throw gcnew Exception("Can't convert empty string!");
 
 			int len = (int)wcslen(_unicode) + 1;
 			char *_new = new char[len];
@@ -185,7 +185,7 @@ public:
 				if (ch > 0x7f)
 				{
 					delete[] _new;
-					return false;//throw gcnew Exception("Can't convert non-ASCII string!");
+					return nullptr;//throw gcnew Exception("Can't convert non-ASCII string!");
 				}
 				_new[i] = (char)(ch & 0x7F);
 			}
@@ -197,7 +197,7 @@ public:
 			_ascii = _new;
 		}
 
-		return true;
+		return this;
 	}
 
 	//bool ToWide(): TODO
