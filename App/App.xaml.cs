@@ -281,7 +281,7 @@ namespace SatisfactorySavegameTool
 
 		// Incident related - size of snapshot to take
 		public const int INCIDENT_OFFSET          = 512;
-		public const int INCIDENT_LENGTH          = INCIDENT_OFFSET + 256;
+		public const int INCIDENT_LENGTH          = INCIDENT_OFFSET + INCIDENT_OFFSET;
 
 
 		// Creating actual settings is a 2-step approach:

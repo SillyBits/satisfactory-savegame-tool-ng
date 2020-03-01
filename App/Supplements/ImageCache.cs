@@ -190,7 +190,7 @@ namespace SatisfactorySavegameTool.Supplements
 		}
 
 		private static Dictionary<VersionTable.Version, PakCache> _Cache = new Dictionary<VersionTable.Version, PakCache>();
-		private static volatile bool _loading = true;
+		private static volatile bool _loading = false;
 	}
 
 	internal class PakCache
