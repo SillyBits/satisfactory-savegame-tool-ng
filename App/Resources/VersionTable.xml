@@ -48,4 +48,13 @@
 	<version build="109075" type="1" version="0.2.1.18" />						<!-- Early Access - v0.2.1.18 - Build 109075 -->
 	<version build="109370" type="0" version="0.2.1.19" />						<!-- Early Access (EXPERIMENTAL) - v0.2.1.19 - Build 109370 -->
 	<version build="109693" type="0" version="0.2.1.20" />						<!-- Early Access (EXPERIMENTAL) - v0.2.1.20 - Build 109693 -->
+	<version build="114192" type="0" version="0.3.0.0" remarks="Update 3" />	<!-- Early Access (EXPERIMENTAL) - v0.3.0.0 - Build 114192 -->
+	<version build="114399" type="0" version="0.3.0.1" />						<!-- Early Access (EXPERIMENTAL) - v0.3.0.1 - Build 114399 -->
+	<version build="114480" type="0" version="0.3.0.2" />						<!-- Early Access (EXPERIMENTAL) - v0.3.0.2 - Build 114480 -->
+	<version build="114985" type="0" version="0.3.1.0" />						<!-- Early Access (EXPERIMENTAL) - v0.3.1.0 - Build 114985 -->
+	<version build="115086" type="0" version="0.3.1.1" />						<!-- Early Access (EXPERIMENTAL) - v0.3.1.1 - Build 115086 -->
+	<version build="115191" type="0" version="0.3.1.2" />						<!-- Early Access (EXPERIMENTAL) - v0.3.1.2 - Build 115191 -->
+	<version build="115661" type="0" version="0.3.2.0" />						<!-- Early Access (EXPERIMENTAL) - v0.3.2.0 - Build 115661 -->
+	<version build="115821" type="0" version="0.3.2.1" />						<!-- Early Access (EXPERIMENTAL) - v0.3.2.1 - Build 115821 -->
+	<version build="116098" type="0" version="0.3.2.2" />						<!-- Early Access (EXPERIMENTAL) - v0.3.2.2 - Build 116098 -->
 </versions>
