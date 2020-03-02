@@ -235,8 +235,12 @@ By activating such an option you do agree to those terms.</OptionsDialog.Privacy
 	<IncidentReportDialog.Message>While loading your savegame {0},
 the tool detected a yet unknown property '{1}' at position {2:#,#0}.
 This property needs to be dealt with to allow this tool to load this savegame.</IncidentReportDialog.Message>
+	<IncidentReportDialog.Message.ReadException>While loading your savegame {0},
+the tool catched a read exception from class '{1}' at position {2:#,#0}.
+This needs to be dealt with to allow this tool to load this savegame.</IncidentReportDialog.Message.ReadException>
 	<IncidentReportDialog.Hint>You can enable reporting such incidents within the options dialog.</IncidentReportDialog.Hint>
-	<IncidentReportDialog.Snapshot>Following a small snapshot from your savegame which will be added to the report to assist in implementing this property:</IncidentReportDialog.Snapshot>
+	<!--<IncidentReportDialog.Snapshot>Following a small snapshot from your savegame which will be added to the report to assist in implementing this property:</IncidentReportDialog.Snapshot>-->
+	<IncidentReportDialog.Snapshot>Following a small snapshot from your savegame which will be added to the report:</IncidentReportDialog.Snapshot>
 
 	<DifferencesDialog.Title>Differences</DifferencesDialog.Title>
 	<DifferencesDialog.Empty>&lt;missing&gt;</DifferencesDialog.Empty>

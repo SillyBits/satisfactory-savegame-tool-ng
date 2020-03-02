@@ -236,8 +236,12 @@ Mit aktivieren einer Berichtsoption stimmt der Nutzer dieser Verwendung zu.</Opt
 	<IncidentReportDialog.Message>Während versucht wurde den Spielstand {0}
 zu laden stolperte der Helfer über eine unbekannte Struktur '{1}' an Position {2:#,#0}.
 Um diesen Spielstand laden zu können muss der Helfer erst entsprechend erweitert werden.</IncidentReportDialog.Message>
+	<IncidentReportDialog.Message.ReadException>Während versucht wurde den Spielstand {0}
+zu laden stolperte der Helfer über eine Ausnahme in Klasse '{1}' an Position {2:#,#0}.
+Um diesen Spielstand laden zu können muss der Helfer erst entsprechend korrigiert werden.</IncidentReportDialog.Message.ReadException>
 	<IncidentReportDialog.Hint>In den Optionen kannst Du einstellen ob solche Vorkommnisse als Bericht versendet werden sollen.</IncidentReportDialog.Hint>
-	<IncidentReportDialog.Snapshot>Nachfolgend ein kleiner Ausschnitt Deiner Spieldatei, dieser wird dem Bericht angehängt um bei der Analyse dieser unbekannten Struktur zu helfen:</IncidentReportDialog.Snapshot>
+	<!--<IncidentReportDialog.Snapshot>Nachfolgend ein kleiner Ausschnitt Deiner Spieldatei, dieser wird dem Bericht angehängt um bei der Analyse dieser unbekannten Struktur zu helfen:</IncidentReportDialog.Snapshot>-->
+	<IncidentReportDialog.Snapshot>Nachfolgend ein kleiner Ausschnitt Deiner Spieldatei, dieser wird dem Bericht angehängt:</IncidentReportDialog.Snapshot>
 
 	<DifferencesDialog.Title>Unterschiede</DifferencesDialog.Title>
 	<DifferencesDialog.Empty>&lt;fehlt&gt;</DifferencesDialog.Empty>

@@ -37,7 +37,40 @@ namespace SatisfactorySavegameTool.Dialogs
 		}
 
 
-		private IncidentReportDialog(Window parent, string filename, UnknownPropertyException exc)
+		public static void Show(string filename, Reader.ReadException exc)
+		{
+			Show(null, filename, exc);
+		}
+
+		public static void Show(Window parent, string filename, Reader.ReadException exc)
+		{
+			if (exc.Pos == -1 || exc.PrevPos == -1)
+			{
+				string msg = string.Format(Translate._("IncidentReportDialog.Message.ReadException"), filename, exc.Name, "UNKNOWN")
+						   //+ "\n\n"
+						   //+ Translate._("IncidentReportDialog.Hint")
+						   ;
+				MessageBox.Show(msg, Translate._("IncidentReportDialog.Title"), MessageBoxButton.OK, MessageBoxImage.Exclamation);
+			}
+			else
+			{
+				if (Config.Root.incident_reports.enabled)
+				{
+					new IncidentReportDialog(parent, filename, exc).ShowDialog();
+				}
+				else
+				{
+					string msg = string.Format(Translate._("IncidentReportDialog.Message.ReadException"), filename, exc.Name, exc.PrevPos)
+							   + "\n\n"
+							   + Translate._("IncidentReportDialog.Hint")
+							   ;
+					MessageBox.Show(msg, Translate._("IncidentReportDialog.Title"), MessageBoxButton.OK, MessageBoxImage.Exclamation);
+				}
+			}
+		}
+
+
+		private IncidentReportDialog(Window parent)
 			: base()
 		{
 			InitializeComponent();
@@ -62,13 +95,30 @@ namespace SatisfactorySavegameTool.Dialogs
 				Height = 500;
 				WindowStartupLocation = WindowStartupLocation.CenterOwner;
 			}
+		}
 
+		private IncidentReportDialog(Window parent, string filename, UnknownPropertyException exc)
+			: this(parent)
+		{
 			_msg = exc.Message;
 
 			Message.Text = string.Format(Translate._("IncidentReportDialog.Message"), filename, exc.PropertyType, exc.ErrorPos);
 
 			long offset = (exc.ErrorPos - Settings.INCIDENT_OFFSET) & (~0xF);
 			long length = Settings.INCIDENT_LENGTH;
+			_ReadData(filename, offset, length);
+			SnapshotData.Text = CoreLib.Helpers.Hexdump(_data, 16, indent:0, rel_offset:offset);
+		}
+
+		private IncidentReportDialog(Window parent, string filename, Reader.ReadException exc)
+			: this(parent)
+		{
+			_msg = exc.Message;
+
+			Message.Text = string.Format(Translate._("IncidentReportDialog.Message.ReadException"), filename, exc.Name, exc.PrevPos);
+
+			long offset = (exc.PrevPos - Settings.INCIDENT_OFFSET) & (~0xF);
+			long length = (exc.Pos - exc.PrevPos) + Settings.INCIDENT_LENGTH;
 			_ReadData(filename, offset, length);
 			SnapshotData.Text = CoreLib.Helpers.Hexdump(_data, 16, indent:0, rel_offset:offset);
 		}

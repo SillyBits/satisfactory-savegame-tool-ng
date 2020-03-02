@@ -429,6 +429,12 @@ namespace SatisfactorySavegameTool
 
 				IncidentReportDialog.Show(filename, exc);
 			}
+			catch (Reader.ReadException exc)
+			{
+				CurrFile = null;
+
+				IncidentReportDialog.Show(filename, exc);
+			}
 			finally
 			{
 				progress = null;
