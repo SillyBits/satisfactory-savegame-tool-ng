@@ -7,11 +7,19 @@ namespace Reader
 	ReadException::ReadException(IReader^ reader, int count)
 		: Exception(String::Format("Reader({0}|{1}): Failed to read {2} bytes",
 			reader->Name, reader->PrevPos, count))
+		, _Reader(reader)
+		, _Name(reader->Name)
+		, _PrevPos(reader->PrevPos)
+		, _Pos(reader->Pos)
 	{ }
 
 	ReadException::ReadException(IReader^ reader, String^ msg)
 		: Exception(String::Format("Reader({0}|{1}): {2}",
 			reader->Name, reader->PrevPos, msg))
+		, _Reader(reader)
+		, _Name(reader->Name)
+		, _PrevPos(reader->PrevPos)
+		, _Pos(reader->Pos)
 	{ }
 
 
@@ -27,6 +35,7 @@ namespace Reader
 	// Properties
 	const __int64 ReaderBase::Pos::get() { return _pos; }
 	const __int64 ReaderBase::PrevPos::get() { return _prev_pos; }
+	void          ReaderBase::PrevPos::set(const __int64 prev) { _prev_pos = prev; }
 
 	// Methods
 	void ReaderBase::Close() { _pos = _prev_pos = -1; }
@@ -65,8 +74,8 @@ namespace Reader
 	str^ ReaderBase::ReadString() { return ReadString(0); }
 	str^ ReaderBase::ReadString(const int length)
 	{
-		_prev_pos = _pos;
-		__int64 last = _pos;
+		PrevPos = Pos;
+		__int64 last = Pos;
 
 		int len = length ? length : ReadInt();
 
@@ -84,7 +93,7 @@ namespace Reader
 			ReadByte((byte*)p, len * 2);
 			if (p[len - 1] != 0)
 			{
-				_prev_pos = last;
+				PrevPos = last;
 				throw gcnew ReadException(this, "Null-Terminator expected");
 			}
 
@@ -98,7 +107,7 @@ namespace Reader
 		ReadByte((byte*)p, len);
 		if (p[len - 1] != 0)
 		{
-			_prev_pos = last;
+			PrevPos = last;
 			throw gcnew ReadException(this, "Null-Terminator expected");
 		}
 

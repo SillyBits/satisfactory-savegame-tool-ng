@@ -11,7 +11,7 @@ namespace Reader
 	public:
 		// Properties
 		property const __int64 Pos { const __int64 get() abstract; };
-		property const __int64 PrevPos { const __int64 get() abstract; };
+		property const __int64 PrevPos { const __int64 get() abstract; void set(const __int64) abstract; };
 		property const __int64 Size { const __int64 get() abstract; };
 		property String^ Name { String^ get() abstract; };
 		property String^ Fullname { String^ get() abstract; };
@@ -76,6 +76,17 @@ namespace Reader
 	public:
 		ReadException(IReader^ reader, int count);
 		ReadException(IReader^ reader, String^ msg);
+
+		property IReader^ Reader  { IReader^ get() { return _Reader; } };
+		property String^  Name    { String^ get() { return _Name; } };
+		property __int64  PrevPos { __int64 get() { return _PrevPos; } };
+		property __int64  Pos     { __int64 get() { return _Pos; } };
+
+	private:
+		IReader^ _Reader;
+		String^  _Name;
+		__int64  _PrevPos;
+		__int64  _Pos;
 	};
 
 
@@ -87,7 +98,7 @@ namespace Reader
 
 		// Properties
 		virtual property const __int64 Pos { const __int64 get(); };
-		virtual property const __int64 PrevPos { const __int64 get(); };
+		virtual property const __int64 PrevPos { const __int64 get(); void set(const __int64); };
 		virtual property const __int64 Size { const __int64 get() abstract; };
 		virtual property String^ Name { String^ get() abstract; };
 		virtual property String^ Fullname { String^ get() abstract; };
