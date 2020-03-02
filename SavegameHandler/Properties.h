@@ -234,14 +234,20 @@ namespace Savegame
 		{
 			byte b = reader->ReadByte();
 			if (b != 0)
+			{
+				reader->PrevPos = reader->Pos - 1;
 				throw gcnew ReadException(reader, String::Format("NULL byte expected but found {0}", b));
+			}
 		}
 
 		static void CheckNullInt(IReader^ reader)
 		{
 			int i = reader->ReadInt();
 			if (i != 0)
+			{
+				reader->PrevPos = reader->Pos - 4;
 				throw gcnew ReadException(reader, String::Format("NULL int expected but found {0}", i));
+			}
 		}
 
 
@@ -276,23 +282,6 @@ namespace Savegame
 
 
 		String^ ToString() override { return "[" + TypeName + "]"; }
-
-
-		ref class ReadException : Exception
-		{
-		public:
-			ReadException(IReader^ reader, String^ msg)
-				: Exception(String::Format("Reader({0}|{1}): {2}", reader->Name, reader->PrevPos, msg))
-			{ }
-		};
-
-		ref class WriteException : Exception
-		{
-		public:
-			WriteException(IWriter^ writer, String^ msg)
-				: Exception(String::Format("Writer({0}|{1}): {2}", writer->Name, writer->PrevPos, msg))
-			{ }
-		};
 
 
 	protected:
@@ -1326,16 +1315,8 @@ namespace Savegame
 	#pragma endregion
 
 	#pragma region InterfaceProperty
-	public ref class InterfaceProperty : ObjectProperty
-	{
-	public:
-		InterfaceProperty(Property^ parent)
-			: ObjectProperty(parent, false)
-		{ }
-		READ
-			Read(reader, false);
-		READ_END
-	};
+	CLS_(InterfaceProperty,ObjectProperty)
+	CLS_END
 	#pragma endregion
 
 	#pragma region ArrayProperty
@@ -1390,7 +1371,7 @@ namespace Savegame
 			{
 				ADD_i(count)
 				for each (InterfaceProperty^ prop in (Properties^)Value)
-					ADD(prop->GetSize())
+					ADD(prop->GetSize(false))
 			}
 			else
 				throw gcnew Exception(String::Format("Unknown inner array type '{0}'", InnerType));
@@ -1458,7 +1439,7 @@ namespace Savegame
 				for (int i = 0; i < count; ++i)
 				{
 					InterfaceProperty^ prop = gcnew InterfaceProperty(this);
-					objs->Add(prop->Read(reader));
+					objs->Add(prop->Read(reader, false));
 				}
 				Value = objs;
 			}
@@ -1532,7 +1513,7 @@ namespace Savegame
 				Properties^ props = (Properties^)Value;
 				writer->Write((int)props->Count);
 				for each (Property^ prop in props)
-					prop->Write(writer);
+					dynamic_cast<InterfaceProperty^>(prop)->Write(writer, false);
 			}
 			else
 				throw gcnew WriteException(writer, String::Format("Unknown inner array type '{0}'", InnerType));
