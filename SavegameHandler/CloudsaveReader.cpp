@@ -49,6 +49,7 @@ namespace Reader
 	// Properties not handled by ReaderBase
 	const __int64 CloudsaveReader::Pos::get() { return _curr_chunk->Offset + _offset; }
 	const __int64 CloudsaveReader::PrevPos::get() { return _prev_offset; }
+	void          CloudsaveReader::PrevPos::set(const __int64 prev) { _prev_offset = prev; }
 	const __int64 CloudsaveReader::Size::get() { return _size; }
 	String^ CloudsaveReader::Name::get() { return _reader->Name; }
 	String^ CloudsaveReader::Fullname::get() { return _reader->Fullname; }

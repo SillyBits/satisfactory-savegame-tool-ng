@@ -15,7 +15,7 @@ namespace Reader
 		!CloudsaveReader();
 
 		virtual property const __int64 Pos { const __int64 get() override; };
-		virtual property const __int64 PrevPos { const __int64 get() override; };
+		virtual property const __int64 PrevPos { const __int64 get() override; void set(const __int64) override; };
 		virtual property const __int64 Size { const __int64 get() override; };
 		virtual property String^ Name { String^ get() override; };
 		virtual property String^ Fullname { String^ get() override; };
