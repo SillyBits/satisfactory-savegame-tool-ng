@@ -59,4 +59,6 @@
 	<version build="116098" type="0" version="0.3.2.2" />						<!-- Early Access (EXPERIMENTAL) - v0.3.2.2 - Build 116098 -->
 	<version build="116442" type="0" version="0.3.3.0" />						<!-- Early Access (EXPERIMENTAL) - v0.3.3.0 - Build 116442 -->
 	<version build="116717" type="0" version="0.3.3.1" />						<!-- Early Access (EXPERIMENTAL) - v0.3.3.1 - Build 116717 -->
+	<version build="116717" type="0" version="0.3.3.1" />						<!-- Early Access (EXPERIMENTAL) - v0.3.3.1 - Build 116717 -->
+	<version build="116997" type="0" version="0.3.3.2" />						<!-- Early Access (EXPERIMENTAL) - v0.3.3.2 - Build 116977 -->
 </versions>
