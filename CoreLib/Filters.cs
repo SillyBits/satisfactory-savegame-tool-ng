@@ -165,7 +165,7 @@ namespace CoreLib
 		{
 			public Operations Operation { get; set; }
 			public Conditions Condition { get; set; }
-			public string     Value     { get; set; }
+			public object     Value     { get; set; }
 
 			public Definition()
 			{
@@ -174,7 +174,7 @@ namespace CoreLib
 				Value     = null;
 			}
 
-			public Definition(Operations operation, Conditions condition, string value)
+			public Definition(Operations operation, Conditions condition, object value)
 			{
 				Operation = operation;
 				Condition = condition;

@@ -501,12 +501,15 @@ namespace SatisfactorySavegameTool.Actions
 
 				switch (def.Source)
 				{
-					case Sources.None      : return new None(baseFilter);
-					case Sources.ClassName : return new ChildFilter(baseFilter, "ClassName");
-					case Sources.PathName  : return new ChildFilter(baseFilter, "PathName");
-					case Sources.LevelName : return new ChildFilter(baseFilter, "LevelName");
-					case Sources.FieldName : return new FieldName(baseFilter);
-					case Sources.FieldValue: return new FieldValue(baseFilter);
+					case Sources.None        : return new None(baseFilter);
+					case Sources.ClassName   : return new ChildFilter(baseFilter, "ClassName");
+					case Sources.PathName    : return new ChildFilter(baseFilter, "PathName");
+					case Sources.LevelName   : return new ChildFilter(baseFilter, "LevelName");
+					case Sources.FieldName   : return new FieldName(baseFilter);
+					case Sources.FieldValue  : return new FieldValue(baseFilter);
+					case Sources.TranslationX: return new Translation(baseFilter, Translation.Coordinate.X);
+					case Sources.TranslationY: return new Translation(baseFilter, Translation.Coordinate.Y);
+					case Sources.TranslationZ: return new Translation(baseFilter, Translation.Coordinate.Z);
 				}
 				return null;
 			}
@@ -617,6 +620,38 @@ namespace SatisfactorySavegameTool.Actions
 				}
 			}
 
+			private class Translation : FilterBase
+			{
+				public enum Coordinate { X, Y, Z };
+
+				public Translation(F.IFilter filter, Coordinate coord)
+					: base(filter)
+				{
+					_Coordinate = coord;
+				}
+
+				public override F.IResult Test(object value)
+				{
+					if (value is P.Actor)
+					{
+						P.Actor actor = value as P.Actor;
+						P.Vector translate = actor.Translate;
+						if (translate != null)
+						{
+							switch (_Coordinate)
+							{
+								case Coordinate.X: return _filter.Test(translate.X);
+								case Coordinate.Y: return _filter.Test(translate.Y);
+								case Coordinate.Z: return _filter.Test(translate.Z);
+							}
+						}
+					}
+					return F.EMPTY_RESULT;
+				}
+
+				private Coordinate _Coordinate;
+			}
+
 		}
 		#endregion
 
@@ -688,6 +723,9 @@ namespace SatisfactorySavegameTool.Actions
 			LevelName,
 			FieldName,
 			FieldValue,
+			TranslationX,
+			TranslationY,
+			TranslationZ,
 		}
 
 		public class FilterSources : ObservableCollection<Sources>
@@ -756,7 +794,7 @@ namespace SatisfactorySavegameTool.Actions
 				Source = Sources.None;
 			}
 
-			internal FilterDefinition(F.Operations operation, Sources source, F.Conditions condition, string value)
+			internal FilterDefinition(F.Operations operation, Sources source, F.Conditions condition, object value)
 				: base(operation, condition, value)
 			{
 				Source = source;

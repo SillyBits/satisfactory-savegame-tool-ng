@@ -289,6 +289,9 @@ Bitte beachte das 'Oder' Filter bis zum nächsten 'Und' Filter kombiniert werden
 	<Action.Export.Dialog.Source.LevelName>LevelName</Action.Export.Dialog.Source.LevelName>
 	<Action.Export.Dialog.Source.FieldName>Feld-Name</Action.Export.Dialog.Source.FieldName>
 	<Action.Export.Dialog.Source.FieldValue>Feld-Wert</Action.Export.Dialog.Source.FieldValue>
+	<Action.Export.Dialog.Source.TranslationX>Translate.X</Action.Export.Dialog.Source.TranslationX>
+	<Action.Export.Dialog.Source.TranslationY>Translate.Y</Action.Export.Dialog.Source.TranslationY>
+	<Action.Export.Dialog.Source.TranslationZ>Translate.Z</Action.Export.Dialog.Source.TranslationZ>
 	<Action.Export.Dialog.Condition.None>&lt;Auswahl&gt;</Action.Export.Dialog.Condition.None>
 	<Action.Export.Dialog.Condition.Equal>ist</Action.Export.Dialog.Condition.Equal>
 	<Action.Export.Dialog.Condition.NotEqual>ist nicht</Action.Export.Dialog.Condition.NotEqual>

@@ -288,6 +288,9 @@ Note that 'Or' filters are combined up until next 'And' encountered.</Action.Exp
 	<Action.Export.Dialog.Source.LevelName>LevelName</Action.Export.Dialog.Source.LevelName>
 	<Action.Export.Dialog.Source.FieldName>Field name</Action.Export.Dialog.Source.FieldName>
 	<Action.Export.Dialog.Source.FieldValue>Field value</Action.Export.Dialog.Source.FieldValue>
+	<Action.Export.Dialog.Source.TranslationX>Translate.X</Action.Export.Dialog.Source.TranslationX>
+	<Action.Export.Dialog.Source.TranslationY>Translate.Y</Action.Export.Dialog.Source.TranslationY>
+	<Action.Export.Dialog.Source.TranslationZ>Translate.Z</Action.Export.Dialog.Source.TranslationZ>
 	<Action.Export.Dialog.Condition.None>&lt;Select&gt;</Action.Export.Dialog.Condition.None>
 	<Action.Export.Dialog.Condition.Equal>is</Action.Export.Dialog.Condition.Equal>
 	<Action.Export.Dialog.Condition.NotEqual>is not</Action.Export.Dialog.Condition.NotEqual>
