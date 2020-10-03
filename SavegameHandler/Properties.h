@@ -691,6 +691,25 @@ namespace Savegame
 		WRITE_END
 	CLS_END
 
+	CLS_(Int8Property, ValueProperty)
+		SIZE
+			ADD_b(NullByte)
+			ADD(Int8Property::GetLength())
+			SIZE_CHECK
+		SIZE_END
+		LENGTH
+			ADD_i(Value)// Always a single byte
+		LENGTH_END
+		READ
+			CheckNullByte(reader);
+			Value = reader->ReadByte();
+		READ_END
+		WRITE
+			writer->Write((byte)0);
+			writer->Write((byte)Value);
+		WRITE_END
+	CLS_END
+
 	CLS_(Int64Property, ValueProperty)
 		SIZE
 			ADD_b(NullByte)
