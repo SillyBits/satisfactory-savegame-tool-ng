@@ -1835,6 +1835,9 @@ namespace Savegame
 	CLS_(ProjectileData,PropertyList)
 	CLS_END
 
+	CLS_(Hotbar,PropertyList)
+	CLS_END
+
 	#pragma endregion
 
 	#pragma endregion
