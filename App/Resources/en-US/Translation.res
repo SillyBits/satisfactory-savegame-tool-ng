@@ -159,6 +159,7 @@ unrecoverable damage to your save!</MainWindow.LoadGamefile.PeekHeader.Warn>
 	<TreePanel.Tree.Stairs.Right>Right</TreePanel.Tree.Stairs.Right>
 	<TreePanel.Tree.Foundation>Foundation</TreePanel.Tree.Foundation>
 	<TreePanel.Tree.Ramp>Ramp</TreePanel.Tree.Ramp>
+	<TreePanel.Tree.RampInverted>Ramp (inverted)</TreePanel.Tree.RampInverted>
 
 	<DetailsPanel.Empty>&lt;empty&gt;</DetailsPanel.Empty>
 	<DetailsPanel.ItemTable.Type.Item>Item</DetailsPanel.ItemTable.Type.Item>

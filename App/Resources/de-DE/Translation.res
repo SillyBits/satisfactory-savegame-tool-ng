@@ -159,6 +159,7 @@ könnte den Spielstand unter Umständen komplett unbrauchbar machen!</MainWindow
 	<TreePanel.Tree.Stairs.Right>Rechts</TreePanel.Tree.Stairs.Right>
 	<TreePanel.Tree.Foundation>Fundament</TreePanel.Tree.Foundation>
 	<TreePanel.Tree.Ramp>Rampe</TreePanel.Tree.Ramp>
+	<TreePanel.Tree.RampInverted>Rampe (umgekehrt)</TreePanel.Tree.RampInverted>
 
 	<DetailsPanel.Empty>&lt;leer&gt;</DetailsPanel.Empty>
 	<DetailsPanel.ItemTable.Type.Item>Gegenstand</DetailsPanel.ItemTable.Type.Item>

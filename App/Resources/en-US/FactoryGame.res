@@ -20,38 +20,38 @@
 	<BP_TutorialSubsystem_C>Tutorial Subsystem</BP_TutorialSubsystem_C>
 	
 	<!-- Areas -->
-	<Area_AbyssCliffs_1_C>[Area] Abyss Cliffs 1</Area_AbyssCliffs_1_C>
-	<Area_DesertCanyons_1_C>[Area] Desert Canyons 1</Area_DesertCanyons_1_C>
-	<Area_DuneDesert_1_C>[Area] Dune Desert 1</Area_DuneDesert_1_C>
-	<Area_DuneDesert_2_C>[Area] Dune Desert 2</Area_DuneDesert_2_C>
-	<Area_GrassFields_1_C>[Area] Grass Fields 1</Area_GrassFields_1_C>
-	<Area_GrassFields_2_C>[Area] Grass Fields 2</Area_GrassFields_2_C>
-	<Area_GrassFields_3_C>[Area] Grass Fields 3</Area_GrassFields_3_C>
-	<Area_LakeForest_1_C>[Area] Lake Forest 1</Area_LakeForest_1_C>
-	<Area_LakeForest_2_C>[Area] Lake Forest 2</Area_LakeForest_2_C>
-	<Area_MazeCanyons_1_C>[Area] Maze Canyons 1</Area_MazeCanyons_1_C>
-	<Area_MazeCanyons_2_C>[Area] Maze Canyons 2</Area_MazeCanyons_2_C>
-	<Area_NoMansLand_1_C>[Area] No Mans Land 1</Area_NoMansLand_1_C>
-	<Area_NorthernForest_1_C>[Area] Northern Forest 1</Area_NorthernForest_1_C>
-	<Area_NorthernForest_2_C>[Area] Northern Forest 2</Area_NorthernForest_2_C>
-	<Area_RedBambooFields_1_C>[Area] Red Bamboo Fields 1</Area_RedBambooFields_1_C>
-	<Area_RedBambooFields_2_C>[Area] Red Bamboo Fields 2</Area_RedBambooFields_2_C>
-	<Area_RedJungle_1_C>[Area] Red Jungle 1</Area_RedJungle_1_C>
-	<Area_RedJungle_2_C>[Area] Red Jungle 2</Area_RedJungle_2_C>
-	<Area_RockyDesert_1_C>[Area] Rocky Desert 1</Area_RockyDesert_1_C>
-	<Area_RockyDesert_2_C>[Area] Rocky Desert 2</Area_RockyDesert_2_C>
-	<Area_Savanna_1_C>[Area] Savanna 1</Area_Savanna_1_C>
-	<Area_Savanna_2_C>[Area] Savanna 2</Area_Savanna_2_C>
-	<Area_SouthernForest_1_C>[Area] Southern Forest 1</Area_SouthernForest_1_C>
-	<Area_SouthernForest_2_C>[Area] Southern Forest 2</Area_SouthernForest_2_C>
-	<Area_Swamp_1_C>[Area] Swamp 1</Area_Swamp_1_C>
-	<Area_Swamp_2_C>[Area] Swamp 2</Area_Swamp_2_C>
-	<Area_TitanForest_1_C>[Area] Titan Forest 1</Area_TitanForest_1_C>
-	<Area_TitanForest_2_C>[Area] Titan Forest 2</Area_TitanForest_2_C>
-	<Area_WesternDuneForest_1_C>[Area] Western Dune Forest 1</Area_WesternDuneForest_1_C>
-	<Area_WesternDuneForest_2_C>[Area] Western Dune Forest 2</Area_WesternDuneForest_2_C>
-	<Area_crater_1_C>[Area] Crater 1</Area_crater_1_C>
-	<Area_crater_2_C>[Area] Crater 2</Area_crater_2_C>
+	<Area_AbyssCliffs_1_C>Abyss Cliffs 1</Area_AbyssCliffs_1_C>
+	<Area_DesertCanyons_1_C>Desert Canyons 1</Area_DesertCanyons_1_C>
+	<Area_DuneDesert_1_C>Dune Desert 1</Area_DuneDesert_1_C>
+	<Area_DuneDesert_2_C>Dune Desert 2</Area_DuneDesert_2_C>
+	<Area_GrassFields_1_C>Grass Fields 1</Area_GrassFields_1_C>
+	<Area_GrassFields_2_C>Grass Fields 2</Area_GrassFields_2_C>
+	<Area_GrassFields_3_C>Grass Fields 3</Area_GrassFields_3_C>
+	<Area_LakeForest_1_C>Lake Forest 1</Area_LakeForest_1_C>
+	<Area_LakeForest_2_C>Lake Forest 2</Area_LakeForest_2_C>
+	<Area_MazeCanyons_1_C>Maze Canyons 1</Area_MazeCanyons_1_C>
+	<Area_MazeCanyons_2_C>Maze Canyons 2</Area_MazeCanyons_2_C>
+	<Area_NoMansLand_1_C>No Mans Land 1</Area_NoMansLand_1_C>
+	<Area_NorthernForest_1_C>Northern Forest 1</Area_NorthernForest_1_C>
+	<Area_NorthernForest_2_C>Northern Forest 2</Area_NorthernForest_2_C>
+	<Area_RedBambooFields_1_C>Red Bamboo Fields 1</Area_RedBambooFields_1_C>
+	<Area_RedBambooFields_2_C>Red Bamboo Fields 2</Area_RedBambooFields_2_C>
+	<Area_RedJungle_1_C>Red Jungle 1</Area_RedJungle_1_C>
+	<Area_RedJungle_2_C>Red Jungle 2</Area_RedJungle_2_C>
+	<Area_RockyDesert_1_C>Rocky Desert 1</Area_RockyDesert_1_C>
+	<Area_RockyDesert_2_C>Rocky Desert 2</Area_RockyDesert_2_C>
+	<Area_Savanna_1_C>Savanna 1</Area_Savanna_1_C>
+	<Area_Savanna_2_C>Savanna 2</Area_Savanna_2_C>
+	<Area_SouthernForest_1_C>Southern Forest 1</Area_SouthernForest_1_C>
+	<Area_SouthernForest_2_C>Southern Forest 2</Area_SouthernForest_2_C>
+	<Area_Swamp_1_C>Swamp 1</Area_Swamp_1_C>
+	<Area_Swamp_2_C>Swamp 2</Area_Swamp_2_C>
+	<Area_TitanForest_1_C>Titan Forest 1</Area_TitanForest_1_C>
+	<Area_TitanForest_2_C>Titan Forest 2</Area_TitanForest_2_C>
+	<Area_WesternDuneForest_1_C>Western Dune Forest 1</Area_WesternDuneForest_1_C>
+	<Area_WesternDuneForest_2_C>Western Dune Forest 2</Area_WesternDuneForest_2_C>
+	<Area_crater_1_C>Crater 1</Area_crater_1_C>
+	<Area_crater_2_C>Crater 2</Area_crater_2_C>
 	
 	<!-- Loot, somewhat, incl. deposits & nodes -->
 	<AlienArtifact_01_C>Alien Artifact 01</AlienArtifact_01_C>
@@ -269,6 +269,7 @@
 	<!-- Vehicles -->
 	<BP_Explorer_C>Explorer</BP_Explorer_C>
 	<BP_FreightWagon_C>Freight Wagon</BP_FreightWagon_C>
+	<BP_Golfcart_C>Golf cart</BP_Golfcart_C>
 	<BP_Locomotive_C>Locomotive</BP_Locomotive_C>
 	<BP_Tractor_C>Tractor</BP_Tractor_C>
 	<BP_Truck_C>Truck</BP_Truck_C>
@@ -294,9 +295,12 @@
 	<Build_ConveyorLiftMk5_C>ConveyorLift Mk5</Build_ConveyorLiftMk5_C>
 	<Build_ConveyorPole_C>Conveyor Pole</Build_ConveyorPole_C>
 	<Build_ConveyorPoleStackable_C>Conveyor Pole Stackable</Build_ConveyorPoleStackable_C>
+	<Build_Fence_01_C>Fence</Build_Fence_01_C>
 	<Build_Foundation_8x1_01_C>Foundation 8x1</Build_Foundation_8x1_01_C>
 	<Build_Foundation_8x2_01_C>Foundation 8x2</Build_Foundation_8x2_01_C>
 	<Build_Foundation_8x4_01_C>Foundation 8x4</Build_Foundation_8x4_01_C>
+	<Build_FoundationGlass_01_C>Glass foundation</Build_FoundationGlass_01_C>
+	<Build_Foundation_Frame_01_C>Frame foundation</Build_Foundation_Frame_01_C>
 	<Build_FoundryMk1_C>Foundry Mk1</Build_FoundryMk1_C>
 	<Build_GeneratorBiomass_C>Biomass Generator</Build_GeneratorBiomass_C>
 	<Build_GeneratorCoal_C>Coal Generator</Build_GeneratorCoal_C>
@@ -305,22 +309,39 @@
 	<Build_GeneratorIntegratedBiomass_C>Biomass Generator (Integrated)</Build_GeneratorIntegratedBiomass_C>
 	<Build_GeneratorNuclear_C>Nuclear Generator</Build_GeneratorNuclear_C>
 	<Build_HubTerminal_C>Hub Terminal</Build_HubTerminal_C>
-	<Build_JumpPad_C>Jump Pad</Build_JumpPad_C>
-	<Build_JumpPadTilted_C>Jump Pad Tilted</Build_JumpPadTilted_C>
+	<Build_HyperPoleStackable_C>Hypertube Pole (stackable)</Build_HyperPoleStackable_C>
+	<Build_PipeHyperStart_C>Hypertube-Start</Build_PipeHyperStart_C>
+	<Build_PipeHyperSupport_C>Hypertube Pole</Build_PipeHyperSupport_C>
+	<Build_PipeHyper_C>Hypertube</Build_PipeHyper_C>
+	<Build_JumpPad_C>Old Jump Pad</Build_JumpPad_C>
+	<Build_JumpPadAdjustable_C>Jump Pad</Build_JumpPadAdjustable_C>
+	<Build_JumpPadTilted_C>Old Tilted Jump Pad</Build_JumpPadTilted_C>
+	<Build_Ladder_C>Ladder</Build_Ladder_C>
 	<Build_LandingPad_C>Landing Pad</Build_LandingPad_C>
 	<Build_LookoutTower_C>Lookout Tower</Build_LookoutTower_C>
-	<Build_MamIntegrated_C>Mam Integrated</Build_MamIntegrated_C>
+	<Build_Mam_C>Molecular Analysis Machine</Build_Mam_C>
 	<Build_ManufacturerMk1_C>Manufacturer Mk1</Build_ManufacturerMk1_C>
-	<Build_ManufacturerMk2_C>Manufacturer Mk2</Build_ManufacturerMk2_C>
 	<Build_MinerMk1_C>Miner Mk1</Build_MinerMk1_C>
 	<Build_MinerMk2_C>Miner Mk2</Build_MinerMk2_C>
 	<Build_MinerMk3_C>Miner Mk3</Build_MinerMk3_C>
 	<Build_OilPump_C>OilPump</Build_OilPump_C>
 	<Build_OilRefinery_C>Oil Refinery</Build_OilRefinery_C>
+	<Build_Packager_C>Packager</Build_Packager_C>
+	<Build_PipeStorageTankMk2_C>Industrial Storage tank</Build_PipeStorageTankMk2_C>
+	<Build_PipeStorageTank_C>Storage tank</Build_PipeStorageTank_C>
+	<Build_PipeSupportStackable_C>Pipeline Pole (stackable)</Build_PipeSupportStackable_C>
+	<Build_PipelineJunction_Cross_C>Pipeline Cross</Build_PipelineJunction_Cross_C>
+	<Build_PipelinePump_C>Pipeline Pump</Build_PipelinePump_C>
+	<Build_PipelineSupportWallHole_C>Pipeline Wall hole</Build_PipelineSupportWallHole_C>
+	<Build_PipelineSupportWall_C>Pipeline Wall support</Build_PipelineSupportWall_C>
+	<Build_PipelineSupport_C>Pipeline Pole</Build_PipelineSupport_C>
+	<Build_Pipeline_C>Pipeline</Build_Pipeline_C>
 	<Build_PowerLine_C>Power Line</Build_PowerLine_C>
 	<Build_PowerPoleMk1_C>Power Pole Mk1</Build_PowerPoleMk1_C>
 	<Build_PowerPoleMk2_C>Power Pole Mk2</Build_PowerPoleMk2_C>
 	<Build_PowerPoleMk3_C>Power Pole Mk3</Build_PowerPoleMk3_C>
+	<Build_PowerPoleWallDouble_C>Power Pole Wall double</Build_PowerPoleWallDouble_C>
+	<Build_PowerPoleWall_C>Power Pole Wall</Build_PowerPoleWall_C>
 	<Build_RadarTower_C>Radar Tower</Build_RadarTower_C>
 	<Build_RailroadSwitchControl_C>Railroad Switch Control</Build_RailroadSwitchControl_C>
 	<Build_RailroadTrack_C>Railroad Track</Build_RailroadTrack_C>
@@ -328,6 +349,25 @@
 	<Build_Ramp_8x1_01_C>Ramp 8x1</Build_Ramp_8x1_01_C>
 	<Build_Ramp_8x2_01_C>Ramp 8x2</Build_Ramp_8x2_01_C>
 	<Build_Ramp_8x4_01_C>Ramp 8x4</Build_Ramp_8x4_01_C>
+	<Build_RampDouble_8x1_C>Double Ramp 8x1</Build_RampDouble_8x1_C>
+	<Build_RampDouble_8x2_C>Double Ramp 8x2</Build_RampDouble_8x2_C>
+	<Build_RampDouble_C>Double Ramp 8x4</Build_RampDouble_C>
+	<Build_RampInverted_8x1_01_C>Inverted Ramp 8x1 (1?)</Build_RampInverted_8x1_01_C>
+	<Build_RampInverted_8x2_01_C>Inverted Ramp 8x2 (1?)</Build_RampInverted_8x2_01_C>
+	<Build_RampInverted_8x1_Corner_01_C>Inverted Corner Ramp 8x1 (1?)</Build_RampInverted_8x1_Corner_01_C>
+	<Build_RampInverted_8x1_Corner_02_C>Inverted Corner Ramp 8x1 (2?)</Build_RampInverted_8x1_Corner_02_C>
+	<Build_RampInverted_8x2_Corner_01_C>Inverted Corner Ramp 8x2 (1?)</Build_RampInverted_8x2_Corner_01_C>
+	<Build_RampInverted_8x2_Corner_02_C>Inverted Corner Ramp 8x2 (2?)</Build_RampInverted_8x2_Corner_02_C>
+	<Build_RampInverted_8x4_Corner_01_C>Inverted Corner Ramp 8x4 (1?)</Build_RampInverted_8x4_Corner_01_C>
+	<Build_RampInverted_8x4_Corner_02_C>Inverted Corner Ramp 8x4 (2?)</Build_RampInverted_8x4_Corner_02_C>
+	<Build_Ramp_8x4_Inverted_01_C>Inverted Ramp 8x4 (!?)</Build_Ramp_8x4_Inverted_01_C>
+	<Build_Ramp_8x8x8_C>Ramp 8x8x8 ???</Build_Ramp_8x8x8_C>
+	<Build_Ramp_Diagonal_8x2_01_C>Diagonal Ramp 8x2 (1?)</Build_Ramp_Diagonal_8x2_01_C>
+	<Build_Ramp_Diagonal_8x2_02_C>Diagonal Ramp 8x2 (2?)</Build_Ramp_Diagonal_8x2_02_C>
+	<Build_Ramp_Diagonal_8x4_01_C>Diagonal Ramp 8x4 (1?)</Build_Ramp_Diagonal_8x4_01_C>
+	<Build_Ramp_Diagonal_8x4_02_C>Diagonal Ramp 8x4 (2?)</Build_Ramp_Diagonal_8x4_02_C>
+	<Build_ResourceSinkShop_C>AWESOME Sink Shop</Build_ResourceSinkShop_C>
+	<Build_ResourceSink_C>AWESOME Sink</Build_ResourceSink_C>
 	<Build_SmelterMk1_C>Smelter Mk1</Build_SmelterMk1_C>
 	<Build_SpaceElevator_C>Space Elevator</Build_SpaceElevator_C>
 	<Build_Stairs_Left_01_C>Stairs Left</Build_Stairs_Left_01_C>
@@ -354,8 +394,6 @@
 	<Build_Wall_Conveyor_8x4_02_Steel_C>Wall Conveyor 8x4 Steel (2 belts)</Build_Wall_Conveyor_8x4_02_Steel_C>
 	<Build_Wall_Conveyor_8x4_03_C>Wall Conveyor 8x4 (1 belt)</Build_Wall_Conveyor_8x4_03_C>
 	<Build_Wall_Conveyor_8x4_03_Steel_C>Wall Conveyor 8x4 Steel (1 belt)</Build_Wall_Conveyor_8x4_03_Steel_C>
-	<Build_Wall_Conveyor_8x4_04_C>Wall Conveyor Straight 8x4 (1 belt)</Build_Wall_Conveyor_8x4_04_C>
-	<Build_Wall_Conveyor_8x4_04_Steel_C>Wall Conveyor Straight 8x4 Steel (1 belt)</Build_Wall_Conveyor_8x4_04_Steel_C>
 	<Build_Wall_Door_8x4_01_C>Wall Door Center 8x4</Build_Wall_Door_8x4_01_C>
 	<Build_Wall_Door_8x4_01_Steel_C>Wall Door Center 8x4 Steel</Build_Wall_Door_8x4_01_Steel_C>
 	<Build_Wall_Door_8x4_02_C>Wall Door Left 8x4</Build_Wall_Door_8x4_02_C>
@@ -363,6 +401,7 @@
 	<Build_Wall_Door_8x4_03_C>Wall Door Right 8x4</Build_Wall_Door_8x4_03_C>
 	<Build_Wall_Door_8x4_03_Steel_C>Wall Door Right 8x4 Steel</Build_Wall_Door_8x4_03_Steel_C>
 	<Build_Wall_Gate_8x4_01_C>Wall Gate 8x4</Build_Wall_Gate_8x4_01_C>
+	<Build_WaterPump_C>Water Pump</Build_WaterPump_C>
 	<Build_WorkBench_C>Work Bench</Build_WorkBench_C>
 	<Build_WorkBenchIntegrated_C>Work Bench Integrated</Build_WorkBenchIntegrated_C>
 	<Build_Workshop_C>Workshop</Build_Workshop_C>
@@ -376,6 +415,7 @@
 	<Recipe_Alternate_CircuitBoard_2_C>[Recipe][Alt] Quickwire Circuit Board</Recipe_Alternate_CircuitBoard_2_C>
 	<Recipe_Alternate_Coal_1_C>[Recipe][Alt] Wood Coal</Recipe_Alternate_Coal_1_C>
 	<Recipe_Alternate_Coal_2_C>[Recipe][Alt] Biomass Coal</Recipe_Alternate_Coal_2_C>
+	<Recipe_Alternate_CoatedIronCanister_C>[Recipe][Alt] Coated Iron Canister</Recipe_Alternate_CoatedIronCanister_C>
 	<Recipe_Alternate_Computer_1_C>[Recipe][Alt] Quickwire Computer</Recipe_Alternate_Computer_1_C>
 	<Recipe_Alternate_Computer_2_C>[Recipe][Alt] Crystal Computer</Recipe_Alternate_Computer_2_C>
 	<Recipe_Alternate_Concrete_C>[Recipe][Alt] Concrete</Recipe_Alternate_Concrete_C>
@@ -404,6 +444,7 @@
 	<Recipe_Alternate_Screw_2_C>[Recipe][Alt] Steel Screw</Recipe_Alternate_Screw_2_C>
 	<Recipe_Alternate_Silica_C>[Recipe][Alt] Silica</Recipe_Alternate_Silica_C>
 	<Recipe_Alternate_Stator_C>[Recipe][Alt] Stator</Recipe_Alternate_Stator_C>
+	<Recipe_Alternate_SteelCanister_C>[Recipe][Alt] Steel Canister</Recipe_Alternate_SteelCanister_C>
 	<Recipe_Alternate_TurboMotor_1_C>[Recipe][Alt] Turbo Motor</Recipe_Alternate_TurboMotor_1_C>
 	<Recipe_Alternate_Turbofuel_C>[Recipe][Alt] Turbofuel</Recipe_Alternate_Turbofuel_C>
 	<Recipe_Alternate_UraniumCell_1_C>[Recipe][Alt] Uranium Cell</Recipe_Alternate_UraniumCell_1_C>
@@ -480,8 +521,10 @@
 	<Recipe_IronPlateReinforced_C>[Recipe] Reinforced Iron Plate</Recipe_IronPlateReinforced_C>
 	<Recipe_IronRod_C>[Recipe] Iron Rod</Recipe_IronRod_C>
 	<Recipe_JetPack_C>[Recipe] Jet Pack</Recipe_JetPack_C>
-	<Recipe_JumpPad_C>[Recipe] Jump Pad</Recipe_JumpPad_C>
-	<Recipe_JumpPadTilted_C>[Recipe] Tilted Jump Pad</Recipe_JumpPadTilted_C>
+	<Recipe_JumpPad_C>[Recipe] Old Jump Pad</Recipe_JumpPad_C>
+	<Recipe_JumpPadAdjustable_C>[Recipe] Jump Pad</Recipe_JumpPadAdjustable_C>
+	<Recipe_JumpPadTilted_C>[Recipe] Old Tilted Jump Pad</Recipe_JumpPadTilted_C>
+	<Recipe_Ladder_C>[Recipe] Ladder</Recipe_Ladder_C>
 	<Recipe_Limestone_C>[Recipe] Limestone</Recipe_Limestone_C>
 	<Recipe_Locomotive_C>[Recipe] Electric Locomotive</Recipe_Locomotive_C>
 	<Recipe_LookoutTower_C>[Recipe] Lookout Tower</Recipe_LookoutTower_C>
@@ -507,7 +550,20 @@
 	<Recipe_OreCopper_C>[Recipe] Copper Ore</Recipe_OreCopper_C>
 	<Recipe_OreIron_C>[Recipe] Iron Ore</Recipe_OreIron_C>
 	<Recipe_OreUranium_C>[Recipe] Uranium</Recipe_OreUranium_C>
+	<Recipe_Packager_C>[Recipe] Packager</Recipe_Packager_C>
 	<Recipe_Parachute_C>[Recipe] Parachute</Recipe_Parachute_C>
+	<Recipe_PipeStorageTankMk2_C>[Recipe] Industrial Storage tank</Recipe_PipeStorageTankMk2_C>
+	<Recipe_PipeStorageTank_C>[Recipe] Storage tank</Recipe_PipeStorageTank_C>
+	<Recipe_PipeSupportStackable_C>[Recipe] Pipeline Pole (stackable)</Recipe_PipeSupportStackable_C>
+	<Recipe_PipelineJunction_Cross_C>[Recipe] Pipeline Cross</Recipe_PipelineJunction_Cross_C>
+	<Recipe_Pipeline_C>[Recipe] Pipeline Mk.1</Recipe_Pipeline_C>
+	<Recipe_PipelineMK2_C>[Recipe] Pipeline Mk.2</Recipe_PipelineMK2_C>
+	<Recipe_PipelinePump_C>[Recipe] Pipeline Pump Mk.1</Recipe_PipelinePump_C>
+	<Recipe_PipelinePumpMK2_C>[Recipe] Pipeline Pump Mk.2</Recipe_PipelinePumpMK2_C>
+	<Recipe_Valve_C>[Recipe] Pipeline Valve</Recipe_Valve_C>
+	<Recipe_PipelineSupportWallHole_C>[Recipe] Pipeline Wall hole</Recipe_PipelineSupportWallHole_C>
+	<Recipe_PipelineSupportWall_C>[Recipe] Pipeline Wall support</Recipe_PipelineSupportWall_C>
+	<Recipe_PipelineSupport_C>[Recipe] Pipeline Pole</Recipe_PipelineSupport_C>
 	<Recipe_Plastic_C>[Recipe] Plastic</Recipe_Plastic_C>
 	<Recipe_PortableMiner_C>[Recipe] Portable Miner</Recipe_PortableMiner_C>
 	<Recipe_PowerCrystalShard_1_C>[Recipe] Power Shard (1)</Recipe_PowerCrystalShard_1_C>
