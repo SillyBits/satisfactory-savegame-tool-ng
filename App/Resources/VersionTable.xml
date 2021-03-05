@@ -93,4 +93,37 @@
 	<version build="131095" type="0" version="0.3.5.5" />						<!-- Early Access (EXPERIMENTAL) - v0.3.5.5 - Build 131095 -->
 <!-- version build="131271" type="0" version="0.3.5.6 remarks="Moved to stable"      Early Access (EXPERIMENTAL) - v0.3.5.6 - Build 131271 -->
 	<version build="131382" type="1" version="0.3.5.6" />						<!-- Early Access - v0.3.5.6 - Build 131382 -->
+	<version build="134641" type="0" version="0.3.6" />							<!-- Early Access (EXPERIMENTAL) - v0.3.6 - Build 134641 -->
+	<version build="135035" type="0" version="0.3.6.1" />						<!-- Early Access (EXPERIMENTAL) - v0.3.6.1 – Build 135035 -->
+	<version build="135771" type="0" version="0.3.6.2" />						<!-- Early Access (EXPERIMENTAL) - v0.3.6.2 – Build 135771 -->
+	<version build="136090" type="0" version="0.3.6.3" />						<!-- Early Access (EXPERIMENTAL) - v0.3.6.3 – Build 136090 -->
+	<version build="136185" type="0" version="0.3.6.4" />						<!-- Early Access (EXPERIMENTAL) - v0.3.6.4 – Build 136185 -->
+	<version build="136408" type="1" version="0.3.6.5" />						<!-- Early Access - v0.3.6.5 – Build 136408 -->
+	<version build="136629" type="0" version="0.3.6.6" />						<!-- Early Access (EXPERIMENTAL) - v0.3.6.6 – Build 136629 -->
+	<version build="136775" type="0" version="0.3.6.7" />						<!-- Early Access (EXPERIMENTAL) - v0.3.6.7 – Build 136775 -->
+	<version build="136896" type="0" version="0.3.6.8" />						<!-- Early Access (EXPERIMENTAL) - v0.3.6.8 – Build 136896 -->
+	<version build="136970" type="0" version="0.3.6.9" />						<!-- Early Access (EXPERIMENTAL) - v0.3.6.9 – Build 136970 -->
+	<version build="137253" type="0" version="0.3.6.10" />						<!-- Early Access (EXPERIMENTAL) - v0.3.6.10 – Build 137253 -->
+	<version build="137444" type="0" version="0.3.6.11" />						<!-- Early Access (EXPERIMENTAL) - v0.3.6.11 – Build 137444 -->
+	<version build="137570" type="0" version="0.3.6.12" />						<!-- Early Access (EXPERIMENTAL) - v0.3.6.12 – Build 137570 -->
+	<version build="139299" type="1" version="0.3.7.0" remarks="Fics*mas" />	<!-- Early Access - v0.3.7.0 – Build 138299 -->
+	<version build="139329" type="1" version="0.3.7.1" />						<!-- Early Access - v0.3.7.1 – Build 138329 -->
+	<version build="138516" type="1" version="0.3.7.2" />						<!-- Early Access - v0.3.7.2 – Build 138516 -->
+	<version build="138887" type="1" version="0.3.7.3" />						<!-- Early Access - v0.3.7.3 – Build 138887 -->
+	<version build="139586" type="1" version="0.3.7.4" />						<!-- Early Access - v0.3.7.4 – Build 139586 -->
+	<version build="139698" type="1" version="0.3.7.5" remarks="Happy H'days" /><!-- Early Access - v0.3.7.5 – Build 139698 -->
+	<version build="139858" type="1" version="0.3.7.6" />						<!-- Early Access - v0.3.7.6 – Build 139858 -->
+	<version build="140083" type="1" version="0.3.7.7" />						<!-- Early Access - v0.3.7.7 – Build 140083 -->
+	<version build="140822" type="0" version="0.3.8.0" />						<!-- Early Access (EXPERIMENTAL) - v0.3.8.0 – Build 140822 -->
+	<version build="141026" type="0" version="0.3.8.1" />						<!-- Early Access (EXPERIMENTAL) - v0.3.8.1 – Build 141026 -->
+	<version build="141270" type="0" version="0.3.8.2" />						<!-- Early Access (EXPERIMENTAL) - v0.3.8.2 – Build 141270 -->
+	<version build="141578" type="0" version="0.3.8.3" />						<!-- Early Access (EXPERIMENTAL) - v0.3.8.3 – Build 141578 -->
+	<version build="141736" type="0" version="0.3.8.4" />						<!-- Early Access (EXPERIMENTAL) - v0.3.8.4 – Build 141736 -->
+	<version build="141903" type="0" version="0.3.8.5" />						<!-- Early Access (EXPERIMENTAL) - v0.3.8.5 – Build 141903 -->
+	<version build="142203" type="0" version="0.3.8.6" />						<!-- Early Access (EXPERIMENTAL) - v0.3.8.6 – Build 142203 -->
+	<version build="142854" type="0" version="0.3.8.7" />						<!-- Early Access (EXPERIMENTAL) - v0.3.8.7 – Build 142854 -->
+	<version build="143604" type="0" version="0.3.8.8" />						<!-- Early Access (EXPERIMENTAL) - v0.3.8.8 – Build 143604 -->
+	<version build="144440" type="0" version="0.3.8.9" />						<!-- Early Access (EXPERIMENTAL) - v0.3.8.9 – Build 144440 -->
+	<version build="145286" type="0" version="0.3.8.10" />						<!-- Early Access (EXPERIMENTAL) - v0.3.8.10 – Build 145286 -->
+	<version build="145609" type="0" version="0.3.8.11" />						<!-- Early Access (EXPERIMENTAL) - v0.3.8.11 – Build 145609 -->
 </versions>
